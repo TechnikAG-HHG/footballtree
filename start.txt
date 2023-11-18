@@ -1,0 +1,4 @@
+ssh -R technikag:80:127.0.0.1:5000 -i D:\new\mykey serveo.net
+ssh -R technikag:80:127.0.0.1:5000 -i D:\new\mykey -o ServerAliveInterval=600 serveo.net
+ssh -R technikag:80:127.0.0.1:5000 -i D:\new\mykey -o ServerAliveInterval=6000 serveo.net
+ssh -R technikag:80:127.0.0.1:5000 -i \new\mykey -o ServerAliveInterval=600 -o TCPKeepAlive=no serveo.net
