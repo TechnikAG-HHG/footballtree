@@ -1,10 +1,7 @@
-<<<<<<< Updated upstream
-var tableCount = 2
-var teamCount = data.Teams.length
-=======
+
 var tableCount = 0
 var teamCount = 0
->>>>>>> Stashed changes
+
 var entriesPerTable = teamCount / tableCount
 
 function generateTables() {

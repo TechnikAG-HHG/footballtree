@@ -68,8 +68,8 @@ class Window(tk.Tk):
         # Display the default frame
         self.show_frame(self.Team_frame)
         
-        #server_thread = threading.Thread(target=self.start_server)
-        #server_thread.start()
+        server_thread = threading.Thread(target=self.start_server)
+        server_thread.start()
         
     def start_server(self):
         app.run(debug=False, threaded=True, port=5000, host="0.0.0.0", use_reloader=False)
@@ -118,7 +118,6 @@ class Window(tk.Tk):
                 if entry != "" and entry != "\n":
                     f.write(entry.get() + "\n")
         self.updated_data.update({"Teams": self.read_team_names()})
-        self.updated_data.update({"NumberOfTeams": len(self.read_team_names())})
 
                 
     def read_team_names(self):
@@ -474,7 +473,6 @@ def index():
     initial_data = {}  # You can modify this data as needed
     initial_data["Teams"] = tkapp.read_team_names()
     initial_data["LastUpdate"] = 0
-    initial_data["NumberOfTeams"] = len(tkapp.read_team_names())
     resp = make_response(render_template("websitegroup.html", initial_data=initial_data))
     return resp
 
