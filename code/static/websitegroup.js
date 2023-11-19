@@ -1,9 +1,11 @@
 var tableCount = 2
-var teamCount = 12
+var teamCount = data.Teams.length
 var entriesPerTable = teamCount / tableCount
 
-
 function generateTables() {
+    tableCount = 2
+    teamCount = data.Teams.length
+    entriesPerTable = teamCount / tableCount
 
     var tablesContainer = document.getElementById("tablesContainer");
     tablesContainer.innerHTML = '';
@@ -104,18 +106,39 @@ function updateTables(data) {
         var y = 1;
         for (var i = x * entriesPerTable - entriesPerTable; i < data.Teams.length && y < 7; i++) {
             var team = data.Teams[i];
+            var Sp = data.Spiele[i];
+            var T = data.Tore[i];
+            var P = data.Punkte[i];
 
-            console.log(y, team)
+            console.log(y, team, Sp, T, P)
 
             tables.forEach(function(table) {
                 var nameCell = table.getElementsByClassName("nameCell" + y)[0];
                 if (nameCell) {
                     nameCell.textContent = team;
                 }
+
+                var spCell = table.getElementsByClassName("spCell" + y)[0];
+                if (spCell) {
+                    spCell.textContent = Sp;
+                }
+
+                var tCell = table.getElementsByClassName("tCell" + y)[0];
+                if (tCell) {
+                    tCell.textContent = T;
+                }
+
+                var pCell = table.getElementsByClassName("pCell" + y)[0];
+                if (pCell) {
+                    pCell.textContent = P;
+                }
             });
             y++;
         }
     }
+    tableCount = 2
+    teamCount = data.Teams.length
+    entriesPerTable = teamCount / tableCount
 }
 
 // generate tables on page load
