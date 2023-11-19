@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>footballgroup</title>
+
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='websitegroup.css') }}">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div class="title">
+            <h1>Winterturnier 2023</h1>
+        </div>
+
+        <div id="settings">
+            <button onclick="generateTables()">Generate Tables</button>
+        </div>
+    
+        <div id="tablesContainer"></div>
+        
+        <script>
+            var data = {{ initial_data|tojson|safe }};
+            console.log('Initial data:', data);
+        </script>
+
+        <script src="{{url_for('static', filename='websitegroup.js')}}"></script>
+
+
+    </body>
+</html>

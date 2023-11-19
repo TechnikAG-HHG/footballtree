@@ -262,7 +262,7 @@ def index():
     initial_data = {}  # You can modify this data as needed
     initial_data["Teams"] = tkapp.read_team_names()
     initial_data["LastUpdate"] = 0
-    resp = make_response(render_template("index.html", initial_data=initial_data))
+    resp = make_response(render_template("websitegroup.html", initial_data=initial_data))
     return resp
 
 @app.route('/update_data')
