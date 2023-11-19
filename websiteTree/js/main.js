@@ -5,9 +5,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
 function drawTree() {
     var teamCount = 16;
     var boxes = teamCount;
-    var boxheight = 15;
+    var boxheight = 100;
     var boxestodraw = 0;
     var textsdrawn = 0;
+    var marginsubbox = 20;
 
     console.log("drawTree() called");
 
@@ -39,13 +40,13 @@ function drawTree() {
         var box1 = document.createElement("div");
         box1.className = `box${i}`;
         box1.className += " drawn-box";
-        box1.style.height = `${i * boxheight}%`;
+        box1.style.height = `${boxheight}%`;
 
         //create the box2
         var box2 = document.createElement("div");
         box2.className = `box${i}`;
         box2.className += " drawn-box";
-        box2.style.height = `${i * boxheight}%`;
+        box2.style.height = `${boxheight}%`;
     
         // Append the boxes to the container
         document.getElementById("main-container").appendChild(box1);
@@ -62,9 +63,13 @@ function drawTree() {
         subboxestodraw = subboxestodraw / 4;
 
         for (var x = 0; x < subboxestodraw; x++) {
+            var subboxmargintodraw =  marginsubbox
+            
             var subbox1 = document.createElement("div");
             subbox1.className = `subbox${x}`;
             subbox1.className += " drawn-sub-box";
+            subbox1.style.marginTop = `${subboxmargintodraw}px`;
+            subbox1.style.marginBottom = `${subboxmargintodraw}px`;
             box1.appendChild(subbox1);
         
             var teamname1 = document.createElement("div");
@@ -75,6 +80,8 @@ function drawTree() {
             var subbox2 = document.createElement("div");
             subbox2.className = `subbox${x}`;
             subbox2.className += " drawn-sub-box";
+            subbox2.style.marginTop = `${subboxmargintodraw}px`;
+            subbox2.style.marginBottom = `${subboxmargintodraw}px`;
             box2.appendChild(subbox2);
         
             var teamname2 = document.createElement("div");
