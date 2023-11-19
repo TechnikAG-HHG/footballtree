@@ -15,14 +15,14 @@ function calculateMatches() {
     var group1 = teams.slice(0, midpoint);
     var group2 = teams.slice(midpoint);
 
-    var matches1 = calculateMatchesForGroup(group1, "Group 1");
-    var matches2 = calculateMatchesForGroup(group2, "Group 2");
+    var matches1 = calculateMatchesForGroup(group1, "Gruppe 1");
+    var matches2 = calculateMatchesForGroup(group2, "Gruppe 2");
 
     var matches = interleaveMatches(matches1, matches2);
 
     matches = matches.map(function(match) {
         matchCount++; // Increment the match count
-        match.number = "Match " + (matchCount - 30);
+        match.number = "Spiel " + (matchCount - 30);
         return match;
     });
 
@@ -60,7 +60,7 @@ function calculateMatchesForGroup(teams, groupName) {
     matches = matches.map(function(match) {
         matchCount++; // Increment the match count
         return {
-            number: "Match " + matchCount,
+            number: "Spiel " + matchCount,
             teams: match,
             group: groupName
         };
