@@ -1,7 +1,3 @@
-document.addEventListener('DOMContentLoaded', (event) => {
-    document.getElementById('drawTreeButton').addEventListener('click', drawTree);
-});
-
 function drawTree() {
     var teamCount = 16;
     var boxes = teamCount;
@@ -105,3 +101,5 @@ function drawText(textsdrawn) {
         textsdrawn--;
     }
 }  
+
+drawTree();

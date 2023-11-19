@@ -265,6 +265,24 @@ def index():
     resp = make_response(render_template("websitegroup.html", initial_data=initial_data))
     return resp
 
+@app.route("/tree")
+def tree_index():
+    tkapp.test()
+    initial_data = {}  # You can modify this data as needed
+    initial_data["Teams"] = tkapp.read_team_names()
+    initial_data["LastUpdate"] = 0
+    resp = make_response(render_template("websitetree.html", initial_data=initial_data))
+    return resp
+
+@app.route("/plan")
+def plan_index():
+    tkapp.test()
+    initial_data = {}  # You can modify this data as needed
+    initial_data["Teams"] = tkapp.read_team_names()
+    initial_data["LastUpdate"] = 0
+    resp = make_response(render_template("websiteplan.html", initial_data=initial_data))
+    return resp
+
 @app.route('/update_data')
 def update_data():
     
