@@ -10,6 +10,7 @@ h1 {
     font-size: 125px;
     text-align: center;
     font-family: 'Roboto', sans-serif;
+    margin-top: 20%;
 }
 
 
@@ -37,6 +38,7 @@ body {
     justify-content: center;
     align-items: center;
     align-self: center;
+    flex-wrap: wrap;
 }
 
 
@@ -49,7 +51,7 @@ table {
     margin-left: 2%;
     color: white;
     border-radius: 10px;
-    font-size: 50px;
+    font-size: 40px;
     border-collapse: separate;
     border-spacing: 0;
 }
