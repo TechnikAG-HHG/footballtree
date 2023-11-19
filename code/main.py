@@ -115,7 +115,7 @@ class Window(tk.Tk):
             for entry in self.name_entries:
                 if entry != "" and entry != "\n":
                     f.write(entry.get() + "\n")
-        self.updated_data['Teams'] = self.read_team_names()
+        self.updated_data.update({"Teams": self.read_team_names()})
 
                 
     def read_team_names(self):
@@ -261,12 +261,14 @@ def index():
     tkapp.test()
     initial_data = {}  # You can modify this data as needed
     initial_data["Teams"] = tkapp.read_team_names()
-    initial_data["LastUpdate"] = time.time()
+    initial_data["LastUpdate"] = 0
     resp = make_response(render_template("index.html", initial_data=initial_data))
     return resp
 
 @app.route('/update_data')
 def update_data():
+    
+    timeatstart = time.time()
     
     last_data_update = request.headers.get('Last-Data-Update', 0)
     print(last_data_update)
@@ -275,11 +277,30 @@ def update_data():
     
     
     if updated_data != {}:
-        for key in updated_data:
-            stored_data[time.time()] = update_data[key]
+        
+        #print(updated_data)  
+        #print(updated_data.keys())
+        #print(updated_data.values())
+        for key, value in updated_data.items():
+            for key2, value2 in stored_data.items():
+                if key in value2.keys():
+                    stored_data.pop(key2)
+                    break
+            
+            stored_data.update({time.time()+2:{key:value}})
             print(stored_data)
         
-        updated_data["LastUpdate"] = time.time() + 10
+        updated_data.update({"LastUpdate": timeatstart})
+        
+    for key, value in stored_data.items():
+        print("magucken")
+        if key >= float(last_data_update):
+            print("key", key, "value", value, "last_data_update", last_data_update, "should be updated")
+            updated_data.update(value)
+            print("updated_data", updated_data)
+            
+    
+    print("stored_data", stored_data, "updated_data", updated_data, "last_data_update", last_data_update)
         
     print(updated_data)
     tkapp.delete_updated_data()
