@@ -1,18 +1,38 @@
-from flask import Flask, render_template, jsonify
+import tkinter as tk
+from tkinter import simpledialog
 
-app = Flask(__name__)
+def read_teams_from_file(file_path):
+    with open(file_path, 'r') as file:
+        teams = [line.strip() for line in file.readlines() if line.strip()]
+    return teams
 
-# Route to send initial data to the client
-@app.route('/')
-def index():
-    initial_data = {'a': 0, 'b': 1, 'c': 2}  # You can modify this data as needed
-    return render_template('index.html', initial_data=initial_data)
+def open_team_window(team_name):
+    team_window = tk.Toplevel(root)
+    team_window.title(f"Enter Names for {team_name}")
 
-# Route to dynamically update data on the client side
-@app.route('/update_data')
-def update_data():
-    updated_data = {'Players': {"Player1":"Erik Van Doof","Player2":"Felix Schweigmann"}, 'c': 5}  # You can modify this data as needed
-    return jsonify(updated_data)
+    def save_names():
+        names = entry.get("1.0", "end-1c").split('\n')
+        names = [name.strip() for name in names if name.strip()]
+        print(f"Names for {team_name}: {names}")
+        team_window.destroy()
 
-if __name__ == '__main__':
-    app.run(debug=True)
+    tk.Label(team_window, text=f"Enter names for {team_name} (one per line):").pack(pady=10)
+    entry = tk.Text(team_window, height=5, width=30)
+    entry.pack(pady=10)
+
+    save_button = tk.Button(team_window, text="Save", command=save_names)
+    save_button.pack(pady=10)
+
+# Read teams from file
+teams_list = read_teams_from_file('names.txt')
+
+# Create main window
+root = tk.Tk()
+root.title("Team Names")
+
+# Create buttons for each team
+for team_name in teams_list:
+    team_button = tk.Button(root, text=team_name, command=lambda name=team_name: open_team_window(name))
+    team_button.pack(pady=5)
+
+root.mainloop()
