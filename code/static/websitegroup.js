@@ -1,5 +1,10 @@
+<<<<<<< Updated upstream
 var tableCount = 2
 var teamCount = data.Teams.length
+=======
+var tableCount = 0
+var teamCount = 0
+>>>>>>> Stashed changes
 var entriesPerTable = teamCount / tableCount
 
 function generateTables() {
@@ -9,6 +14,10 @@ function generateTables() {
 
     var tablesContainer = document.getElementById("tablesContainer");
     tablesContainer.innerHTML = '';
+
+    var tableCount = 2
+    var teamCount = data.Teams.length
+    var entriesPerTable = teamCount / tableCount
 
     for (var i = 1; i <= tableCount; i++) {
         var table = document.createElement("table");
@@ -135,6 +144,10 @@ function updateTables(data) {
             });
             y++;
         }
+        
+        var tableCount = 2
+        var teamCount = data.Teams.length
+        var entriesPerTable = teamCount / tableCount
     }
     tableCount = 2
     teamCount = data.Teams.length
