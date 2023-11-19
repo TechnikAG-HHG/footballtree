@@ -1,9 +1,10 @@
-var tableCount = 2
-var teamCount = 12
-var entriesPerTable = teamCount / tableCount
+const { header } = require("request/lib/hawk");
 
 
 function generateTables() {
+    var tableCount = 2
+    var teamCount = 12
+    var entriesPerTable = teamCount / tableCount
 
     var tablesContainer = document.getElementById("tablesContainer");
     tablesContainer.innerHTML = '';
@@ -60,7 +61,7 @@ function generateTables() {
         tablesContainer.appendChild(table);
     }
 
-
+    var data = {{ initial_data|tojson|safe }};
     console.log('Initial data:', data);
 
     updateTables(data);
@@ -85,36 +86,25 @@ function updateData() {
                 data[key] = updatedData[key];
             }
         }
+
+        // Example: Update the HTML to reflect the changes
+        document.getElementById('output').innerHTML = 'Updated data: ' + JSON.stringify(data);
     })
     .catch(error => console.error('Error fetching data:', error));
 
-    setTimeout(function() {
-        updateTables(data);
-    }, 500);
+    updateTables(data);
 }
 
 
 function updateTables(data) {
-    for (var x = 1; x < tableCount + 1; x++) {
-        var tables = document.querySelectorAll(`.table${x} tbody tr`);
-        // update team names
+    var teams = data['Teams'];
 
-        console.log('table', x)
-
-        var y = 1;
-        for (var i = x * entriesPerTable - entriesPerTable; i < data.Teams.length && y < 7; i++) {
-            var team = data.Teams[i];
-
-            console.log(y, team)
-
-            tables.forEach(function(table) {
-                var nameCell = table.getElementsByClassName("nameCell" + y)[0];
-                if (nameCell) {
-                    nameCell.textContent = team;
-                }
-            });
-            y++;
-        }
+    // update team names
+    var i = 1;
+    for (var team in teams) {
+        var nameCell = table.getElementsByClassName("nameCell" + i);
+        nameCell.textContent = team;
+        i++;
     }
 }
 
@@ -122,4 +112,4 @@ function updateTables(data) {
 generateTables();
 
 // call updateData() every 5 seconds
-setInterval(updateData, 2000);
+setInterval(updateData, 5000);

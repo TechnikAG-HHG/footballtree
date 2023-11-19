@@ -1,0 +1,79 @@
+html, body {
+    height: 95%;
+    width: 95%;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    color: white;
+    font-size: 75px;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+}
+
+
+body {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #1a1a1a;
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+
+#main-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+}
+
+.drawn-box {
+    width: 100%;
+    background-color: transparent;
+    border: 5px solid transparent;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    align-self: center;
+    margin-left: 30px;
+}
+
+.drawn-box-final {
+    width: 100%;
+    border: 5px solid gold;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-left: 40px;
+    color: white;
+}
+
+.drawn-sub-box {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border: 5px solid #49ba67;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    align-self: center;
+    color: white
+}
