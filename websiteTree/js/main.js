@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 function drawTree() {
     var teamCount = 16;
     var boxes = teamCount;
-    var boxheight = 100;
+    var boxheight = 20;
     var boxestodraw = 0;
     var textsdrawn = 0;
     var marginsubbox = 20;
@@ -40,13 +40,13 @@ function drawTree() {
         var box1 = document.createElement("div");
         box1.className = `box${i}`;
         box1.className += " drawn-box";
-        box1.style.height = `${boxheight}%`;
+        box1.style.height = `${i * boxheight}%`;
 
         //create the box2
         var box2 = document.createElement("div");
         box2.className = `box${i}`;
         box2.className += " drawn-box";
-        box2.style.height = `${boxheight}%`;
+        box2.style.height = `${i * boxheight}%`;
     
         // Append the boxes to the container
         document.getElementById("main-container").appendChild(box1);
