@@ -1,15 +1,17 @@
 html, body {
     height: 95%;
-    width: 95%;
+    width: 170%;
     margin: 0;
     padding: 20px;
 }
 
 h1 {
     color: white;
-    font-size: 125px;
+    font-size: 90px;
     text-align: center;
     font-family: 'Roboto', sans-serif;
+    margin-bottom: 60vh;
+    margin-top: 100vh;
 }
 
 
@@ -37,6 +39,7 @@ body {
     justify-content: center;
     align-items: center;
     align-self: center;
+    flex-direction: column;
 }
 
 
