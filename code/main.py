@@ -19,9 +19,9 @@ class Window(tk.Tk):
 
         buttons = [
             ("Team", self.show_Team_frame),
-            ("Player", self.show_player_frame),
-            ("Services", self.show_services_frame),
-            ("Contact", self.show_contact_frame),
+            ("Players", self.show_player_frame),
+            ("SPIEL", self.show_SPIEL_frame),
+            #("Contact", self.show_contact_frame),
         ]
 
         button_width = 10  # Set a fixed width for all buttons
@@ -31,7 +31,6 @@ class Window(tk.Tk):
             button.pack(side=tk.TOP, anchor=tk.W)
             
             
-            
     def __init__(self):
         super().__init__()
         self.name_entries = []
@@ -39,6 +38,7 @@ class Window(tk.Tk):
         self.updated_data = {}
         self.variable_dict = {}
         self.team_button_list = []
+        self.spiel_buttons = {}
 
         # Set window title
         self.title("Football Tournament Manager")
@@ -56,20 +56,20 @@ class Window(tk.Tk):
         # Create frames for different sets of elements
         self.Team_frame = tk.Frame(self, bg="lightblue")
         self.player_frame = tk.Frame(self, bg="lightgreen")
-        self.services_frame = tk.Frame(self, bg="lightcoral")
-        self.contact_frame = tk.Frame(self, bg="lightyellow")
+        self.SPIEL_frame = tk.Frame(self, bg="lightcoral")
+        #self.contact_frame = tk.Frame(self, bg="lightyellow")
 
         # Create elements for each frame
         self.create_Team_elements()
         self.create_player_elements()
-        self.create_services_elements()
-        self.create_contact_elements()
+        self.create_SPIEL_elements()
+        #self.create_contact_elements()
 
         # Display the default frame
         self.show_frame(self.Team_frame)
         
-        server_thread = threading.Thread(target=self.start_server)
-        server_thread.start()
+        #server_thread = threading.Thread(target=self.start_server)
+        #server_thread.start()
         
     def start_server(self):
         app.run(debug=False, threaded=True, port=5000, host="0.0.0.0", use_reloader=False)
@@ -120,11 +120,16 @@ class Window(tk.Tk):
         self.updated_data.update({"Teams": self.read_team_names()})
 
                 
-    def read_team_names(self):
+    def read_team_names(self, teams_to_read="all"):
         with open("data/team_names.txt", "r") as f:
             self.name_entries_read = []
-            for line in f:
-                self.name_entries_read.append(line.replace("\n", ""))
+            if teams_to_read == "all":
+                for line in f:
+                    self.name_entries_read.append(line.replace("\n", ""))
+            else:
+                for i, line in enumerate(f):
+                    if i in teams_to_read:
+                        self.name_entries_read.append(line.replace("\n", ""))
         
         return self.name_entries_read
     
@@ -406,27 +411,59 @@ class Window(tk.Tk):
 
 ##############################################################################################
 
-    def create_services_elements(self):
-        # Create elements for the Services frame
-        services_button = tk.Button(self.services_frame, text="Services Button", command=self.services_button_command)
-        services_button.pack(pady=10)
+    def create_SPIEL_elements(self):
+        # Create elements for the SPIEL frame
+        SPIEL_button = tk.Button(self.SPIEL_frame, text="SPIEL Button", command=self.SPIEL_button_command)
+        SPIEL_button.pack(pady=10)
+        
+        
+        # Assuming self.spiel_buttons is initialized as an empty dictionary
+        self.spiel_buttons = {}
+
+        self.teams_playing = [1,2]
+
+        # Inside your loop
+        for team in self.read_team_names(self.teams_playing):
+            print(team)
+            try:
+                with open(f"data/{team}.txt", "r") as f:
+                    for i, line in enumerate(f):
+                        # Create a new frame for each group
+                        group_frame = tk.Frame(self.SPIEL_frame, background="lightcoral")
+                        group_frame.pack(pady=10, anchor=tk.NW)
+
+                        playertext1 = tk.Label(group_frame, text=line.strip(), font=("Helvetica", 14))
+                        playertext1.pack(side=tk.TOP)
+
+                        playerbutton = tk.Button(group_frame, text=line.strip(), command=self.test)
+                        playerbutton.pack(side=tk.TOP)
+
+                        #self.spiel_buttons[team] = (playerbutton)  # Use append for a list
+
+            except FileNotFoundError:
+                with open(f"data/{team}.txt", "w+") as f:
+                    f.write("")
+
+
+                
+                
         
 
 ##############################################################################################
 
 ##############################################################################################
 
-    def create_contact_elements(self):
+    #def create_contact_elements(self):
         # Create elements for the Contact frame
-        contact_button = tk.Button(self.contact_frame, text="Contact Button", command=self.contact_button_command)
-        contact_button.pack(pady=10)
+        #contact_button = tk.Button(self.contact_frame, text="Contact Button", command=self.contact_button_command)
+        #contact_button.pack(pady=10)
         
 
 ##############################################################################################
 
     def show_frame(self, frame):
         # Hide all frames and pack the selected frame
-        for frm in [self.Team_frame, self.player_frame, self.services_frame, self.contact_frame]:
+        for frm in [self.Team_frame, self.player_frame, self.SPIEL_frame]: # self.contact_frame
             frm.pack_forget()
         frame.pack(fill=tk.BOTH, expand=True)
 
@@ -438,22 +475,22 @@ class Window(tk.Tk):
         self.reload_button_player_command()
         self.show_frame(self.player_frame)
 
-    def show_services_frame(self):
-        self.show_frame(self.services_frame)
+    def show_SPIEL_frame(self):
+        self.show_frame(self.SPIEL_frame)
 
-    def show_contact_frame(self):
-        self.show_frame(self.contact_frame)
+    #def show_contact_frame(self):
+        #self.show_frame(self.contact_frame)
 
     # Button command functions
 
     def player_button_command(self):
         print("player Button Clicked")
 
-    def services_button_command(self):
-        print("Services Button Clicked")
+    def SPIEL_button_command(self):
+        print("SPIEL Button Clicked")
 
-    def contact_button_command(self):
-        print("Contact Button Clicked")
+    #def contact_button_command(self):
+        #print("Contact Button Clicked")
         
     ##############################################################################################
             
