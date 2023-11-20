@@ -34,7 +34,7 @@ body {
     margin: 0;
     padding: 0;
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
     align-self: center;
 }
@@ -67,7 +67,7 @@ body {
 .drawn-sub-box {
     width: 100%;
     height: 100%;
-    background-color: transparent;
+    background-color: solid #1a1a1a;
     border: 5px solid #49ba67;
     border-radius: 5px;
     display: flex;
@@ -75,5 +75,5 @@ body {
     align-items: center;
     flex-direction: column;
     align-self: center;
-    color: white
+    color: white;
 }

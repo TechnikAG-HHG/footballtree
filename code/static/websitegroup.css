@@ -55,10 +55,11 @@ body {
         padding-bottom: 0;
         padding-top: 0;
         font-size: 125px;
+        margin: 0;
     }
 
     html, body {
-        height: 100vh;
+        height: 90%;
         width: 100%;
         margin: 0;
         padding: 0%;
