@@ -16,6 +16,11 @@
         <div id="main-container">
             <!-- Your other content here -->
         </div>
+
+        <script>
+            var data = {{ initial_data|tojson|safe }};
+            console.log('Initial data:', data);
+        </script>
         
         <script src="{{url_for('static', filename='websitetree.js')}}"></script>
 
