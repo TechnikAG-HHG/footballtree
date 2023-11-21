@@ -31,7 +31,7 @@ class Window(tk.Tk):
             button.pack(side=tk.TOP, anchor=tk.W)
             
             
-    def __init__(self):
+    def __init__(self, start_server=True):
         super().__init__()
         self.name_entries = []
         self.label_list = []
@@ -39,6 +39,7 @@ class Window(tk.Tk):
         self.variable_dict = {}
         self.team_button_list = []
         self.spiel_buttons = {}
+        self.teams_playing = [None, None]
 
         # Set window title
         self.title("Football Tournament Manager")
@@ -68,8 +69,10 @@ class Window(tk.Tk):
         # Display the default frame
         self.show_frame(self.Team_frame)
         
-        server_thread = threading.Thread(target=self.start_server)
-        server_thread.start()
+        
+        if start_server:
+            server_thread = threading.Thread(target=self.start_server)
+            server_thread.start()
         
     def start_server(self):
         app.run(debug=False, threaded=True, port=5000, host="0.0.0.0", use_reloader=False)
@@ -478,11 +481,10 @@ class Window(tk.Tk):
         # Assuming self.spiel_buttons is initialized as an empty dictionary
         self.spiel_buttons = {}
 
-        self.teams_playing = [1,2]
 
         # Inside your loop
         for team in self.read_team_names(self.teams_playing):
-            print(team)
+            #print(team)
 
             # Initialize the dictionary for the current team
             self.spiel_buttons[team] = {}
@@ -523,7 +525,7 @@ class Window(tk.Tk):
                         playerbutton2.pack(side=tk.TOP, pady=2)
                         
                         
-                        print("team", team, "i", i)
+                        #print("team", team, "i", i)
 
                         # Save the group_frame, playertext1, and playerbutton in each for loop with the team name as key
                         self.spiel_buttons[team][i] = (self.group_frame, playertext1, playertext2, playertext3, playerbutton1, playerbutton2)  # Use append for a list
@@ -534,6 +536,57 @@ class Window(tk.Tk):
                 with open(f"data/{team}.txt", "w+") as f:
                     f.write("")
 
+        self.manual_team_select_1 = ttk.Combobox(self.SPIEL_frame, values=self.read_team_names(), font=("Helvetica", 14))
+        self.manual_team_select_1.pack(pady=10, side=tk.BOTTOM)
+        self.manual_team_select_1.bind("<<ComboboxSelected>>", lambda event, nr=0: self.on_team_select(event, nr))
+        
+        
+        self.manual_team_select_2 = ttk.Combobox(self.SPIEL_frame, values=self.read_team_names(), font=("Helvetica", 14))
+        self.manual_team_select_2.pack(pady=10, side=tk.BOTTOM)
+        self.manual_team_select_2.bind("<<ComboboxSelected>>", lambda event, nr=1: self.on_team_select(event, nr))
+
+
+        if self.teams_playing.count(None) == 0:
+            self.manual_team_select_1.set(self.read_team_names()[self.teams_playing[0]])
+            self.manual_team_select_2.set(self.read_team_names()[self.teams_playing[1]])
+            
+        if self.teams_playing.count(None) == 2:
+            self.manual_team_select_1.state(["disabled"])
+            
+
+    def on_team_select(self, event, nr):
+        selected_team = event.widget.get()
+        
+        # Convert the value to the team index
+        team_index = self.read_team_names().index(selected_team)
+
+        # Ensure self.teams_playing has enough elements
+        while len(self.teams_playing) <= nr:
+            self.teams_playing.append(None)
+
+        # Assign the team index to the specified position
+        self.teams_playing[nr] = team_index
+        
+        
+        if self.teams_playing.count(None) == 0:
+            self.manual_team_select_1.set(self.read_team_names()[self.teams_playing[0]])
+            self.manual_team_select_2.set(self.read_team_names()[self.teams_playing[1]])
+        
+        print(self.teams_playing)
+        if self.teams_playing.count(None) == 1:
+            self.manual_team_select_1.state(["!disabled"])
+            self.manual_team_select_1.set(self.read_team_names()[self.teams_playing[0]])
+            
+        
+        
+        if self.teams_playing.count(None) == 2:
+            self.manual_team_select_1.state(["disabled"])
+            
+        
+        
+        self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements)
+
+        
     def delete_all_in_frame(self, frame):
         if frame.winfo_exists():
             for widget in frame.winfo_children():
@@ -631,6 +684,8 @@ class Window(tk.Tk):
 
     def show_SPIEL_frame(self):
         self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements)
+        print(stored_data)
+        self.calculate_matches()
         self.show_frame(self.SPIEL_frame)
 
     #def show_contact_frame(self):
@@ -638,11 +693,11 @@ class Window(tk.Tk):
 
     # Button command functions
 
-    def player_button_command(self):
-        print("player Button Clicked")
+    #def player_button_command(self):
+        #print("player Button Clicked")
 
-    def SPIEL_button_command(self):
-        print("SPIEL Button Clicked")
+    #def SPIEL_button_command(self):
+        #print("SPIEL Button Clicked")
 
     #def contact_button_command(self):
         #print("Contact Button Clicked")
@@ -653,13 +708,100 @@ class Window(tk.Tk):
         print("test")
         
     def delete_updated_data(self):
-        print("delete")
-        print(self.updated_data)
+        #print("delete")
+        #print(self.updated_data)
         self.updated_data = {}
         
     ##############################################################################################
+    #############################Calculatre###########################################
+    ##############################################################################################
+    ##############################################################################################
+    def calculate_matches(self):
+        
+        self.match_count = 0
+
+        initial_data = {
+        "Teams": tkapp.read_team_names(),
+        "Tore": ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+        "ZeitIntervall": 10,
+        "Startzeit": [9,30],
+        "LastUpdate": 0
+    }
+        
+        teams = initial_data["Teams"][:]  # Create a copy of the teams array
+        # If the number of teams is odd, add a "dummy" team
+        if len(teams) % 2 != 0:
+            teams.append("dummy")
+
+        teams.sort()
+
+        midpoint = (len(teams) + 1) // 2
+        group1 = teams[:midpoint]
+        group2 = teams[midpoint:]
+
+        matches1 = self.calculate_matches_for_group(group1, "Gruppe 1")
+        matches2 = self.calculate_matches_for_group(group2, "Gruppe 2")
+
+        matches = self.interleave_matches(matches1, matches2)
+        
+        self.match_count = 0
+
+        self.matches = list(map(lambda match: self.add_match_number(match), matches))
+        
+        print(self.matches)
+    
+    
+    
+    def interleave_matches(self, matches1, matches2):
+        matches = []
+        i = j = 0
+        while i < len(matches1) or j < len(matches2):
+            if i < len(matches1):
+                matches.append(matches1[i])
+                i += 1
+            if j < len(matches2):
+                matches.append(matches2[j])
+                j += 1
+        return matches
+
+
+    def calculate_matches_for_group(self, teams, group_name):
+        rounds = []
+
+        for _ in range(len(teams) - 1):
+            rounds.append([])
+            for match in range(len(teams) // 2):
+                team1 = teams[match]
+                team2 = teams[-1 - match]
+                rounds[-1].append([team1, team2])
+            # Rotate the teams for the next round
+            teams[1:1] = [teams.pop()]
+
+        # Remove matches with the "dummy" team
+        if "dummy" in teams:
+            rounds = list(map(lambda rnd: list(filter(lambda match: "dummy" not in match, rnd)), rounds))
+
+        matches = [match for rnd in rounds for match in rnd]
+
+        matches = list(map(lambda match: {"number": "", "teams": match, "group": group_name}, matches))
+
+        return matches
+
+
+    def add_match_number(self, match):
+         
+        self.match_count += 1
+        match["number"] = "Spiel " + str(self.match_count)
+        return match
+
+
+    ##############################################################################################
+    ##############################################################################################
+    ##############################################################################################
+    ##############################################################################################
 
 def get_initial_data(template_name):
+    global initial_data
     tkapp.test()
     initial_data = {
         "Teams": tkapp.read_team_names(),
@@ -730,9 +872,11 @@ def update_data():
 global tkapp
 global server_thread
 global stored_data
+global initial_data
+
 
 stored_data = {}
-tkapp = Window()
+tkapp = Window(False)
 
 if __name__ == "__main__":
     
