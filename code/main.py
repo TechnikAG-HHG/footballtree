@@ -663,7 +663,7 @@ def get_initial_data(template_name):
     tkapp.test()
     initial_data = {
         "Teams": tkapp.read_team_names(),
-        "Tore": ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+        "Tore": [0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         "ZeitIntervall": 10,
         "Startzeit": [9,30],
         "LastUpdate": 0
