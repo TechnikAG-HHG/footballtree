@@ -19,9 +19,9 @@ class Window(tk.Tk):
 
         buttons = [
             ("Team", self.show_Team_frame),
-            ("Player", self.show_player_frame),
-            ("Services", self.show_services_frame),
-            ("Contact", self.show_contact_frame),
+            ("Players", self.show_player_frame),
+            ("SPIEL", self.show_SPIEL_frame),
+            #("Contact", self.show_contact_frame),
         ]
 
         button_width = 10  # Set a fixed width for all buttons
@@ -31,7 +31,6 @@ class Window(tk.Tk):
             button.pack(side=tk.TOP, anchor=tk.W)
             
             
-            
     def __init__(self):
         super().__init__()
         self.name_entries = []
@@ -39,6 +38,7 @@ class Window(tk.Tk):
         self.updated_data = {}
         self.variable_dict = {}
         self.team_button_list = []
+        self.spiel_buttons = {}
 
         # Set window title
         self.title("Football Tournament Manager")
@@ -56,14 +56,14 @@ class Window(tk.Tk):
         # Create frames for different sets of elements
         self.Team_frame = tk.Frame(self, bg="lightblue")
         self.player_frame = tk.Frame(self, bg="lightgreen")
-        self.services_frame = tk.Frame(self, bg="lightcoral")
-        self.contact_frame = tk.Frame(self, bg="lightyellow")
+        self.SPIEL_frame = tk.Frame(self, bg="lightcoral")
+        #self.contact_frame = tk.Frame(self, bg="lightyellow")
 
         # Create elements for each frame
         self.create_Team_elements()
         self.create_player_elements()
-        self.create_services_elements()
-        self.create_contact_elements()
+        self.create_SPIEL_elements()
+        #self.create_contact_elements()
 
         # Display the default frame
         self.show_frame(self.Team_frame)
@@ -120,11 +120,16 @@ class Window(tk.Tk):
         self.updated_data.update({"Teams": self.read_team_names()})
 
                 
-    def read_team_names(self):
+    def read_team_names(self, teams_to_read="all"):
         with open("data/team_names.txt", "r") as f:
             self.name_entries_read = []
-            for line in f:
-                self.name_entries_read.append(line.replace("\n", ""))
+            if teams_to_read == "all":
+                for line in f:
+                    self.name_entries_read.append(line.replace("\n", ""))
+            else:
+                for i, line in enumerate(f):
+                    if i in teams_to_read:
+                        self.name_entries_read.append(line.replace("\n", ""))
         
         return self.name_entries_read
     
@@ -234,33 +239,53 @@ class Window(tk.Tk):
             self.team_button_list.append(team_button)
             team_button.config(bg="lightgray")
         
-    def save_names_player(self):
+    def save_names_player(self, team_name=""):
         entries = self.variable_dict.get(f"entries{self.frameplayer}")
-
+        entries2 = self.variable_dict.get(f"entries2{self.frameplayer}")
+        entries3 = self.variable_dict.get(f"entries3{self.frameplayer}")
+        
+        if team_name == "":
+            team_name = self.selected_team
+        
         if entries:
-            with open(f"data/{self.selected_team}.txt", "w+") as f:
-                for entry in entries:
+            
+            
+            with open(f"data/{team_name}.txt", "w+") as f:
+                for i, (entry, entrie2, entrie3) in enumerate(zip(entries, entries2, entries3)):
                     # Check if the entry widget exists
                     if entry.winfo_exists():
-                        entry_text = entry.get()
+                        entry_text = str(entry.get())
+                        entry_text2 = str(entrie2.get())
+                        entry_text3 = str(entrie3.get())
                         if entry_text and entry_text != "\n":
-                            f.write(entry_text + "\n")
+                            combined_entry_text = f"{entry_text.replace(' - ',' ')} - {entry_text2.replace(' - ',' ')} - {entry_text3.replace(' - ',' ')}"
+                            if combined_entry_text and combined_entry_text != "\n":
+                                
+                                f.write(combined_entry_text + "\n")
 
         ###self.updated_data.update({"Players": {self.selected_team: self.read_team_names_player(self.selected_team)}})
             
     
-    def add_name_entry_player(self, Frame, Counter, entry_text=""):
+    def add_name_entry_player(self, Frame, Counter, entry_text="", entry_text2="", entry_text3=""):
         varcountname = f"count{Frame}"
-        varentriesname = f"entries{Frame}"
+        varentrie1name = f"entries{Frame}"
+        varentrie2name = f"entries2{Frame}"
+        varentrie3name = f"entries3{Frame}"
         varlabelname = f"label{Frame}"
 
         # Check if the variable already exists in the dictionary
         if varcountname not in self.variable_dict:
             self.variable_dict[varcountname] = 0  # Initialize count to 0
 
-        if varentriesname not in self.variable_dict:
-            self.variable_dict[varentriesname] = []
+        if varentrie1name not in self.variable_dict:
+            self.variable_dict[varentrie1name] = []
+            
+        if varentrie2name not in self.variable_dict:
+            self.variable_dict[varentrie2name] = []
 
+        if varentrie3name not in self.variable_dict:
+            self.variable_dict[varentrie3name] = []
+        
         if varlabelname not in self.variable_dict:
             self.variable_dict[varlabelname] = []
 
@@ -273,51 +298,63 @@ class Window(tk.Tk):
         # Create a label with "Team 1" and the count
         label_text = f'{Counter} {count}'
         label = tk.Label(Frame, text=label_text, font=("Helvetica", 14))  # Increase font size
-        label.grid(row=len(self.variable_dict[varentriesname]), column=0, padx=5, pady=5, sticky='e')
+        label.grid(row=len(self.variable_dict[varentrie1name]), column=0, padx=5, pady=5, sticky='e')
 
         # Create a new entry field
         new_entry = tk.Entry(Frame, font=("Helvetica", 14))  # Increase font size
+        
+        new_entry2 = tk.Entry(Frame, font=("Helvetica", 14))  # Increase font size
+        
+        new_entry3 = tk.Entry(Frame, font=("Helvetica", 14))  # Increase font size
         #print("entry_text", entry_text)
         #print("new_entry")
 
         # Write entry_text to the entry field if it is not empty
         if entry_text:
             new_entry.insert(0, entry_text)
+            
+        if entry_text2:
+            new_entry2.insert(0, entry_text2)
+            
+        if entry_text3:
+            new_entry3.insert(0, entry_text3)
+        else:
+            new_entry3.insert(0, "0")
 
-        new_entry.grid(row=len(self.variable_dict[varentriesname]), column=1, pady=5, sticky='we')
-        self.variable_dict[varentriesname].append(new_entry)
+        new_entry.grid(row=len(self.variable_dict[varentrie1name]), column=1, pady=5, sticky='we')
+        new_entry2.grid(row=len(self.variable_dict[varentrie1name]), column=2, pady=5, sticky='we')
+        new_entry3.grid(row=len(self.variable_dict[varentrie1name]), column=3, pady=5, sticky='we')
+        self.variable_dict[varentrie1name].append(new_entry)
+        self.variable_dict[varentrie2name].append(new_entry2)
+        self.variable_dict[varentrie3name].append(new_entry3)
         self.variable_dict[varlabelname].append(label)
 
     
     
     def write_names_into_entry_fields_players(self, txt_file, Counter, Frame):
         try:
-            with open(f"data/{txt_file}.txt", "r") as f:
-                # if the file is empty, do nothing
-                if os.stat(f"data/{txt_file}.txt").st_size == 0:
-                    self.add_name_entry_player(Frame, Counter)
+            # Read player names using read_player_names function
+            player_names, player_ids, scores = self.read_player_names(txt_file)
 
-                
-                # if the file is not empty, read the names from the file and put them into the entry fields
-                else:
-                    for i, line in enumerate(f):
-                        print("line", line)
-                        if line != "\n" and line != "":
-                            self.add_name_entry_player(Frame, Counter, line.replace("\n", ""))
-                        
-                        if i == 1 and line == "\n" or i == 1 and line == "":
-                            self.add_name_entry_player(Frame, Counter)    
-                            
-                    return False
+            # if the file is empty or no names are read, add an empty entry
+            if not player_names:
+                self.add_name_entry_player(Frame, Counter)
+            else:
+                # if names are read, put them into the entry fields
+                for player_name, player_id, score in zip(player_names, player_ids, scores):
+                    self.add_name_entry_player(Frame, Counter, player_name, player_id, score)
+
+            return False
+
         except FileNotFoundError:
-            print("File not found")
-            #create file
             
             with open(f"data/{txt_file}.txt", "w+") as f:
                 f.write("")
             
             self.add_name_entry_player(Frame, Counter)
+            
             return True
+
 
     
     def reload_button_player_command(self):
@@ -342,19 +379,27 @@ class Window(tk.Tk):
     
         
         varcountname = f"count{str(self.frameplayer)}"
-        varentriesname = f"entries{str(self.frameplayer)}"
+        varentrie1name = f"entries{str(self.frameplayer)}"
+        varentrie2name = f"entries2{str(self.frameplayer)}"
+        varentrie3name = f"entries3{str(self.frameplayer)}"
         varlabelname = f"label{str(self.frameplayer)}"
 
         # Check if the key exists in the dictionary
-        if self.variable_dict.get(varentriesname):
+        if self.variable_dict.get(varentrie1name):
             # Access the value associated with the key
-            if self.variable_dict[varentriesname] != []:
-                for entry in self.variable_dict[varentriesname]:
+            if self.variable_dict[varentrie1name] != []:
+                for entry in self.variable_dict[varentrie1name]:
                     entry.destroy()
 
                 for label in self.variable_dict[varlabelname]:
                     label.destroy()
-        
+                
+                for entry in self.variable_dict[varentrie2name]:
+                    entry.destroy()
+                    
+                for entry in self.variable_dict[varentrie3name]:
+                    entry.destroy()
+    
         
         
         self.variable_dict[varcountname] = 0
@@ -372,18 +417,26 @@ class Window(tk.Tk):
         team_button.config(bg="red")
         
         varcountname = f"count{str(self.frameplayer)}"
-        varentriesname = f"entries{str(self.frameplayer)}"
+        varentrie1name = f"entries{str(self.frameplayer)}"
+        varentrie2name = f"entries2{str(self.frameplayer)}"
+        varentrie3name = f"entries3{str(self.frameplayer)}"
         varlabelname = f"label{str(self.frameplayer)}"
 
         # Check if the key exists in the dictionary
-        if self.variable_dict.get(varentriesname):
+        if self.variable_dict.get(varentrie1name):
             # Access the value associated with the key
-            if self.variable_dict[varentriesname] != []:
-                for entry in self.variable_dict[varentriesname]:
+            if self.variable_dict[varentrie1name] != []:
+                for entry in self.variable_dict[varentrie1name]:
                     entry.destroy()
 
                 for label in self.variable_dict[varlabelname]:
                     label.destroy()
+                
+                for entry in self.variable_dict[varentrie2name]:
+                    entry.destroy()
+                
+                for entry in self.variable_dict[varentrie3name]:
+                    entry.destroy()
         
         self.selected_team = team_name
         
@@ -391,7 +444,17 @@ class Window(tk.Tk):
         
         self.write_names_into_entry_fields_players(team_name, "Player", self.frameplayer)
             
-        
+    def read_player_names(self, team_name):
+        with open(f"data/{team_name}.txt", "r") as f:
+            self.name_entries_read = []
+            player_id_list = []
+            scores = []
+            for line in f:
+                player_name, player_id, score = line.split(" - ", 2)
+                self.name_entries_read.append(player_name.replace("\n", ""))
+                player_id_list.append(player_id.replace("\n", ""))
+                scores.append(score.replace("\n", ""))
+        return self.name_entries_read, player_id_list, scores
     
     def read_teams_from_file(self, file_path):
         try:
@@ -406,27 +469,155 @@ class Window(tk.Tk):
 
 ##############################################################################################
 
-    def create_services_elements(self):
-        # Create elements for the Services frame
-        services_button = tk.Button(self.services_frame, text="Services Button", command=self.services_button_command)
-        services_button.pack(pady=10)
+    def create_SPIEL_elements(self):
+        # Create elements for the SPIEL frame
+        SPIEL_button = tk.Button(self.SPIEL_frame, text="Reload", command=lambda : self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements), font=("Helvetica", 14))
+        SPIEL_button.pack(pady=10, side=tk.BOTTOM)  
+        
+        
+        # Assuming self.spiel_buttons is initialized as an empty dictionary
+        self.spiel_buttons = {}
+
+        self.teams_playing = [1,2]
+
+        # Inside your loop
+        for team in self.read_team_names(self.teams_playing):
+            print(team)
+
+            # Initialize the dictionary for the current team
+            self.spiel_buttons[team] = {}
+
+            try:
+                with open(f"data/{team}.txt", "r") as f:
+                    
+                    self.for_team_frame = tk.Frame(self.SPIEL_frame, background="lightcoral")
+                    self.for_team_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP)
+                    
+                    self.team_label = tk.Label(self.for_team_frame, text=team, font=("Helvetica", 18))
+                    self.team_label.pack(side=tk.LEFT, pady=2, anchor=tk.NW)
+                    
+                    self.spiel_buttons[team]["global"] = (self.for_team_frame, self.team_label)
+
+                    for i, line in enumerate(f):
+                        # Create a new frame for each group
+                        self.group_frame = tk.Frame(self.for_team_frame, background="lightcoral")
+                        self.group_frame.pack(side=tk.LEFT, padx=10, pady=10)
+
+                        playertext1 = tk.Label(self.group_frame, text=f"Player {i}", font=("Helvetica", 14))
+                        playertext1.pack(side=tk.TOP, pady=2)
+                        
+                        player_name, player_id, score = line.split(" - ", 2)
+                        score = score.replace("\n", "")
+                        playertext2_text = f"{player_name} - {player_id}"
+                        
+                        playertext2 = tk.Label(self.group_frame, text=playertext2_text , font=("Helvetica", 14))
+                        playertext2.pack(side=tk.TOP, pady=2)
+                        
+                        playertext3 = tk.Label(self.group_frame, text=f"Tore {str(score)}", font=("Helvetica", 14))
+                        playertext3.pack(side=tk.TOP, pady=2)
+
+                        playerbutton1 = tk.Button(self.group_frame, text="UP", command=lambda team=team, player_index=i: self.player_scored_a_point(team, player_index, "UP"), font=("Helvetica", 14))
+                        playerbutton1.pack(side=tk.TOP, pady=2)
+                        
+                        playerbutton2 = tk.Button(self.group_frame, text="DOWN", command=lambda team=team, player_index=i: self.player_scored_a_point(team, player_index, "DOWN"), font=("Helvetica", 14))
+                        playerbutton2.pack(side=tk.TOP, pady=2)
+                        
+                        
+                        print("team", team, "i", i)
+
+                        # Save the group_frame, playertext1, and playerbutton in each for loop with the team name as key
+                        self.spiel_buttons[team][i] = (self.group_frame, playertext1, playertext2, playertext3, playerbutton1, playerbutton2)  # Use append for a list
+                        
+                        #self.spiel_buttons[team] = (playerbutton)  # Use append for a list
+
+            except FileNotFoundError:
+                with open(f"data/{team}.txt", "w+") as f:
+                    f.write("")
+
+    def delete_all_in_frame(self, frame):
+        if frame.winfo_exists():
+            for widget in frame.winfo_children():
+                if widget.winfo_class() == 'Frame':
+                    # Recursively delete widgets in nested frames
+                    widget.grid_forget()
+                    widget.pack_forget()
+                    self.delete_all_in_frame(widget)
+                    widget.destroy()
+                else:
+                    widget.destroy()
+
+            # Update the layout
+            frame.update_idletasks()
+            frame.update()
+
+    
+    def reload_button_command_common(self, frame, create_function_name):
+        # Delete all entry fields
+        self.delete_all_in_frame(frame)
+        
+        # Read the names from the file and put them into the entry fields
+        self.create_function_name = create_function_name
+        
+        self.create_function_name()
         
 
-##############################################################################################
+    def player_scored_a_point(self, team, player_index, direction="UP"):
+        # Get the current score
+        current_score = int(self.read_specific_player_stats(team, player_index, "score"))
+        # Update the score
+        if direction == "UP":
+            current_score += 1
+        else:
+            current_score -= 1
+        # Update the score label
+        self.spiel_buttons[team][player_index][3].config(text=f"Tore {current_score}")
+        
+        with open(f"data/{team}.txt", "r") as f:
+            # read the line with the index of the player
+            lines = f.readlines()
+            line = lines[player_index]
+            # split the line into player name and score
+            player_name, player_id, _ = line.split(" - ", 2)
+            
+        with open(f"data/{team}.txt", "w") as f:
+            # write the line with the index of the player
+            lines[player_index] = f"{player_name} - {player_id} - {current_score}\n"
+            f.writelines(lines)
+        
+        ###self.updated_data.update({"SPIEL": {team: self.read_team_names_player(team)}})
+    
+    def read_specific_player_stats(self, team_name, player_index, stat):
+        with open(f"data/{team_name}.txt", "r") as f:
+            # read the line with the index of the player
+            lines = f.readlines()
+            line = lines[player_index]
+            # split the line into player name and score
+            player_name, player_id, score = line.split(" - ", 2)
+            if stat == "name":
+                return player_name
+            elif stat == "id":
+                return player_id
+            elif stat == "score":
+                return score
+            else:
+                return 0
+    
 
 ##############################################################################################
 
-    def create_contact_elements(self):
+##############################################################################################
+
+    #def create_contact_elements(self):
         # Create elements for the Contact frame
-        contact_button = tk.Button(self.contact_frame, text="Contact Button", command=self.contact_button_command)
-        contact_button.pack(pady=10)
+        #contact_button = tk.Button(self.contact_frame, text="Contact Button", command=self.contact_button_command)
+        #contact_button.pack(pady=10)
         
 
 ##############################################################################################
 
     def show_frame(self, frame):
         # Hide all frames and pack the selected frame
-        for frm in [self.Team_frame, self.player_frame, self.services_frame, self.contact_frame]:
+        for frm in [self.Team_frame, self.player_frame, self.SPIEL_frame]: # self.contact_frame
             frm.pack_forget()
         frame.pack(fill=tk.BOTH, expand=True)
 
@@ -438,22 +629,23 @@ class Window(tk.Tk):
         self.reload_button_player_command()
         self.show_frame(self.player_frame)
 
-    def show_services_frame(self):
-        self.show_frame(self.services_frame)
+    def show_SPIEL_frame(self):
+        self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements)
+        self.show_frame(self.SPIEL_frame)
 
-    def show_contact_frame(self):
-        self.show_frame(self.contact_frame)
+    #def show_contact_frame(self):
+        #self.show_frame(self.contact_frame)
 
     # Button command functions
 
     def player_button_command(self):
         print("player Button Clicked")
 
-    def services_button_command(self):
-        print("Services Button Clicked")
+    def SPIEL_button_command(self):
+        print("SPIEL Button Clicked")
 
-    def contact_button_command(self):
-        print("Contact Button Clicked")
+    #def contact_button_command(self):
+        #print("Contact Button Clicked")
         
     ##############################################################################################
             
@@ -467,32 +659,31 @@ class Window(tk.Tk):
         
     ##############################################################################################
 
+def get_initial_data(template_name):
+    tkapp.test()
+    initial_data = {
+        "Teams": tkapp.read_team_names(),
+        "Tore": "0,0,0,0,0,0,0,0,0,0,0,0",
+        "ZeitIntervall": 10,
+        "Startzeit": "9,30",
+        "LastUpdate": 0
+    }
+    return make_response(render_template(template_name, initial_data=initial_data))
+
 @app.route("/")
 def index():
-    tkapp.test()
-    initial_data = {}  # You can modify this data as needed
-    initial_data["Teams"] = tkapp.read_team_names()
-    initial_data["LastUpdate"] = 0
-    resp = make_response(render_template("websitegroup.html", initial_data=initial_data))
-    return resp
+    return get_initial_data("websitegroup.html")
 
 @app.route("/tree")
 def tree_index():
-    tkapp.test()
-    initial_data = {}  # You can modify this data as needed
-    initial_data["Teams"] = tkapp.read_team_names()
-    initial_data["LastUpdate"] = 0
-    resp = make_response(render_template("websitetree.html", initial_data=initial_data))
-    return resp
+    return get_initial_data("websitetree.html")
 
 @app.route("/plan")
 def plan_index():
-    tkapp.test()
-    initial_data = {}  # You can modify this data as needed
-    initial_data["Teams"] = tkapp.read_team_names()
-    initial_data["LastUpdate"] = 0
-    resp = make_response(render_template("websiteplan.html", initial_data=initial_data))
-    return resp
+    return get_initial_data("websiteplan.html")
+
+#create fake data for testing for ZeitIntervall, Startzeit 
+
 
 @app.route('/update_data')
 def update_data():
