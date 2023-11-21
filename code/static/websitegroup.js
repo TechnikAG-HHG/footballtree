@@ -1,14 +1,9 @@
 
-var tableCount = 0
+var tableCount = 2
 var teamCount = 0
-
-var entriesPerTable = teamCount / tableCount
+var entriesPerTable = 6
 
 function generateTables() {
-    tableCount = 2
-    teamCount = data.Teams.length
-    entriesPerTable = teamCount / tableCount
-
     var tablesContainer = document.getElementById("tablesContainer");
     tablesContainer.innerHTML = '';
 
@@ -112,11 +107,11 @@ function updateTables(data) {
         var y = 1;
         for (var i = x * entriesPerTable - entriesPerTable; i < data.Teams.length && y < 7; i++) {
             var team = data.Teams[i];
-            var Sp = data.Spiele[i];
+            var Sp = 0;
             var T = data.Tore[i];
-            var P = data.Punkte[i];
+            var P = 0;
 
-            console.log(y, team, Sp, T, P)
+            console.log(y, team, Sp, T, P, entriesPerTable, i)
 
             tables.forEach(function(table) {
                 var nameCell = table.getElementsByClassName("nameCell" + y)[0];
@@ -141,21 +136,6 @@ function updateTables(data) {
             });
             y++;
         }
-
-        // Sort the tables by the points cell
-        tables.sort(function(a, b) {
-            var pCellA = a.getElementsByClassName("pCell" + y)[0];
-            var pCellB = b.getElementsByClassName("pCell" + y)[0];
-
-            return pCellB.textContent - pCellA.textContent;
-        });
-
-        
-        // Append the sorted tables to the tbody
-        var tbody = document.querySelector(`.table${x} tbody`);
-        tables.forEach(function(table) {
-            tbody.appendChild(table);
-        });
     }
 }
 
