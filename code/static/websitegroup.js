@@ -104,7 +104,7 @@ function updateData() {
 
 function updateTables(data) {
     for (var x = 1; x < tableCount + 1; x++) {
-        var tables = document.querySelectorAll(`.table${x} tbody tr`);
+        var tables = Array.from(document.querySelectorAll(`.table${x} tbody tr`));
         // update team names
 
         console.log('table', x)
@@ -141,14 +141,22 @@ function updateTables(data) {
             });
             y++;
         }
+
+        // Sort the tables by the points cell
+        tables.sort(function(a, b) {
+            var pCellA = a.getElementsByClassName("pCell" + y)[0];
+            var pCellB = b.getElementsByClassName("pCell" + y)[0];
+
+            return pCellB.textContent - pCellA.textContent;
+        });
+
         
-        var tableCount = 2
-        var teamCount = data.Teams.length
-        var entriesPerTable = teamCount / tableCount
+        // Append the sorted tables to the tbody
+        var tbody = document.querySelector(`.table${x} tbody`);
+        tables.forEach(function(table) {
+            tbody.appendChild(table);
+        });
     }
-    tableCount = 2
-    teamCount = data.Teams.length
-    entriesPerTable = teamCount / tableCount
 }
 
 // generate tables on page load

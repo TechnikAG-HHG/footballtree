@@ -1,10 +1,10 @@
 function drawTree() {
-    var teamCount = 16;
+    var teamCount = 4;
     var boxes = teamCount;
     var boxheight = 80;
     var boxestodraw = 0;
     var textsdrawn = 0;
-    var marginsubbox = 500;
+    var marginsubbox = 800;
 
     console.log("drawTree() called");
 
@@ -13,12 +13,24 @@ function drawTree() {
     var boxfinal = document.createElement("div");
     // Set class for styling
     boxfinal.className = "drawn-box-final";
+    boxfinal.className += ` drawn-box`;
+    boxfinal.className += ` box${0}`;
+    boxfinal.style.height = `${boxheight}%`;
     document.getElementById("main-container").appendChild(boxfinal);
 
-    var boxfinaltext = document.createElement("div");
-    boxfinaltext.className = "team-name";
-    boxfinaltext.className += ` text0`;
-    boxfinal.appendChild(boxfinaltext);
+    var subboxfinal = document.createElement("div");
+    subboxfinal.className = "drawn-sub-box-final";
+    subboxfinal.className += ` drawn-sub-box`;
+
+    var subboxmargintodraw =  marginsubbox / Math.pow(3, 1);
+    subboxfinal.style.marginTop = `${subboxmargintodraw}px`;
+    subboxfinal.style.marginBottom = `${subboxmargintodraw}px`;
+    boxfinal.appendChild(subboxfinal);
+
+    var subboxfinaltext = document.createElement("div");
+    subboxfinaltext.className = "team-name";
+    subboxfinaltext.className += ` text0`;
+    subboxfinal.appendChild(subboxfinaltext);
 
 
     // calculate how many boxes to draw in each direction
@@ -58,7 +70,7 @@ function drawTree() {
         subboxestodraw = subboxestodraw / 4;
 
         for (var x = 0; x < subboxestodraw; x++) {
-            var subboxmargintodraw =  marginsubbox / Math.pow(2, i);
+            var subboxmargintodraw =  marginsubbox / Math.pow(3, i);
             
             var subbox1 = document.createElement("div");
             subbox1.className = `subbox${x}`;
@@ -101,16 +113,12 @@ function drawText(textsdrawn) {
 }  
 
 
-function setBoxFinalHeight() {
-    var box1 = document.getElementsByClassName('subbox1')[0];
-    if (box1) {
-        var boxfinal = document.getElementsByClassName('drawn-box-final')[0];
-        boxfinal.style.height = `${box1.offsetHeight / 4}%`;
-    }
-}
-
-
 function drawLines() {
+    // Remove the existing SVG element if it exists
+    var existingSvg = document.querySelector('svg');
+    if (existingSvg) {
+        existingSvg.remove();
+    }
     // Create an SVG element
     var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.style.width = '100%';
@@ -132,6 +140,7 @@ function drawLines() {
     if (middleIndex === -1) {
         middleIndex = Math.floor(boxes.length / 2);
     }
+
 
     // Draw lines to the left
     for (var i = middleIndex - 1; i >= 0; i--) {
@@ -175,7 +184,7 @@ function drawLinesBetweenBoxes(box, nextBox, svg) {
             line1.setAttribute('y1', y1);
             line1.setAttribute('x2', x1);
             line1.setAttribute('y2', y2);
-            line1.setAttribute('stroke', '#49ba67');
+            line1.setAttribute('stroke', '#73deb9');
             line1.setAttribute('stroke-width', '5');
 
             // Create an SVG line element for the vertical line
@@ -184,7 +193,7 @@ function drawLinesBetweenBoxes(box, nextBox, svg) {
             line2.setAttribute('y1', y2);
             line2.setAttribute('x2', x2);
             line2.setAttribute('y2', y2);
-            line2.setAttribute('stroke', '#49ba67');
+            line2.setAttribute('stroke', '#73deb9');
             line2.setAttribute('stroke-width', '5');
 
             // Append the lines to the SVG element
@@ -197,9 +206,47 @@ function drawLinesBetweenBoxes(box, nextBox, svg) {
 }
 
 
+function updateData() {
+    // Include the last data version in the request headers
+    var headers = new Headers();
+    headers.append('Last-Data-Update', data['LastUpdate']);
+
+    fetch('/update_data', {
+        headers: headers
+    })
+    .then(response => response.json())
+    .then(updatedData => {
+        console.log('Updated data:', updatedData);
+
+        // Update variables in JavaScript
+        for (var key in updatedData) {
+            if (updatedData.hasOwnProperty(key)) {
+                data[key] = updatedData[key];
+            }
+        }
+    })
+    .catch(error => console.error('Error fetching data:', error));
+
+    setTimeout(function() {
+        drawTeams();
+    }, 500);
+}
+
+
+function drawTeams() {
+
+}
+
+
 drawTree();
 
-// Use setTimeout to delay the execution of setBoxFinalHeight
-window.setTimeout(setBoxFinalHeight, 0);
-
 drawLines();
+
+drawTeams();
+
+window.onresize = function() {
+    drawLines();
+};
+
+// call updateData() every 2 seconds
+setInterval(updateData, 2000);

@@ -41,7 +41,7 @@ body {
 
 .drawn-box {
     width: 100%;
-    background-color: transparent;
+    background-color: #1a1a1a;
     border: 5px solid transparent;
     border-radius: 10px;
     display: flex;
@@ -54,20 +54,21 @@ body {
 
 .drawn-box-final {
     width: 100%;
-    border: 5px solid gold;
+    background-color: #1a1a1a;
+    border: 5px solid transparent;
     border-radius: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    margin-left: 40px;
-    color: white;
+    align-self: center;
+    margin-left: 30px;
 }
 
 .drawn-sub-box {
     width: 100%;
     height: 100%;
-    background-color: solid #1a1a1a;
+    background-color:#1a1a1a;
     border: 5px solid #49ba67;
     border-radius: 5px;
     display: flex;
@@ -76,4 +77,20 @@ body {
     flex-direction: column;
     align-self: center;
     color: white;
+    z-index: 99;
+}
+
+.drawn-sub-box-final {
+    width: 100%;
+    height: 100%;
+    background-color:#1a1a1a;
+    border: 5px solid gold;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    align-self: center;
+    color: white;
+    z-index: 99;
 }
