@@ -119,20 +119,37 @@ class Window(tk.Tk):
         with open("data/team_names.txt", "w+") as f:
             for entry in self.name_entries:
                 if entry != "" and entry != "\n":
-                    f.write(entry.get() + "\n")
+                    f.write(entry.get() + " - 0\n")
         self.updated_data.update({"Teams": self.read_team_names()})
 
                 
-    def read_team_names(self, teams_to_read="all"):
+    def read_team_names(self, teams_to_read="all", read_score_from_team=False):
         with open("data/team_names.txt", "r") as f:
             self.name_entries_read = []
+            scores = []
             if teams_to_read == "all":
                 for line in f:
+                    line, score = line.split(" - ", 1)
                     self.name_entries_read.append(line.replace("\n", ""))
+                    scores.append(score.replace("\n", ""))
             else:
-                for i, line in enumerate(f):
-                    if i in teams_to_read:
-                        self.name_entries_read.append(line.replace("\n", ""))
+                print(teams_to_read)
+                for line_number_to_read in teams_to_read:
+                    # Subtract 1 since enumerate starts counting from 1 and list indices start from 0
+                    if line_number_to_read != None:
+                        index = line_number_to_read - 1
+
+                        # Read the line at the specified index
+                        f.seek(0)  # Move the file pointer to the beginning of the file
+                        for i2, line in enumerate(f, start=0):
+                            if i2 == line_number_to_read:
+                                line, score = line.split(" - ", 1)
+                                scores.append(score.replace("\n", ""))
+                                self.name_entries_read.append(line.replace("\n", ""))
+                                break  # Stop reading once the line is found
+
+        if read_score_from_team:
+            return self.name_entries_read, scores                
         
         return self.name_entries_read
     
@@ -242,6 +259,7 @@ class Window(tk.Tk):
             self.team_button_list.append(team_button)
             team_button.config(bg="lightgray")
         
+        
     def save_names_player(self, team_name=""):
         entries = self.variable_dict.get(f"entries{self.frameplayer}")
         entries2 = self.variable_dict.get(f"entries2{self.frameplayer}")
@@ -323,6 +341,8 @@ class Window(tk.Tk):
             new_entry3.insert(0, entry_text3)
         else:
             new_entry3.insert(0, "0")
+        
+        
 
         new_entry.grid(row=len(self.variable_dict[varentrie1name]), column=1, pady=5, sticky='we')
         new_entry2.grid(row=len(self.variable_dict[varentrie1name]), column=2, pady=5, sticky='we')
@@ -406,8 +426,6 @@ class Window(tk.Tk):
         
         
         self.variable_dict[varcountname] = 0
-            
-    
     
     
     def select_team(self, team_name, team_button_list, index):
@@ -446,6 +464,7 @@ class Window(tk.Tk):
         self.variable_dict[varcountname] = 0
         
         self.write_names_into_entry_fields_players(team_name, "Player", self.frameplayer)
+          
             
     def read_player_names(self, team_name):
         with open(f"data/{team_name}.txt", "r") as f:
@@ -458,6 +477,7 @@ class Window(tk.Tk):
                 player_id_list.append(player_id.replace("\n", ""))
                 scores.append(score.replace("\n", ""))
         return self.name_entries_read, player_id_list, scores
+    
     
     def read_teams_from_file(self, file_path):
         try:
@@ -474,8 +494,15 @@ class Window(tk.Tk):
 
     def create_SPIEL_elements(self):
         # Create elements for the SPIEL frame
-        SPIEL_button = tk.Button(self.SPIEL_frame, text="Reload", command=lambda : self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements), font=("Helvetica", 14))
-        SPIEL_button.pack(pady=10, side=tk.BOTTOM)  
+        
+        manual_frame = tk.Frame(self.SPIEL_frame, bg="lightcoral")
+        manual_frame.pack(pady=5, anchor=tk.S, side=tk.BOTTOM, padx=5, fill=tk.X)
+        
+        manual_manual_frame = tk.Frame(manual_frame, bg="lightcoral")
+        manual_manual_frame.pack(pady=0, anchor=tk.SE, side=tk.RIGHT, padx=0)
+        
+        SPIEL_button = tk.Button(manual_manual_frame, text="Reload", command=lambda : self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements), font=("Helvetica", 14))
+        SPIEL_button.pack(pady=10, side=tk.BOTTOM, anchor=tk.S) 
         
         
         # Assuming self.spiel_buttons is initialized as an empty dictionary
@@ -485,44 +512,73 @@ class Window(tk.Tk):
         # Inside your loop
         for team in self.read_team_names(self.teams_playing):
             #print(team)
-
+            
             # Initialize the dictionary for the current team
             self.spiel_buttons[team] = {}
 
             try:
                 with open(f"data/{team}.txt", "r") as f:
                     
-                    self.for_team_frame = tk.Frame(self.SPIEL_frame, background="lightcoral")
-                    self.for_team_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP)
+                    self.for_team_frame = tk.Frame(self.SPIEL_frame, background="lightblue")
+                    self.for_team_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, fill="both", padx=10, expand=True)
+                    
+                    # Create global scores buttons, one for up and one for down
+                    score_button_frame = tk.Frame(self.for_team_frame, background="lightblue")
+                    score_button_frame.pack(pady=10, anchor=tk.E, side=tk.RIGHT, padx=10)
+                    
+                    score_button_up = tk.Button(score_button_frame, text="UP", command=lambda team=team: self.global_scored_a_point(team, "UP"), font=("Helvetica", 22))
+                    score_button_up.pack(pady=2, anchor=tk.N, side=tk.TOP, expand=True, fill=tk.X)
+                    
+                    score_label = tk.Label(score_button_frame, text="45", font=("Helvetica", 22))
+                    score_label.pack(pady=2, anchor=tk.N, side=tk.TOP, expand=True, fill=tk.X)
+                    
+                    score_button_down = tk.Button(score_button_frame, text="DOWN", command=lambda team=team: self.global_scored_a_point(team, "DOWN"), font=("Helvetica", 22))
+                    score_button_down.pack(pady=2, anchor=tk.N, side=tk.BOTTOM, expand=True, fill=tk.X)
                     
                     self.team_label = tk.Label(self.for_team_frame, text=team, font=("Helvetica", 18))
                     self.team_label.pack(side=tk.LEFT, pady=2, anchor=tk.NW)
                     
                     self.spiel_buttons[team]["global"] = (self.for_team_frame, self.team_label)
+                    
+                    frame_frame = tk.Frame(self.for_team_frame, background="lightblue")
+                    frame_frame.pack(side=tk.TOP, pady=0, anchor=tk.N)
 
+                    up_frame = tk.Frame(frame_frame, background="lightblue")
+                    up_frame.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.NW)
+
+                    down_frame = tk.Frame(frame_frame, background="lightblue")
+                    down_frame.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.SW)
+                    
                     for i, line in enumerate(f):
-                        # Create a new frame for each group
-                        self.group_frame = tk.Frame(self.for_team_frame, background="lightcoral")
-                        self.group_frame.pack(side=tk.LEFT, padx=10, pady=10)
+                        
+                        if i < 8:
+                            self.group_frame = tk.Frame(up_frame, background="lightblue")
+                            self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
+                        else:
+                            self.group_frame = tk.Frame(down_frame, background="lightblue")
+                            self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
+                        
+                        #self.group_frame = tk.Frame(self.for_team_frame, background="lightcoral")
+                        #self.group_frame.pack(side=tk.LEFT, padx=10, pady=10)
 
                         playertext1 = tk.Label(self.group_frame, text=f"Player {i}", font=("Helvetica", 14))
-                        playertext1.pack(side=tk.TOP, pady=2)
+                        playertext1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
                         
                         player_name, player_id, score = line.split(" - ", 2)
                         score = score.replace("\n", "")
                         playertext2_text = f"{player_name} - {player_id}"
                         
                         playertext2 = tk.Label(self.group_frame, text=playertext2_text , font=("Helvetica", 14))
-                        playertext2.pack(side=tk.TOP, pady=2)
+                        playertext2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
                         
                         playertext3 = tk.Label(self.group_frame, text=f"Tore {str(score)}", font=("Helvetica", 14))
-                        playertext3.pack(side=tk.TOP, pady=2)
+                        playertext3.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
 
                         playerbutton1 = tk.Button(self.group_frame, text="UP", command=lambda team=team, player_index=i: self.player_scored_a_point(team, player_index, "UP"), font=("Helvetica", 14))
-                        playerbutton1.pack(side=tk.TOP, pady=2)
+                        playerbutton1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
                         
                         playerbutton2 = tk.Button(self.group_frame, text="DOWN", command=lambda team=team, player_index=i: self.player_scored_a_point(team, player_index, "DOWN"), font=("Helvetica", 14))
-                        playerbutton2.pack(side=tk.TOP, pady=2)
+                        playerbutton2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
                         
                         
                         #print("team", team, "i", i)
@@ -536,23 +592,32 @@ class Window(tk.Tk):
                 with open(f"data/{team}.txt", "w+") as f:
                     f.write("")
 
-        self.manual_team_select_1 = ttk.Combobox(self.SPIEL_frame, values=self.read_team_names(), font=("Helvetica", 14))
-        self.manual_team_select_1.pack(pady=10, side=tk.BOTTOM)
-        self.manual_team_select_1.bind("<<ComboboxSelected>>", lambda event, nr=0: self.on_team_select(event, nr))
+        
+        self.manual_team_select_1 = ttk.Combobox(manual_manual_frame, values=self.read_team_names(), font=("Helvetica", 14))
+        self.manual_team_select_1.pack(pady=10, side=tk.BOTTOM, anchor=tk.S)
+        self.manual_team_select_1.bind("<<ComboboxSelected>>", lambda event, nr=1: self.on_team_select(event, nr))
         
         
-        self.manual_team_select_2 = ttk.Combobox(self.SPIEL_frame, values=self.read_team_names(), font=("Helvetica", 14))
-        self.manual_team_select_2.pack(pady=10, side=tk.BOTTOM)
-        self.manual_team_select_2.bind("<<ComboboxSelected>>", lambda event, nr=1: self.on_team_select(event, nr))
+        self.manual_team_select_2 = ttk.Combobox(manual_manual_frame, values=self.read_team_names(), font=("Helvetica", 14))
+        self.manual_team_select_2.pack(pady=10, side=tk.BOTTOM, anchor=tk.S)
+        self.manual_team_select_2.bind("<<ComboboxSelected>>", lambda event, nr=0: self.on_team_select(event, nr))
+
+
+        self.create_matches_labels(manual_frame)
 
 
         if self.teams_playing.count(None) == 0:
-            self.manual_team_select_1.set(self.read_team_names()[self.teams_playing[0]])
-            self.manual_team_select_2.set(self.read_team_names()[self.teams_playing[1]])
+            #print(self.teams_playing)
+            self.manual_team_select_1.set(self.read_team_names()[self.teams_playing[1]])
+            self.manual_team_select_2.set(self.read_team_names()[self.teams_playing[0]])
             
         if self.teams_playing.count(None) == 2:
             self.manual_team_select_1.state(["disabled"])
-            
+        
+        if self.teams_playing.count(None) == 1:
+            self.manual_team_select_1.state(["!disabled"])
+            #print(self.teams_playing)
+            self.manual_team_select_2.set(self.read_team_names()[self.teams_playing[0]])        
 
     def on_team_select(self, event, nr):
         selected_team = event.widget.get()
@@ -569,13 +634,14 @@ class Window(tk.Tk):
         
         
         if self.teams_playing.count(None) == 0:
-            self.manual_team_select_1.set(self.read_team_names()[self.teams_playing[0]])
-            self.manual_team_select_2.set(self.read_team_names()[self.teams_playing[1]])
+            self.manual_team_select_1.set(self.read_team_names()[self.teams_playing[1]])
+            self.manual_team_select_2.set(self.read_team_names()[self.teams_playing[0]])
         
-        print(self.teams_playing)
+        #print(self.teams_playing)
         if self.teams_playing.count(None) == 1:
             self.manual_team_select_1.state(["!disabled"])
-            self.manual_team_select_1.set(self.read_team_names()[self.teams_playing[0]])
+            print(self.teams_playing)
+            self.manual_team_select_2.set(self.read_team_names()[self.teams_playing[0]])
             
         
         
@@ -639,6 +705,7 @@ class Window(tk.Tk):
         
         ###self.updated_data.update({"SPIEL": {team: self.read_team_names_player(team)}})
     
+    
     def read_specific_player_stats(self, team_name, player_index, stat):
         with open(f"data/{team_name}.txt", "r") as f:
             # read the line with the index of the player
@@ -654,6 +721,136 @@ class Window(tk.Tk):
                 return score
             else:
                 return 0
+    
+    
+    def create_matches_labels(self, frame):
+        matches = self.calculate_matches()
+        
+        spiel_select_frame = tk.Frame(frame, bg="lightcoral")
+        spiel_select_frame.pack(pady=10, padx=10, anchor=tk.SW, side=tk.LEFT)
+        
+        spiel_select = ttk.Combobox(spiel_select_frame, font=("Helvetica", 14), width=35)
+        spiel_select.pack(pady=10, side=tk.TOP, anchor=tk.N)
+
+        spiel_select.bind("<<ComboboxSelected>>", lambda event: self.on_match_select(event, matches))
+    
+        # Initialize the values as an empty list
+        values_list = []
+
+        for match in matches:
+            # Append each match label to the values list
+            values_list.append(match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1])
+
+        # Set the values of the Combobox after the loop
+        spiel_select["values"] = values_list
+        
+        # get the index of the match that is currently being played and set the Combobox value to that match without using self.match_count - 1
+        
+        for match in matches:
+            match_teams_indexes = [self.read_team_names().index(match_team) for match_team in match["teams"]]
+            if match_teams_indexes == self.teams_playing or match_teams_indexes[::-1] == self.teams_playing:
+                se = match["number"]
+                #print("got it")
+                break
+            #print(match["teams"], self.teams_playing, match["number"], match_teams_indexes, match_teams_indexes[::-1])
+        else:
+            if self.teams_playing.count(None) == 0:
+                values_list = []
+                values_list.append("No Match found")
+                spiel_select["values"] = values_list
+                spiel_select.set(values_list[0])
+                print("no match found")
+                return
+        
+        if self.teams_playing.count(None) == 0:
+            
+            se = int(se.replace("Spiel ", "")) - 1
+            current_match_index = se
+            spiel_select.set(values_list[current_match_index])
+            
+            
+        
+        next_match_button = tk.Button(spiel_select_frame, text="Next Match", command=lambda : self.next_previous_match_button(spiel_select, matches), font=("Helvetica", 14))
+        next_match_button.pack(pady=10, padx=5, side=tk.LEFT, anchor=tk.SW)
+        
+        previous_match_button = tk.Button(spiel_select_frame, text="Previous Match", command=lambda : self.next_previous_match_button(spiel_select, matches, False), font=("Helvetica", 14))
+        previous_match_button.pack(pady=10, padx=5, side=tk.RIGHT, anchor=tk.SE)
+
+
+    def on_match_select(self, event, matches):
+        selected_match = event.widget.get()
+        #print(selected_match)
+        #print(matches)
+        # Convert the value to the match index
+        match_index = [match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1] for match in matches].index(selected_match)
+
+        # Get the teams playing in the selected match and if there are none, set teams_playing to None
+        team_names = self.read_team_names()
+        
+        self.teams_playing = [team_names.index(matches[match_index]["teams"][0]), team_names.index(matches[match_index]["teams"][1])] if [team_names.index(matches[match_index]["teams"][0]), team_names.index(matches[match_index]["teams"][1])] else [None, None]
+        # Update the buttons
+        self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements)
+        print("match selected")
+        
+    
+    def next_previous_match_button(self, spiel_select, matches, next_match=True):
+        
+        # Get the current match index
+        match_index = [match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1] for match in matches].index(spiel_select.get())
+        
+        
+        
+        if next_match:
+            match_index += 1
+        else:
+            match_index -= 1
+
+        # Get the teams playing in the selected match
+        team_names = self.read_team_names()
+        print(matches[match_index]["teams"][0], matches[match_index]["teams"][1], team_names)
+        self.teams_playing = [team_names.index(matches[match_index]["teams"][0]), team_names.index(matches[match_index]["teams"][1])] if [team_names.index(matches[match_index]["teams"][0]), team_names.index(matches[match_index]["teams"][1])] else [None, None]
+        
+        # Update the buttons
+        self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements)
+
+
+    def global_scored_a_point(self, team, direction="UP"):
+        # Get the current score
+        current_score = int(self.read_team_stats(team, "score"))
+        # Update the score
+        if direction == "UP":
+            current_score += 1
+        else:
+            current_score -= 1
+            
+        self.write_score_for_team_into_file(team, current_score)
+    
+
+        # Update the score label
+        self.spiel_buttons[team]["global"][1].config(text=team + " " + str(current_score))
+        
+    def write_score_for_team_into_file(self, team_name, score):
+        with open(f"data/team_names.txt", "r") as f:
+            # read the line with the index of the player
+            lines = f.readlines()
+            line = lines[team_name]
+            line = line.replace("\n", "")
+            line, _ = line.split(" - ", 1)
+            # split the line into player name and score
+            line = f"{line} - {score}\n"
+        
+        with open(f"data/team_names.txt", "w") as f:
+            # write the line with the index of the player
+            lines[team_name] = line
+            f.writelines(lines)
+            
+    
+    def read_team_stats(self, team_name, stat):
+        score = self.read_team_names(self.teams_playing, True)
+        score = score[score.index(team_name)]
+        if stat == "score":
+            return score
+        
     
 
 ##############################################################################################
@@ -721,7 +918,7 @@ class Window(tk.Tk):
         self.match_count = 0
 
         initial_data = {
-        "Teams": tkapp.read_team_names(),
+        "Teams": self.read_team_names(),
         "Tore": ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
         "ZeitIntervall": 10,
         "Startzeit": [9,30],
@@ -748,7 +945,9 @@ class Window(tk.Tk):
 
         self.matches = list(map(lambda match: self.add_match_number(match), matches))
         
-        print(self.matches)
+        #print(self.matches)
+        
+        return self.matches
     
     
     
