@@ -32,6 +32,22 @@ function calculateMatches() {
         return match;
     });
 
+    // Send data to the server using Fetch API
+    fetch('/senddata', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(matches)
+    })
+    .then(response => response.json())
+    .then(output => {
+        console.log('Response from server:', output);
+    })
+    .catch(error => {
+        console.error('Error sending data:', error);
+    });
+  
     generateTableGroup(matches);
 }
 
