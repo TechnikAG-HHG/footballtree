@@ -6,6 +6,7 @@ import requests
 import os
 import time
 from flask import Flask, send_file, request, abort, render_template, make_response, session, redirect, jsonify
+import sqlite3
 
 app = Flask(__name__)
 app.secret_key = "Felix.com"
@@ -124,34 +125,40 @@ class Window(tk.Tk):
 
                 
     def read_team_names(self, teams_to_read="all", read_score_from_team=False):
-        with open("data/team_names.txt", "r") as f:
-            self.name_entries_read = []
-            scores = []
-            if teams_to_read == "all":
-                for line in f:
-                    line, score = line.split(" - ", 1)
-                    self.name_entries_read.append(line.replace("\n", ""))
-                    scores.append(score.replace("\n", ""))
-            else:
-                print(teams_to_read)
-                for line_number_to_read in teams_to_read:
-                    # Subtract 1 since enumerate starts counting from 1 and list indices start from 0
-                    if line_number_to_read != None:
-                        index = line_number_to_read - 1
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
 
-                        # Read the line at the specified index
-                        f.seek(0)  # Move the file pointer to the beginning of the file
-                        for i2, line in enumerate(f, start=0):
-                            if i2 == line_number_to_read:
-                                line, score = line.split(" - ", 1)
-                                scores.append(score.replace("\n", ""))
-                                self.name_entries_read.append(line.replace("\n", ""))
-                                break  # Stop reading once the line is found
+        self.name_entries_read = []
+        scores = []
+
+        if teams_to_read == "all":
+            query = "SELECT team_name, score FROM teams JOIN scores ON teams.team_id = scores.team_id"
+            cursor.execute(query)
+
+            for row in cursor.fetchall():
+                team_name, score = row
+                self.name_entries_read.append(team_name)
+                scores.append(score)
+        else:
+            for team_id_to_read in teams_to_read:
+                if team_id_to_read is not None:
+                    query = f"SELECT team_name, score FROM teams JOIN scores ON teams.team_id = scores.team_id WHERE teams.team_id = ?"
+                    cursor.execute(query, (team_id_to_read,))
+
+                    row = cursor.fetchone()
+                    if row:
+                        team_name, score = row
+                        self.name_entries_read.append(team_name)
+                        scores.append(score)
+
+        cursor.close()
+        connection.close()
 
         if read_score_from_team:
             return self.name_entries_read, scores                
         
         return self.name_entries_read
+    
     
     def write_names_into_entry_fields(self):
         try:
@@ -882,7 +889,7 @@ class Window(tk.Tk):
     def show_SPIEL_frame(self):
         self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements)
         print(stored_data)
-        self.writeInMatches()
+        self.calculate_matches()
         self.show_frame(self.SPIEL_frame)
 
     #def show_contact_frame(self):
@@ -909,8 +916,90 @@ class Window(tk.Tk):
         #print(self.updated_data)
         self.updated_data = {}
         
-    def writeInMatches(self):
-        self.matches = matchData
+    ##############################################################################################
+    #############################Calculatre###########################################
+    ##############################################################################################
+    ##############################################################################################
+    def calculate_matches(self):
+        
+        self.match_count = 0
+
+        initial_data = {
+        "Teams": self.read_team_names(),
+        "Tore": ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+        "ZeitIntervall": 10,
+        "Startzeit": [9,30],
+        "LastUpdate": 0
+    }
+        
+        teams = initial_data["Teams"][:]  # Create a copy of the teams array
+        # If the number of teams is odd, add a "dummy" team
+        if len(teams) % 2 != 0:
+            teams.append("dummy")
+
+        teams.sort()
+
+        midpoint = (len(teams) + 1) // 2
+        group1 = teams[:midpoint]
+        group2 = teams[midpoint:]
+
+        matches1 = self.calculate_matches_for_group(group1, "Gruppe 1")
+        matches2 = self.calculate_matches_for_group(group2, "Gruppe 2")
+
+        matches = self.interleave_matches(matches1, matches2)
+        
+        self.match_count = 0
+
+        self.matches = list(map(lambda match: self.add_match_number(match), matches))
+        
+        #print(self.matches)
+        
+        return self.matches
+    
+    
+    
+    def interleave_matches(self, matches1, matches2):
+        matches = []
+        i = j = 0
+        while i < len(matches1) or j < len(matches2):
+            if i < len(matches1):
+                matches.append(matches1[i])
+                i += 1
+            if j < len(matches2):
+                matches.append(matches2[j])
+                j += 1
+        return matches
+
+
+    def calculate_matches_for_group(self, teams, group_name):
+        rounds = []
+
+        for _ in range(len(teams) - 1):
+            rounds.append([])
+            for match in range(len(teams) // 2):
+                team1 = teams[match]
+                team2 = teams[-1 - match]
+                rounds[-1].append([team1, team2])
+            # Rotate the teams for the next round
+            teams[1:1] = [teams.pop()]
+
+        # Remove matches with the "dummy" team
+        if "dummy" in teams:
+            rounds = list(map(lambda rnd: list(filter(lambda match: "dummy" not in match, rnd)), rounds))
+
+        matches = [match for rnd in rounds for match in rnd]
+
+        matches = list(map(lambda match: {"number": "", "teams": match, "group": group_name}, matches))
+
+        return matches
+
+
+    def add_match_number(self, match):
+         
+        self.match_count += 1
+        match["number"] = "Spiel " + str(self.match_count)
+        return match
+
 
     ##############################################################################################
     ##############################################################################################
@@ -922,7 +1011,7 @@ def get_initial_data(template_name):
     tkapp.test()
     initial_data = {
         "Teams": tkapp.read_team_names(),
-        "Tore": [0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "Tore": ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
         "ZeitIntervall": 10,
         "Startzeit": [9,30],
         "LastUpdate": 0
@@ -941,9 +1030,7 @@ def tree_index():
 def plan_index():
     return get_initial_data("websiteplan.html")
 
-@app.route("/tv")
-def tv_index():
-    return get_initial_data("websitetv.html")
+#create fake data for testing for ZeitIntervall, Startzeit 
 
 
 @app.route('/update_data')
@@ -988,28 +1075,15 @@ def update_data():
     #updated_data = {'Teams': tkapp.read_team_names(), 'Players': {"Player1":"Erik Van Doof","Player2":"Felix Schweigmann"}}  # You can modify this data as needed
     return jsonify(updated_data)
 
-
-@app.route('/senddata', methods=['POST'])
-def receive_data():
-    global matchData
-    
-    matchData = request.json  # Assuming the data is sent in JSON format
-    # Process the received data as needed
-    print("Received match data")
-
-    # Send a response back to the client
-    response_data = {"message": "Data received successfully"}
-    return jsonify(response_data)
-
-
 global tkapp
 global server_thread
 global stored_data
 global initial_data
+global db_path
 
-
+db_path = "data/teams.db"
 stored_data = {}
-tkapp = Window(True)
+tkapp = Window(False)
 
 if __name__ == "__main__":
     

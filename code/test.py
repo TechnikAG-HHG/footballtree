@@ -1,16 +1,27 @@
-from flask import Flask, request, jsonify
+import tkinter as tk
 
-app = Flask(__name__)
+def button_click(button_number):
+    print(f"Button {button_number} clicked!")
 
-@app.route('/senddata', methods=['POST'])
-def receive_data():
-    output = request.json  # Assuming the data is sent in JSON format
-    # Process the received data as needed
-    print("Received data:", output)
+root = tk.Tk()
+root.title("Variable Buttons Example")
 
-    # Send a response back to the client
-    response_data = {"message": "Data received successfully"}
-    return jsonify(response_data)
+# Create a variable number of buttons
+num_buttons = 10  # You can change this to the desired number of buttons
 
-if __name__ == '__main__':
-    app.run(debug=True)
+up_frame = tk.Frame(root)
+up_frame.pack(side=tk.TOP)
+
+down_frame = tk.Frame(root)
+down_frame.pack(side=tk.BOTTOM)
+
+for i in range(num_buttons):
+    # Place the first 6 buttons at the top, and the rest using a different layout option
+    if i < 6:
+        button = tk.Button(up_frame, text=f"Button {i+1}", command=lambda i=i: button_click(i+1), width=15)
+        button.pack(side=tk.LEFT, anchor=tk.N)
+    else:
+        button = tk.Button(down_frame, text=f"Button {i+1}", command=lambda i=i: button_click(i+1), width=15)
+        button.pack(side=tk.LEFT, anchor=tk.S)
+
+root.mainloop()
