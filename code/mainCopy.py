@@ -45,7 +45,9 @@ class Window(tk.Tk):
         # Set window title
         self.title("Football Tournament Manager")
         self.state('zoomed')
-
+        
+        self.init_sqlite_db()
+        
         menu = tk.Menu(self)
         self.config(menu=menu)
         filemenu = tk.Menu(menu)
@@ -70,15 +72,65 @@ class Window(tk.Tk):
         # Display the default frame
         self.show_frame(self.Team_frame)
         
+        print("finished init")
+        
         
         if start_server:
             server_thread = threading.Thread(target=self.start_server)
             server_thread.start()
+    
         
     def start_server(self):
         app.run(debug=False, threaded=True, port=5000, host="0.0.0.0", use_reloader=False)
+    
+    
+    def init_sqlite_db(self):
+        self.db_path = "data/data.db"
         
-
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
+        
+        teamDataTableCreationQuery = """
+        CREATE TABLE IF NOT EXISTS teamData (
+            id INTEGER PRIMARY KEY,
+            teamName TEXT UNIQUE,
+            goals INTEGER DEFAULT 0,
+            goalsReceived INTEGER DEFAULT 0,
+            games INTEGER DEFAULT 0,
+            points INTEGER DEFAULT 0
+        )
+        """
+        cursor.execute(teamDataTableCreationQuery)
+        connection.commit()
+        
+        playerDataTableCreationQuery = """
+        CREATE TABLE IF NOT EXISTS playerData (
+            id INTEGER PRIMARY KEY,
+            playerName TEXT UNIQUE,
+            playerNumber INTEGER,
+            teamId INTEGER DEFAULT 0,
+            goals INTEGER DEFAULT 0
+        )
+        """
+        cursor.execute(playerDataTableCreationQuery)
+        connection.commit()
+        
+        matchDataTableCreationQuery = """
+        CREATE TABLE IF NOT EXISTS matchData (
+            id INTEGER PRIMARY KEY,
+            groupNumber INTEGER,
+            team1Id INTEGER,
+            team2Id INTEGER,
+            team1Goals INTEGER DEFAULT 0,
+            team2Goals INTEGER DEFAULT 0,
+            matchTime TEXT
+        )
+        """
+        cursor.execute(matchDataTableCreationQuery)
+        connection.commit()
+        
+        cursor.close()
+        connection.close()
             
             
 ##############################################################################################
@@ -116,68 +168,54 @@ class Window(tk.Tk):
         # Read the names from the file and put them into the entry fields
         self.write_names_into_entry_fields()
         
-    def save_names(self):
-        with open("data/team_names.txt", "w+") as f:
-            for entry in self.name_entries:
-                if entry != "" and entry != "\n":
-                    f.write(entry.get() + " - 0\n")
-        self.updated_data.update({"Teams": self.read_team_names()})
-
-                
-    def read_team_names(self, teams_to_read="all", read_score_from_team=False):
-        connection = sqlite3.connect(db_path)
+    def save_team_names_in_db(self):
+        connection = sqlite3.connect(self.db_path)
         cursor = connection.cursor()
 
-        self.name_entries_read = []
-        scores = []
+        name_entries = self.name_entries
+        print(name_entries)
 
-        if teams_to_read == "all":
-            query = "SELECT team_name, score FROM teams JOIN scores ON teams.team_id = scores.team_id"
-            cursor.execute(query)
+        # Get existing teams from the database
+        cursor.execute("SELECT teamName FROM teamData")
+        existing_teams = {row[0] for row in cursor.fetchall()}
 
-            for row in cursor.fetchall():
-                team_name, score = row
-                self.name_entries_read.append(team_name)
-                scores.append(score)
-        else:
-            for team_id_to_read in teams_to_read:
-                if team_id_to_read is not None:
-                    query = f"SELECT team_name, score FROM teams JOIN scores ON teams.team_id = scores.team_id WHERE teams.team_id = ?"
-                    cursor.execute(query, (team_id_to_read,))
+        # Update existing teams and add new teams with default values
+        for entry in name_entries:
+            team_name = entry.get().strip()
+            print(team_name)
+            if team_name != "":
+                # Update existing team
+                if not team_name in existing_teams:
+                    # Add new team with default values
+                    cursor.execute("INSERT INTO teamData (teamName, goals) VALUES (?, 0)", (team_name,))
+                    existing_teams.add(team_name)
 
-                    row = cursor.fetchone()
-                    if row:
-                        team_name, score = row
-                        self.name_entries_read.append(team_name)
-                        scores.append(score)
+        # Delete teams not in the entries
+        teams_to_delete = existing_teams - {entry.get().strip() for entry in name_entries}
+        for team_name in teams_to_delete:
+            cursor.execute("DELETE FROM teamData WHERE teamName = ?", (team_name,))
 
+        print("tests")
+        connection.commit()
         cursor.close()
         connection.close()
 
-        if read_score_from_team:
-            return self.name_entries_read, scores                
-        
-        return self.name_entries_read
-    
     
     def write_names_into_entry_fields(self):
-        try:
-            with open("data/team_names.txt", "r") as f:
-                # if the file is empty, do nothing
-                if os.stat("data/team_names.txt").st_size == 0:
-                    self.add_name_entry()
-
-                
-                # if the file is not empty, read the names from the file and put them into the entry fields
-                else:
-                    for line in f:
-                        if line != "\n" and line != "":
-                            self.add_name_entry(line.replace("\n", ""))
-                    return False
-        except FileNotFoundError:
-            print("File not found")
-            self.add_name_entry()
-            return True
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
+        
+        selectTeams = """
+        SELECT teamName FROM teamData
+        ORDER BY id ASC
+        """
+        cursor.execute(selectTeams)
+        
+        for teamName in cursor.fetchall():
+            self.add_name_entry(teamName[0])
+            
+        cursor.close()
+        connection.close()
 
 
     def create_Team_elements(self):
@@ -206,14 +244,12 @@ class Window(tk.Tk):
         # Button to retrieve the entered names
 
 
-        submit_button = tk.Button(self.Team_frame, text="Submit", command=self.save_names, font=("Helvetica", 14))
+        submit_button = tk.Button(self.Team_frame, text="Submit", command=self.save_team_names_in_db, font=("Helvetica", 14))
         submit_button.pack(pady=10)
 
         
         reload_button = tk.Button(self.Team_frame, text="Reload", command=self.reload_button_command, font=("Helvetica", 14))
         reload_button.pack(pady=10)
-        
-
         
 
 ##############################################################################################
@@ -254,42 +290,60 @@ class Window(tk.Tk):
         self.selected_team = ""
         self.team_button_list = []
         
-        teams_list = self.read_teams_from_file('data/team_names.txt')
+        team_IDs = self.read_teamIds()
+        teamNames = self.read_teamNames()
         
-        for i, team_name in enumerate(teams_list):
+        for i, (teamID, teamName) in enumerate(zip(team_IDs, teamNames)):
             team_button = tk.Button(
                 self.player_frame,
-                text=team_name,
-                command=lambda name=team_name, i2=i: self.select_team(name, self.team_button_list, i2)
+                text=teamName,
+                command=lambda id=teamID, i2=i: self.select_team(id, self.team_button_list, i2)
             )
             team_button.pack(pady=5, padx=5, anchor=tk.NW, side=tk.LEFT)
             self.team_button_list.append(team_button)
             team_button.config(bg="lightgray")
         
         
-    def save_names_player(self, team_name=""):
+    def save_names_player(self, team_id=-1):
         entries = self.variable_dict.get(f"entries{self.frameplayer}")
         entries2 = self.variable_dict.get(f"entries2{self.frameplayer}")
         entries3 = self.variable_dict.get(f"entries3{self.frameplayer}")
-        
-        if team_name == "":
-            team_name = self.selected_team
-        
+
+        if team_id == -1:
+            team_id = self.selected_team
+
         if entries:
-            
-            
-            with open(f"data/{team_name}.txt", "w+") as f:
-                for i, (entry, entrie2, entrie3) in enumerate(zip(entries, entries2, entries3)):
-                    # Check if the entry widget exists
-                    if entry.winfo_exists():
-                        entry_text = str(entry.get())
-                        entry_text2 = str(entrie2.get())
-                        entry_text3 = str(entrie3.get())
-                        if entry_text and entry_text != "\n":
-                            combined_entry_text = f"{entry_text.replace(' - ',' ')} - {entry_text2.replace(' - ',' ')} - {entry_text3.replace(' - ',' ')}"
-                            if combined_entry_text and combined_entry_text != "\n":
-                                
-                                f.write(combined_entry_text + "\n")
+            connection = sqlite3.connect(self.db_path)
+            cursor = connection.cursor()
+
+            # Get existing players for the team from the database
+            cursor.execute("SELECT playerName FROM playerData WHERE teamId = ?", (team_id,))
+            existing_players = {row[0] for row in cursor.fetchall()}
+
+            # Iterate through the current entries and update or insert as needed
+            for entry, entrie2, entrie3 in zip(entries, entries2, entries3):
+                entry_text = str(entry.get())
+                entry_text2 = str(entrie2.get())
+                entry_text3 = str(entrie3.get())
+
+                if entry_text:
+                    # Update existing player
+                    if entry_text in existing_players:
+                        update_query = "UPDATE playerData SET playerNumber = ?, goals = ? WHERE playerName = ? AND teamId = ?"
+                        cursor.execute(update_query, (entry_text2, entry_text3, entry_text, team_id))
+                    else:
+                        # Add new player
+                        insert_query = "INSERT INTO playerData (playerName, playerNumber, goals, teamId) VALUES (?, ?, ?, ?)"
+                        cursor.execute(insert_query, (entry_text, entry_text2, entry_text3, team_id))
+
+            # Delete players not in the entries
+            players_to_delete = existing_players - {entry.get() for entry in entries}
+            for player_name in players_to_delete:
+                cursor.execute("DELETE FROM playerData WHERE playerName = ? AND teamId = ?", (player_name, team_id))
+
+            connection.commit()
+            cursor.close()
+            connection.close()
 
         ###self.updated_data.update({"Players": {self.selected_team: self.read_team_names_player(self.selected_team)}})
             
@@ -360,33 +414,22 @@ class Window(tk.Tk):
         self.variable_dict[varlabelname].append(label)
 
     
-    
-    def write_names_into_entry_fields_players(self, txt_file, Counter, Frame):
-        try:
-            # Read player names using read_player_names function
-            player_names, player_ids, scores = self.read_player_names(txt_file)
+    def write_names_into_entry_fields_players(self, teamID, Counter, Frame):
+        # Read player names using read_player_stats function
+        output = self.read_player_stats(teamID, True)
+        player_names = [row[0] for row in output]
+        player_numbers = [row[1] for row in output]
+        goals = [row[2] for row in output]
 
-            # if the file is empty or no names are read, add an empty entry
-            if not player_names:
-                self.add_name_entry_player(Frame, Counter)
-            else:
-                # if names are read, put them into the entry fields
-                for player_name, player_id, score in zip(player_names, player_ids, scores):
-                    self.add_name_entry_player(Frame, Counter, player_name, player_id, score)
-
-            return False
-
-        except FileNotFoundError:
-            
-            with open(f"data/{txt_file}.txt", "w+") as f:
-                f.write("")
-            
+        # if the file is empty or no names are read, add an empty entry
+        if not player_names:
             self.add_name_entry_player(Frame, Counter)
-            
-            return True
+        else:
+            # if names are read, put them into the entry fields
+            for player_name, player_number, goal in zip(player_names, player_numbers, goals):
+                self.add_name_entry_player(Frame, Counter, player_name, player_number, goal)
 
 
-    
     def reload_button_player_command(self):
         
         for button in self.team_button_list:
@@ -395,13 +438,14 @@ class Window(tk.Tk):
         self.selected_team = ""
         self.team_button_list = []
         
-        teams_list = self.read_teams_from_file('data/team_names.txt')
+        team_IDs = self.read_teamIds()
+        teamNames = self.read_teamNames()
         
-        for i, team_name in enumerate(teams_list):
+        for i, (teamID, teamName) in enumerate(zip(team_IDs, teamNames)):
             team_button = tk.Button(
                 self.player_frame,
-                text=team_name,
-                command=lambda name=team_name, i2=i: self.select_team(name, self.team_button_list, i2)
+                text=teamName,
+                command=lambda id=teamID, i2=i: self.select_team(id, self.team_button_list, i2)
             )
             team_button.pack(pady=5, padx=5, anchor=tk.NW, side=tk.LEFT)
             self.team_button_list.append(team_button)
@@ -435,7 +479,7 @@ class Window(tk.Tk):
         self.variable_dict[varcountname] = 0
     
     
-    def select_team(self, team_name, team_button_list, index):
+    def select_team(self, teamID, team_button_list, index):
         
         for button in team_button_list:
             button.config(bg="lightgray")
@@ -466,34 +510,115 @@ class Window(tk.Tk):
                 for entry in self.variable_dict[varentrie3name]:
                     entry.destroy()
         
-        self.selected_team = team_name
+        self.selected_team = teamID
         
         self.variable_dict[varcountname] = 0
         
-        self.write_names_into_entry_fields_players(team_name, "Player", self.frameplayer)
+        self.write_names_into_entry_fields_players(teamID, "Player", self.frameplayer)
           
             
-    def read_player_names(self, team_name):
-        with open(f"data/{team_name}.txt", "r") as f:
-            self.name_entries_read = []
-            player_id_list = []
-            scores = []
-            for line in f:
-                player_name, player_id, score = line.split(" - ", 2)
-                self.name_entries_read.append(player_name.replace("\n", ""))
-                player_id_list.append(player_id.replace("\n", ""))
-                scores.append(score.replace("\n", ""))
-        return self.name_entries_read, player_id_list, scores
+    def read_player_stats(self, teamID, readGoals=False, playerID=-1):
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
+        output = []
+        
+        if readGoals and playerID == -1:
+            getData = """
+            SELECT playerName, playerNumber, goals FROM playerData
+            WHERE teamId = ?
+            ORDER BY id ASC
+            """
+            cursor.execute(getData, (teamID,))
+            
+            for row in cursor.fetchall():
+                output.append(row)
+                
+        elif readGoals and playerID != -1:
+            getData = """
+            SELECT playerName, playerNumber, goals FROM playerData
+            WHERE teamId = ? AND id = ?
+            ORDER BY id ASC
+            """
+            cursor.execute(getData, (teamID, playerID))
+            
+            for row in cursor.fetchall():
+                output.append(row)
+                
+        elif not readGoals and playerID != -1:
+            getData = """
+            SELECT playerName, playerNumber FROM playerData
+            WHERE teamId = ? AND id = ?
+            ORDER BY id ASC
+            """
+            cursor.execute(getData, (teamID, playerID))
+            
+            for row in cursor.fetchall():
+                output.append(row)
+            
+        else:
+            getData = """
+            SELECT playerName, playerNumber FROM playerData
+            WHERE teamId = ?
+            ORDER BY id ASC
+            """
+            cursor.execute(getData, (teamID,))
+            
+            for row in cursor.fetchall():
+                output.append(row)
+                
+        cursor.close()
+        connection.close()
+        
+        return output
+            
+            
+    def read_teamNames(self, teams_to_read=-1):
+        teamNames = []
+        
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
+        
+        if teams_to_read != -1:
+            selectTeams = """
+            SELECT teamName FROM teamData
+            WHERE id = ?
+            ORDER BY id ASC
+            """
+            cursor.execute(selectTeams, (teams_to_read,))
+            for team in cursor.fetchall():
+                teamNames.append(team[0])
+          
+        else:
+            selectTeams = """
+            SELECT teamName FROM teamData
+            ORDER BY id ASC
+            """
+            cursor.execute(selectTeams)
+        
+            for team in cursor.fetchall():
+                teamNames.append(team[0])
+                
+        cursor.close()
+        connection.close()
+
+        return teamNames
     
     
-    def read_teams_from_file(self, file_path):
-        try:
-            with open(file_path, 'r') as file:
-                teams = [line.strip() for line in file.readlines() if line.strip()]
-            return teams
-        except FileNotFoundError:
-            print("File not found")
-            return []
+    def read_teamIds(self):
+        teamIds = []
+        
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
+        
+        cursor.execute("SELECT id FROM teamData")
+        
+        for id in cursor.fetchall():
+            teamIds.append(id[0])
+            
+        cursor.close()
+        connection.close()
+
+        return teamIds
 
 ##############################################################################################
 
@@ -517,95 +642,88 @@ class Window(tk.Tk):
 
 
         # Inside your loop
-        for team in self.read_team_names(self.teams_playing):
+        for (team_name, team_id) in zip(self.read_teamNames(), self.read_teamIds()):
+
             #print(team)
             
             # Initialize the dictionary for the current team
-            self.spiel_buttons[team] = {}
+            self.spiel_buttons[team_id] = {}
 
-            try:
-                with open(f"data/{team}.txt", "r") as f:
                     
-                    self.for_team_frame = tk.Frame(self.SPIEL_frame, background="lightblue")
-                    self.for_team_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, fill="both", padx=10, expand=True)
-                    
-                    # Create global scores buttons, one for up and one for down
-                    score_button_frame = tk.Frame(self.for_team_frame, background="lightblue")
-                    score_button_frame.pack(pady=10, anchor=tk.E, side=tk.RIGHT, padx=10)
-                    
-                    score_button_up = tk.Button(score_button_frame, text="UP", command=lambda team=team: self.global_scored_a_point(team, "UP"), font=("Helvetica", 22))
-                    score_button_up.pack(pady=2, anchor=tk.N, side=tk.TOP, expand=True, fill=tk.X)
-                    
-                    score_label = tk.Label(score_button_frame, text="45", font=("Helvetica", 22))
-                    score_label.pack(pady=2, anchor=tk.N, side=tk.TOP, expand=True, fill=tk.X)
-                    
-                    score_button_down = tk.Button(score_button_frame, text="DOWN", command=lambda team=team: self.global_scored_a_point(team, "DOWN"), font=("Helvetica", 22))
-                    score_button_down.pack(pady=2, anchor=tk.N, side=tk.BOTTOM, expand=True, fill=tk.X)
-                    
-                    self.team_label = tk.Label(self.for_team_frame, text=team, font=("Helvetica", 18))
-                    self.team_label.pack(side=tk.LEFT, pady=2, anchor=tk.NW)
-                    
-                    self.spiel_buttons[team]["global"] = (self.for_team_frame, self.team_label)
-                    
-                    frame_frame = tk.Frame(self.for_team_frame, background="lightblue")
-                    frame_frame.pack(side=tk.TOP, pady=0, anchor=tk.N)
+            self.for_team_frame = tk.Frame(self.SPIEL_frame, background="lightblue")
+            self.for_team_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, fill="both", padx=10, expand=True)
+            
+            # Create global scores buttons, one for up and one for down
+            score_button_frame = tk.Frame(self.for_team_frame, background="lightblue")
+            score_button_frame.pack(pady=10, anchor=tk.E, side=tk.RIGHT, padx=10)
+            
+            score_button_up = tk.Button(score_button_frame, text="UP", command=lambda team=team_id: self.global_scored_a_point(team, "UP"), font=("Helvetica", 22))
+            score_button_up.pack(pady=2, anchor=tk.N, side=tk.TOP, expand=True, fill=tk.X)
+            
+            score_label = tk.Label(score_button_frame, text="45", font=("Helvetica", 22))
+            score_label.pack(pady=2, anchor=tk.N, side=tk.TOP, expand=True, fill=tk.X)
+            
+            score_button_down = tk.Button(score_button_frame, text="DOWN", command=lambda team=team_id: self.global_scored_a_point(team, "DOWN"), font=("Helvetica", 22))
+            score_button_down.pack(pady=2, anchor=tk.N, side=tk.BOTTOM, expand=True, fill=tk.X)
+            
+            self.team_label = tk.Label(self.for_team_frame, text=team_name, font=("Helvetica", 18))
+            self.team_label.pack(side=tk.LEFT, pady=2, anchor=tk.NW)
+            
+            self.spiel_buttons[team_id]["global"] = (self.for_team_frame, self.team_label)
+            
+            frame_frame = tk.Frame(self.for_team_frame, background="lightblue")
+            frame_frame.pack(side=tk.TOP, pady=0, anchor=tk.N)
 
-                    up_frame = tk.Frame(frame_frame, background="lightblue")
-                    up_frame.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.NW)
+            up_frame = tk.Frame(frame_frame, background="lightblue")
+            up_frame.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.NW)
 
-                    down_frame = tk.Frame(frame_frame, background="lightblue")
-                    down_frame.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.SW)
-                    
-                    for i, line in enumerate(f):
-                        
-                        if i < 8:
-                            self.group_frame = tk.Frame(up_frame, background="lightblue")
-                            self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
-                        else:
-                            self.group_frame = tk.Frame(down_frame, background="lightblue")
-                            self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
-                        
-                        #self.group_frame = tk.Frame(self.for_team_frame, background="lightcoral")
-                        #self.group_frame.pack(side=tk.LEFT, padx=10, pady=10)
+            down_frame = tk.Frame(frame_frame, background="lightblue")
+            down_frame.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.SW)
+            
 
-                        playertext1 = tk.Label(self.group_frame, text=f"Player {i}", font=("Helvetica", 14))
-                        playertext1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
-                        
-                        player_name, player_id, score = line.split(" - ", 2)
-                        score = score.replace("\n", "")
-                        playertext2_text = f"{player_name} - {player_id}"
-                        
-                        playertext2 = tk.Label(self.group_frame, text=playertext2_text , font=("Helvetica", 14))
-                        playertext2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
-                        
-                        playertext3 = tk.Label(self.group_frame, text=f"Tore {str(score)}", font=("Helvetica", 14))
-                        playertext3.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
+            for i, (player_name, player_number, goals) in enumerate(self.read_player_stats(team_id, True)):       
+                print(type(player_name), player_name)
+                if i < 8:
+                    self.group_frame = tk.Frame(up_frame, background="lightblue")
+                    self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
+                else:
+                    self.group_frame = tk.Frame(down_frame, background="lightblue")
+                    self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
+                
+                #self.group_frame = tk.Frame(self.for_team_frame, background="lightcoral")
+                #self.group_frame.pack(side=tk.LEFT, padx=10, pady=10)
 
-                        playerbutton1 = tk.Button(self.group_frame, text="UP", command=lambda team=team, player_index=i: self.player_scored_a_point(team, player_index, "UP"), font=("Helvetica", 14))
-                        playerbutton1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
-                        
-                        playerbutton2 = tk.Button(self.group_frame, text="DOWN", command=lambda team=team, player_index=i: self.player_scored_a_point(team, player_index, "DOWN"), font=("Helvetica", 14))
-                        playerbutton2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
-                        
-                        
-                        #print("team", team, "i", i)
+                playertext1 = tk.Label(self.group_frame, text=f"Player {i}", font=("Helvetica", 14))
+                playertext1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
+                
+                playertext2_text = f"{player_name} - {player_number}"
+                
+                playertext2 = tk.Label(self.group_frame, text=playertext2_text , font=("Helvetica", 14))
+                playertext2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
+                
+                playertext3 = tk.Label(self.group_frame, text=f"Tore {str(goals)}", font=("Helvetica", 14))
+                playertext3.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
 
-                        # Save the group_frame, playertext1, and playerbutton in each for loop with the team name as key
-                        self.spiel_buttons[team][i] = (self.group_frame, playertext1, playertext2, playertext3, playerbutton1, playerbutton2)  # Use append for a list
-                        
-                        #self.spiel_buttons[team] = (playerbutton)  # Use append for a list
+                playerbutton1 = tk.Button(self.group_frame, text="UP", command=lambda team=team_id, player_index=i: self.player_scored_a_point(team, player_index, "UP"), font=("Helvetica", 14))
+                playerbutton1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
+                
+                playerbutton2 = tk.Button(self.group_frame, text="DOWN", command=lambda team=team_id, player_index=i: self.player_scored_a_point(team, player_index, "DOWN"), font=("Helvetica", 14))
+                playerbutton2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
+                
+                
+                #print("team", team, "i", i)
 
-            except FileNotFoundError:
-                with open(f"data/{team}.txt", "w+") as f:
-                    f.write("")
+                # Save the group_frame, playertext1, and playerbutton in each for loop with the team name as key
+                self.spiel_buttons[team_id][i] = (self.group_frame, playertext1, playertext2, playertext3, playerbutton1, playerbutton2)  # Use append for a list
+                
+                #self.spiel_buttons[team] = (playerbutton)  # Use append for a list
 
-        
-        self.manual_team_select_1 = ttk.Combobox(manual_manual_frame, values=self.read_team_names(), font=("Helvetica", 14))
+        self.manual_team_select_1 = ttk.Combobox(manual_manual_frame, values=self.read_teamNames(), font=("Helvetica", 14))
         self.manual_team_select_1.pack(pady=10, side=tk.BOTTOM, anchor=tk.S)
         self.manual_team_select_1.bind("<<ComboboxSelected>>", lambda event, nr=1: self.on_team_select(event, nr))
         
         
-        self.manual_team_select_2 = ttk.Combobox(manual_manual_frame, values=self.read_team_names(), font=("Helvetica", 14))
+        self.manual_team_select_2 = ttk.Combobox(manual_manual_frame, values=self.read_teamNames(), font=("Helvetica", 14))
         self.manual_team_select_2.pack(pady=10, side=tk.BOTTOM, anchor=tk.S)
         self.manual_team_select_2.bind("<<ComboboxSelected>>", lambda event, nr=0: self.on_team_select(event, nr))
 
@@ -615,8 +733,8 @@ class Window(tk.Tk):
 
         if self.teams_playing.count(None) == 0:
             #print(self.teams_playing)
-            self.manual_team_select_1.set(self.read_team_names()[self.teams_playing[1]])
-            self.manual_team_select_2.set(self.read_team_names()[self.teams_playing[0]])
+            self.manual_team_select_1.set(self.read_teamNames()[self.teams_playing[1]])
+            self.manual_team_select_2.set(self.read_teamNames()[self.teams_playing[0]])
             
         if self.teams_playing.count(None) == 2:
             self.manual_team_select_1.state(["disabled"])
@@ -624,13 +742,13 @@ class Window(tk.Tk):
         if self.teams_playing.count(None) == 1:
             self.manual_team_select_1.state(["!disabled"])
             #print(self.teams_playing)
-            self.manual_team_select_2.set(self.read_team_names()[self.teams_playing[0]])        
+            self.manual_team_select_2.set(self.read_teamNames()[self.teams_playing[0]])        
 
     def on_team_select(self, event, nr):
         selected_team = event.widget.get()
         
         # Convert the value to the team index
-        team_index = self.read_team_names().index(selected_team)
+        team_index = self.read_teamNames().index(selected_team)
 
         # Ensure self.teams_playing has enough elements
         while len(self.teams_playing) <= nr:
@@ -641,14 +759,14 @@ class Window(tk.Tk):
         
         
         if self.teams_playing.count(None) == 0:
-            self.manual_team_select_1.set(self.read_team_names()[self.teams_playing[1]])
-            self.manual_team_select_2.set(self.read_team_names()[self.teams_playing[0]])
+            self.manual_team_select_1.set(self.read_teamNames()[self.teams_playing[1]])
+            self.manual_team_select_2.set(self.read_teamNames()[self.teams_playing[0]])
         
         #print(self.teams_playing)
         if self.teams_playing.count(None) == 1:
             self.manual_team_select_1.state(["!disabled"])
-            print(self.teams_playing)
-            self.manual_team_select_2.set(self.read_team_names()[self.teams_playing[0]])
+            #print(self.teams_playing)
+            self.manual_team_select_2.set(self.read_teamNames()[self.teams_playing[0]])
             
         
         
@@ -687,47 +805,31 @@ class Window(tk.Tk):
         self.create_function_name()
         
 
-    def player_scored_a_point(self, team, player_index, direction="UP"):
+    def player_scored_a_point(self, teamID, player_index, direction="UP"):
         # Get the current score
-        current_score = int(self.read_specific_player_stats(team, player_index, "score"))
+        current_goals = int(self.read_player_stats(teamID, True, player_index)[0][2])
         # Update the score
         if direction == "UP":
-            current_score += 1
+            current_goals += 1
         else:
-            current_score -= 1
+            current_goals -= 1
         # Update the score label
-        self.spiel_buttons[team][player_index][3].config(text=f"Tore {current_score}")
+        self.spiel_buttons[teamID][player_index][3].config(text=f"Tore {current_goals}")
         
-        with open(f"data/{team}.txt", "r") as f:
-            # read the line with the index of the player
-            lines = f.readlines()
-            line = lines[player_index]
-            # split the line into player name and score
-            player_name, player_id, _ = line.split(" - ", 2)
-            
-        with open(f"data/{team}.txt", "w") as f:
-            # write the line with the index of the player
-            lines[player_index] = f"{player_name} - {player_id} - {current_score}\n"
-            f.writelines(lines)
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
         
+        updateGoals = """
+        UPDATE playerData
+        SET goals = ?
+        WHERE id = ?
+        """
+        cursor.execute(updateGoals, (current_goals, player_index))
+        
+        cursor.close()
+        connection.commit()
+        connection.close()
         ###self.updated_data.update({"SPIEL": {team: self.read_team_names_player(team)}})
-    
-    
-    def read_specific_player_stats(self, team_name, player_index, stat):
-        with open(f"data/{team_name}.txt", "r") as f:
-            # read the line with the index of the player
-            lines = f.readlines()
-            line = lines[player_index]
-            # split the line into player name and score
-            player_name, player_id, score = line.split(" - ", 2)
-            if stat == "name":
-                return player_name
-            elif stat == "id":
-                return player_id
-            elif stat == "score":
-                return score
-            else:
-                return 0
     
     
     def create_matches_labels(self, frame):
@@ -754,7 +856,7 @@ class Window(tk.Tk):
         # get the index of the match that is currently being played and set the Combobox value to that match without using self.match_count - 1
         
         for match in matches:
-            match_teams_indexes = [self.read_team_names().index(match_team) for match_team in match["teams"]]
+            match_teams_indexes = [self.read_teamNames().index(match_team) for match_team in match["teams"]]
             if match_teams_indexes == self.teams_playing or match_teams_indexes[::-1] == self.teams_playing:
                 se = match["number"]
                 #print("got it")
@@ -792,12 +894,12 @@ class Window(tk.Tk):
         match_index = [match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1] for match in matches].index(selected_match)
 
         # Get the teams playing in the selected match and if there are none, set teams_playing to None
-        team_names = self.read_team_names()
+        team_names = self.read_teamNames()
         
         self.teams_playing = [team_names.index(matches[match_index]["teams"][0]), team_names.index(matches[match_index]["teams"][1])] if [team_names.index(matches[match_index]["teams"][0]), team_names.index(matches[match_index]["teams"][1])] else [None, None]
         # Update the buttons
         self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements)
-        print("match selected")
+        #print("match selected")
         
     
     def next_previous_match_button(self, spiel_select, matches, next_match=True):
@@ -813,53 +915,54 @@ class Window(tk.Tk):
             match_index -= 1
 
         # Get the teams playing in the selected match
-        team_names = self.read_team_names()
-        print(matches[match_index]["teams"][0], matches[match_index]["teams"][1], team_names)
+        team_names = self.read_teamNames()
+        #print(matches[match_index]["teams"][0], matches[match_index]["teams"][1], team_names)
         self.teams_playing = [team_names.index(matches[match_index]["teams"][0]), team_names.index(matches[match_index]["teams"][1])] if [team_names.index(matches[match_index]["teams"][0]), team_names.index(matches[match_index]["teams"][1])] else [None, None]
         
         # Update the buttons
         self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements)
 
 
-    def global_scored_a_point(self, team, direction="UP"):
+    def global_scored_a_point(self, teamID, direction="UP"):
         # Get the current score
-        current_score = int(self.read_team_stats(team, "score"))
+        current_score = int(self.read_team_active_goals(teamID))
         # Update the score
         if direction == "UP":
             current_score += 1
         else:
             current_score -= 1
             
-        self.write_score_for_team_into_file(team, current_score)
+        self.write_score_for_team_into_file(teamID, current_score)
     
 
         # Update the score label
-        self.spiel_buttons[team]["global"][1].config(text=team + " " + str(current_score))
+        self.spiel_buttons[teamID]["global"][1].config(text=teamID + " " + str(current_score))
+       
         
-    def write_score_for_team_into_file(self, team_name, score):
-        with open(f"data/team_names.txt", "r") as f:
-            # read the line with the index of the player
-            lines = f.readlines()
-            line = lines[team_name]
-            line = line.replace("\n", "")
-            line, _ = line.split(" - ", 1)
-            # split the line into player name and score
-            line = f"{line} - {score}\n"
+    def write_score_for_team_into_file(self, teamID, goals):
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
         
-        with open(f"data/team_names.txt", "w") as f:
-            # write the line with the index of the player
-            lines[team_name] = line
-            f.writelines(lines)
+        updateGoals = """
+        UPDATE teamData
+        SET goals = ?
+        WHERE id = ?
+        """
+        cursor.execute(updateGoals, (goals, teamID))
+        
+        cursor.close()
+        connection.commit()
+        connection.close()
             
     
     def read_team_stats(self, team_name, stat):
-        score = self.read_team_names(self.teams_playing, True)
+        score = self.read_teamNames(self.teams_playing, True)
         score = score[score.index(team_name)]
         if stat == "score":
             return score
         
     
-
+    
 ##############################################################################################
 
 ##############################################################################################
@@ -888,7 +991,7 @@ class Window(tk.Tk):
 
     def show_SPIEL_frame(self):
         self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements)
-        print(stored_data)
+        #print(stored_data)
         self.calculate_matches()
         self.show_frame(self.SPIEL_frame)
 
@@ -925,7 +1028,7 @@ class Window(tk.Tk):
         self.match_count = 0
 
         initial_data = {
-        "Teams": self.read_team_names(),
+        "Teams": self.read_teamNames(),
         "Tore": ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
         "ZeitIntervall": 10,
         "Startzeit": [9,30],
@@ -1010,7 +1113,7 @@ def get_initial_data(template_name):
     global initial_data
     tkapp.test()
     initial_data = {
-        "Teams": tkapp.read_team_names(),
+        "Teams": tkapp.read_teamNames(),
         "Tore": ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
         "ZeitIntervall": 10,
         "Startzeit": [9,30],
@@ -1086,7 +1189,4 @@ stored_data = {}
 tkapp = Window(False)
 
 if __name__ == "__main__":
-    
-    
     tkapp.mainloop()
-    
