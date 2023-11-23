@@ -26,31 +26,30 @@ function calculateMatches() {
 
     matchCount = 0; // Reset matchCount to 0
 
-    matches = matches.map(function(match) {
+    matches = matches.map(function (match) {
         matchCount++; // Increment the match count
-        match.number = "Spiel " + (matchCount);
+        match.number = "Spiel " + matchCount;
         return match;
     });
 
     // Send data to the server using Fetch API
-    fetch('/senddata', {
-        method: 'POST',
+    fetch("/senddata", {
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
         },
-        body: JSON.stringify(matches)
+        body: JSON.stringify(matches),
     })
-    .then(response => response.json())
-    .then(output => {
-        console.log('Response from server:', output);
-    })
-    .catch(error => {
-        console.error('Error sending data:', error);
-    });
-  
+        .then((response) => response.json())
+        .then((output) => {
+            console.log("Response from server:", output);
+        })
+        .catch((error) => {
+            console.error("Error sending data:", error);
+        });
+
     generateTableGroup(matches);
 }
-
 
 function calculateMatchesForGroup(teams, groupName) {
     var rounds = [];
@@ -68,33 +67,33 @@ function calculateMatchesForGroup(teams, groupName) {
 
     // Remove matches with the "dummy" team
     if (teams.includes("dummy")) {
-        rounds = rounds.map(function(round) {
-            return round.filter(function(match) {
+        rounds = rounds.map(function (round) {
+            return round.filter(function (match) {
                 return !match.includes("dummy");
             });
         });
     }
 
-    var matches = rounds.reduce(function(allMatches, round) {
+    var matches = rounds.reduce(function (allMatches, round) {
         return allMatches.concat(round);
     }, []);
 
-    matches = matches.map(function(match) {
+    matches = matches.map(function (match) {
         matchCount++; // Increment the match count
         return {
             number: "Spiel " + matchCount,
             teams: match,
-            group: groupName
+            group: groupName,
         };
     });
 
     return matches;
 }
 
-
 function interleaveMatches(matches1, matches2) {
     var matches = [];
-    var i = 0, j = 0;
+    var i = 0,
+        j = 0;
     while (i < matches1.length || j < matches2.length) {
         if (i < matches1.length) {
             matches.push(matches1[i++]);
@@ -105,7 +104,6 @@ function interleaveMatches(matches1, matches2) {
     }
     return matches;
 }
-
 
 function generateTableGroup(matches) {
     var tablesContainer = document.getElementById("tablesContainer");
@@ -146,12 +144,14 @@ function generateTableGroup(matches) {
 
     console.log(matches);
     // Add the new matches to the table
-    matches.forEach(function(match) {
+    matches.forEach(function (match) {
         var row = tbody.insertRow();
 
         var cellTime = row.insertCell(0);
         var matchNumber = parseInt(match.number.split(" ")[1]);
-        var matchTime = new Date(startTime.getTime() + matchNumber * timeInterval * 60000);
+        var matchTime = new Date(
+            startTime.getTime() + matchNumber * timeInterval * 60000
+        );
         cellTime.textContent = formatTime(matchTime);
 
         var cellMatchNumber = row.insertCell(1);
@@ -171,41 +171,44 @@ function generateTableGroup(matches) {
     });
 }
 
-
 function updateData() {
     // Include the last data version in the request headers
     var headers = new Headers();
-    headers.append('Last-Data-Update', data['LastUpdate']);
+    headers.append("Last-Data-Update", data["LastUpdate"]);
 
-    fetch('/update_data', {
-        headers: headers
+    fetch("/update_data", {
+        headers: headers,
     })
-    .then(response => response.json())
-    .then(updatedData => {
-        console.log('Updated data:', updatedData);
+        .then((response) => response.json())
+        .then((updatedData) => {
+            console.log("Updated data:", updatedData);
 
-        // Update variables in JavaScript
-        for (var key in updatedData) {
-            if (updatedData.hasOwnProperty(key)) {
-                data[key] = updatedData[key];
+            // Update variables in JavaScript
+            for (var key in updatedData) {
+                if (updatedData.hasOwnProperty(key)) {
+                    data[key] = updatedData[key];
+                }
             }
-        }
-    })
-    .catch(error => console.error('Error fetching data:', error));
+        })
+        .catch((error) => console.error("Error fetching data:", error));
 
-
-    setTimeout(function() {
+    setTimeout(function () {
         calculateMatches();
     }, 500);
 }
 
-
 function formatTime(date) {
     var hours = date.getHours();
     var minutes = date.getMinutes();
-    return (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes + ' Uhr';
+    return (
+        (hours < 10 ? "0" : "") +
+        hours +
+        ":" +
+        (minutes < 10 ? "0" : "") +
+        minutes +
+        " Uhr"
+    );
 }
-
 
 calculateMatches();
 // call updateData() every 5 seconds

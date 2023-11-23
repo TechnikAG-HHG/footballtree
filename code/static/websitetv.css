@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
     height: 100vh;
     width: 170%;
     padding: 15vh 15vh 15vh 15vh;
@@ -8,12 +9,11 @@ h1 {
     color: white;
     font-size: 11vh;
     text-align: center;
-    font-family: 'Roboto', sans-serif;
+    font-family: "Roboto", sans-serif;
     padding-bottom: 10vh;
     padding-top: 10vh;
     flex-shrink: 10;
 }
-
 
 body {
     width: 100%;
@@ -21,11 +21,10 @@ body {
     justify-content: center;
     align-items: center;
     background-color: #1a1a1a;
-    font-family: 'Roboto', sans-serif;
+    font-family: "Roboto", sans-serif;
     flex-wrap: wrap;
     align-content: center;
 }
-
 
 #tablesContainer {
     position: relative;
@@ -39,7 +38,6 @@ body {
     flex-wrap: wrap;
     flex-shrink: 100%;
 }
-
 
 /* Media query for larger screens */
 @media screen and (min-width: 1000px) {
@@ -55,7 +53,8 @@ body {
         font-size: 125px;
     }
 
-    html, body {
+    html,
+    body {
         height: 100vh;
         width: 100%;
         margin: 0;
@@ -63,7 +62,6 @@ body {
         padding-top: 3%;
     }
 }
-
 
 table {
     border-collapse: collapse;
@@ -80,18 +78,17 @@ table {
     justify-content: center;
 }
 
-
-table, th, td {
+table,
+th,
+td {
     border: 3px solid #49ba67;
-
 }
 
-
-th, td {
+th,
+td {
     padding: 10px;
     text-align: center;
 }
-
 
 th {
     background-color: #f2f2f2;
@@ -101,14 +98,13 @@ th {
     color: white;
     font-size: 70px;
     text-align: center;
-    font-family: 'Roboto', sans-serif;
+    font-family: "Roboto", sans-serif;
     font-weight: bold;
 }
-
 
 .tableCell {
     color: white;
     font-size: 50px;
     text-align: center;
-    font-family: 'Roboto', sans-serif;
+    font-family: "Roboto", sans-serif;
 }

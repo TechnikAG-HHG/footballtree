@@ -8,7 +8,6 @@ function drawTree() {
 
     console.log("drawTree() called");
 
-
     // create the final box in the middle
     var boxfinal = document.createElement("div");
     // Set class for styling
@@ -22,7 +21,7 @@ function drawTree() {
     subboxfinal.className = "drawn-sub-box-final";
     subboxfinal.className += ` drawn-sub-box`;
 
-    var subboxmargintodraw =  marginsubbox / Math.pow(3, 1);
+    var subboxmargintodraw = marginsubbox / Math.pow(3, 1);
     subboxfinal.style.marginTop = `${subboxmargintodraw}px`;
     subboxfinal.style.marginBottom = `${subboxmargintodraw}px`;
     boxfinal.appendChild(subboxfinal);
@@ -32,14 +31,12 @@ function drawTree() {
     subboxfinaltext.className += ` text0`;
     subboxfinal.appendChild(subboxfinaltext);
 
-
     // calculate how many boxes to draw in each direction
     while (boxes > 2) {
         boxes = boxes / 2;
         boxestodraw++;
     }
     boxestodraw = boxestodraw + 2;
-
 
     // draw the boxes
     for (var i = 1; i < boxestodraw; i++) {
@@ -54,7 +51,7 @@ function drawTree() {
         box2.className = `box${i}`;
         box2.className += " drawn-box";
         box2.style.height = `${boxheight}%`;
-    
+
         // Append the boxes to the container
         document.getElementById("main-container").appendChild(box1);
         document.getElementById("main-container").prepend(box2);
@@ -70,27 +67,27 @@ function drawTree() {
         subboxestodraw = subboxestodraw / 4;
 
         for (var x = 0; x < subboxestodraw; x++) {
-            var subboxmargintodraw =  marginsubbox / Math.pow(3, i);
-            
+            var subboxmargintodraw = marginsubbox / Math.pow(3, i);
+
             var subbox1 = document.createElement("div");
             subbox1.className = `subbox${x}`;
             subbox1.className += " drawn-sub-box";
             subbox1.style.marginTop = `${subboxmargintodraw}px`;
             subbox1.style.marginBottom = `${subboxmargintodraw}px`;
             box1.appendChild(subbox1);
-        
+
             var teamname1 = document.createElement("div");
             teamname1.className = "team-name";
             teamname1.className += ` text${(textsdrawn + 1) * 2}`;
             subbox1.appendChild(teamname1);
-        
+
             var subbox2 = document.createElement("div");
             subbox2.className = `subbox${x}`;
             subbox2.className += " drawn-sub-box";
             subbox2.style.marginTop = `${subboxmargintodraw}px`;
             subbox2.style.marginBottom = `${subboxmargintodraw}px`;
             box2.appendChild(subbox2);
-        
+
             var teamname2 = document.createElement("div");
             teamname2.className = "team-name";
             teamname2.className += ` text${(textsdrawn + 1) * 2 - 1}`;
@@ -110,37 +107,35 @@ function drawText(textsdrawn) {
         }
         textsdrawn--;
     }
-}  
-
+}
 
 function drawLines() {
     // Remove the existing SVG element if it exists
-    var existingSvg = document.querySelector('svg');
+    var existingSvg = document.querySelector("svg");
     if (existingSvg) {
         existingSvg.remove();
     }
     // Create an SVG element
     var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.style.width = '100%';
-    svg.style.height = '100%';
-    svg.style.position = 'absolute';
-    svg.style.top = '0';
-    svg.style.left = '0';
-    svg.style.zIndex = '1';
+    svg.style.width = "100%";
+    svg.style.height = "100%";
+    svg.style.position = "absolute";
+    svg.style.top = "0";
+    svg.style.left = "0";
+    svg.style.zIndex = "1";
     document.getElementById("main-container").appendChild(svg);
 
     // Get all the boxes
-    var boxes = Array.from(document.getElementsByClassName('drawn-box'));
+    var boxes = Array.from(document.getElementsByClassName("drawn-box"));
 
     // Find the boxfinal
-    var boxfinal = document.getElementsByClassName('drawn-box-final')[0];
+    var boxfinal = document.getElementsByClassName("drawn-box-final")[0];
 
     // If boxfinal is not in boxes, use the middle box
     var middleIndex = boxes.indexOf(boxfinal);
     if (middleIndex === -1) {
         middleIndex = Math.floor(boxes.length / 2);
     }
-
 
     // Draw lines to the left
     for (var i = middleIndex - 1; i >= 0; i--) {
@@ -159,8 +154,8 @@ function drawLines() {
 
 function drawLinesBetweenBoxes(box, nextBox, svg) {
     // Get the subboxes of the box and the next box
-    var subboxes = box.getElementsByClassName('drawn-sub-box');
-    var nextSubboxes = nextBox.getElementsByClassName('drawn-sub-box');
+    var subboxes = box.getElementsByClassName("drawn-sub-box");
+    var nextSubboxes = nextBox.getElementsByClassName("drawn-sub-box");
 
     // For each subbox
     for (var j = 0; j < subboxes.length; j++) {
@@ -171,7 +166,7 @@ function drawLinesBetweenBoxes(box, nextBox, svg) {
         var y1 = subbox.offsetTop + subbox.offsetHeight / 2;
 
         // For each of the two subboxes directly below the current subbox
-        for (var k = 2*j; k < 2*j + 2 && k < nextSubboxes.length; k++) {
+        for (var k = 2 * j; k < 2 * j + 2 && k < nextSubboxes.length; k++) {
             var nextSubbox = nextSubboxes[k];
 
             // Calculate the coordinates of the end point of the line
@@ -179,64 +174,65 @@ function drawLinesBetweenBoxes(box, nextBox, svg) {
             var y2 = nextSubbox.offsetTop + nextSubbox.offsetHeight / 2;
 
             // Create an SVG line element for the horizontal line
-            var line1 = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-            line1.setAttribute('x1', x1);
-            line1.setAttribute('y1', y1);
-            line1.setAttribute('x2', x1);
-            line1.setAttribute('y2', y2);
-            line1.setAttribute('stroke', '#73deb9');
-            line1.setAttribute('stroke-width', '5');
+            var line1 = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "line"
+            );
+            line1.setAttribute("x1", x1);
+            line1.setAttribute("y1", y1);
+            line1.setAttribute("x2", x1);
+            line1.setAttribute("y2", y2);
+            line1.setAttribute("stroke", "#73deb9");
+            line1.setAttribute("stroke-width", "5");
 
             // Create an SVG line element for the vertical line
-            var line2 = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-            line2.setAttribute('x1', x1);
-            line2.setAttribute('y1', y2);
-            line2.setAttribute('x2', x2);
-            line2.setAttribute('y2', y2);
-            line2.setAttribute('stroke', '#73deb9');
-            line2.setAttribute('stroke-width', '5');
+            var line2 = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "line"
+            );
+            line2.setAttribute("x1", x1);
+            line2.setAttribute("y1", y2);
+            line2.setAttribute("x2", x2);
+            line2.setAttribute("y2", y2);
+            line2.setAttribute("stroke", "#73deb9");
+            line2.setAttribute("stroke-width", "5");
 
             // Append the lines to the SVG element
             svg.appendChild(line1);
             svg.appendChild(line2);
 
-            subbox.style.backgroundColor = '#1a1a1a';
+            subbox.style.backgroundColor = "#1a1a1a";
         }
     }
 }
 
-
 function updateData() {
     // Include the last data version in the request headers
     var headers = new Headers();
-    headers.append('Last-Data-Update', data['LastUpdate']);
+    headers.append("Last-Data-Update", data["LastUpdate"]);
 
-    fetch('/update_data', {
-        headers: headers
+    fetch("/update_data", {
+        headers: headers,
     })
-    .then(response => response.json())
-    .then(updatedData => {
-        console.log('Updated data:', updatedData);
+        .then((response) => response.json())
+        .then((updatedData) => {
+            console.log("Updated data:", updatedData);
 
-        // Update variables in JavaScript
-        for (var key in updatedData) {
-            if (updatedData.hasOwnProperty(key)) {
-                data[key] = updatedData[key];
+            // Update variables in JavaScript
+            for (var key in updatedData) {
+                if (updatedData.hasOwnProperty(key)) {
+                    data[key] = updatedData[key];
+                }
             }
-        }
-    })
-    .catch(error => console.error('Error fetching data:', error));
+        })
+        .catch((error) => console.error("Error fetching data:", error));
 
-    setTimeout(function() {
+    setTimeout(function () {
         drawTeams();
     }, 500);
 }
 
-
-function drawTeams() {
-
-}
-
+function drawTeams() {}
 
 drawTree();
 
@@ -244,7 +240,7 @@ drawLines();
 
 drawTeams();
 
-window.onresize = function() {
+window.onresize = function () {
     drawLines();
 };
 

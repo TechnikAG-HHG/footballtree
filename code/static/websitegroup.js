@@ -1,15 +1,14 @@
-
-var tableCount = 2
-var teamCount = 0
-var entriesPerTable = 6
+var tableCount = 2;
+var teamCount = 0;
+var entriesPerTable = 6;
 
 function generateTables() {
     var tablesContainer = document.getElementById("tablesContainer");
-    tablesContainer.innerHTML = '';
+    tablesContainer.innerHTML = "";
 
-    var tableCount = 2
-    var teamCount = data.Teams.length
-    var entriesPerTable = teamCount / tableCount
+    var tableCount = 2;
+    var teamCount = data.Teams.length;
+    var entriesPerTable = teamCount / tableCount;
 
     for (var i = 1; i <= tableCount; i++) {
         var table = document.createElement("table");
@@ -63,57 +62,60 @@ function generateTables() {
         tablesContainer.appendChild(table);
     }
 
-
-    console.log('Initial data:', data);
+    console.log("Initial data:", data);
 
     updateTables(data);
 }
 
-
 function updateData() {
     // Include the last data version in the request headers
     var headers = new Headers();
-    headers.append('Last-Data-Update', data['LastUpdate']);
+    headers.append("Last-Data-Update", data["LastUpdate"]);
 
-    fetch('/update_data', {
-        headers: headers
+    fetch("/update_data", {
+        headers: headers,
     })
-    .then(response => response.json())
-    .then(updatedData => {
-        console.log('Updated data:', updatedData);
+        .then((response) => response.json())
+        .then((updatedData) => {
+            console.log("Updated data:", updatedData);
 
-        // Update variables in JavaScript
-        for (var key in updatedData) {
-            if (updatedData.hasOwnProperty(key)) {
-                data[key] = updatedData[key];
+            // Update variables in JavaScript
+            for (var key in updatedData) {
+                if (updatedData.hasOwnProperty(key)) {
+                    data[key] = updatedData[key];
+                }
             }
-        }
-    })
-    .catch(error => console.error('Error fetching data:', error));
+        })
+        .catch((error) => console.error("Error fetching data:", error));
 
-    setTimeout(function() {
+    setTimeout(function () {
         updateTables(data);
     }, 500);
 }
 
-
 function updateTables(data) {
     for (var x = 1; x < tableCount + 1; x++) {
-        var tables = Array.from(document.querySelectorAll(`.table${x} tbody tr`));
+        var tables = Array.from(
+            document.querySelectorAll(`.table${x} tbody tr`)
+        );
         // update team names
 
-        console.log('table', x)
+        console.log("table", x);
 
         var y = 1;
-        for (var i = x * entriesPerTable - entriesPerTable; i < data.Teams.length && y < 7; i++) {
+        for (
+            var i = x * entriesPerTable - entriesPerTable;
+            i < data.Teams.length && y < 7;
+            i++
+        ) {
             var team = data.Teams[i];
             var Sp = 0;
             var T = data.Tore[i];
             var P = 0;
 
-            console.log(y, team, Sp, T, P, entriesPerTable, i)
+            console.log(y, team, Sp, T, P, entriesPerTable, i);
 
-            tables.forEach(function(table) {
+            tables.forEach(function (table) {
                 var nameCell = table.getElementsByClassName("nameCell" + y)[0];
                 if (nameCell) {
                     nameCell.textContent = team;
