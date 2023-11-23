@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
     height: 95%;
     width: 95%;
     margin: 0;
@@ -9,9 +10,8 @@ h1 {
     color: white;
     font-size: 75px;
     text-align: center;
-    font-family: 'Roboto', sans-serif;
+    font-family: "Roboto", sans-serif;
 }
-
 
 body {
     width: 100%;
@@ -23,9 +23,8 @@ body {
     background-color: #1a1a1a;
     margin: 0;
     padding: 0;
-    font-family: 'Roboto', sans-serif;
+    font-family: "Roboto", sans-serif;
 }
-
 
 #main-container {
     position: relative;
@@ -68,7 +67,7 @@ body {
 .drawn-sub-box {
     width: 100%;
     height: 100%;
-    background-color:#1a1a1a;
+    background-color: #1a1a1a;
     border: 5px solid #49ba67;
     border-radius: 5px;
     display: flex;
@@ -83,7 +82,7 @@ body {
 .drawn-sub-box-final {
     width: 100%;
     height: 100%;
-    background-color:#1a1a1a;
+    background-color: #1a1a1a;
     border: 5px solid gold;
     border-radius: 5px;
     display: flex;

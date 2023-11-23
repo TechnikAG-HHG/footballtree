@@ -19,8 +19,8 @@ function calculateMatches(teams) {
 
     // Remove matches with the "dummy" team
     if (teams.includes("dummy")) {
-        rounds = rounds.map(function(round) {
-            return round.filter(function(match) {
+        rounds = rounds.map(function (round) {
+            return round.filter(function (match) {
                 return !match.includes("dummy");
             });
         });
@@ -29,6 +29,19 @@ function calculateMatches(teams) {
     return rounds;
 }
 
-var teams = ["Team1", "Team2", "Team3", "Team4", "Team5", "Team6", "Team7", "Team8", "Team9", "Team10", "Team11", "Team12"];
+var teams = [
+    "Team1",
+    "Team2",
+    "Team3",
+    "Team4",
+    "Team5",
+    "Team6",
+    "Team7",
+    "Team8",
+    "Team9",
+    "Team10",
+    "Team11",
+    "Team12",
+];
 var matches = calculateMatches(teams);
 console.log(matches);
