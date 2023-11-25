@@ -15,7 +15,7 @@ lock = threading.Lock()
 
 class Window(tk.Tk):
     def create_navigation_bar(self):
-        navigation_frame = tk.Frame(self, bg="lightgray")
+        navigation_frame = ttk.Frame(self)
         navigation_frame.pack(side=tk.LEFT, fill=tk.Y)
 
         buttons = [
@@ -28,8 +28,8 @@ class Window(tk.Tk):
         button_width = 10  # Set a fixed width for all buttons
 
         for text, command in buttons:
-            button = tk.Button(navigation_frame, text=text, command=command, width=button_width, pady=5, font=("Helvetica", 14))
-            button.pack(side=tk.TOP, anchor=tk.W)
+            button = ttk.Button(navigation_frame, text=text, command=command, width=button_width)
+            button.pack(side=tk.TOP, anchor=tk.W, pady=5)
             
             
     def __init__(self, start_server=True):
@@ -45,23 +45,29 @@ class Window(tk.Tk):
         # Set window title
         self.title("Football Tournament Manager")
         self.state('zoomed')
+        try:
+            icon_path = os.path.join('..', 'icon.ico')
+            self.iconbitmap(icon_path)
+        except:
+            icon_path = os.path.join('icon.ico')
+            self.iconbitmap(icon_path)
         
         self.init_sqlite_db()
         
-        menu = tk.Menu(self)
-        self.config(menu=menu)
-        filemenu = tk.Menu(menu)
-        menu.add_cascade(label="Manager", menu=filemenu)
-        filemenu.add_command(label="Exit", command=self.quit)
+        #menu = tk.Menu(self)
+        #self.config(menu=menu)
+        #filemenu = tk.Menu(menu)
+        #menu.add_cascade(label="Manager", menu=filemenu)
+        #filemenu.add_command(label="Exit", command=self.quit)
 
         # Create and pack the navigation bar
         self.create_navigation_bar()
 
         # Create frames for different sets of elements
-        self.Team_frame = tk.Frame(self, bg="lightblue")
-        self.player_frame = tk.Frame(self, bg="lightgreen")
-        self.SPIEL_frame = tk.Frame(self, bg="lightcoral")
-        #self.contact_frame = tk.Frame(self, bg="lightyellow")
+        self.Team_frame = ttk.Frame(self)
+        self.player_frame = ttk.Frame(self)
+        self.SPIEL_frame = ttk.Frame(self)
+        #self.contact_frame = ttk.Frame(self, bg="lightyellow")
 
         # Create elements for each frame
         self.create_Team_elements()
@@ -140,11 +146,11 @@ class Window(tk.Tk):
 
         # Create a label with "Team 1" and the count
         label_text = f'Team {count}'
-        label = tk.Label(self.frame, text=label_text, font=("Helvetica", 14))  # Increase font size
+        label = ttk.Label(self.frame, text=label_text, font=("Helvetica", 14))  # Increase font size
         label.grid(row=len(self.name_entries), column=0, padx=5, pady=5, sticky='e')
 
         # Create a new entry field
-        new_entry = tk.Entry(self.frame, font=("Helvetica", 14))  # Increase font size
+        new_entry = ttk.Entry(self.frame, font=("Helvetica", 14))  # Increase font size
         
         # Write entry_text to the entry field if it is not empty
         if entry_text:
@@ -199,12 +205,8 @@ class Window(tk.Tk):
         self.updated_data.update({"Team": self.read_teamNames().pop(0)})
         self.connection.commit()
         
-        
-
     
     def write_names_into_entry_fields(self):
-        
-        
         selectTeams = """
         SELECT teamName FROM teamData
         ORDER BY id ASC
@@ -214,14 +216,11 @@ class Window(tk.Tk):
         for teamName in self.cursor.fetchall():
             self.add_name_entry(teamName[0])
             
-        
-        
-
 
     def create_Team_elements(self):
         
         # Create elements for the Team frame
-        canvas = tk.Canvas(self.Team_frame, bg="lightblue")
+        canvas = tk.Canvas(self.Team_frame)
         canvas.pack(side="left", fill="both", expand=True)
         
         # Create a scrollbar and connect it to the canvas
@@ -229,7 +228,7 @@ class Window(tk.Tk):
         scrollbar.pack(side="right", fill="y")
         canvas.configure(yscrollcommand=scrollbar.set)
         
-        self.frame = tk.Frame(canvas, bg="lightblue")
+        self.frame = ttk.Frame(canvas)
         canvas.create_window((0, 0), window=self.frame, anchor="nw")
         
         name_entries = []
@@ -238,17 +237,17 @@ class Window(tk.Tk):
         self.frame.bind("<Configure>", lambda event, canvas=canvas: self.on_frame_configure(canvas))
 
         # Button to add a new name entry
-        add_button = tk.Button(self.Team_frame, text="Add Name", command=self.add_name_entry, font=("Helvetica", 14))
+        add_button = ttk.Button(self.Team_frame, text="Add Name", command=self.add_name_entry)
         add_button.pack(pady=10)
 
         # Button to retrieve the entered names
 
 
-        submit_button = tk.Button(self.Team_frame, text="Submit", command=self.save_team_names_in_db, font=("Helvetica", 14))
+        submit_button = ttk.Button(self.Team_frame, text="Submit", command=self.save_team_names_in_db)
         submit_button.pack(pady=10)
 
         
-        reload_button = tk.Button(self.Team_frame, text="Reload", command=self.reload_button_command, font=("Helvetica", 14))
+        reload_button = ttk.Button(self.Team_frame, text="Reload", command=self.reload_button_command)
         reload_button.pack(pady=10)
         
 
@@ -261,30 +260,30 @@ class Window(tk.Tk):
         #player_button = tk.Button(self.player_frame, text="player Button", command=self.player_button_command)
         #player_button.pack(pady=10)
         # Create elements for the Team frame
-        canvas = tk.Canvas(self.player_frame, bg="lightgreen")
-        canvas.pack( fill="both", expand=True, side="bottom")
-        
+        canvas = tk.Canvas(self.player_frame)
+        canvas.pack(fill="both", expand=True, side="bottom")
+
         # Create a scrollbar and connect it to the canvas
         scrollbar = ttk.Scrollbar(self.player_frame, orient="vertical", command=canvas.yview)
         scrollbar.pack(side=tk.LEFT, fill="y")
         canvas.configure(yscrollcommand=scrollbar.set)
-        
-        self.frameplayer = tk.Frame(canvas, bg="lightgreen")
+
+        self.frameplayer = ttk.Frame(canvas)
         canvas.create_window((0, 0), window=self.frameplayer, anchor="nw")
         
         
         # Button to add a new name entry
-        add_button = tk.Button(self.player_frame, text="Add Name", command=lambda: self.add_name_entry_player(self.frameplayer, "Player"), font=("Helvetica", 14))
+        add_button = ttk.Button(self.player_frame, text="Add Name", command=lambda: self.add_name_entry_player(self.frameplayer, "Player"))
         add_button.pack(pady=5, padx=5, anchor=tk.NE, side=tk.RIGHT)    
 
         # Button to retrieve the entered names
 
 
-        submit_button = tk.Button(self.player_frame, text="Submit", command=self.save_names_player, font=("Helvetica", 14))
+        submit_button = ttk.Button(self.player_frame, text="Submit", command=self.save_names_player)
         submit_button.pack(pady=5, padx=5, anchor=tk.NE, side=tk.RIGHT)    
 
         
-        reload_button = tk.Button(self.player_frame, text="Reload", command=self.reload_button_player_command, font=("Helvetica", 14))
+        reload_button = ttk.Button(self.player_frame, text="Reload", command=self.reload_button_player_command)
         reload_button.pack(pady=5, padx=5, anchor=tk.NE, side=tk.RIGHT)    
         
         self.selected_team = ""
@@ -297,14 +296,14 @@ class Window(tk.Tk):
         for i, teamID in enumerate(team_IDs):
             teamName = teamNames[int(teamID)]
             #print(teamName)
-            team_button = tk.Button(
+            team_button = ttk.Button(
                 self.player_frame,
                 text=teamName,
                 command=lambda id=teamID, i2=i: self.select_team(id, self.team_button_list, i2)
             )
             team_button.pack(pady=5, padx=5, anchor=tk.NW, side=tk.LEFT)
             self.team_button_list.append(team_button)
-            team_button.config(bg="lightgray")
+            
         
         
     def save_names_player(self, team_id=-1):
@@ -393,15 +392,15 @@ class Window(tk.Tk):
 
         # Create a label with "Team 1" and the count
         label_text = f'{Counter} {count}'
-        label = tk.Label(Frame, text=label_text, font=("Helvetica", 14))  # Increase font size
+        label = ttk.Label(Frame, text=label_text, font=("Helvetica", 14))  # Increase font size
         label.grid(row=len(self.variable_dict[varentrie1name]), column=0, padx=5, pady=5, sticky='e')
 
         # Create a new entry field
-        new_entry = tk.Entry(Frame, font=("Helvetica", 14))  # Increase font size
+        new_entry = ttk.Entry(Frame)  # Increase font size
         
-        new_entry2 = tk.Entry(Frame, font=("Helvetica", 14))  # Increase font size
+        new_entry2 = ttk.Entry(Frame)  # Increase font size
         
-        new_entry3 = tk.Entry(Frame, font=("Helvetica", 14))  # Increase font size
+        new_entry3 = ttk.Entry(Frame)  # Increase font size
         #print("entry_text", entry_text)
         #print("new_entry")
 
@@ -457,14 +456,13 @@ class Window(tk.Tk):
         
         for i, teamID in enumerate(team_IDs):
             teamName = teamNames[int(teamID)]
-            team_button = tk.Button(
+            team_button = ttk.Button(
                 self.player_frame,
                 text=teamName,
                 command=lambda id=teamID, i2=i: self.select_team(id, self.team_button_list, i2)
             )
             team_button.pack(pady=5, padx=5, anchor=tk.NW, side=tk.LEFT)
             self.team_button_list.append(team_button)
-            team_button.config(bg="lightgray")
     
         
         varcountname = f"count{str(self.frameplayer)}"
@@ -496,12 +494,10 @@ class Window(tk.Tk):
     
     def select_team(self, teamID, team_button_list, index):
         
-        for button in team_button_list:
-            button.config(bg="lightgray")
+        #for button in team_button_list:
+        #    button.config(bg="lightgray")
         
         team_button = team_button_list[index]
-        
-        team_button.config(bg="red")
         
         varcountname = f"count{str(self.frameplayer)}"
         varentrie1name = f"entries{str(self.frameplayer)}"
@@ -538,7 +534,6 @@ class Window(tk.Tk):
           
             
     def read_player_stats(self, teamID, readGoals=False, playerID=-1):
-        
         output = []
 
         if readGoals and playerID == -1:
@@ -586,9 +581,7 @@ class Window(tk.Tk):
             for row in self.cursor.fetchall():
                 output.append(row)
                 
-        
-        
-        
+
         return output
             
             
@@ -627,57 +620,45 @@ class Window(tk.Tk):
     def read_teamIds(self):
         teamIds = []
         
-        
         self.cursor.execute("SELECT id FROM teamData")
         
         for id in self.cursor.fetchall():
             teamIds.append(id[0])
-            
-        
-        
 
         return teamIds
 
 
     def get_team_id_from_team_name(self, team_name):
-        
-        
+
         self.cursor.execute("SELECT id FROM teamData WHERE teamName = ?", (team_name,))
         
         team_id = self.cursor.fetchone()[0]
-        
-        
-        
         
         return team_id
     
     def get_player_id_from_player_name(self, player_name):
         
-        
         self.cursor.execute("SELECT id FROM playerData WHERE playerName = ?", (player_name,))
         
         player_id = self.cursor.fetchone()[0]
-        
-        
-        
         
         return player_id
 
 
 ##############################################################################################
-
+##############################################################################################
 ##############################################################################################
 
     def create_SPIEL_elements(self):
         # Create elements for the SPIEL frame
         
-        manual_frame = tk.Frame(self.SPIEL_frame, bg="lightcoral")
+        manual_frame = ttk.Frame(self.SPIEL_frame)
         manual_frame.pack(pady=5, anchor=tk.S, side=tk.BOTTOM, padx=5, fill=tk.X)
         
-        manual_manual_frame = tk.Frame(manual_frame, bg="lightcoral")
+        manual_manual_frame = ttk.Frame(manual_frame)
         manual_manual_frame.pack(pady=0, anchor=tk.SE, side=tk.RIGHT, padx=0)
         
-        SPIEL_button = tk.Button(manual_manual_frame, text="Reload", command=lambda : self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements), font=("Helvetica", 14))
+        SPIEL_button = ttk.Button(manual_manual_frame, text="Reload", command=lambda : self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements))
         SPIEL_button.pack(pady=10, side=tk.BOTTOM, anchor=tk.S) 
         
         
@@ -709,34 +690,34 @@ class Window(tk.Tk):
             self.spiel_buttons[team_id] = {}
 
                     
-            self.for_team_frame = tk.Frame(self.SPIEL_frame, background="lightblue")
+            self.for_team_frame = ttk.Frame(self.SPIEL_frame)
             self.for_team_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, fill="both", padx=10, expand=True)
             
             # Create global scores buttons, one for up and one for down
-            score_button_frame = tk.Frame(self.for_team_frame, background="lightblue")
+            score_button_frame = ttk.Frame(self.for_team_frame)
             score_button_frame.pack(pady=10, anchor=tk.E, side=tk.RIGHT, padx=10)
             
-            score_button_up = tk.Button(score_button_frame, text="UP", command=lambda team=team_id: self.global_scored_a_point(team, "UP"), font=("Helvetica", 22))
+            score_button_up = ttk.Button(score_button_frame, text="UP", command=lambda team=team_id: self.global_scored_a_point(team, "UP"))
             score_button_up.pack(pady=2, anchor=tk.N, side=tk.TOP, expand=True, fill=tk.X)
             
-            score_label = tk.Label(score_button_frame, text="45", font=("Helvetica", 22))
+            score_label = ttk.Label(score_button_frame, text="45", font=("Helvetica", 14))
             score_label.pack(pady=2, anchor=tk.N, side=tk.TOP, expand=True, fill=tk.X)
             
-            score_button_down = tk.Button(score_button_frame, text="DOWN", command=lambda team=team_id: self.global_scored_a_point(team, "DOWN"), font=("Helvetica", 22))
+            score_button_down = ttk.Button(score_button_frame, text="DOWN", command=lambda team=team_id: self.global_scored_a_point(team, "DOWN"))
             score_button_down.pack(pady=2, anchor=tk.N, side=tk.BOTTOM, expand=True, fill=tk.X)
             
-            self.team_label = tk.Label(self.for_team_frame, text=team_name, font=("Helvetica", 18))
+            self.team_label = ttk.Label(self.for_team_frame, text=team_name, font=("Helvetica", 14))
             self.team_label.pack(side=tk.LEFT, pady=2, anchor=tk.NW)
             
             self.spiel_buttons[team_id]["global"] = (self.for_team_frame, self.team_label)
             
-            frame_frame = tk.Frame(self.for_team_frame, background="lightblue")
+            frame_frame = ttk.Frame(self.for_team_frame)
             frame_frame.pack(side=tk.TOP, pady=0, anchor=tk.N)
 
-            up_frame = tk.Frame(frame_frame, background="lightblue")
+            up_frame = ttk.Frame(frame_frame)
             up_frame.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.NW)
 
-            down_frame = tk.Frame(frame_frame, background="lightblue")
+            down_frame = ttk.Frame(frame_frame)
             down_frame.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.SW)
             
 
@@ -745,30 +726,30 @@ class Window(tk.Tk):
                 player_index = i 
                 player_id = self.get_player_id_from_player_name(player_name)
                 if i < 8:
-                    self.group_frame = tk.Frame(up_frame, background="lightblue")
+                    self.group_frame = ttk.Frame(up_frame)
                     self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
                 else:
-                    self.group_frame = tk.Frame(down_frame, background="lightblue")
+                    self.group_frame = ttk.Frame(down_frame)
                     self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
                 
                 #self.group_frame = tk.Frame(self.for_team_frame, background="lightcoral")
                 #self.group_frame.pack(side=tk.LEFT, padx=10, pady=10)
 
-                playertext1 = tk.Label(self.group_frame, text=f"Player {i}", font=("Helvetica", 14))
+                playertext1 = ttk.Label(self.group_frame, text=f"Player {i}", font=("Helvetica", 14))
                 playertext1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
                 
                 playertext2_text = f"{player_name} - {player_number}"
                 
-                playertext2 = tk.Label(master=self.group_frame, text=playertext2_text , font=("Helvetica", 14))
+                playertext2 = ttk.Label(master=self.group_frame, text=playertext2_text , font=("Helvetica", 14))
                 playertext2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
                 
-                playertext3 = tk.Label(self.group_frame, text=f"Tore {str(goals)}", font=("Helvetica", 14))
+                playertext3 = ttk.Label(self.group_frame, text=f"Tore {str(goals)}", font=("Helvetica", 14))
                 playertext3.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
 
-                playerbutton1 = tk.Button(self.group_frame, text="UP", command=lambda team=team_id, player_id1=player_id, player_index = player_index: self.player_scored_a_point(team, player_id1, player_index,  "UP"), font=("Helvetica", 14))
+                playerbutton1 = ttk.Button(self.group_frame, text="UP", command=lambda team=team_id, player_id1=player_id, player_index = player_index: self.player_scored_a_point(team, player_id1, player_index,  "UP"))
                 playerbutton1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
                 
-                playerbutton2 = tk.Button(self.group_frame, text="DOWN", command=lambda team=team_id, player_id1=player_id, player_index = player_index: self.player_scored_a_point(team, player_id1, player_index, "DOWN"), font=("Helvetica", 14))
+                playerbutton2 = ttk.Button(self.group_frame, text="DOWN", command=lambda team=team_id, player_id1=player_id, player_index = player_index: self.player_scored_a_point(team, player_id1, player_index, "DOWN"))
                 playerbutton2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
                 
                 
@@ -916,7 +897,7 @@ class Window(tk.Tk):
     def create_matches_labels(self, frame):
         matches = self.calculate_matches()
         
-        spiel_select_frame = tk.Frame(frame, bg="lightcoral")
+        spiel_select_frame = ttk.Frame(frame)
         spiel_select_frame.pack(pady=10, padx=10, anchor=tk.SW, side=tk.LEFT)
         
         spiel_select = ttk.Combobox(spiel_select_frame, font=("Helvetica", 14), width=35)
@@ -960,10 +941,10 @@ class Window(tk.Tk):
             
             
         
-        next_match_button = tk.Button(spiel_select_frame, text="Next Match", command=lambda : self.next_previous_match_button(spiel_select, matches), font=("Helvetica", 14))
+        next_match_button = ttk.Button(spiel_select_frame, text="Next Match", command=lambda : self.next_previous_match_button(spiel_select, matches))
         next_match_button.pack(pady=10, padx=5, side=tk.LEFT, anchor=tk.SW)
         
-        previous_match_button = tk.Button(spiel_select_frame, text="Previous Match", command=lambda : self.next_previous_match_button(spiel_select, matches, False), font=("Helvetica", 14))
+        previous_match_button = ttk.Button(spiel_select_frame, text="Previous Match", command=lambda : self.next_previous_match_button(spiel_select, matches, False))
         previous_match_button.pack(pady=10, padx=5, side=tk.RIGHT, anchor=tk.SE)
 
 
