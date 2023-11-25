@@ -87,8 +87,8 @@ class Window(tk.Tk):
     def init_sqlite_db(self):
         self.db_path = "data/data.db"
         
-        self.connection = sqlite3.connect(self.db_path)
-        self.cursor = self.connection.cursor()
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
         
         teamDataTableCreationQuery = """
         CREATE TABLE IF NOT EXISTS teamData (
@@ -100,8 +100,8 @@ class Window(tk.Tk):
             points INTEGER DEFAULT 0
         )
         """
-        self.cursor.execute(teamDataTableCreationQuery)
-        self.connection.commit()
+        cursor.execute(teamDataTableCreationQuery)
+        connection.commit()
         
         playerDataTableCreationQuery = """
         CREATE TABLE IF NOT EXISTS playerData (
@@ -112,8 +112,8 @@ class Window(tk.Tk):
             goals INTEGER DEFAULT 0
         )
         """
-        self.cursor.execute(playerDataTableCreationQuery)
-        self.connection.commit()
+        cursor.execute(playerDataTableCreationQuery)
+        connection.commit()
         
         matchDataTableCreationQuery = """
         CREATE TABLE IF NOT EXISTS matchData (
@@ -126,11 +126,11 @@ class Window(tk.Tk):
             matchTime TEXT
         )
         """
-        self.cursor.execute(matchDataTableCreationQuery)
-        self.connection.commit()
+        cursor.execute(matchDataTableCreationQuery)
+        connection.commit()
         
-        
-        
+        cursor.close()
+        connection.close()
             
             
 ##############################################################################################
@@ -169,14 +169,15 @@ class Window(tk.Tk):
         self.write_names_into_entry_fields()
         
     def save_team_names_in_db(self):
-        
-        
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
+
         name_entries = self.name_entries
         #print(name_entries)
 
         # Get existing teams from the database
-        self.cursor.execute("SELECT teamName FROM teamData")
-        existing_teams = {row[0] for row in self.cursor.fetchall()}
+        cursor.execute("SELECT teamName FROM teamData")
+        existing_teams = {row[0] for row in cursor.fetchall()}
 
         # Update existing teams and add new teams with default values
         for entry in name_entries:
@@ -186,34 +187,35 @@ class Window(tk.Tk):
                 # Update existing team
                 if not team_name in existing_teams:
                     # Add new team with default values
-                    self.cursor.execute("INSERT INTO teamData (teamName, goals) VALUES (?, 0)", (team_name,))
+                    cursor.execute("INSERT INTO teamData (teamName, goals) VALUES (?, 0)", (team_name,))
                     existing_teams.add(team_name)
 
         # Delete teams not in the entries
         teams_to_delete = existing_teams - {entry.get().strip() for entry in name_entries}
         for team_name in teams_to_delete:
-            self.cursor.execute("DELETE FROM teamData WHERE teamName = ?", (team_name,))
+            cursor.execute("DELETE FROM teamData WHERE teamName = ?", (team_name,))
 
         #print("tests")
-        self.connection.commit()
-        
-        
+        connection.commit()
+        cursor.close()
+        connection.close()
 
     
     def write_names_into_entry_fields(self):
-        
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
         
         selectTeams = """
         SELECT teamName FROM teamData
         ORDER BY id ASC
         """
-        self.cursor.execute(selectTeams)
+        cursor.execute(selectTeams)
         
-        for teamName in self.cursor.fetchall():
+        for teamName in cursor.fetchall():
             self.add_name_entry(teamName[0])
             
-        
-        
+        cursor.close()
+        connection.close()
 
 
     def create_Team_elements(self):
@@ -314,12 +316,12 @@ class Window(tk.Tk):
             team_id = self.selected_team
 
         if entries:
-            
-            
+            connection = sqlite3.connect(self.db_path)
+            cursor = connection.cursor()
 
             # Get existing players for the team from the database
-            self.cursor.execute("SELECT playerName FROM playerData WHERE teamId = ?", (team_id,))
-            existing_players = {row[0] for row in self.cursor.fetchall()}
+            cursor.execute("SELECT playerName FROM playerData WHERE teamId = ?", (team_id,))
+            existing_players = {row[0] for row in cursor.fetchall()}
 
             # Iterate through the current entries and update or insert as needed
             for entry, entrie2, entrie3 in zip(entries, entries2, entries3):
@@ -332,12 +334,12 @@ class Window(tk.Tk):
                     # Update existing player
                     if entry_text in existing_players:
                         update_query = "UPDATE playerData SET playerNumber = ?, goals = ? WHERE playerName = ? AND teamId = ?"
-                        self.cursor.execute(update_query, (entry_text2, entry_text3, entry_text, team_id))
+                        cursor.execute(update_query, (entry_text2, entry_text3, entry_text, team_id))
                     else:
                         # Add new player
                         try:
                             insert_query = "INSERT INTO playerData (playerName, playerNumber, goals, teamId) VALUES (?, ?, ?, ?)"
-                            self.cursor.execute(insert_query, (entry_text, entry_text2, entry_text3, team_id))
+                            cursor.execute(insert_query, (entry_text, entry_text2, entry_text3, team_id))
                         except sqlite3.IntegrityError:
                             
                             for i in range(1, 100):
@@ -345,17 +347,17 @@ class Window(tk.Tk):
                                     entry_text = f"{entry_text} {i}"
                                     break
                             insert_query = "INSERT INTO playerData (playerName, playerNumber, goals, teamId) VALUES (?, ?, ?, ?)"
-                            self.cursor.execute(insert_query, (entry_text, entry_text2, entry_text3, team_id))
+                            cursor.execute(insert_query, (entry_text, entry_text2, entry_text3, team_id))
                                 
 
             # Delete players not in the entries
             players_to_delete = existing_players - {entry.get() for entry in entries}
             for player_name in players_to_delete:
-                self.cursor.execute("DELETE FROM playerData WHERE playerName = ? AND teamId = ?", (player_name, team_id))
+                cursor.execute("DELETE FROM playerData WHERE playerName = ? AND teamId = ?", (player_name, team_id))
 
-            self.connection.commit()
-            
-            
+            connection.commit()
+            cursor.close()
+            connection.close()
 
         ###self.updated_data.update({"Players": {self.selected_team: self.read_team_names_player(self.selected_team)}})
             
@@ -536,7 +538,8 @@ class Window(tk.Tk):
           
             
     def read_player_stats(self, teamID, readGoals=False, playerID=-1):
-        
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
         output = []
 
         if readGoals and playerID == -1:
@@ -545,9 +548,9 @@ class Window(tk.Tk):
             WHERE teamId = ?
             ORDER BY id ASC
             """
-            self.cursor.execute(getData, (teamID,))
+            cursor.execute(getData, (teamID,))
 
-            for row in self.cursor.fetchall():
+            for row in cursor.fetchall():
                 output.append(row)
 
         elif readGoals and playerID != -1:
@@ -557,9 +560,9 @@ class Window(tk.Tk):
             WHERE teamId = ? AND id = ?
             ORDER BY id ASC
             """
-            self.cursor.execute(getData, (teamID, playerID))
+            cursor.execute(getData, (teamID, playerID))
 
-            for row in self.cursor.fetchall():
+            for row in cursor.fetchall():
                 output.append(row)
                 
         elif not readGoals and playerID != -1:
@@ -568,9 +571,9 @@ class Window(tk.Tk):
             WHERE teamId = ? AND id = ?
             ORDER BY id ASC
             """
-            self.cursor.execute(getData, (teamID, playerID))
+            cursor.execute(getData, (teamID, playerID))
             
-            for row in self.cursor.fetchall():
+            for row in cursor.fetchall():
                 output.append(row)
             
         else:
@@ -579,13 +582,13 @@ class Window(tk.Tk):
             WHERE teamId = ?
             ORDER BY id ASC
             """
-            self.cursor.execute(getData, (teamID,))
+            cursor.execute(getData, (teamID,))
             
-            for row in self.cursor.fetchall():
+            for row in cursor.fetchall():
                 output.append(row)
                 
-        
-        
+        cursor.close()
+        connection.close()
         
         return output
             
@@ -593,7 +596,8 @@ class Window(tk.Tk):
     def read_teamNames(self, teams_to_read=-1):
         teamNames = [""]
         
-        
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
         
         if teams_to_read != -1:
             for team in teams_to_read:
@@ -605,8 +609,8 @@ class Window(tk.Tk):
                     WHERE id = ?
                     ORDER BY id ASC
                     """
-                    self.cursor.execute(selectTeam, (team,))
-                    result = self.cursor.fetchone()
+                    cursor.execute(selectTeam, (team,))
+                    result = cursor.fetchone()
                     if result is not None:
                         #print(result)
                         teamNames.append(result[0])
@@ -616,13 +620,13 @@ class Window(tk.Tk):
             SELECT teamName FROM teamData
             ORDER BY id ASC
             """
-            self.cursor.execute(selectTeams)
+            cursor.execute(selectTeams)
         
-            for team in self.cursor.fetchall():
+            for team in cursor.fetchall():
                 teamNames.append(team[0])
                 
-        
-        
+        cursor.close()
+        connection.close()
 
         return teamNames
     
@@ -630,40 +634,43 @@ class Window(tk.Tk):
     def read_teamIds(self):
         teamIds = []
         
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
         
+        cursor.execute("SELECT id FROM teamData")
         
-        self.cursor.execute("SELECT id FROM teamData")
-        
-        for id in self.cursor.fetchall():
+        for id in cursor.fetchall():
             teamIds.append(id[0])
             
-        
-        
+        cursor.close()
+        connection.close()
 
         return teamIds
 
 
     def get_team_id_from_team_name(self, team_name):
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
         
+        cursor.execute("SELECT id FROM teamData WHERE teamName = ?", (team_name,))
         
-        self.cursor.execute("SELECT id FROM teamData WHERE teamName = ?", (team_name,))
+        team_id = cursor.fetchone()[0]
         
-        team_id = self.cursor.fetchone()[0]
-        
-        
-        
+        cursor.close()
+        connection.close()
         
         return team_id
     
     def get_player_id_from_player_name(self, player_name):
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
         
+        cursor.execute("SELECT id FROM playerData WHERE playerName = ?", (player_name,))
         
-        self.cursor.execute("SELECT id FROM playerData WHERE playerName = ?", (player_name,))
+        player_id = cursor.fetchone()[0]
         
-        player_id = self.cursor.fetchone()[0]
-        
-        
-        
+        cursor.close()
+        connection.close()
         
         return player_id
 
@@ -889,7 +896,8 @@ class Window(tk.Tk):
         self.spiel_buttons[teamID][player_index][3].config(text=f"Tore {current_goals}")
 
         
-        
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
         print("Write", "teamID", teamID, "player_index", player_id)
         
         updateGoals = """
@@ -897,13 +905,13 @@ class Window(tk.Tk):
         SET goals = ?
         WHERE teamId = ? AND id = ?
         """
-        self.cursor.execute(updateGoals, (current_goals, teamID, player_id))
+        cursor.execute(updateGoals, (current_goals, teamID, player_id))
         
         # Commit the changes to the database
-        self.connection.commit()
+        connection.commit()
         
-        # Close the database self.connection
-        
+        # Close the database connection
+        connection.close()
         
         # Record the end time
         end_time = time.time()
@@ -1022,7 +1030,6 @@ class Window(tk.Tk):
     def global_scored_a_point(self, teamID, direction="UP"):
         # Get the current score
         current_score = int(self.read_team_active_goals(teamID))
-        
         # Update the score
         if direction == "UP":
             current_score += 1
@@ -1037,18 +1044,19 @@ class Window(tk.Tk):
        
         
     def write_score_for_team_into_file(self, teamID, goals):
-        
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
         
         updateGoals = """
         UPDATE teamData
         SET goals = ?
         WHERE id = ?
         """
-        self.cursor.execute(updateGoals, (goals, teamID))
+        cursor.execute(updateGoals, (goals, teamID))
         
-        
-        self.connection.commit()
-        
+        cursor.close()
+        connection.commit()
+        connection.close()
             
     
     def read_team_stats(self, team_name, stat):

@@ -1,16 +1,5 @@
-from flask import Flask, request, jsonify
+output = [(("Hans Jürgen", 231), 3), ("Felix Schweigsam", 21, 5)]
 
-app = Flask(__name__)
+goal = output[0][0][1]
 
-@app.route('/senddata', methods=['POST'])
-def receive_data():
-    output = request.json  # Assuming the data is sent in JSON format
-    # Process the received data as needed
-    print("Received data:", output)
-
-    # Send a response back to the client
-    response_data = {"message": "Data received successfully"}
-    return jsonify(response_data)
-
-if __name__ == '__main__':
-    app.run(debug=True)
+print(goal)
