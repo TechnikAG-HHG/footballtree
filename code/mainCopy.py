@@ -554,6 +554,7 @@ class Window(tk.Tk):
                 output.append(row)
 
         elif readGoals and playerID != -1:
+            print("readGoals", readGoals, "playerID", playerID, "teamID", teamID)
             getData = """
             SELECT playerName, playerNumber, goals FROM playerData
             WHERE teamId = ? AND id = ?
@@ -659,6 +660,20 @@ class Window(tk.Tk):
         connection.close()
         
         return team_id
+    
+    def get_player_id_from_player_name(self, player_name):
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
+        
+        cursor.execute("SELECT id FROM playerData WHERE playerName = ?", (player_name,))
+        
+        player_id = cursor.fetchone()[0]
+        
+        cursor.close()
+        connection.close()
+        
+        return player_id
+
 
 ##############################################################################################
 
@@ -739,6 +754,7 @@ class Window(tk.Tk):
             for i, (player_name, player_number, goals) in enumerate(self.read_player_stats(team_id, True)):       
                 #print(type(player_name), player_name)
                 player_index = i 
+                player_id = self.get_player_id_from_player_name(player_name)
                 if i < 8:
                     self.group_frame = tk.Frame(up_frame, background="lightblue")
                     self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
@@ -760,10 +776,10 @@ class Window(tk.Tk):
                 playertext3 = tk.Label(self.group_frame, text=f"Tore {str(goals)}", font=("Helvetica", 14))
                 playertext3.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
 
-                playerbutton1 = tk.Button(self.group_frame, text="UP", command=lambda team=team_id, player_index=player_index: self.player_scored_a_point(team, player_index, "UP"), font=("Helvetica", 14))
+                playerbutton1 = tk.Button(self.group_frame, text="UP", command=lambda team=team_id, player_id1=player_id, player_index = player_index: self.player_scored_a_point(team, player_id1, player_index,  "UP"), font=("Helvetica", 14))
                 playerbutton1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
                 
-                playerbutton2 = tk.Button(self.group_frame, text="DOWN", command=lambda team=team_id, player_index=player_index: self.player_scored_a_point(team, player_index, "DOWN"), font=("Helvetica", 14))
+                playerbutton2 = tk.Button(self.group_frame, text="DOWN", command=lambda team=team_id, player_id1=player_id, player_index = player_index: self.player_scored_a_point(team, player_id1, player_index, "DOWN"), font=("Helvetica", 14))
                 playerbutton2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
                 
                 
@@ -863,10 +879,10 @@ class Window(tk.Tk):
         self.create_function_name()
         
 
-    def player_scored_a_point(self, teamID, player_index, direction="UP"):
+    def player_scored_a_point(self, teamID, player_id, player_index, direction="UP"):
         # Get the current score
-        print(self.read_player_stats(teamID, True, player_index - 1)) 
-        current_goals = self.read_player_stats(teamID, True, player_index - 1)[0][2]
+        print(self.read_player_stats(teamID, True, player_id)) 
+        current_goals = self.read_player_stats(teamID, True, player_id)[0][2]
         
         # Update the score
         if direction == "UP":
@@ -874,24 +890,38 @@ class Window(tk.Tk):
         else:
             current_goals -= 1
         
+        start_time = time.time()
+        
         # Update the score label
         self.spiel_buttons[teamID][player_index][3].config(text=f"Tore {current_goals}")
 
+        
         connection = sqlite3.connect(self.db_path)
         cursor = connection.cursor()
+        print("Write", "teamID", teamID, "player_index", player_id)
         
         updateGoals = """
         UPDATE playerData
         SET goals = ?
         WHERE teamId = ? AND id = ?
         """
-        cursor.execute(updateGoals, (current_goals, teamID, player_index - 1))
+        cursor.execute(updateGoals, (current_goals, teamID, player_id))
         
         # Commit the changes to the database
         connection.commit()
         
         # Close the database connection
         connection.close()
+        
+        # Record the end time
+        end_time = time.time()
+
+        # Calculate the elapsed time in milliseconds
+        elapsed_time_ms = (end_time - start_time) * 1000
+
+        # Print the result
+        print(f"Elapsed Time: {elapsed_time_ms:.2f} ms")
+        
         ###self.updated_data.update({"SPIEL": {team: self.read_team_names_player(team)}})
     
     
