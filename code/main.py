@@ -759,7 +759,7 @@ class Window(tk.Tk):
                 
                 playertext2_text = f"{player_name} - {player_number}"
                 
-                playertext2 = tk.Label(self.group_frame, text=playertext2_text , font=("Helvetica", 14))
+                playertext2 = tk.Label(master=self.group_frame, text=playertext2_text , font=("Helvetica", 14))
                 playertext2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
                 
                 playertext3 = tk.Label(self.group_frame, text=f"Tore {str(goals)}", font=("Helvetica", 14))
@@ -1304,7 +1304,7 @@ global db_path
 
 db_path = "data/data.db"
 stored_data = {}
-tkapp = Window(True)
+tkapp = Window(False)
 
 if __name__ == "__main__":
     tkapp.mainloop()
