@@ -97,7 +97,8 @@ class Window(tk.Tk):
             goals INTEGER DEFAULT 0,
             goalsReceived INTEGER DEFAULT 0,
             games INTEGER DEFAULT 0,
-            points INTEGER DEFAULT 0
+            points INTEGER DEFAULT 0,
+            groupNumber INTEGER
         )
         """
         self.cursor.execute(teamDataTableCreationQuery)
@@ -195,6 +196,7 @@ class Window(tk.Tk):
             self.cursor.execute("DELETE FROM teamData WHERE teamName = ?", (team_name,))
 
         #print("tests")
+        self.updated_data.update({"Team": self.read_teamNames().pop(0)})
         self.connection.commit()
         
         
@@ -593,8 +595,6 @@ class Window(tk.Tk):
     def read_teamNames(self, teams_to_read=-1):
         teamNames = [""]
         
-        
-        
         if teams_to_read != -1:
             for team in teams_to_read:
                 if team != None:
@@ -621,15 +621,11 @@ class Window(tk.Tk):
             for team in self.cursor.fetchall():
                 teamNames.append(team[0])
                 
-        
-        
-
         return teamNames
     
     
     def read_teamIds(self):
         teamIds = []
-        
         
         
         self.cursor.execute("SELECT id FROM teamData")
@@ -1205,12 +1201,37 @@ class Window(tk.Tk):
     ##############################################################################################
     ##############################################################################################
     ##############################################################################################
+    
+def get_data_for_website(which_data=-1):
+    
+    if which_data == 0:
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+        
+        getTeams = """
+        SELECT teamName FROM teamData
+        ORDER BY id ASC
+        """
+        cursor.execute(getTeams)
+        
+        teamNames = []
+        
+        for team in cursor.fetchall():
+            teamNames.append(team[0])
+        
+        teamNames.pop(0)
+            
+        cursor.close()
+        connection.close()
+        
+        return teamNames
+        
 
 def get_initial_data(template_name):
     global initial_data
     tkapp.test()
     initial_data = {
-        "Teams": tkapp.read_teamNames(),
+        "Teams": get_data_for_website(0),
         "Tore": ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
         "ZeitIntervall": 10,
         "Startzeit": [9,30],
@@ -1281,9 +1302,9 @@ global stored_data
 global initial_data
 global db_path
 
-db_path = "data/teams.db"
+db_path = "data/data.db"
 stored_data = {}
-tkapp = Window(False)
+tkapp = Window(True)
 
 if __name__ == "__main__":
     tkapp.mainloop()
