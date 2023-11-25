@@ -196,7 +196,7 @@ class Window(tk.Tk):
             self.cursor.execute("DELETE FROM teamData WHERE teamName = ?", (team_name,))
 
         #print("tests")
-        self.updated_data.update({"Team": self.read_teamNames().pop(0)})
+        self.updated_data.update({"Team": self.read_teamNames()})
         self.connection.commit()
         
         
@@ -1218,8 +1218,6 @@ def get_data_for_website(which_data=-1):
         
         for team in cursor.fetchall():
             teamNames.append(team[0])
-        
-        teamNames.pop(0)
             
         cursor.close()
         connection.close()
@@ -1240,6 +1238,10 @@ def get_initial_data(template_name):
     return make_response(render_template(template_name, initial_data=initial_data))
 
 @app.route("/")
+def home():
+    return get_initial_data("websitemain.html")
+
+@app.route("/group")
 def index():
     return get_initial_data("websitegroup.html")
 
@@ -1251,7 +1253,9 @@ def tree_index():
 def plan_index():
     return get_initial_data("websiteplan.html")
 
-#create fake data for testing for ZeitIntervall, Startzeit 
+@app.route("/tv")
+def tv_index():
+    return get_initial_data("websitetv.html")
 
 
 @app.route('/update_data')

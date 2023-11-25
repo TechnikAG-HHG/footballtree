@@ -194,6 +194,15 @@ function formatTime(date) {
     );
 }
 
+// Function to handle button clicks and redirect
+function redirectTo(path) {
+    window.location.href = path;
+}
+
+document.getElementById("returnButton").addEventListener("click", function () {
+    redirectTo("/");
+});
+
 calculateMatches();
 // call updateData() every 5 seconds
 setInterval(updateData, 2000);
