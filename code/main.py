@@ -1289,36 +1289,41 @@ class Window(ctk.CTk):
             
             print("team1", team1, "team2", team2, "group", group, "number", number)
             
-            selectTeam1 = """
-            SELECT id FROM teamData
-            WHERE teamName = ?
-            ORDER BY id ASC
-            """
-            self.cursor.execute(selectTeam1, (team1,))
-            team1ID = self.cursor.fetchone()[0]
+            try:
+                selectTeam1 = """
+                SELECT id FROM teamData
+                WHERE teamName = ?
+                ORDER BY id ASC
+                """
+                self.cursor.execute(selectTeam1, (team1,))
+                team1ID = self.cursor.fetchone()[0]
+                
+                selectTeam2 = """
+                SELECT id FROM teamData
+                WHERE teamName = ?
+                ORDER BY id ASC
+                """
+                self.cursor.execute(selectTeam2, (team2,))
+                team2ID = self.cursor.fetchone()[0]
+                
+                insertMatch = """
+                    INSERT OR REPLACE INTO matchData (team1Id, team2Id, groupNumber, matchId)
+                    VALUES (?, ?, ?, ?)
+                """
+                self.cursor.execute(
+                    insertMatch, 
+                    (int(team1ID), 
+                    int(team2ID), 
+                    int(str(group).replace('Gruppe ','')), 
+                    int(str(number).replace('Spiel ','')))
+)
+                
+                # Commit the changes to the database
+            except Exception as e:
+                # Handle the exception (e.g., print an error message, log the error)
+                print(f"Error inserting match: {e}")
+                # Rollback changes to maintain database integrity
             
-            selectTeam2 = """
-            SELECT id FROM teamData
-            WHERE teamName = ?
-            ORDER BY id ASC
-            """
-            self.cursor.execute(selectTeam2, (team2,))
-            team2ID = self.cursor.fetchone()[0]
-            
-            
-            insertMatch = """
-            INSERT INTO matchData (team1Id, team2Id, groupNumber, matchId)
-            VALUES (?, ?, ?, ?)
-            """
-            print("team1ID", team1ID, "team2ID", team2ID, "group", group, "number", number)
-            self.cursor.execute(
-                insertMatch, 
-                (int(team1ID), 
-                 int(team2ID), 
-                 int(str(group).replace('Gruppe ','')), 
-                 int(str(number).replace('Spiel ',''))))
-            
-            # Commit the changes to the database
         self.connection.commit()
             
     ##############################################################################################
