@@ -1,8 +1,4 @@
 
-names.txt
-.vscode/settings.json
 .vscode/settings.json
 *.txt
-*.txt
-*.txt
-data/team_names.txt
+*.db
