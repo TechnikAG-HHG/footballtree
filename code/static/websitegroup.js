@@ -141,6 +141,15 @@ function updateTables(data) {
     }
 }
 
+// Function to handle button clicks and redirect
+function redirectTo(path) {
+    window.location.href = path;
+}
+
+document.getElementById("returnButton").addEventListener("click", function () {
+    redirectTo("/");
+});
+
 // generate tables on page load
 generateTables();
 
