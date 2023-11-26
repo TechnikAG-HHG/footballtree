@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>Winterturnier 2023</title>
+
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="{{ url_for('static', filename='websitemain.css') }}"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <div class="title">
+            <h1>Winterturnier 2023</h1>
+        </div>
+
+        <button id="planButton">Zum Spielplan</button>
+        <button id="groupButton">Zur Gruppenansicht</button>
+        <button id="treeButton">Zum Gewinnbaum</button>
+
+        <a class="MadeBy">Made by:</a>
+        <a class="link" , href="https://www.github.com/EinEisbxr">
+            github.com/EinEisbxr
+        </a>
+        <a class="link" , href="https://www.github.com/Limonadeundco">
+            github.com/Limonadeundco
+        </a>
+
+        <script src="{{url_for('static', filename='websitemain.js')}}"></script>
+    </body>
+</html>

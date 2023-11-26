@@ -1,18 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <title>footballtree</title>
+        <title>Winterturnier 2023</title>
 
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='websitetree.css') }}">
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="{{ url_for('static', filename='websitetree.css') }}"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+            rel="stylesheet"
+        />
     </head>
     <body>
-        <div class="title">
+        <div class="header">
+            <button id="returnButton">Zur&uuml;ck</button>
+
             <h1>Winterturnier 2023</h1>
         </div>
+
         <div id="main-container">
             <!-- Your other content here -->
         </div>
@@ -21,10 +31,7 @@
             var data = {{ initial_data|tojson|safe }};
             console.log('Initial data:', data);
         </script>
-        
-        <script src="{{url_for('static', filename='websitetree.js')}}"></script>
 
+        <script src="{{url_for('static', filename='websitetree.js')}}"></script>
     </body>
 </html>
-
-
