@@ -130,10 +130,10 @@ class Window(ctk.CTk):
         
         matchDataTableCreationQuery = """
         CREATE TABLE IF NOT EXISTS matchData (
-            id INTEGER PRIMARY KEY,
+            matchId INTEGER PRIMARY KEY,
             groupNumber INTEGER,
-            team1Id INTEGER,
-            team2Id INTEGER,
+            team1Id INTEGER REFERENCES teamData(id),
+            team2Id INTEGER REFERENCES teamData(id),
             team1Goals INTEGER DEFAULT 0,
             team2Goals INTEGER DEFAULT 0,
             matchTime TEXT
@@ -190,7 +190,7 @@ class Window(ctk.CTk):
         # Get existing teams from the database
         self.cursor.execute("SELECT teamName FROM teamData")
         existing_teams = {row[0] for row in self.cursor.fetchall()}
-        print("existing_teams", existing_teams)
+        #print("existing_teams", existing_teams)
 
         # Update existing teams and add new teams with default values
         for entry in name_entries:
@@ -200,9 +200,15 @@ class Window(ctk.CTk):
                 # Update existing team
                 if not team_name in existing_teams:
                     # Add new team with default values
-                    self.cursor.execute("INSERT INTO teamData (teamName, goals) VALUES (?, 0)", (team_name,))
-                    existing_teams.add(team_name)
-
+                    try:
+                        self.cursor.execute("INSERT INTO teamData (teamName, goals) VALUES (?, 0)", (team_name,))
+                        existing_teams.add(team_name)
+                    except sqlite3.IntegrityError:
+                            for i in range(1, 100):
+                                if f"{team_name} {i}" not in existing_teams:
+                                    team_name = f"{team_name} {i}"
+                                    break
+                            self.cursor.execute("INSERT INTO teamData (teamName, goals) VALUES (?, 0)", (team_name,))
         # Delete teams not in the entries
         teams_to_delete = existing_teams - {entry.get().strip() for entry in name_entries}
         for team_name in teams_to_delete:
@@ -225,8 +231,6 @@ class Window(ctk.CTk):
             
 
     def create_Team_elements(self):
-        
-        
         
         # Create elements for the Team frame
         canvas = tk.Canvas(self.Team_frame)
@@ -281,7 +285,7 @@ class Window(ctk.CTk):
         canvas.create_window((0, 0), window=self.frameplayer, anchor="nw")
         
         self.test_frame = ctk.CTkFrame(self.player_frame, bg_color='grey17', fg_color='grey17')
-        self.test_frame.pack()
+        self.test_frame.pack(anchor=tk.NW, side=tk.LEFT, fill=tk.X, padx=10, expand=True)
         
         buttons_frame = ctk.CTkFrame(self.test_frame, bg_color='grey15', fg_color='grey15')
         buttons_frame.pack(pady=5, padx=5, anchor=tk.NE, side=tk.RIGHT)
@@ -698,10 +702,6 @@ class Window(ctk.CTk):
 
     def create_SPIEL_elements(self):
         
-        #create custom tkinter style element
-        #style = ttk.Style('Custom.TFrame', fg_color='grey17', bg_color='grey17')
-        
-        
         # Create elements for the SPIEL frame
         manual_frame = ctk.CTkFrame(self.SPIEL_frame, bg_color='grey17', fg_color='grey17')
         manual_frame.pack(pady=5, anchor=tk.S, side=tk.BOTTOM, padx=5, fill=tk.X)
@@ -835,7 +835,6 @@ class Window(ctk.CTk):
         self.manual_team_select_1.set("None")
         self.manual_team_select_1.pack(pady=10, side=tk.BOTTOM, anchor=tk.S)
         #self.manual_team_select_1.bind("<<ComboboxSelected>>", lambda event, nr=1: self.on_team_select(event, nr))
-        
         
         self.manual_team_select_2 = ctk.CTkComboBox(
             manual_manual_frame, 
@@ -1224,6 +1223,8 @@ class Window(ctk.CTk):
         
         #print(self.matches)
         
+        self.save_matches_to_db()
+        
         return self.matches
     
     
@@ -1271,6 +1272,55 @@ class Window(ctk.CTk):
         return match
 
 
+    def save_matches_to_db(self):
+        #print("save_matches_to_db")
+        #print(self.matches)
+        #print(self.matches[0]["teams"][0])
+        #print(self.matches[0]["teams"][1])
+        #print(self.matches[0]["group"])
+        #print(self.matches[0]["number"])
+        
+        for match in self.matches:
+            print(match)
+            team1 = match["teams"][0]
+            team2 = match["teams"][1]
+            group = match["group"]
+            number = match["number"]
+            
+            print("team1", team1, "team2", team2, "group", group, "number", number)
+            
+            selectTeam1 = """
+            SELECT id FROM teamData
+            WHERE teamName = ?
+            ORDER BY id ASC
+            """
+            self.cursor.execute(selectTeam1, (team1,))
+            team1ID = self.cursor.fetchone()[0]
+            
+            selectTeam2 = """
+            SELECT id FROM teamData
+            WHERE teamName = ?
+            ORDER BY id ASC
+            """
+            self.cursor.execute(selectTeam2, (team2,))
+            team2ID = self.cursor.fetchone()[0]
+            
+            
+            insertMatch = """
+            INSERT INTO matchData (team1Id, team2Id, groupNumber, matchId)
+            VALUES (?, ?, ?, ?)
+            """
+            print("team1ID", team1ID, "team2ID", team2ID, "group", group, "number", number)
+            self.cursor.execute(
+                insertMatch, 
+                (int(team1ID), 
+                 int(team2ID), 
+                 int(str(group).replace('Gruppe ','')), 
+                 int(str(number).replace('Spiel ',''))))
+            
+            # Commit the changes to the database
+        self.connection.commit()
+            
     ##############################################################################################
     ##############################################################################################
     ##############################################################################################
