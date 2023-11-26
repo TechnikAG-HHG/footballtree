@@ -71,7 +71,7 @@ class Window(ctk.CTk):
 
         # Create frames for different sets of elements
         self.Team_frame = ctk.CTkFrame(self)
-        self.player_frame = ctk.CTkFrame(self)
+        self.player_frame = ctk.CTkFrame(self, height=10)
         self.SPIEL_frame = ctk.CTkFrame(self)
         #self.contact_frame = ctk.CTkFrame(self, bg="lightyellow")
 
@@ -143,9 +143,6 @@ class Window(ctk.CTk):
         self.connection.commit()
         
         
-        
-            
-            
 ##############################################################################################
     def add_name_entry(self, entry_text=""):
         count = len(self.name_entries) + 1
@@ -166,8 +163,10 @@ class Window(ctk.CTk):
         self.name_entries.append(new_entry)
         self.label_list.append(label)
 
+
     def on_frame_configure(self, canvas):
         canvas.configure(scrollregion=canvas.bbox("all"))
+        
         
     def reload_button_command(self):
         # Delete all entry fields
@@ -181,6 +180,7 @@ class Window(ctk.CTk):
         # Read the names from the file and put them into the entry fields
         self.write_names_into_entry_fields()
         
+        
     def save_team_names_in_db(self):
         
         
@@ -190,6 +190,7 @@ class Window(ctk.CTk):
         # Get existing teams from the database
         self.cursor.execute("SELECT teamName FROM teamData")
         existing_teams = {row[0] for row in self.cursor.fetchall()}
+        print("existing_teams", existing_teams)
 
         # Update existing teams and add new teams with default values
         for entry in name_entries:
@@ -272,46 +273,67 @@ class Window(ctk.CTk):
         canvas.pack(fill="both", expand=True, side="bottom")
 
         # Create a scrollbar and connect it to the canvas
-        scrollbar = ctk.CTkScrollbar(self.player_frame, orientation='vertical', command=canvas.yview)
+        scrollbar = ctk.CTkScrollbar(self.player_frame, orientation='vertical', command=canvas.yview, height=20)
         scrollbar.pack(side=tk.LEFT, fill="y")
         canvas.configure(yscrollcommand=scrollbar.set)
 
         self.frameplayer = ctk.CTkFrame(canvas)
         canvas.create_window((0, 0), window=self.frameplayer, anchor="nw")
         
+        self.test_frame = ctk.CTkFrame(self.player_frame, bg_color='grey17', fg_color='grey17')
+        self.test_frame.pack()
+        
+        buttons_frame = ctk.CTkFrame(self.test_frame, bg_color='grey15', fg_color='grey15')
+        buttons_frame.pack(pady=5, padx=5, anchor=tk.NE, side=tk.RIGHT)
         
         # Button to add a new name entry
-        add_button = ctk.CTkButton(self.player_frame, text="Add Name", command=lambda: self.add_name_entry_player(self.frameplayer, "Player"))
-        add_button.pack(pady=5, padx=5, anchor=tk.NE, side=tk.RIGHT)    
+        add_button = ctk.CTkButton(buttons_frame, text="Add Name", command=lambda: self.add_name_entry_player(self.frameplayer, "Player"))
+        add_button.pack(pady=20, padx=20, anchor=tk.NE, side=tk.RIGHT)    
 
         # Button to retrieve the entered names
+        submit_button = ctk.CTkButton(buttons_frame, text="Submit", command=self.save_names_player)
+        submit_button.pack(pady=20, padx=20, anchor=tk.NE, side=tk.RIGHT)    
 
-
-        submit_button = ctk.CTkButton(self.player_frame, text="Submit", command=self.save_names_player)
-        submit_button.pack(pady=5, padx=5, anchor=tk.NE, side=tk.RIGHT)    
-
-        
-        reload_button = ctk.CTkButton(self.player_frame, text="Reload", command=self.reload_button_player_command)
-        reload_button.pack(pady=5, padx=5, anchor=tk.NE, side=tk.RIGHT)    
+        reload_button = ctk.CTkButton(buttons_frame, text="Reload", command=self.reload_button_player_command)
+        reload_button.pack(pady=20, padx=20, anchor=tk.NE, side=tk.RIGHT)    
         
         self.selected_team = ""
         self.team_button_list = []
         
         team_IDs = self.read_teamIds()
         teamNames = self.read_teamNames()
-        #print(teamNames)
+        teamNames.pop(0)
+        #print("teamNames", teamNames, "team_IDs", team_IDs)
         
+        self.player_top_frame = ctk.CTkFrame(self.test_frame)
+
+        self.player_bottom_frame = ctk.CTkFrame(self.test_frame)
+
         for i, teamID in enumerate(team_IDs):
-            teamName = teamNames[int(teamID)]
-            #print(teamName)
-            team_button = ctk.CTkButton(
-                self.player_frame,
-                text=teamName,
-                command=lambda id=teamID, i2=i: self.select_team(id, self.team_button_list, i2)
-            )
-            team_button.pack(pady=5, padx=5, anchor=tk.NW, side=tk.LEFT)
+            teamName = teamNames[int(teamID-1)]
+
+            if i < 10:
+                team_button = ctk.CTkButton(
+                    self.player_top_frame,
+                    text=teamName,
+                    command=lambda id=teamID, i2=i: self.select_team(id, self.team_button_list, i2),
+                    width=120
+                )
+                team_button.pack(pady=5, padx=5, anchor=tk.N, side=tk.LEFT)
+
+            else:
+                team_button = ctk.CTkButton(
+                    self.player_bottom_frame,
+                    text=teamName,
+                    command=lambda id=teamID, i2=i: self.select_team(id, self.team_button_list, i2),
+                    width=120
+                )
+                team_button.pack(pady=5, padx=5, anchor=tk.N, side=tk.LEFT)
+
             self.team_button_list.append(team_button)
             
+        self.player_top_frame.pack(anchor=tk.NW, side=tk.TOP)
+        self.player_bottom_frame.pack(anchor=tk.NW, side=tk.TOP)
         
         
     def save_names_player(self, team_id=-1):
@@ -347,6 +369,7 @@ class Window(ctk.CTk):
                         try:
                             insert_query = "INSERT INTO playerData (playerName, playerNumber, goals, teamId) VALUES (?, ?, ?, ?)"
                             self.cursor.execute(insert_query, (entry_text, entry_text2, entry_text3, team_id))
+                            existing_players.add(entry_text)
                         except sqlite3.IntegrityError:
                             
                             for i in range(1, 100):
@@ -461,15 +484,30 @@ class Window(ctk.CTk):
         
         team_IDs = self.read_teamIds()
         teamNames = self.read_teamNames()
+        teamNames.pop(0)
+        #print("teamNames", teamNames, "team_IDs", team_IDs)
         
         for i, teamID in enumerate(team_IDs):
-            teamName = teamNames[int(teamID)]
-            team_button = ctk.CTkButton(
-                self.player_frame,
-                text=teamName,
-                command=lambda id=teamID, i2=i: self.select_team(id, self.team_button_list, i2)
-            )
-            team_button.pack(pady=5, padx=5, anchor=tk.NW, side=tk.LEFT)
+            teamName = teamNames[int(teamID-1)]
+
+            if i < 10:
+                team_button = ctk.CTkButton(
+                    self.player_top_frame,
+                    text=teamName,
+                    command=lambda id=teamID, i2=i: self.select_team(id, self.team_button_list, i2),
+                    width=120
+                )
+                team_button.pack(pady=5, padx=5, anchor=tk.N, side=tk.LEFT)
+
+            else:
+                team_button = ctk.CTkButton(
+                    self.player_bottom_frame,
+                    text=teamName,
+                    command=lambda id=teamID, i2=i: self.select_team(id, self.team_button_list, i2),
+                    width=120
+                )
+                team_button.pack(pady=5, padx=5, anchor=tk.N, side=tk.LEFT)
+
             self.team_button_list.append(team_button)
     
         
@@ -621,7 +659,7 @@ class Window(ctk.CTk):
         
             for team in self.cursor.fetchall():
                 teamNames.append(team[0])
-        print("teamNames", teamNames)
+        #print("teamNames", teamNames)
         return teamNames
     
     
@@ -632,6 +670,7 @@ class Window(ctk.CTk):
         
         for id in self.cursor.fetchall():
             teamIds.append(id[0])
+        teamIds.sort()
 
         return teamIds
 
@@ -748,10 +787,10 @@ class Window(ctk.CTk):
                 player_index = i 
                 player_id = self.get_player_id_from_player_name(player_name)
                 if i < 8:
-                    self.group_frame = ctk.CTkFrame(up_frame, bg_color='grey17', fg_color='grey17')
+                    self.group_frame = ctk.CTkFrame(up_frame, bg_color='grey17', fg_color='grey15')
                     self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
                 else:
-                    self.group_frame = ctk.CTkFrame(down_frame, bg_color='grey17', fg_color='grey17')
+                    self.group_frame = ctk.CTkFrame(down_frame, bg_color='grey17', fg_color='grey15')
                     self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
                 
                 #self.group_frame = tk.Frame(self.for_team_frame, background="lightcoral")
@@ -784,7 +823,7 @@ class Window(ctk.CTk):
 
         teams_list = self.read_teamNames()
         teams_list.pop(0)
-        print("teams_list", teams_list)
+        #print("teams_list", teams_list)
 
         self.manual_team_select_1 = ctk.CTkComboBox(
             manual_manual_frame, 
@@ -832,6 +871,7 @@ class Window(ctk.CTk):
             self.manual_team_select_1.configure(state=tk.NORMAL)
             self.manual_team_select_1.set("None")
             self.manual_team_select_2.set(self.read_teamNames()[self.teams_playing[0]])        
+
 
     def on_team_select(self, event, nr):
         #print("on_team_select")
@@ -1048,7 +1088,6 @@ class Window(ctk.CTk):
             print("Selected match not found in the list.")
 
 
-
     def global_scored_a_point(self, teamID, direction="UP"):
         # Get the current score
         current_score = int(self.read_team_active_goals(teamID))
@@ -1079,7 +1118,6 @@ class Window(ctk.CTk):
         
         self.connection.commit()
         
-            
     
     def read_team_stats(self, team_name, stat):
         score = self.read_teamNames(self.teams_playing, True)
