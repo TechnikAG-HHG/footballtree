@@ -1,13 +1,14 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import filedialog
 import customtkinter as ctk
-#import tkinter.messagebox
 import threading
 import requests
 import os
 import time
 from flask import Flask, send_file, request, abort, render_template, make_response, session, redirect, jsonify
 import sqlite3
+import vlc
 
 app = Flask(__name__)
 app.secret_key = "Felix.com"
@@ -37,6 +38,8 @@ class Window(ctk.CTk):
         super().__init__()
         self.name_entries = []
         self.label_list = []
+        self.file_dialog_list = []
+        self.mp3_list = {}
         self.updated_data = {}
         self.variable_dict = {}
         self.team_button_list = []
@@ -59,6 +62,8 @@ class Window(ctk.CTk):
         ctk.set_appearance_mode("dark")
         
         self.init_sqlite_db()
+        
+        self.media_player_instance = vlc.Instance()
         
         #menu = tk.Menu(self)
         #self.configure(menu=menu)
@@ -110,6 +115,7 @@ class Window(ctk.CTk):
             goalsReceived INTEGER DEFAULT 0,
             games INTEGER DEFAULT 0,
             points INTEGER DEFAULT 0,
+            mp3Path TEXT DEFAULT "",
             groupNumber INTEGER
         )
         """
@@ -144,8 +150,10 @@ class Window(ctk.CTk):
         
         
 ##############################################################################################
-    def add_name_entry(self, entry_text=""):
+    def add_name_entry(self, entry_text="", mp3_path=""):
+        #print(entry_text)
         count = len(self.name_entries) + 1
+        team_id = count - 1
 
         # Create a label with "Team 1" and the count
         label_text = f'Team {count}'
@@ -158,61 +166,103 @@ class Window(ctk.CTk):
         # Write entry_text to the entry field if it is not empty
         if entry_text:
             new_entry.insert(0, entry_text)
-
+        
         new_entry.grid(row=len(self.name_entries), column=1, pady=5, sticky='we')
+        
+        new_file_dialog = ctk.CTkButton(self.frame, text="Select mp3", command=lambda: self.save_mp3_path(new_file_dialog, team_id))
+        new_file_dialog.grid(row=len(self.name_entries), column=2, pady=5, sticky='we', padx=5)
+        
+        if mp3_path:
+            self.mp3_list[team_id] = mp3_path
+            new_file_dialog.configure(text=os.path.basename(mp3_path))
+        
+        self.file_dialog_list.append(new_file_dialog)
         self.name_entries.append(new_entry)
         self.label_list.append(label)
 
 
     def on_frame_configure(self, canvas):
         canvas.configure(scrollregion=canvas.bbox("all"))
+    
+    
+    def save_mp3_path(self, new_file_dialog, team_id):
+        file_path = filedialog.askopenfilename(initialdir="/", title="Select mp3 file", filetypes=(("mp3 files", "*.mp3"), ("all files", "*.*")))
         
+        if file_path:
+            self.mp3_list[team_id] = file_path
+            new_file_dialog.configure(text=os.path.basename(file_path))
+
+        #print(file_path)
+        #self.cursor.execute("UPDATE teamData SET mp3Path = ? WHERE id = ?", (file_path, team_id))
+        #self.connection.commit()
         
     def reload_button_command(self):
         # Delete all entry fields
+        
+        self.mp3_list = {}
+        
         for entry in self.name_entries:
             entry.destroy()
         self.name_entries = []
         
         for label in self.label_list:
             label.destroy()
+            
+        for file_fialog in self.file_dialog_list:
+            file_fialog.destroy()
         
         # Read the names from the file and put them into the entry fields
         self.write_names_into_entry_fields()
         
         
     def save_team_names_in_db(self):
-        
-        
         name_entries = self.name_entries
-        #print(name_entries)
 
         # Get existing teams from the database
-        self.cursor.execute("SELECT teamName FROM teamData")
-        existing_teams = {row[0] for row in self.cursor.fetchall()}
-        #print("existing_teams", existing_teams)
+        self.cursor.execute("SELECT id, teamName, mp3Path FROM teamData")
+        existing_teams = {row[1]: (row[0], row[2]) for row in self.cursor.fetchall()}
 
         # Update existing teams and add new teams with default values
-        for entry in name_entries:
+        for i, entry in enumerate(name_entries):
             team_name = entry.get().strip()
-            #print(team_name)
+            mp3_path = self.mp3_list.get(i)
+            #print("mp3_dsfdsfdspath", mp3_path)
+
             if team_name != "":
                 # Update existing team
-                if not team_name in existing_teams:
+                if team_name in existing_teams:
+                    team_id, existing_mp3_path = existing_teams[team_name]
+                    if existing_mp3_path != mp3_path:
+                        # Update MP3 path for existing team
+                        if mp3_path is not None:
+                            self.cursor.execute("UPDATE teamData SET mp3Path = ? WHERE id = ?", (mp3_path, team_id))
+                else:
                     # Add new team with default values
                     try:
-                        self.cursor.execute("INSERT INTO teamData (teamName, goals) VALUES (?, 0)", (team_name,))
-                        existing_teams.add(team_name)
-                    except sqlite3.IntegrityError:
-                            for i in range(1, 100):
-                                if f"{team_name} {i}" not in existing_teams:
-                                    team_name = f"{team_name} {i}"
-                                    break
+                        if mp3_path is not None:
+                            self.cursor.execute("INSERT INTO teamData (teamName, goals, mp3Path) VALUES (?, 0, ?)", (team_name, mp3_path))
+                            existing_teams[team_name] = (self.cursor.lastrowid, mp3_path)
+                        else:
                             self.cursor.execute("INSERT INTO teamData (teamName, goals) VALUES (?, 0)", (team_name,))
+                            existing_teams[team_name] = (self.cursor.lastrowid, None)
+                    except sqlite3.IntegrityError:
+                        for i in range(1, 100):
+                            new_team_name = f"{team_name} {i}"
+                            if new_team_name not in existing_teams:
+                                team_name = new_team_name
+                                break
+                        if mp3_path is not None:
+                            self.cursor.execute("INSERT INTO teamData (teamName, goals, mp3Path) VALUES (?, 0, ?)", (team_name, mp3_path))
+                            existing_teams[team_name] = (self.cursor.lastrowid, mp3_path)
+                        else:
+                            self.cursor.execute("INSERT INTO teamData (teamName, goals) VALUES (?, 0)", (team_name,))
+                            existing_teams[team_name] = (self.cursor.lastrowid, None)
+
         # Delete teams not in the entries
-        teams_to_delete = existing_teams - {entry.get().strip() for entry in name_entries}
+        teams_to_delete = set(existing_teams.keys()) - {entry.get().strip() for entry in name_entries}
         for team_name in teams_to_delete:
-            self.cursor.execute("DELETE FROM teamData WHERE teamName = ?", (team_name,))
+            team_id, _ = existing_teams[team_name]
+            self.cursor.execute("DELETE FROM teamData WHERE id = ?", (team_id,))
 
         #print("tests")
         self.updated_data.update({"Team": self.read_teamNames()})
@@ -221,17 +271,25 @@ class Window(ctk.CTk):
     
     def write_names_into_entry_fields(self):
         selectTeams = """
-        SELECT teamName FROM teamData
+        SELECT teamName, mp3Path FROM teamData
         ORDER BY id ASC
         """
         self.cursor.execute(selectTeams)
         
-        for teamName in self.cursor.fetchall():
-            self.add_name_entry(teamName[0])
+        allfetched = self.cursor.fetchall()
+        
+        if allfetched == []:
+            self.add_name_entry()
+        
+        #print("allfetched", allfetched)
+        for teamName, mp3_path in allfetched:
+            print("teamName", teamName)
+            print("mp3_path", mp3_path)
+            self.add_name_entry(teamName, mp3_path)
+        
             
 
     def create_Team_elements(self):
-        
         # Create elements for the Team frame
         canvas = tk.Canvas(self.Team_frame)
         canvas.pack(side="left", fill="both", expand=True)
@@ -273,16 +331,18 @@ class Window(ctk.CTk):
         #player_button = tk.Button(self.player_frame, text="player Button", command=self.player_button_command)
         #player_button.pack(pady=10)
         # Create elements for the Team frame
-        canvas = tk.Canvas(self.player_frame)
-        canvas.pack(fill="both", expand=True, side="bottom")
+        self.canvas = tk.Canvas(self.player_frame)
+        self.canvas.pack(fill="both", expand=True, side="bottom")
 
         # Create a scrollbar and connect it to the canvas
-        scrollbar = ctk.CTkScrollbar(self.player_frame, orientation='vertical', command=canvas.yview, height=20)
+        scrollbar = ctk.CTkScrollbar(self.player_frame, orientation='vertical', command= self.canvas.yview, height=25)
         scrollbar.pack(side=tk.LEFT, fill="y")
-        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        self.canvas.configure(yscrollcommand=scrollbar.set)
+        self.canvas.configure(yscrollincrement=6)
 
-        self.frameplayer = ctk.CTkFrame(canvas)
-        canvas.create_window((0, 0), window=self.frameplayer, anchor="nw")
+        self.frameplayer = ctk.CTkFrame(self.canvas)
+        self.canvas.create_window((0, 0), window=self.frameplayer, anchor="nw")
         
         self.test_frame = ctk.CTkFrame(self.player_frame, bg_color='grey17', fg_color='grey17')
         self.test_frame.pack(anchor=tk.NW, side=tk.LEFT, fill=tk.X, padx=10, expand=True)
@@ -309,9 +369,9 @@ class Window(ctk.CTk):
         teamNames.pop(0)
         #print("teamNames", teamNames, "team_IDs", team_IDs)
         
-        self.player_top_frame = ctk.CTkFrame(self.test_frame)
+        self.player_top_frame = ctk.CTkFrame(self.test_frame, width=1, height=1)
 
-        self.player_bottom_frame = ctk.CTkFrame(self.test_frame)
+        self.player_bottom_frame = ctk.CTkFrame(self.test_frame, width=1, height=1)
 
         for i, teamID in enumerate(team_IDs):
             teamName = teamNames[int(teamID-1)]
@@ -546,6 +606,7 @@ class Window(ctk.CTk):
         
         #for button in team_button_list:
         #    button.configure(bg="lightgray")
+        self.canvas.yview_moveto(0.0)
         
         team_button = team_button_list[index]
         
@@ -739,7 +800,6 @@ class Window(ctk.CTk):
             
             # Initialize the dictionary for the current team
             self.spiel_buttons[team_id] = {}
-            
                     
             self.for_team_frame = ctk.CTkFrame(self.SPIEL_frame, bg_color='grey17', fg_color='grey17')
             self.for_team_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, fill="both", padx=10, expand=True)
@@ -761,7 +821,10 @@ class Window(ctk.CTk):
             score_button_up = ctk.CTkButton(score_button_frame, text="UP", command=lambda team=team_id: self.global_scored_a_point(team, "UP"))
             score_button_up.pack(pady=2, anchor=tk.N, side=tk.TOP, expand=True, fill=tk.X)
             
-            score_label = ctk.CTkLabel(score_button_frame, text="45", font=("Helvetica", 14))
+            score_label_var = tk.StringVar()
+            score_label_var.set(int(self.read_team_stats(team_id, "score")))
+            
+            score_label = ctk.CTkLabel(score_button_frame, text="None", font=("Helvetica", 14), textvariable=score_label_var)
             score_label.pack(pady=2, anchor=tk.N, side=tk.TOP, expand=True, fill=tk.X)
             
             score_button_down = ctk.CTkButton(score_button_frame, text="DOWN", command=lambda team=team_id: self.global_scored_a_point(team, "DOWN"))
@@ -770,7 +833,7 @@ class Window(ctk.CTk):
             self.team_label = ctk.CTkLabel(self.for_team_frame, text=team_name, font=("Helvetica", 14))
             self.team_label.pack(side=tk.LEFT, pady=2, anchor=tk.NW)
             
-            self.spiel_buttons[team_id]["global"] = (self.for_team_frame, self.team_label)
+            self.spiel_buttons[team_id]["global"] = (self.for_team_frame, self.team_label, score_button_up, score_label_var, score_button_down)
             
             frame_frame = ctk.CTkFrame(self.for_team_frame, bg_color='grey17', fg_color='grey17')
             frame_frame.pack(side=tk.TOP, pady=0, anchor=tk.N)
@@ -1058,6 +1121,8 @@ class Window(ctk.CTk):
         else:
             self.teams_playing = [None, None]
             
+        self.active_match = match_index
+            
         # Update the buttons
         self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements)
         #print("match selected")
@@ -1089,23 +1154,35 @@ class Window(ctk.CTk):
 
     def global_scored_a_point(self, teamID, direction="UP"):
         # Get the current score
-        current_score = int(self.read_team_active_goals(teamID))
+        current_score = int(self.read_team_stats(teamID, "score"))
         
         # Update the score
         if direction == "UP":
             current_score += 1
+            
         else:
             current_score -= 1
             
+        # Write the score into the database
         self.write_score_for_team_into_file(teamID, current_score)
-    
 
         # Update the score label
-        self.spiel_buttons[teamID]["global"][1].configure(text=teamID + " " + str(current_score))
+        self.spiel_buttons[teamID]["global"][3].set(str(current_score))
+    
+    
+    def read_mp3_path_from_db_for_team(self, teamID):
+        selectPath = """
+        SELECT mp3Path FROM teamData
+        WHERE id = ?
+        """
+        self.cursor.execute(selectPath, (teamID,))
+        
+        mp3Path = self.cursor.fetchone()[0]
+        
+        return mp3Path
        
         
     def write_score_for_team_into_file(self, teamID, goals):
-        
         
         updateGoals = """
         UPDATE teamData
@@ -1114,14 +1191,23 @@ class Window(ctk.CTk):
         """
         self.cursor.execute(updateGoals, (goals, teamID))
         
-        
         self.connection.commit()
         
     
-    def read_team_stats(self, team_name, stat):
-        score = self.read_teamNames(self.teams_playing, True)
-        score = score[score.index(team_name) + 1]
+    def read_team_stats(self, team_id, stat):
+        #print("read_team_stats", "teams_playing", self.teams_playing, "team_id", team_id, "stat", stat)
+        
         if stat == "score":
+            
+            get_score = """
+            SELECT goals FROM teamData
+            WHERE id = ?
+            ORDER BY id ASC
+            """
+            self.cursor.execute(get_score, (team_id,))
+            
+            score = self.cursor.fetchone()[0]
+            
             return score
         
     
@@ -1177,10 +1263,19 @@ class Window(ctk.CTk):
     def test(self):
         print("test")
         
+        
     def delete_updated_data(self):
         #print("delete")
         #print(self.updated_data)
         self.updated_data = {}
+        
+        
+    def play_mp3(self, file_path, volume):
+        player = self.media_player_instance.media_player_new()
+        media = self.media_player_instance.media_new(file_path)
+        player.set_media(media)
+        player.audio_set_volume(volume)
+        player.play()
         
     ##############################################################################################
     #############################Calculatre###########################################
@@ -1281,13 +1376,13 @@ class Window(ctk.CTk):
         #print(self.matches[0]["number"])
         
         for match in self.matches:
-            print(match)
+            #print(match)
             team1 = match["teams"][0]
             team2 = match["teams"][1]
             group = match["group"]
             number = match["number"]
             
-            print("team1", team1, "team2", team2, "group", group, "number", number)
+            #print("team1", team1, "team2", team2, "group", group, "number", number)
             
             try:
                 selectTeam1 = """
@@ -1320,7 +1415,7 @@ class Window(ctk.CTk):
                 
                 # Commit the changes to the database
             except Exception as e:
-                # Handle the exception (e.g., print an error message, log the error)
+                # Handle the exception (e.g., #print an error message, log the error)
                 print(f"Error inserting match: {e}")
                 # Rollback changes to maintain database integrity
             
