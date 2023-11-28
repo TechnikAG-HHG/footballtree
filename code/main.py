@@ -64,6 +64,7 @@ class Window(ctk.CTk):
         self.init_sqlite_db()
         
         self.media_player_instance = vlc.Instance()
+        self.media_player_instance.log_unset()
         
         #menu = tk.Menu(self)
         #self.configure(menu=menu)
@@ -410,8 +411,6 @@ class Window(ctk.CTk):
 
         if entries:
             
-            
-
             # Get existing players for the team from the database
             self.cursor.execute("SELECT playerName FROM playerData WHERE teamId = ?", (team_id,))
             existing_players = {row[0] for row in self.cursor.fetchall()}
@@ -1159,6 +1158,7 @@ class Window(ctk.CTk):
         # Update the score
         if direction == "UP":
             current_score += 1
+            self.play_mp3(self.read_mp3_path_from_db_for_team(teamID), 100)
             
         else:
             current_score -= 1
@@ -1178,6 +1178,9 @@ class Window(ctk.CTk):
         self.cursor.execute(selectPath, (teamID,))
         
         mp3Path = self.cursor.fetchone()[0]
+        
+        if mp3Path == "":
+            return ""
         
         return mp3Path
        
@@ -1271,6 +1274,8 @@ class Window(ctk.CTk):
         
         
     def play_mp3(self, file_path, volume):
+        if file_path == "":
+            return
         player = self.media_player_instance.media_player_new()
         media = self.media_player_instance.media_new(file_path)
         player.set_media(media)
