@@ -1175,6 +1175,7 @@ class Window(ctk.CTk):
 
             # Update the score label
             self.spiel_buttons[teamID]["global"][3].set(str(current_score))
+            self.updated_data.update({"Tore": get_data_for_website(1)})
     
     
     def read_mp3_path_from_db_for_team(self, teamID):
@@ -1210,6 +1211,7 @@ class Window(ctk.CTk):
         
         return True
     
+    
     def save_goals_for_teams_in_db(self, teamID, team2ID, direction="UP"):
         
         #first add one goal to the team that scored, which is teamID
@@ -1244,7 +1246,7 @@ class Window(ctk.CTk):
         
         self.connection.commit()
         
-        
+
     def save_goals_for_match_in_db(self, teamID, team2ID, goals):
         
         get_team1_or_team2 = """
@@ -1588,14 +1590,25 @@ def get_data_for_website(which_data=-1):
         connection.close()
         
         return teamNames
+    
+    if which_data == 1:     
+        
+        Tore = []
+        
+        #for Team in tkapp.read_teamIds():
+            #Tore.append((tkapp.read_team_stats(Team, "score"), tkapp.read_team_stats(Team, "goalsReceived")))
+            
+        return Tore
         
 
 def get_initial_data(template_name):
     global initial_data
     tkapp.test()
+    
+    
     initial_data = {
         "Teams": get_data_for_website(0),
-        "Tore": ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+        "Tore": get_data_for_website(1),
         "ZeitIntervall": 10,
         "Startzeit": [9,30],
         "LastUpdate": 0
@@ -1636,31 +1649,32 @@ def update_data():
     
     if updated_data != {}:
         
-        #print(updated_data)  
-        #print(updated_data.keys())
-        #print(updated_data.values())
+        print("updated_data)  ", updated_data, "last_data_update", last_data_update, "should be updated")
+        print(updated_data.keys())
+        print(updated_data.values())
         for key, value in updated_data.items():
             for key2, value2 in stored_data.items():
                 if key in value2.keys():
                     stored_data.pop(key2)
                     break
             
-            stored_data.update({time.time()+2:{key:value}})
-            #print(stored_data)
+            stored_data.update({time.time()-3:{key:value}})
+            print("stored_data", stored_data)
         
         updated_data.update({"LastUpdate": timeatstart})
         
     for key, value in stored_data.items():
         #print("magucken")
         if key >= float(last_data_update):
-            #print("key", key, "value", value, "last_data_update", last_data_update, "should be updated")
+            print("key", key, "value", value, "last_data_update", last_data_update, "should be updated")
             updated_data.update(value)
-            #print("updated_data", updated_data)
+            updated_data.update({"LastUpdate": timeatstart})
+            print("updated_data", updated_data)
             
     
-    #print("stored_data", stored_data, "updated_data", updated_data, "last_data_update", last_data_update)
+    print("stored_data", stored_data, "updated_data", updated_data, "last_data_update", last_data_update)
         
-    #print(updated_data)
+    print("updated_data", updated_data)
     tkapp.delete_updated_data()
     #updated_data = {'Teams': tkapp.read_team_names(), 'Players': {"Player1":"Erik Van Doof","Player2":"Felix Schweigmann"}}  # You can modify this data as needed
     return jsonify(updated_data)
