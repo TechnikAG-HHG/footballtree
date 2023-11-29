@@ -35,6 +35,14 @@ button {
     font-size: 4vw;
     font-weight: bold;
     color: white;
+    box-shadow: 0.7vw 0.7vw 0.7vw 0.2vw rgba(0, 0, 0, 0.501),
+        2vw 2vw 1vw 0.2vw rgba(0, 0, 0, 0.299);
+}
+
+button:hover {
+    background-color: #3d8e4f;
+    box-shadow: 0.7vw 0.7vw 0.7vw 0.2vw rgba(0, 0, 0, 0.501),
+        2vw 2vw 1vw 0.2vw rgba(0, 0, 0, 0.299);
 }
 
 a {

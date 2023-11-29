@@ -50,6 +50,12 @@ body {
     margin-left: 3vw;
 }
 
+#returnButton:hover {
+    background-color: #3d8e4f;
+    box-shadow: 0 0.5vw 1vw 0 rgba(0, 0, 0, 0.24),
+        0 1vw 3vw 0 rgba(0, 0, 0, 0.19);
+}
+
 #tablesContainer {
     display: flex;
     justify-content: center;
