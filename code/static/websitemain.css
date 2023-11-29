@@ -1,29 +1,25 @@
 html,
 body {
-    height: 95%;
-    width: 95%;
+    width: 100%;
     margin: 0;
-    padding: 20px;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background-color: #1a1a1a;
+    font-family: "Roboto", sans-serif;
+    padding-top: 2vw;
 }
 
 h1 {
     color: white;
-    font-size: 400%;
+    font-size: 5vw;
     text-align: center;
     font-family: "Roboto", sans-serif;
-}
-
-body {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    background-color: #1a1a1a;
     margin: 0;
-    padding: 0;
-    font-family: "Roboto", sans-serif;
 }
 
 button {
@@ -31,29 +27,37 @@ button {
     justify-content: center;
     align-items: center;
     flex-direction: row;
-    margin-top: 20px;
-    width: 90%;
-    height: 20%;
-    border-radius: 3vh;
+    margin-top: 0.7vw;
+    width: 50vw;
+    height: 20vh;
+    border-radius: 2vw;
     background-color: #49ba67;
-    font-size: 200%;
+    font-size: 4vw;
     font-weight: bold;
     color: white;
+    box-shadow: 0.7vw 0.7vw 0.7vw 0.2vw rgba(0, 0, 0, 0.501),
+        2vw 2vw 1vw 0.2vw rgba(0, 0, 0, 0.299);
+}
+
+button:hover {
+    background-color: #3d8e4f;
+    box-shadow: 0.7vw 0.7vw 0.7vw 0.2vw rgba(0, 0, 0, 0.501),
+        2vw 2vw 1vw 0.2vw rgba(0, 0, 0, 0.299);
 }
 
 a {
     color: white;
-    font-size: 160%;
+    font-size: 1.5vw;
     text-align: center;
     font-family: "Roboto", sans-serif;
-    margin-top: 6px;
+    margin-top: 0.3vw;
     margin-bottom: 0;
     font-weight: bold;
     text-decoration: none;
 }
 
 .MadeBy {
-    margin-top: 40px;
+    margin-top: 3vw;
 }
 
 .link,
@@ -67,25 +71,33 @@ a {
 }
 
 /* Media query for larger screens */
-@media screen and (min-width: 1000px) {
-    #tablesContainer {
-        flex-direction: row; /* Change to row for larger screens */
-        width: 100%;
-        margin: 0;
-    }
-
+@media screen and (max-width: 1000px) {
     h1 {
-        padding-bottom: 0;
-        padding-top: 0;
-        font-size: 125px;
+        font-size: 10vw;
+        margin-top: 10vw;
+        margin-bottom: 10vw;
     }
 
     button {
-        font-size: 7vh;
-        width: 50%;
+        width: 80vw;
+        height: 10vh;
+        font-size: 6vw;
+        font-size: 7vw;
+        margin-top: 3vw;
     }
 
-    button:hover {
-        background-color: #3d8e4f;
+    .MadeBy {
+        margin-top: 10vw;
+    }
+
+    a {
+        color: white;
+        font-size: 5vw;
+        text-align: center;
+        font-family: "Roboto", sans-serif;
+        margin-top: 1vw;
+        margin-bottom: 0;
+        font-weight: bold;
+        text-decoration: none;
     }
 }
