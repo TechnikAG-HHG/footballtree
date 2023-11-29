@@ -288,8 +288,7 @@ class Window(ctk.CTk):
             #print("teamName", teamName)
             #print("mp3_path", mp3_path)
             self.add_name_entry(teamName, mp3_path)
-        
-            
+           
 
     def create_Team_elements(self):
         # Create elements for the Team frame
@@ -748,6 +747,7 @@ class Window(ctk.CTk):
         
         return team_id
     
+    
     def get_player_id_from_player_name(self, player_name):
         
         self.cursor.execute("SELECT id FROM playerData WHERE playerName = ?", (player_name,))
@@ -1159,7 +1159,7 @@ class Window(ctk.CTk):
 
     def global_scored_a_point(self, teamID, team2ID, direction="UP"):
         # Get the current score
-        current_score = int(self.read_team_stats(teamID, "score"))
+        current_score = self.read_goals_for_match_from_db(teamID, team2ID)
         
         # Update the score
         if direction == "UP":
@@ -1204,7 +1204,22 @@ class Window(ctk.CTk):
         else:
             goals -= 1
         
+        self.save_goals_for_match_in_db(teamID, team2ID, goals)
         
+        self.save_goals_for_teams_in_db(teamID, team2ID, direction)
+        
+        return True
+    
+    def save_goals_for_teams_in_db(self, teamID, team2ID, direction="UP"):
+        
+        #first add one goal to the team that scored, which is teamID
+        goals = self.read_team_stats(teamID, "score")
+        
+        if direction == "UP":
+            goals += 1
+        else:
+            goals -= 1
+            
         updateGoals = """
         UPDATE teamData
         SET goals = ?
@@ -1212,12 +1227,24 @@ class Window(ctk.CTk):
         """
         self.cursor.execute(updateGoals, (goals, teamID))
         
-        self.save_goals_for_match_in_db(teamID, team2ID, goals)
+        #then add one goal to the team that got scored against, which is team2ID
+        goalsReceived = self.read_team_stats(team2ID, "goalsReceived")
+        
+        if direction == "UP":
+            goalsReceived += 1
+        else:
+            goalsReceived -= 1
+            
+        updateGoals = """
+        UPDATE teamData
+        SET goalsReceived = ?
+        WHERE id = ?
+        """
+        self.cursor.execute(updateGoals, (goalsReceived, team2ID))
         
         self.connection.commit()
         
-        return True
-    
+        
     def save_goals_for_match_in_db(self, teamID, team2ID, goals):
         
         get_team1_or_team2 = """
@@ -1234,6 +1261,8 @@ class Window(ctk.CTk):
         
         self.team1_or_team2 = self.cursor.fetchone()[0]
         
+        print("self.team1_or_team2", self.team1_or_team2)
+        
         
         update_goals_for_match = """
         UPDATE matchData
@@ -1244,7 +1273,10 @@ class Window(ctk.CTk):
         
         self.connection.commit()
         
+        
     def read_goals_for_match_from_db(self, teamID, team2ID):
+        
+        print("read_goals_for_match_from_db", "teamID", teamID, "team2ID", team2ID)
         
         get_team1_or_team2 = """
         SELECT 
@@ -1263,7 +1295,7 @@ class Window(ctk.CTk):
         if onefetched == None:
             return "None"
         
-        print(self.cursor.fetchone())
+        print(onefetched)
         
         self.team1_or_team2 = onefetched[0]
         print("self.team1_or_team2", self.team1_or_team2)
@@ -1296,6 +1328,19 @@ class Window(ctk.CTk):
             score = self.cursor.fetchone()[0]
             
             return score
+
+        if stat == "goalsReceived":
+            
+            get_goalsRecived = """
+            SELECT goalsReceived FROM teamData
+            WHERE id = ?
+            ORDER BY id ASC
+            """
+            self.cursor.execute(get_goalsRecived, (team_id,))
+            
+            goalsRecived = self.cursor.fetchone()[0]
+            
+            return goalsRecived
         
     
     
@@ -1457,57 +1502,64 @@ class Window(ctk.CTk):
 
 
     def save_matches_to_db(self):
-        #print("save_matches_to_db")
-        #print(self.matches)
-        #print(self.matches[0]["teams"][0])
-        #print(self.matches[0]["teams"][1])
-        #print(self.matches[0]["group"])
-        #print(self.matches[0]["number"])
-        
+        get_existing_matches = """
+        SELECT team1Id, team2Id, groupNumber, matchId, team1Goals, team2Goals, matchTime FROM matchData
+        """
+        self.cursor.execute(get_existing_matches)
+        existing_matches = {tuple(row[:4]) for row in self.cursor.fetchall()}
+
         for match in self.matches:
-            #print(match)
             team1 = match["teams"][0]
             team2 = match["teams"][1]
             group = match["group"]
             number = match["number"]
-            
-            #print("team1", team1, "team2", team2, "group", group, "number", number)
-            
-            try:
-                selectTeam1 = """
-                SELECT id FROM teamData
-                WHERE teamName = ?
-                ORDER BY id ASC
+
+            selectTeam1 = """
+            SELECT id FROM teamData
+            WHERE teamName = ?
+            ORDER BY id ASC
+            """
+            self.cursor.execute(selectTeam1, (team1,))
+            team1ID = self.cursor.fetchone()[0]
+
+            selectTeam2 = """
+            SELECT id FROM teamData
+            WHERE teamName = ?
+            ORDER BY id ASC
+            """
+            self.cursor.execute(selectTeam2, (team2,))
+            team2ID = self.cursor.fetchone()[0]
+
+            match_tuple = (int(team1ID), int(team2ID), int(str(group).replace('Gruppe ','')), int(str(number).replace('Spiel ','')))
+            match_tuple2 = (int(team1ID), int(team2ID), int(str(group).replace('Gruppe ','')))
+
+            if match_tuple in existing_matches:
+                get_existing_match_data = """
+                SELECT * FROM matchData
+                WHERE team1Id = ? AND team2Id = ? AND groupNumber = ? AND matchId = ?
                 """
-                self.cursor.execute(selectTeam1, (team1,))
-                team1ID = self.cursor.fetchone()[0]
-                
-                selectTeam2 = """
-                SELECT id FROM teamData
-                WHERE teamName = ?
-                ORDER BY id ASC
+                self.cursor.execute(get_existing_match_data, match_tuple)
+                existing_match_data = self.cursor.fetchone()
+
+                # Copy the existing match data into the new match data
+                match_data = existing_match_data
+
+                updateMatch = """
+                    UPDATE matchData
+                    SET team1Id = ?, team2Id = ?, groupNumber = ?, team1Goals = ?, team2Goals = ?, matchTime = ?
+                    WHERE team1Id = ? AND team2Id = ? AND groupNumber = ? AND matchId = ?
                 """
-                self.cursor.execute(selectTeam2, (team2,))
-                team2ID = self.cursor.fetchone()[0]
-                
+                self.cursor.execute(updateMatch, match_data + match_tuple2)
+            else:
                 insertMatch = """
-                    INSERT OR REPLACE INTO matchData (team1Id, team2Id, groupNumber, matchId)
+                    INSERT INTO matchData (team1Id, team2Id, groupNumber, matchId)
                     VALUES (?, ?, ?, ?)
                 """
-                self.cursor.execute(
-                    insertMatch, 
-                    (int(team1ID), 
-                    int(team2ID), 
-                    int(str(group).replace('Gruppe ','')), 
-                    int(str(number).replace('Spiel ','')))
-)
-                
-                # Commit the changes to the database
-            except Exception as e:
-                # Handle the exception (e.g., #print an error message, log the error)
-                print(f"Error inserting match: {e}")
-                # Rollback changes to maintain database integrity
-            
+                try:
+                    self.cursor.execute(insertMatch, match_tuple)
+                except sqlite3.IntegrityError:
+                    print(f"matchId {match_tuple[3]} already exists. Skipping insertion.")
+
         self.connection.commit()
             
     ##############################################################################################
