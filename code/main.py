@@ -1459,11 +1459,7 @@ class Window(ctk.CTk):
         self.match_count = 0
 
         initial_data = {
-        "Teams": self.read_teamNames(),
-        "Tore": ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
-        "ZeitIntervall": 10,
-        "Startzeit": [9,30],
-        "LastUpdate": 0
+        "Teams": self.read_teamNames()
         }
         
         teams = initial_data["Teams"][:]  # Create a copy of the teams array
@@ -1484,6 +1480,8 @@ class Window(ctk.CTk):
         matches2 = self.calculate_matches_for_group(group2, "Gruppe 2")
 
         matches = self.interleave_matches(matches1, matches2)
+        
+        print("matches", matches, "matches1", matches1, "matches2", matches2)
         
         self.match_count = 0
 
@@ -1540,11 +1538,17 @@ class Window(ctk.CTk):
 
 
     def save_matches_to_db(self):
+        
         get_existing_matches = """
         SELECT team1Id, team2Id, groupNumber, matchId, team1Goals, team2Goals, matchTime FROM matchData
         """
+        
         self.cursor.execute(get_existing_matches)
         existing_matches = {tuple(row[:4]) for row in self.cursor.fetchall()}
+        
+        added_matches = []
+        
+        print("existing_matches", existing_matches, "self.matches", self.matches)
 
         for match in self.matches:
             team1 = match["teams"][0]
@@ -1570,6 +1574,8 @@ class Window(ctk.CTk):
 
             match_tuple = (int(team1ID), int(team2ID), int(str(group).replace('Gruppe ','')), int(str(number).replace('Spiel ','')))
             match_tuple2 = (int(team1ID), int(team2ID), int(str(group).replace('Gruppe ','')))
+            
+            added_matches.append(match_tuple)
 
             if match_tuple in existing_matches:
                 get_existing_match_data = """
@@ -1597,6 +1603,31 @@ class Window(ctk.CTk):
                     self.cursor.execute(insertMatch, match_tuple)
                 except sqlite3.IntegrityError:
                     print(f"matchId {match_tuple[3]} already exists. Skipping insertion.")
+        
+        teams_to_delete = []
+        
+        for existing_match in existing_matches:
+            if existing_match not in added_matches:
+                teams_to_delete.append(existing_match)
+                
+                
+        print("teams_to_delete", teams_to_delete)
+        
+        for team_to_delete in teams_to_delete:
+            deleteMatch = """
+                DELETE FROM matchData
+                WHERE team1Id = ? AND team2Id = ? AND groupNumber = ? AND matchId = ?
+            """
+            self.cursor.execute(deleteMatch, team_to_delete)
+            
+        # Delete teams that are not in the sorted list of team IDs
+        delete_teams = """
+        DELETE FROM matchData WHERE matchId NOT IN (SELECT matchId FROM matchData ORDER BY matchId)
+        """
+        self.cursor.execute(delete_teams)
+            
+            
+            
 
         self.connection.commit()
             
@@ -1790,7 +1821,7 @@ global db_path
 
 db_path = "data/data.db"
 stored_data = {}
-tkapp = Window(True)
+tkapp = Window(False)
 
 if __name__ == "__main__":
     tkapp.mainloop()
