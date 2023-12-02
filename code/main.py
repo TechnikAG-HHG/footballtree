@@ -274,7 +274,7 @@ class Window(ctk.CTk):
         team_names = self.read_teamNames()
         team_names.pop(0)
 
-        self.updated_data.update({"Team": team_names})
+        self.updated_data.update({"Teams": team_names})
         self.connection.commit()
         
     
@@ -1821,7 +1821,7 @@ global db_path
 
 db_path = "data/data.db"
 stored_data = {}
-tkapp = Window(False)
+tkapp = Window()
 
 if __name__ == "__main__":
     tkapp.mainloop()

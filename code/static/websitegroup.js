@@ -88,7 +88,6 @@ function updateData() {
 }
 
 function updateTables(data) {
-    console.log(data.Teams);
     var tableCount = 2;
     var teamCount = data.Teams.length;
     var entriesPerTable = Math.ceil(teamCount / tableCount);
@@ -111,8 +110,6 @@ function updateTables(data) {
             var Sp = data.Spiele[i];
             var T = data.Tore[i];
             var P = 0;
-
-            console.log(y, team, Sp, T, P, entriesPerTable, i);
 
             tables.forEach(function (table) {
                 var nameCell = table.getElementsByClassName("nameCell" + y)[0];
