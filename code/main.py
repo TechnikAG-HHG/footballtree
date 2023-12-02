@@ -223,16 +223,21 @@ class Window(ctk.CTk):
         # Get existing teams from the database
         self.cursor.execute("SELECT id, teamName, mp3Path FROM teamData")
         existing_teams = {row[1]: (row[0], row[2]) for row in self.cursor.fetchall()}
+        
+        team_ids_to_delete = []
 
         # Delete teams not in the entries and reassign IDs
         teams_to_delete = set(existing_teams.keys()) - {entry.get().strip() for entry in name_entries}
         for team_name in teams_to_delete:
             team_id, _ = existing_teams[team_name]
-            self.cursor.execute("DELETE FROM teamData WHERE id = ?", (team_id,))
+            #self.cursor.execute("DELETE FROM teamData WHERE id = ?", (team_id,))
+            team_ids_to_delete.append(team_id)
+            
 
         # Update existing teams and add new teams with default values
         for i, entry in enumerate(name_entries):
             team_name = entry.get().strip()
+            team_id1 = i + 1
             mp3_path = self.mp3_list.get(i)
 
             if team_name != "":
@@ -246,25 +251,57 @@ class Window(ctk.CTk):
                 else:
                     # Add new team with default values
                     try:
-                        if mp3_path is not None:
-                            self.cursor.execute("INSERT INTO teamData (teamName, goals, mp3Path) VALUES (?, 0, ?)", (team_name, mp3_path))
-                            existing_teams[team_name] = (self.cursor.lastrowid, mp3_path)
+                        #print("team_id1", team_id1, "team_ids_to_delete", team_ids_to_delete)
+                        if team_id1 in team_ids_to_delete:
+                            if mp3_path is not None:
+                                self.cursor.execute("UPDATE teamData SET teamName = ?, mp3Path = ? WHERE id = ?", (team_name, mp3_path, team_id1))
+                                existing_teams[team_name] = (self.cursor.lastrowid, mp3_path)
+                            else:
+                                self.cursor.execute("UPDATE teamData SET teamName = ? WHERE id = ?", (team_name, team_id1))
+                                existing_teams[team_name] = (self.cursor.lastrowid, None)
+                                team_ids_to_delete.remove(team_id1)
                         else:
-                            self.cursor.execute("INSERT INTO teamData (teamName, goals) VALUES (?, 0)", (team_name,))
-                            existing_teams[team_name] = (self.cursor.lastrowid, None)
+                            if mp3_path is not None:
+                                self.cursor.execute("INSERT INTO teamData (teamName, goals, mp3Path) VALUES (?, 0, ?)", (team_name, mp3_path))
+                                existing_teams[team_name] = (self.cursor.lastrowid, mp3_path)
+                            else:
+                                self.cursor.execute("INSERT INTO teamData (teamName, goals) VALUES (?, 0)", (team_name,))
+                                existing_teams[team_name] = (self.cursor.lastrowid, None)
+                            
                     except sqlite3.IntegrityError:
                         for i in range(1, 100):
                             new_team_name = f"{team_name} {i}"
                             if new_team_name not in existing_teams:
                                 team_name = new_team_name
                                 break
-                        if mp3_path is not None:
-                            self.cursor.execute("INSERT INTO teamData (teamName, goals, mp3Path) VALUES (?, 0, ?)", (team_name, mp3_path))
-                            existing_teams[team_name] = (self.cursor.lastrowid, mp3_path)
+                            
+                        if team_id1 in team_ids_to_delete:
+                            if mp3_path is not None:
+                                self.cursor.execute("UPDATE teamData SET teamName = ?, mp3Path = ? WHERE id = ?", (team_name, mp3_path, team_id1))
+                                existing_teams[team_name] = (self.cursor.lastrowid, mp3_path)
+                            else:
+                                self.cursor.execute("UPDATE teamData SET teamName = ? WHERE id = ?", (team_name, team_id1))
+                                existing_teams[team_name] = (self.cursor.lastrowid, None)
+                            team_ids_to_delete.remove(team_id1)
+                        
                         else:
-                            self.cursor.execute("INSERT INTO teamData (teamName, goals) VALUES (?, 0)", (team_name,))
-                            existing_teams[team_name] = (self.cursor.lastrowid, None)
+                            if mp3_path is not None:
+                                self.cursor.execute("INSERT INTO teamData (teamName, goals, mp3Path) VALUES (?, 0, ?)", (team_name, mp3_path))
+                                existing_teams[team_name] = (self.cursor.lastrowid, mp3_path)
+                            else:
+                                self.cursor.execute("INSERT INTO teamData (teamName, goals) VALUES (?, 0)", (team_name,))
+                                existing_teams[team_name] = (self.cursor.lastrowid, None)
 
+        for team_id in team_ids_to_delete:
+            self.cursor.execute("DELETE FROM teamData WHERE id = ?", (team_id,))
+        
+        # get all ids from teamData
+        self.cursor.execute("SELECT id FROM teamData")
+        team_ids = [row[0] for row in self.cursor.fetchall()]
+        for i, team_id in enumerate(team_ids):
+            if i + 1 != team_id:
+                self.cursor.execute("UPDATE teamData SET id = ? WHERE id = ?", (i+1, team_id))
+        
         # Reassign IDs consecutively
         self.cursor.execute("DELETE FROM teamData WHERE id NOT IN (SELECT id FROM teamData ORDER BY id)")
         #self.cursor.execute("UPDATE SQLITE_SEQUENCE SET seq = (SELECT MAX(id) FROM teamData)")
@@ -455,6 +492,13 @@ class Window(ctk.CTk):
                             insert_query = "INSERT INTO playerData (playerName, playerNumber, goals, teamId) VALUES (?, ?, ?, ?)"
                             self.cursor.execute(insert_query, (entry_text, entry_text2, entry_text3, team_id))
                                 
+            #get all ids from playerData
+            self.cursor.execute("SELECT id FROM playerData")
+            player_ids = [row[0] for row in self.cursor.fetchall()]
+            for i, player_id in enumerate(player_ids):
+                if i + 1 != player_id:
+                    self.cursor.execute("UPDATE playerData SET id = ? WHERE id = ?", (i+1, player_id))
+            
 
             # Delete players not in the entries
             players_to_delete = existing_players - {entry.get() for entry in entries}
@@ -1114,10 +1158,10 @@ class Window(ctk.CTk):
             
             
         next_match_button = ctk.CTkButton(spiel_select_frame, text="Next Match", command=lambda : self.next_previous_match_button(spiel_select, matches))
-        next_match_button.pack(pady=10, padx=5, side=tk.LEFT, anchor=tk.SW)
+        next_match_button.pack(pady=10, padx=5, side=tk.RIGHT, anchor=tk.SE)
         
         previous_match_button = ctk.CTkButton(spiel_select_frame, text="Previous Match", command=lambda : self.next_previous_match_button(spiel_select, matches, False))
-        previous_match_button.pack(pady=10, padx=5, side=tk.RIGHT, anchor=tk.SE)
+        previous_match_button.pack(pady=10, padx=5, side=tk.LEFT, anchor=tk.SW)
 
 
     def on_match_select(self, event, matches):
@@ -1294,7 +1338,7 @@ class Window(ctk.CTk):
         
     def read_goals_for_match_from_db(self, teamID, team2ID):
         
-        print("read_goals_for_match_from_db", "teamID", teamID, "team2ID", team2ID)
+        #print("read_goals_for_match_from_db", "teamID", teamID, "team2ID", team2ID)
         
         get_team1_or_team2 = """
         SELECT 
@@ -1821,7 +1865,7 @@ global db_path
 
 db_path = "data/data.db"
 stored_data = {}
-tkapp = Window()
+tkapp = Window(False)
 
 if __name__ == "__main__":
     tkapp.mainloop()
