@@ -1,14 +1,10 @@
-var tableCount = 2;
-var teamCount = 0;
-var entriesPerTable = 6;
-
 function generateTables() {
     var tablesContainer = document.getElementById("tablesContainer");
     tablesContainer.innerHTML = "";
 
     var tableCount = 2;
     var teamCount = data.Teams.length;
-    var entriesPerTable = teamCount / tableCount;
+    var entriesPerTable = Math.ceil(teamCount / tableCount);
 
     for (var i = 1; i <= tableCount; i++) {
         var table = document.createElement("table");
@@ -78,22 +74,24 @@ function updateData() {
         .then((response) => response.json())
         .then((updatedData) => {
             console.log("Updated data:", updatedData);
-
-            // Update variables in JavaScript
-            for (var key in updatedData) {
+            for (var key in data) {
                 if (updatedData.hasOwnProperty(key)) {
                     data[key] = updatedData[key];
                 }
             }
+            // Wait 500ms before calling updateTables
+            setTimeout(function () {
+                updateTables(data);
+            }, 500);
         })
         .catch((error) => console.error("Error fetching data:", error));
-
-    setTimeout(function () {
-        updateTables(data);
-    }, 500);
 }
 
 function updateTables(data) {
+    var tableCount = 2;
+    var teamCount = data.Teams.length;
+    var entriesPerTable = Math.ceil(teamCount / tableCount);
+
     for (var x = 1; x < tableCount + 1; x++) {
         var tables = Array.from(
             document.querySelectorAll(`.table${x} tbody tr`)
@@ -105,15 +103,13 @@ function updateTables(data) {
         var y = 1;
         for (
             var i = x * entriesPerTable - entriesPerTable;
-            i < data.Teams.length && y < 7;
+            i < data.Teams.length && y < entriesPerTable + 1;
             i++
         ) {
             var team = data.Teams[i];
-            var Sp = 0;
+            var Sp = data.Spiele[i];
             var T = data.Tore[i];
             var P = 0;
-
-            console.log(y, team, Sp, T, P, entriesPerTable, i);
 
             tables.forEach(function (table) {
                 var nameCell = table.getElementsByClassName("nameCell" + y)[0];
