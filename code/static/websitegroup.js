@@ -4,7 +4,13 @@ function generateTables() {
 
     var tableCount = 2;
     var teamCount = data.Teams.length;
-    var entriesPerTable = Math.ceil(teamCount / tableCount);
+    if (teamCount % 2 != 0) {
+        var entriesTable1 = Math.ceil(teamCount / tableCount);
+        var entriesTable2 = Math.floor(teamCount / tableCount);
+    } else {
+        var entriesTable1 = teamCount / tableCount;
+        var entriesTable2 = teamCount / tableCount;
+    }
 
     for (var i = 1; i <= tableCount; i++) {
         var table = document.createElement("table");
@@ -30,27 +36,52 @@ function generateTables() {
         headerCellP.textContent = "P";
         headerCellP.className = "headerCell";
 
-        for (var j = 1; j <= entriesPerTable; j++) {
-            var row = tbody.insertRow(j - 1);
-            var cellName = row.insertCell(0);
-            cellName.textContent = j;
-            cellName.className = "tableCell";
-            cellName.className += " nameCell" + j;
+        if (i == 1) {
+            for (var j = 1; j <= entriesTable1; j++) {
+                var row = tbody.insertRow(j - 1);
+                var cellName = row.insertCell(0);
+                cellName.textContent = j;
+                cellName.className = "tableCell";
+                cellName.className += " nameCell" + j;
 
-            var cellSp = row.insertCell(1);
-            cellSp.textContent = 0;
-            cellSp.className = "tableCell";
-            cellSp.className += " spCell" + j;
+                var cellSp = row.insertCell(1);
+                cellSp.textContent = 0;
+                cellSp.className = "tableCell";
+                cellSp.className += " spCell" + j;
 
-            var cellT = row.insertCell(2);
-            cellT.textContent = ":";
-            cellT.className = "tableCell";
-            cellT.className += " tCell" + j;
+                var cellT = row.insertCell(2);
+                cellT.textContent = ":";
+                cellT.className = "tableCell";
+                cellT.className += " tCell" + j;
 
-            var cellP = row.insertCell(3);
-            cellP.textContent = 0;
-            cellP.className = "tableCell";
-            cellP.className += " pCell" + j;
+                var cellP = row.insertCell(3);
+                cellP.textContent = 0;
+                cellP.className = "tableCell";
+                cellP.className += " pCell" + j;
+            }
+        } else if (i == 2) {
+            for (var j = 1; j <= entriesTable2; j++) {
+                var row = tbody.insertRow(j - 1);
+                var cellName = row.insertCell(0);
+                cellName.textContent = j;
+                cellName.className = "tableCell";
+                cellName.className += " nameCell" + j;
+
+                var cellSp = row.insertCell(1);
+                cellSp.textContent = 0;
+                cellSp.className = "tableCell";
+                cellSp.className += " spCell" + j;
+
+                var cellT = row.insertCell(2);
+                cellT.textContent = ":";
+                cellT.className = "tableCell";
+                cellT.className += " tCell" + j;
+
+                var cellP = row.insertCell(3);
+                cellP.textContent = 0;
+                cellP.className = "tableCell";
+                cellP.className += " pCell" + j;
+            }
         }
 
         table.appendChild(thead);
@@ -81,7 +112,7 @@ function updateData() {
             }
             // Wait 500ms before calling updateTables
             setTimeout(function () {
-                updateTables(data);
+                updateTableSize();
             }, 500);
         })
         .catch((error) => console.error("Error fetching data:", error));
@@ -90,7 +121,13 @@ function updateData() {
 function updateTables(data) {
     var tableCount = 2;
     var teamCount = data.Teams.length;
-    var entriesPerTable = Math.ceil(teamCount / tableCount);
+    if (teamCount % 2 != 0) {
+        var entriesTable1 = Math.ceil(teamCount / tableCount);
+        var entriesTable2 = Math.floor(teamCount / tableCount);
+    } else {
+        var entriesTable1 = teamCount / tableCount;
+        var entriesTable2 = teamCount / tableCount;
+    }
 
     for (var x = 1; x < tableCount + 1; x++) {
         var tables = Array.from(
@@ -101,15 +138,24 @@ function updateTables(data) {
         console.log("table", x);
 
         var y = 1;
+        if (x == 1) {
+            var entriesPerTable = entriesTable1;
+        } else if (x == 2) {
+            var entriesPerTable = entriesTable2;
+        }
         for (
-            var i = x * entriesPerTable - entriesPerTable;
+            var i = x * entriesTable1 - entriesTable1;
             i < data.Teams.length && y < entriesPerTable + 1;
             i++
         ) {
             var team = data.Teams[i];
             var Sp = data.Spiele[i];
             var T = data.Tore[i];
+            var T1 = T[0];
+            var T2 = T[1];
             var P = 0;
+
+            console.log("team", team, "Sp", Sp, "T", T, "P", P);
 
             tables.forEach(function (table) {
                 var nameCell = table.getElementsByClassName("nameCell" + y)[0];
@@ -124,7 +170,7 @@ function updateTables(data) {
 
                 var tCell = table.getElementsByClassName("tCell" + y)[0];
                 if (tCell) {
-                    tCell.textContent = T;
+                    tCell.textContent = `${T1} : ${T2}`;
                 }
 
                 var pCell = table.getElementsByClassName("pCell" + y)[0];
@@ -135,6 +181,23 @@ function updateTables(data) {
             y++;
         }
     }
+}
+
+function updateTableSize() {
+    // Delete both tables
+    var table1 = document.getElementById("table1");
+    var table2 = document.getElementById("table2");
+
+    if (table1) {
+        table1.remove();
+    }
+
+    if (table2) {
+        table2.remove();
+    }
+
+    // Replace them with the generateTables function
+    generateTables();
 }
 
 // Function to handle button clicks and redirect

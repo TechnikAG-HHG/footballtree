@@ -3,31 +3,43 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-        <title>footballgroup</title>
-
+        <title>Website Cycle</title>
         <link
             rel="stylesheet"
             type="text/css"
             href="{{ url_for('static', filename='websitetv.css') }}"
         />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-            rel="stylesheet"
-        />
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+        <script>
+            const websites = [
+                "http://192.168.178.56:5000/plan",
+                "http://192.168.178.56:5000/group",
+                "http://192.168.178.56:5000/tree",
+            ];
+
+            let currentIndex = 0;
+
+            function cycleWebsites() {
+                // Create a new iframe
+                const iframe = $("<iframe>")
+                    .attr("src", websites[currentIndex])
+                    .appendTo("body");
+
+                // Remove old iframes
+                $("iframe").not(iframe).remove();
+
+                currentIndex = (currentIndex + 1) % websites.length;
+            }
+
+            $(document).ready(function () {
+                cycleWebsites(); // Load the first website on page load
+                setInterval(function () {
+                    cycleWebsites();
+                }, 11000); // 11000 milliseconds = 11 seconds (adjust the total time as needed)
+            });
+        </script>
     </head>
     <body>
-        <div class="title">
-            <h1>Winterturnier 2023</h1>
-        </div>
-
-        <div id="tablesContainer"></div>
-
-        <script>
-            var data = {{ initial_data|tojson|safe }};
-            console.log('Initial data:', data);
-        </script>
-
-        <script src="{{url_for('static', filename='websitetv.js')}}"></script>
+        <!-- Initial content will be replaced dynamically -->
     </body>
 </html>
