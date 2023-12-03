@@ -149,11 +149,11 @@ function updateTables(data) {
             i++
         ) {
             var team = data.Teams[i];
-            var Sp = data.Spiele[i];
-            var T = data.Tore[i];
+            var Sp = data.Games[i];
+            var T = data.Goals[i];
             var T1 = T[0];
             var T2 = T[1];
-            var P = 0;
+            var P = data.Points[i];
 
             console.log("team", team, "Sp", Sp, "T", T, "P", P);
 
