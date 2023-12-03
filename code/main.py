@@ -34,7 +34,7 @@ class Window(ctk.CTk):
             button.pack(side=tk.TOP, anchor=tk.W, pady=5)
             
             
-    def __init__(self, start_server=True):
+    def __init__(self, start_server):
         super().__init__()
         self.name_entries = []
         self.label_list = []
@@ -218,100 +218,72 @@ class Window(ctk.CTk):
         
         
     def save_team_names_in_db(self):
+        old_mp3_list = []
         name_entries = self.name_entries
-
-        # Get existing teams from the database
-        self.cursor.execute("SELECT id, teamName, mp3Path FROM teamData")
-        existing_teams = {row[1]: (row[0], row[2]) for row in self.cursor.fetchall()}
         
-        team_ids_to_delete = []
+        get_team_ids = "SELECT id FROM teamData"
+        old_team_ids = self.cursor.execute(get_team_ids).fetchall()
 
-        # Delete teams not in the entries and reassign IDs
-        teams_to_delete = set(existing_teams.keys()) - {entry.get().strip() for entry in name_entries}
-        for team_name in teams_to_delete:
-            team_id, _ = existing_teams[team_name]
-            #self.cursor.execute("DELETE FROM teamData WHERE id = ?", (team_id,))
-            team_ids_to_delete.append(team_id)
+        print("old_team_ids", old_team_ids)
+        self.cursor.execute("SELECT mp3Path FROM teamData")
+        entries = self.cursor.fetchall()
+        
+        for i in enumerate(old_team_ids):
+            old_mp3_list.append("")
             
-
-        # Update existing teams and add new teams with default values
-        for i, entry in enumerate(name_entries):
-            team_name = entry.get().strip()
-            team_id1 = i + 1
-            mp3_path = self.mp3_list.get(i)
-
-            if team_name != "":
-                # Update existing team
-                if team_name in existing_teams:
-                    team_id, existing_mp3_path = existing_teams[team_name]
-                    if existing_mp3_path != mp3_path:
-                        # Update MP3 path for existing team
-                        if mp3_path is not None:
-                            self.cursor.execute("UPDATE teamData SET mp3Path = ? WHERE id = ?", (mp3_path, team_id))
-                else:
-                    # Add new team with default values
-                    try:
-                        #print("team_id1", team_id1, "team_ids_to_delete", team_ids_to_delete)
-                        if team_id1 in team_ids_to_delete:
-                            if mp3_path is not None:
-                                self.cursor.execute("UPDATE teamData SET teamName = ?, mp3Path = ? WHERE id = ?", (team_name, mp3_path, team_id1))
-                                existing_teams[team_name] = (self.cursor.lastrowid, mp3_path)
-                            else:
-                                self.cursor.execute("UPDATE teamData SET teamName = ? WHERE id = ?", (team_name, team_id1))
-                                existing_teams[team_name] = (self.cursor.lastrowid, None)
-                                team_ids_to_delete.remove(team_id1)
-                        else:
-                            if mp3_path is not None:
-                                self.cursor.execute("INSERT INTO teamData (teamName, goals, mp3Path) VALUES (?, 0, ?)", (team_name, mp3_path))
-                                existing_teams[team_name] = (self.cursor.lastrowid, mp3_path)
-                            else:
-                                self.cursor.execute("INSERT INTO teamData (teamName, goals) VALUES (?, 0)", (team_name,))
-                                existing_teams[team_name] = (self.cursor.lastrowid, None)
-                            
-                    except sqlite3.IntegrityError:
-                        for i in range(1, 100):
-                            new_team_name = f"{team_name} {i}"
-                            if new_team_name not in existing_teams:
-                                team_name = new_team_name
-                                break
-                            
-                        if team_id1 in team_ids_to_delete:
-                            if mp3_path is not None:
-                                self.cursor.execute("UPDATE teamData SET teamName = ?, mp3Path = ? WHERE id = ?", (team_name, mp3_path, team_id1))
-                                existing_teams[team_name] = (self.cursor.lastrowid, mp3_path)
-                            else:
-                                self.cursor.execute("UPDATE teamData SET teamName = ? WHERE id = ?", (team_name, team_id1))
-                                existing_teams[team_name] = (self.cursor.lastrowid, None)
-                            team_ids_to_delete.remove(team_id1)
-                        
-                        else:
-                            if mp3_path is not None:
-                                self.cursor.execute("INSERT INTO teamData (teamName, goals, mp3Path) VALUES (?, 0, ?)", (team_name, mp3_path))
-                                existing_teams[team_name] = (self.cursor.lastrowid, mp3_path)
-                            else:
-                                self.cursor.execute("INSERT INTO teamData (teamName, goals) VALUES (?, 0)", (team_name,))
-                                existing_teams[team_name] = (self.cursor.lastrowid, None)
-
-        for team_id in team_ids_to_delete:
-            self.cursor.execute("DELETE FROM teamData WHERE id = ?", (team_id,))
+        print("old_mp3_list", old_mp3_list)
+        print("entries", entries)
+        for i, entry in enumerate(entries):
+            old_mp3_list[i] = entry
+            
+        # Get existing teams from the database
+        self.cursor.execute("DROP TABLE teamData")      
         
-        # get all ids from teamData
+        teamDataTableCreationQuery = """
+        CREATE TABLE IF NOT EXISTS teamData (
+            id INTEGER PRIMARY KEY,
+            teamName TEXT UNIQUE,
+            goals INTEGER DEFAULT 0,
+            goalsReceived INTEGER DEFAULT 0,
+            games INTEGER DEFAULT 0,
+            points INTEGER DEFAULT 0,
+            mp3Path TEXT DEFAULT "",
+            groupNumber INTEGER
+        )
+        """
+        
+        self.cursor.execute(teamDataTableCreationQuery)
+        self.connection.commit()
+        
+        for entry in name_entries:
+            entry_text = entry.get().strip()
+            print("entry_text", entry_text)
+            if entry_text:
+                # Update existing team
+                try:
+                    insert_query = "INSERT INTO teamData (teamName) VALUES (?)"
+                    self.cursor.execute(insert_query, (entry_text,))
+                except sqlite3.IntegrityError:
+                    for i in range(1, 100):
+                        if f"{entry_text} {i}" not in self.read_teamNames():
+                            entry_text = f"{entry_text} {i}"
+                            break
+                    insert_query = "INSERT INTO teamData (teamName) VALUES (?)"
+                    self.cursor.execute(insert_query, (entry_text,))
+                    
+        #get all ids from teamData
         self.cursor.execute("SELECT id FROM teamData")
         team_ids = [row[0] for row in self.cursor.fetchall()]
-        for i, team_id in enumerate(team_ids):
-            if i + 1 != team_id:
-                self.cursor.execute("UPDATE teamData SET id = ? WHERE id = ?", (i+1, team_id))
+        for team_id in team_ids:
+            mp3_entry = self.mp3_list.get(team_id-1, "")
+            print("mp3_entry", mp3_entry.strip())
+            if mp3_entry.strip() == "" and old_mp3_list is not None and team_id - 1 < len(old_mp3_list) and old_mp3_list[team_id - 1] is not None:
+                self.mp3_list[team_id-1] = old_mp3_list[team_id-1][0]
+
+        set_mp3_paths = "UPDATE teamData SET mp3Path = ? WHERE id = ?"
+        self.cursor.executemany(set_mp3_paths, [(mp3_path, team_id + 1) for team_id, mp3_path in self.mp3_list.items()])
         
-        # Reassign IDs consecutively
-        self.cursor.execute("DELETE FROM teamData WHERE id NOT IN (SELECT id FROM teamData ORDER BY id)")
-        #self.cursor.execute("UPDATE SQLITE_SEQUENCE SET seq = (SELECT MAX(id) FROM teamData)")
-
-        #print("tests")
-
-        team_names = self.read_teamNames()
-        team_names.pop(0)
-
-        self.updated_data.update({"Teams": team_names})
+        #self.updated_data.update({"Teams": team_names})
         self.connection.commit()
         
     
@@ -827,7 +799,7 @@ class Window(ctk.CTk):
         manual_manual_frame = ctk.CTkFrame(manual_frame, bg_color='grey17', fg_color='grey17')
         manual_manual_frame.pack(pady=0, anchor=tk.SE, side=tk.RIGHT, padx=0)
         
-        SPIEL_button = ctk.CTkButton(manual_manual_frame, text="Reload", command=lambda : self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements))
+        SPIEL_button = ctk.CTkButton(manual_manual_frame, text="Reload", command=lambda : self.reload_spiel_button_command())
         SPIEL_button.pack(pady=10, side=tk.BOTTOM, anchor=tk.S) 
         
         
@@ -1031,7 +1003,10 @@ class Window(ctk.CTk):
             self.manual_team_select_1.set("None")
             
         
-        self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements)
+        self.reload_spiel_button_command()
+        
+        self.show_frame(self.SPIEL_frame)
+
 
         
     def delete_all_in_frame(self, frame):
@@ -1050,17 +1025,29 @@ class Window(ctk.CTk):
             frame.update_idletasks()
             frame.update()
 
+
+    def delete_frame(self, frame):
+        frame.grid_forget()
+        frame.pack_forget()
+        frame.destroy()
     
-    def reload_button_command_common(self, frame, create_function_name):
+    
+    def reload_spiel_button_command(self):
+        
+        self.calculate_points()
+                
         # Delete all entry fields
-        self.delete_all_in_frame(frame)
+        self.SPIEL_frame.grid_forget()
+        self.SPIEL_frame.pack_forget()
+        self.SPIEL_frame.destroy()
+    
         
-        # Read the names from the file and put them into the entry fields
-        self.create_function_name = create_function_name
-        
-        self.create_function_name()
+        self.SPIEL_frame = ctk.CTkFrame(self)
         
 
+        self.create_SPIEL_elements()
+
+        
     def player_scored_a_point(self, teamID, player_id, player_index, direction="UP"):
         # Get the current score
         #print(self.read_player_stats(teamID, True, player_id)) 
@@ -1188,9 +1175,11 @@ class Window(ctk.CTk):
         self.save_games_played_in_db(team1_index)
         self.save_games_played_in_db(team2_index)
         
-        self.updated_data.update({"Spiele": get_data_for_website(2)})
-            
-        self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements)
+        self.updated_data.update({"Games": get_data_for_website(2)})
+        
+        self.reload_spiel_button_command()
+        
+        self.show_frame(self.SPIEL_frame)
         
     
     def next_previous_match_button(self, spiel_select, matches, next_match=True):
@@ -1210,7 +1199,9 @@ class Window(ctk.CTk):
 
             # Update the buttons
             self.teams_playing = teams_playing
-            self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements)
+            self.reload_spiel_button_command()
+            self.show_frame(self.SPIEL_frame)
+            
 
         except ValueError:
             # Handle the case where the selected match is not found in the list
@@ -1235,7 +1226,7 @@ class Window(ctk.CTk):
 
             # Update the score label
             self.spiel_buttons[teamID]["global"][3].set(str(current_score))
-            self.updated_data.update({"Tore": get_data_for_website(1)})
+            self.updated_data.update({"Goals": get_data_for_website(1)})
     
     
     def read_mp3_path_from_db_for_team(self, teamID):
@@ -1454,25 +1445,11 @@ class Window(ctk.CTk):
         self.show_frame(self.player_frame)
 
     def show_SPIEL_frame(self):
-        self.reload_button_command_common(self.SPIEL_frame, self.create_SPIEL_elements)
+        self.reload_spiel_button_command()
         #print(stored_data)
         self.calculate_matches()
         self.show_frame(self.SPIEL_frame)
 
-    #def show_contact_frame(self):
-        #self.show_frame(self.contact_frame)
-
-    # Button command functions
-
-    #def player_button_command(self):
-        #print("player Button Clicked")
-
-    #def SPIEL_button_command(self):
-        #print("SPIEL Button Clicked")
-
-    #def contact_button_command(self):
-        #print("Contact Button Clicked")
-        
     ##############################################################################################
             
     def test(self):
@@ -1495,7 +1472,7 @@ class Window(ctk.CTk):
         player.play()
         
     ##############################################################################################
-    #############################Calculatre###########################################
+    #############################Calculatre########################################################
     ##############################################################################################
     ##############################################################################################
     def calculate_matches(self):
@@ -1506,6 +1483,8 @@ class Window(ctk.CTk):
         "Teams": self.read_teamNames()
         }
         
+        initial_data["Teams"].pop(0)
+        
         teams = initial_data["Teams"][:]  # Create a copy of the teams array
         #print("teams", teams)
         
@@ -1513,19 +1492,18 @@ class Window(ctk.CTk):
         if len(teams) % 2 != 0:
             teams.append("dummy")
 
-        teams.sort()
-        teams.pop(0)
-
         midpoint = (len(teams) + 1) // 2
         group1 = teams[:midpoint]
         group2 = teams[midpoint:]
+        
+        print("group1", group1, "group2", group2, "teams", teams, "midpoint", midpoint)
 
         matches1 = self.calculate_matches_for_group(group1, "Gruppe 1")
         matches2 = self.calculate_matches_for_group(group2, "Gruppe 2")
 
         matches = self.interleave_matches(matches1, matches2)
         
-        print("matches", matches, "matches1", matches1, "matches2", matches2)
+        #print("matches", matches, "matches1", matches1, "matches2", matches2)
         
         self.match_count = 0
 
@@ -1592,7 +1570,7 @@ class Window(ctk.CTk):
         
         added_matches = []
         
-        print("existing_matches", existing_matches, "self.matches", self.matches)
+        #print("existing_matches", existing_matches, "self.matches", self.matches)
 
         for match in self.matches:
             team1 = match["teams"][0]
@@ -1655,7 +1633,7 @@ class Window(ctk.CTk):
                 teams_to_delete.append(existing_match)
                 
                 
-        print("teams_to_delete", teams_to_delete)
+        #print("teams_to_delete", teams_to_delete)
         
         for team_to_delete in teams_to_delete:
             deleteMatch = """
@@ -1670,10 +1648,62 @@ class Window(ctk.CTk):
         """
         self.cursor.execute(delete_teams)
             
-            
-            
-
         self.connection.commit()
+        
+        
+    def reset_points_for_all_teams_in_db(self):
+        resetPoints = """
+        UPDATE teamData
+        SET points = 0
+        """
+        self.cursor.execute(resetPoints)
+        self.connection.commit()
+        
+    
+    def add_points_for_team_in_db(self, teamID, points):
+        getPoints = """
+        SELECT points FROM teamData
+        WHERE id = ?
+        ORDER BY id ASC
+        """
+        self.cursor.execute(getPoints, (teamID,))
+        
+        oldpoints = self.cursor.fetchone()[0]
+        
+        newpoints = oldpoints + points
+        
+        updatePoints = """
+        UPDATE teamData
+        SET points = ?
+        WHERE id = ?
+        """
+        self.cursor.execute(updatePoints, (newpoints, teamID))
+        
+        self.connection.commit()    
+    
+        
+    def calculate_points(self):
+        selectMatches = """
+            SELECT team1Id, team2Id, team1Goals, team2Goals
+            FROM matchData
+        """
+        
+        self.cursor.execute(selectMatches)
+        matches = self.cursor.fetchall()
+        
+        self.reset_points_for_all_teams_in_db()
+        
+        for match in matches:
+            if match[2] > match[3]:
+                self.add_points_for_team_in_db(match[0], 3)
+            elif match[2] < match[3]:
+                self.add_points_for_team_in_db(match[1], 3)
+            elif match[2] != 0 and match[3] != 0:
+                self.add_points_for_team_in_db(match[0], 1)
+                self.add_points_for_team_in_db(match[1], 1)
+                
+        self.updated_data.update({"Points": get_data_for_website(3)})    
+                
             
     ##############################################################################################
     ##############################################################################################
@@ -1776,8 +1806,24 @@ def get_data_for_website(which_data=-1):
         
         return games
     
+    if which_data == 3:
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+        
+        get_points = """
+        SELECT points FROM teamData
+        ORDER BY id ASC
+        """
+        
+        cursor.execute(get_points)
+        
+        points = cursor.fetchall()
+        
+        cursor.close()
+        connection.close()
+        
+        return points
             
-
 def get_initial_data(template_name):
     global initial_data
     tkapp.test()
@@ -1785,8 +1831,9 @@ def get_initial_data(template_name):
     
     initial_data = {
         "Teams": get_data_for_website(0),
-        "Tore": get_data_for_website(1),
-        "Spiele": get_data_for_website(2),
+        "Goals": get_data_for_website(1),
+        "Games": get_data_for_website(2),
+        "Points": get_data_for_website(3),
         "ZeitIntervall": 10,
         "Startzeit": [9,30],
         "LastUpdate": 0
@@ -1865,7 +1912,7 @@ global db_path
 
 db_path = "data/data.db"
 stored_data = {}
-tkapp = Window()
+tkapp = Window(True)
 
 if __name__ == "__main__":
     tkapp.mainloop()
