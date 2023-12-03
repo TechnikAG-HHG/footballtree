@@ -47,7 +47,7 @@ function generateTables() {
                 var cellSp = row.insertCell(1);
                 cellSp.textContent = 0;
                 cellSp.className = "tableCell";
-                cellSp.className += " spCell" + j;
+                cellSp.className += " sCell" + j;
 
                 var cellT = row.insertCell(2);
                 cellT.textContent = ":";
@@ -70,7 +70,7 @@ function generateTables() {
                 var cellSp = row.insertCell(1);
                 cellSp.textContent = 0;
                 cellSp.className = "tableCell";
-                cellSp.className += " spCell" + j;
+                cellSp.className += " sCell" + j;
 
                 var cellT = row.insertCell(2);
                 cellT.textContent = ":";
@@ -163,9 +163,9 @@ function updateTables(data) {
                     nameCell.textContent = team;
                 }
 
-                var spCell = table.getElementsByClassName("spCell" + y)[0];
-                if (spCell) {
-                    spCell.textContent = Sp;
+                var sCell = table.getElementsByClassName("sCell" + y)[0];
+                if (sCell) {
+                    sCell.textContent = Sp;
                 }
 
                 var tCell = table.getElementsByClassName("tCell" + y)[0];
@@ -180,6 +180,8 @@ function updateTables(data) {
             });
             y++;
         }
+        var table = document.querySelector("#tablesContainer .table" + x);
+        sortRowsByPoints(table);
     }
 }
 
@@ -198,6 +200,29 @@ function updateTableSize() {
 
     // Replace them with the generateTables function
     generateTables();
+}
+
+function sortRowsByPoints(table) {
+    var tbody = table.querySelector("tbody");
+    var rows = Array.from(tbody.querySelectorAll("tr"));
+
+    rows.sort(function (a, b) {
+        var aPCell = a.querySelector("[class*='pCell']");
+        var bPCell = b.querySelector("[class*='pCell']");
+        console.log("aPCell", aPCell, "bPCell", bPCell);
+        var aP = aPCell ? parseInt(aPCell.textContent) : 0;
+        var bP = bPCell ? parseInt(bPCell.textContent) : 0;
+        console.log("aP", aP, "bP", bP);
+        return bP - aP;
+    });
+
+    while (tbody.firstChild) {
+        tbody.firstChild.remove();
+    }
+
+    for (var i = 0; i < rows.length; i++) {
+        tbody.appendChild(rows[i]);
+    }
 }
 
 // Function to handle button clicks and redirect
