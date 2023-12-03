@@ -221,11 +221,20 @@ class Window(ctk.CTk):
         old_mp3_list = []
         name_entries = self.name_entries
         
+        get_team_ids = "SELECT id FROM teamData"
+        old_team_ids = self.cursor.execute(get_team_ids).fetchall()
+
+        print("old_team_ids", old_team_ids)
         self.cursor.execute("SELECT mp3Path FROM teamData")
-        for row in enumerate(self.cursor.fetchall()):
-            if row == None:
-                mp3_path = ""
-            old_mp3_list.append(mp3_path)
+        entries = self.cursor.fetchall()
+        
+        for i in enumerate(old_team_ids):
+            old_mp3_list.append("")
+            
+        print("old_mp3_list", old_mp3_list)
+        print("entries", entries)
+        for i, entry in enumerate(entries):
+            old_mp3_list[i] = entry
             
         # Get existing teams from the database
         self.cursor.execute("DROP TABLE teamData")      
@@ -267,10 +276,12 @@ class Window(ctk.CTk):
         team_ids = [row[0] for row in self.cursor.fetchall()]
         for team_id in team_ids:
             mp3_entry = self.mp3_list.get(team_id-1, "")
-            if mp3_entry == "":
-                print("mp3_entry", mp3_entry, "team_id", team_id, "old_mp3_list", old_mp3_list)
-                self.mp3_list[team_id-1] = old_mp3_list[team_id][0]
+            print("mp3_entry", mp3_entry.strip())
+            if mp3_entry.strip() == "" and old_mp3_list is not None and team_id - 1 < len(old_mp3_list) and old_mp3_list[team_id - 1] is not None:
+                self.mp3_list[team_id-1] = old_mp3_list[team_id-1][0]
 
+        set_mp3_paths = "UPDATE teamData SET mp3Path = ? WHERE id = ?"
+        self.cursor.executemany(set_mp3_paths, [(mp3_path, team_id + 1) for team_id, mp3_path in self.mp3_list.items()])
         
         #self.updated_data.update({"Teams": team_names})
         self.connection.commit()
@@ -1901,7 +1912,7 @@ global db_path
 
 db_path = "data/data.db"
 stored_data = {}
-tkapp = Window(False)
+tkapp = Window(True)
 
 if __name__ == "__main__":
     tkapp.mainloop()
