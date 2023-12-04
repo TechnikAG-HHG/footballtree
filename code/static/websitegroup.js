@@ -99,7 +99,7 @@ function updateData() {
     var headers = new Headers();
     headers.append("Last-Data-Update", data["LastUpdate"]);
 
-    fetch("/update_data", {
+    fetch("/update_data_group", {
         headers: headers,
     })
         .then((response) => response.json())
@@ -209,10 +209,8 @@ function sortRowsByPoints(table) {
     rows.sort(function (a, b) {
         var aPCell = a.querySelector("[class*='pCell']");
         var bPCell = b.querySelector("[class*='pCell']");
-        console.log("aPCell", aPCell, "bPCell", bPCell);
         var aP = aPCell ? parseInt(aPCell.textContent) : 0;
         var bP = bPCell ? parseInt(bPCell.textContent) : 0;
-        console.log("aP", aP, "bP", bP);
         return bP - aP;
     });
 

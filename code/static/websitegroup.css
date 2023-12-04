@@ -101,3 +101,9 @@ td {
     border: 0.15vw solid #49ba67;
     overflow: hidden;
 }
+
+tbody tr:nth-child(-n + 2) td {
+    background-color: #daa520;
+    color: black;
+    font-weight: bold;
+}
