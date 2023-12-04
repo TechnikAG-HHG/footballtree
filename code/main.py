@@ -18,20 +18,20 @@ lock = threading.Lock()
 class Window(ctk.CTk):
     def create_navigation_bar(self):
         navigation_frame = ctk.CTkFrame(self)
-        navigation_frame.pack(side=tk.LEFT, fill=tk.Y)
+        navigation_frame.pack(side=tk.LEFT, fill=tk.Y, pady=8)
 
         buttons = [
-            ("Team", self.show_Team_frame),
-            ("Players", self.show_player_frame),
-            ("SPIEL", self.show_SPIEL_frame),
-            #("Contact", self.show_contact_frame),
+            ("Team Creation", self.show_Team_frame),
+            ("Player Selection", self.show_player_frame),
+            ("Active Match", self.show_SPIEL_frame),
+            ("Settings", self.show_settings_frame),
         ]
 
         button_width = 10  # Set a fixed width for all buttons
 
         for text, command in buttons:
             button = ctk.CTkButton(navigation_frame, text=text, command=command, width=button_width)
-            button.pack(side=tk.TOP, anchor=tk.W, pady=5)
+            button.pack(side=tk.TOP, anchor=tk.N, pady=8, padx=8, fill=tk.X)
             
             
     def __init__(self, start_server):
@@ -63,6 +63,8 @@ class Window(ctk.CTk):
         
         self.init_sqlite_db()
         
+        self.load_settings()
+        
         self.media_player_instance = vlc.Instance()
         self.media_player_instance.log_unset()
         
@@ -79,13 +81,13 @@ class Window(ctk.CTk):
         self.Team_frame = ctk.CTkFrame(self)
         self.player_frame = ctk.CTkFrame(self, height=10)
         self.SPIEL_frame = ctk.CTkFrame(self)
-        #self.contact_frame = ctk.CTkFrame(self, bg="lightyellow")
+        self.settings_frame = ctk.CTkFrame(self)
 
         # Create elements for each frame
         self.create_Team_elements()
         self.create_player_elements()
         self.create_SPIEL_elements()
-        #self.create_contact_elements()
+        self.create_settings_elements()
 
         # Display the default frame
         self.show_frame(self.Team_frame)
@@ -149,7 +151,46 @@ class Window(ctk.CTk):
         self.cursor.execute(matchDataTableCreationQuery)
         self.connection.commit()
         
+        settingsDataTableCreationQuery = """
+        CREATE TABLE IF NOT EXISTS settingsData (
+            id INTEGER PRIMARY KEY,
+            roundTime INTEGER DEFAULT 0,
+            breakTime INTEGER DEFAULT 0,
+            isMatchAktive BOOLEAN DEFAULT 0,
+            isBreak BOOLEAN DEFAULT 0,
+            volume INTEGER DEFAULT 0,
+            activeMode INTEGER DEFAULT 0
+        )
+        """
+        self.cursor.execute(settingsDataTableCreationQuery)
+        self.connection.commit()
+
+        # Create a first row if there is no row
+        self.cursor.execute("SELECT * FROM settingsData")
+        if self.cursor.fetchone() is None:
+            insert_query = "INSERT INTO settingsData (id) VALUES (?)"
+            self.cursor.execute(insert_query, (1,))
         
+    
+    def load_settings(self):
+        self.cursor.execute("SELECT * FROM settingsData")
+        settings = self.cursor.fetchone()
+        
+        self.volume = tk.IntVar(value=100)
+        self.active_mode = tk.IntVar(value=1)
+
+        
+        #self.round_time = settings[1]
+        #self.break_time = settings[2]
+        #self.is_match_aktive = settings[3]
+        #self.is_break = settings[4]
+        if settings[5] is not None and settings[5] != "":
+            self.volume.set(value=settings[5])
+            
+        if settings[6] is not None and settings[6] != "" and settings[6] != 0:
+            self.active_mode.set(value=settings[6])
+        
+
 ##############################################################################################
     def add_name_entry(self, entry_text="", mp3_path=""):
         #print(entry_text)
@@ -224,14 +265,14 @@ class Window(ctk.CTk):
         get_team_ids = "SELECT id FROM teamData"
         old_team_ids = self.cursor.execute(get_team_ids).fetchall()
 
-        print("old_team_ids", old_team_ids)
+        #print("old_team_ids", old_team_ids)
         self.cursor.execute("SELECT mp3Path FROM teamData")
         entries = self.cursor.fetchall()
         
         for i in enumerate(old_team_ids):
             old_mp3_list.append("")
             
-        print("entries", entries)
+        #print("entries", entries)
         for i, entry in enumerate(entries):
             old_mp3_list[i] = entry
             
@@ -253,6 +294,7 @@ class Window(ctk.CTk):
         
         self.cursor.execute(teamDataTableCreationQuery)
         self.connection.commit()
+        
         
         for entry in name_entries:
             entry_text = entry.get().strip()
@@ -398,7 +440,7 @@ class Window(ctk.CTk):
                 print("team_IDs", team_IDs)
                 print("i", i)
 
-            if i < 10:
+            if i < 9:
                 team_button = ctk.CTkButton(
                     self.player_top_frame,
                     text=teamName,
@@ -418,8 +460,8 @@ class Window(ctk.CTk):
 
             self.team_button_list.append(team_button)
             
-        self.player_top_frame.pack(anchor=tk.NW, side=tk.TOP)
-        self.player_bottom_frame.pack(anchor=tk.NW, side=tk.TOP)
+        self.player_top_frame.pack(anchor=tk.NW, side=tk.TOP, pady=5, padx=5)
+        self.player_bottom_frame.pack(anchor=tk.NW, side=tk.TOP, pady=5, padx=5)
         
         
     def save_names_player(self, team_id=-1):
@@ -581,7 +623,7 @@ class Window(ctk.CTk):
         for i, teamID in enumerate(team_IDs):
             teamName = teamNames[int(teamID-1)]
 
-            if i < 10:
+            if i < 9:
                 team_button = ctk.CTkButton(
                     self.player_top_frame,
                     text=teamName,
@@ -1212,7 +1254,7 @@ class Window(ctk.CTk):
         # Update the score
         if direction == "UP" and current_score != "None":
             current_score += 1
-            self.play_mp3(self.read_mp3_path_from_db_for_team(teamID), 100)
+            self.play_mp3(self.read_mp3_path_from_db_for_team(teamID))
             
         elif direction == "DOWN" and current_score != "None":
             current_score -= 1
@@ -1424,17 +1466,69 @@ class Window(ctk.CTk):
 
 ##############################################################################################
 
-    #def create_contact_elements(self):
-        # Create elements for the Contact frame
-        #contact_button = tk.Button(self.contact_frame, text="Contact Button", command=self.contact_button_command)
-        #contact_button.pack(pady=10)
+    def create_settings_elements(self):
         
+        # Create elements for the Contact frame
+        option_frame = ctk.CTkFrame(self.settings_frame, bg_color='grey15', fg_color='grey15')
+        option_frame.pack(pady=10, anchor=tk.NW, side=tk.LEFT, padx=10)
+        
+        
+        volume_label = ctk.CTkLabel(option_frame, text="Volume", font=("Helvetica", 19))
+        volume_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        
+        volume_value_label = ctk.CTkLabel(option_frame, textvariable=self.volume, font=("Helvetica", 17))
+        volume_value_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        
+        volume_slider = ctk.CTkSlider(
+            option_frame, 
+            orientation=tk.HORIZONTAL, 
+            from_=0, 
+            to=100, 
+            variable=self.volume, 
+            command=lambda event: self.on_volume_change(event), 
+            width=200, 
+            height=30)
+        volume_slider.pack(pady=10, padx=10, side=tk.TOP, anchor=tk.NW)
+        
+        option_label = ctk.CTkLabel(option_frame, text="Spiel Modi", font=("Helvetica", 19))
+        option_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        
+        
+        radio_button_1 = ctk.CTkRadioButton(option_frame, text="Gruppenphase", variable=self.active_mode, value=1, font=("Helvetica", 17), command=self.on_radio_button_change)
+        radio_button_1.pack(side=tk.TOP, pady=2, padx = 5, anchor=tk.NW)
 
+        radio_button_2 = ctk.CTkRadioButton(option_frame, text="Final Phase", variable=self.active_mode, value=2, font=("Helvetica", 17), command=self.on_radio_button_change)
+        radio_button_2.pack(side=tk.TOP, pady=2, padx = 5, anchor=tk.NW)
+
+        radio_button_3 = ctk.CTkRadioButton(option_frame, text="Debug", variable=self.active_mode, value=3, font=("Helvetica", 17), command=self.on_radio_button_change)
+        radio_button_3.pack(side=tk.TOP, pady=5, padx = 5, anchor=tk.NW)
+        
+    
+    def on_volume_change(self, event):
+        saveVolumeInDB = """
+        UPDATE settingsData
+        SET volume = ?
+        WHERE id = 1
+        """
+        self.cursor.execute(saveVolumeInDB, (event,))
+        self.connection.commit()
+       
+        
+    def on_radio_button_change(self):
+        selected_value = self.active_mode.get()
+        saveModeInDB = """
+        UPDATE settingsData
+        SET activeMode = ?
+        WHERE id = 1
+        """
+        self.cursor.execute(saveModeInDB, (selected_value,))
+        self.connection.commit()
+            
 ##############################################################################################
 
     def show_frame(self, frame):
         # Hide all frames and pack the selected frame
-        for frm in [self.Team_frame, self.player_frame, self.SPIEL_frame]: # self.contact_frame
+        for frm in [self.Team_frame, self.player_frame, self.SPIEL_frame, self.settings_frame]: # self.settings_frame
             frm.pack_forget()
         frame.pack(fill=tk.BOTH, expand=True)
 
@@ -1451,6 +1545,9 @@ class Window(ctk.CTk):
         #print(stored_data)
         self.calculate_matches()
         self.show_frame(self.SPIEL_frame)
+        
+    def show_settings_frame(self):
+        self.show_frame(self.settings_frame)
 
     ##############################################################################################
             
@@ -1464,13 +1561,15 @@ class Window(ctk.CTk):
         self.updated_data = {}
         
         
-    def play_mp3(self, file_path, volume):
+    def play_mp3(self, file_path, volume=""):
         if file_path == "":
             return
+        if volume == "":
+            volume = self.volume
         player = self.media_player_instance.media_player_new()
         media = self.media_player_instance.media_new(file_path)
         player.set_media(media)
-        player.audio_set_volume(volume)
+        player.audio_set_volume(int(volume.get()))
         player.play()
         
     ##############################################################################################
