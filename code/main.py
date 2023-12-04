@@ -231,7 +231,6 @@ class Window(ctk.CTk):
         for i in enumerate(old_team_ids):
             old_mp3_list.append("")
             
-        print("old_mp3_list", old_mp3_list)
         print("entries", entries)
         for i, entry in enumerate(entries):
             old_mp3_list[i] = entry
@@ -1007,7 +1006,6 @@ class Window(ctk.CTk):
         
         self.show_frame(self.SPIEL_frame)
 
-
         
     def delete_all_in_frame(self, frame):
         if frame.winfo_exists():
@@ -1157,7 +1155,7 @@ class Window(ctk.CTk):
         #print(matches)
         # Convert the value to the match index
         match_index = [match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1] for match in matches].index(selected_match)
-
+        print("match_index", match_index)
         # Get the teams playing in the selected match and if there are none, set teams_playing to None
         team_names = self.read_teamNames()
         
@@ -1172,8 +1170,7 @@ class Window(ctk.CTk):
         self.active_match = match_index
         #print("self.active_matchon_match_select", self.active_match)
         
-        self.save_games_played_in_db(team1_index)
-        self.save_games_played_in_db(team2_index)
+        self.save_games_played_in_db(match_index)
         
         self.updated_data.update({"Games": get_data_for_website(2)})
         
@@ -1396,26 +1393,31 @@ class Window(ctk.CTk):
             return goalsRecived
         
     
-    def save_games_played_in_db(self, teamID):
+    def save_games_played_in_db(self, match_index):
         
-        getPlayed = """
-        SELECT matchId FROM matchData
-        WHERE team1Id = ? OR team2Id = ?
-        """
-        self.cursor.execute(getPlayed, (teamID, teamID))
-        
-        played = self.cursor.fetchall()
-        
-        played = len(played)
-        
-        updatePlayed = """
-        UPDATE teamData
-        SET games = ?
-        WHERE id = ?
-        """
-        
-        self.cursor.execute(updatePlayed, (played, teamID))
-        
+        teams_ids = self.read_teamIds()
+        for teamID in teams_ids:
+            
+            getPlayed = """
+            SELECT matchId FROM matchData
+            WHERE (team1Id = ? OR team2Id = ?) AND matchId < ?
+            """
+            self.cursor.execute(getPlayed, (teamID, teamID, match_index + 2))
+            
+            played = self.cursor.fetchall()
+            
+            print("played", played)
+            
+            played = len(played)
+            
+            updatePlayed = """
+            UPDATE teamData
+            SET games = ?
+            WHERE id = ?
+            """
+            
+            self.cursor.execute(updatePlayed, (played, teamID))
+            
         self.connection.commit()
     
 ##############################################################################################
@@ -1860,10 +1862,8 @@ def plan_index():
 def tv_index():
     return get_initial_data("websitetv.html")
 
-
 @app.route('/update_data')
-def update_data():
-    
+def update_data():   
     timeatstart = time.time()
     
     last_data_update = request.headers.get('Last-Data-Update', 0)
@@ -1904,6 +1904,7 @@ def update_data():
     #updated_data = {'Teams': tkapp.read_team_names(), 'Players': {"Player1":"Erik Van Doof","Player2":"Felix Schweigmann"}}  # You can modify this data as needed
     return jsonify(updated_data)
 
+    
 global tkapp
 global server_thread
 global stored_data
