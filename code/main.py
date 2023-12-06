@@ -17,8 +17,8 @@ lock = threading.Lock()
 
 class Window(ctk.CTk):
     def create_navigation_bar(self):
-        navigation_frame = ctk.CTkFrame(self)
-        navigation_frame.pack(side=tk.LEFT, fill=tk.Y, pady=8)
+        navigation_frame = ctk.CTkFrame(self, fg_color='#142324', corner_radius=0)
+        navigation_frame.pack(side=tk.LEFT, fill=tk.Y)
 
         buttons = [
             ("Team Creation", self.show_Team_frame),
@@ -27,11 +27,13 @@ class Window(ctk.CTk):
             ("Settings", self.show_settings_frame),
         ]
 
-        button_width = 10  # Set a fixed width for all buttons
+        button_width = self.screenwidth / 12.8
+        button_height = self.screenheight / 25
+        button_font_size = self.screenwidth / 120
 
         for text, command in buttons:
-            button = ctk.CTkButton(navigation_frame, text=text, command=command, width=button_width)
-            button.pack(side=tk.TOP, anchor=tk.N, pady=8, padx=8, fill=tk.X)
+            button = ctk.CTkButton(navigation_frame, text=text, command=command, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
+            button.pack(side=tk.TOP, anchor=tk.N, pady=8, padx=14, fill=tk.X)
             
             
     def __init__(self, start_server):
@@ -46,9 +48,13 @@ class Window(ctk.CTk):
         self.spiel_buttons = {}
         self.teams_playing = [None, None]
 
+        self.screenheight = self.winfo_screenheight()
+        self.screenwidth = self.winfo_screenwidth()
+        
         # Set window title
         self.title("Football Tournament Manager")
         self.after(0, lambda:self.state('zoomed'))
+        self.configure(fg_color="#0e1718")
         try:
             icon_path = os.path.join('..', 'icon.ico')
             self.iconbitmap(icon_path)
@@ -56,8 +62,8 @@ class Window(ctk.CTk):
             icon_path = os.path.join('icon.ico')
             self.iconbitmap(icon_path)
         
-        self.tk_setPalette(background='grey17', foreground='grey17',
-               activeBackground='grey17', activeForeground='grey17')
+        self.tk_setPalette(background='#0e1718', foreground='#0e1718',
+               activeBackground='#0e1718', activeForeground='#0e1718')
         
         ctk.set_appearance_mode("dark")
         
@@ -78,10 +84,10 @@ class Window(ctk.CTk):
         self.create_navigation_bar()
 
         # Create frames for different sets of elements
-        self.Team_frame = ctk.CTkFrame(self)
-        self.player_frame = ctk.CTkFrame(self, height=10)
-        self.SPIEL_frame = ctk.CTkFrame(self)
-        self.settings_frame = ctk.CTkFrame(self)
+        self.Team_frame = ctk.CTkFrame(self, fg_color='#0e1718', corner_radius=0)
+        self.player_frame = ctk.CTkFrame(self, height=10, fg_color='#0e1718', corner_radius=0)
+        self.SPIEL_frame = ctk.CTkFrame(self, fg_color='#0e1718', corner_radius=0)
+        self.settings_frame = ctk.CTkFrame(self, fg_color='#0e1718', corner_radius=0)
 
         # Create elements for each frame
         self.create_Team_elements()
@@ -193,17 +199,20 @@ class Window(ctk.CTk):
 
 ##############################################################################################
     def add_name_entry(self, entry_text="", mp3_path=""):
+        team_element_width = self.screenwidth / 10
+        team_element_height = self.screenheight / 30
+        team_element_font_size = self.screenwidth / 150
         #print(entry_text)
         count = len(self.name_entries) + 1
         team_id = count - 1
 
         # Create a label with "Team 1" and the count
         label_text = f'Team {count}'
-        label = ctk.CTkLabel(self.frame, text=label_text, font=("Helvetica", 14))  # Increase font size
-        label.grid(row=len(self.name_entries), column=0, padx=5, pady=5, sticky='e')
+        label = ctk.CTkLabel(self.frame, text=label_text, font=("Helvetica", team_element_font_size * 1.2, "bold"))  # Increase font size
+        label.grid(row=len(self.name_entries), column=0, padx=15, pady=5, sticky='e')
         
         # Create a new entry field
-        new_entry = ctk.CTkEntry(self.frame, font=("Helvetica", 14))  # Increase font size
+        new_entry = ctk.CTkEntry(self.frame, font=("Helvetica", team_element_font_size), width=team_element_width, height=team_element_height)  # Increase font size
         
         # Write entry_text to the entry field if it is not empty
         if entry_text:
@@ -211,8 +220,8 @@ class Window(ctk.CTk):
         
         new_entry.grid(row=len(self.name_entries), column=1, pady=5, sticky='we')
         
-        new_file_dialog = ctk.CTkButton(self.frame, text="Select mp3", command=lambda: self.save_mp3_path(new_file_dialog, team_id))
-        new_file_dialog.grid(row=len(self.name_entries), column=2, pady=5, sticky='we', padx=5)
+        new_file_dialog = ctk.CTkButton(self.frame, text="Select mp3", command=lambda: self.save_mp3_path(new_file_dialog, team_id), width=team_element_width, height=team_element_height, font=("Helvetica", team_element_font_size), fg_color="#34757a", hover_color="#1f4346")
+        new_file_dialog.grid(row=len(self.name_entries), column=2, pady=5, sticky='we', padx=12)
         
         if mp3_path:
             self.mp3_list[team_id] = mp3_path
@@ -349,15 +358,15 @@ class Window(ctk.CTk):
 
     def create_Team_elements(self):
         # Create elements for the Team frame
-        canvas = tk.Canvas(self.Team_frame)
-        canvas.pack(side="left", fill="both", expand=True)
+        canvas = tk.Canvas(self.Team_frame, bg="#0e1718")
+        canvas.pack(side="left", fill="both", expand=True, padx=10, pady=15)
         
         # Create a scrollbar and connect it to the canvas
         scrollbar = ctk.CTkScrollbar(self.Team_frame, orientation='vertical', command=canvas.yview)
         scrollbar.pack(side="right", fill="y")
         canvas.configure(yscrollcommand=scrollbar.set)
         
-        self.frame = ctk.CTkFrame(canvas)
+        self.frame = ctk.CTkFrame(canvas, fg_color="#0e1718")
         canvas.create_window((0, 0), window=self.frame, anchor="nw")
         
         name_entries = []
@@ -365,19 +374,24 @@ class Window(ctk.CTk):
 
         self.frame.bind("<Configure>", lambda event, canvas=canvas: self.on_frame_configure(canvas))
 
+        button_width = self.screenwidth / 15
+        button_height = self.screenheight / 27
+        button_font_size = self.screenwidth / 120
+
+
         # Button to add a new name entry
-        add_button = ctk.CTkButton(self.Team_frame, text="Add Name", command=self.add_name_entry)
-        add_button.pack(pady=10)
+        add_button = ctk.CTkButton(self.Team_frame, text="Add Name", command=self.add_name_entry, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
+        add_button.pack(pady=5, padx=15)
 
         # Button to retrieve the entered names
 
 
-        submit_button = ctk.CTkButton(self.Team_frame, text="Submit", command=self.save_team_names_in_db)
-        submit_button.pack(pady=10)
+        submit_button = ctk.CTkButton(self.Team_frame, text="Submit", command=self.save_team_names_in_db, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
+        submit_button.pack(pady=5, padx=15)
 
         
-        reload_button = ctk.CTkButton(self.Team_frame, text="Reload", command=self.reload_button_command)
-        reload_button.pack(pady=10)
+        reload_button = ctk.CTkButton(self.Team_frame, text="Reload", command=self.reload_button_command, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
+        reload_button.pack(pady=5, padx=15)
         
 
 ##############################################################################################
@@ -390,33 +404,38 @@ class Window(ctk.CTk):
         #player_button.pack(pady=10)
         # Create elements for the Team frame
         self.canvas = tk.Canvas(self.player_frame)
-        self.canvas.pack(fill="both", expand=True, side="bottom")
+        self.canvas.pack(fill="both", expand=True, side="bottom", padx=20, pady=10)
 
         # Create a scrollbar and connect it to the canvas
-        scrollbar = ctk.CTkScrollbar(self.player_frame, orientation='vertical', command= self.canvas.yview, height=25)
+        scrollbar = ctk.CTkScrollbar(self.player_frame, orientation='vertical', command= self.canvas.yview, height=25, fg_color="#0e1718")
         scrollbar.pack(side=tk.LEFT, fill="y")
         
         self.canvas.configure(yscrollcommand=scrollbar.set)
         self.canvas.configure(yscrollincrement=6)
 
-        self.frameplayer = ctk.CTkFrame(self.canvas)
+        self.frameplayer = ctk.CTkFrame(self.canvas, fg_color="#0e1718")
         self.canvas.create_window((0, 0), window=self.frameplayer, anchor="nw")
         
-        self.test_frame = ctk.CTkFrame(self.player_frame, bg_color='grey17', fg_color='grey17')
+        self.test_frame = ctk.CTkFrame(self.player_frame, bg_color='#0e1718', fg_color='#0e1718')
         self.test_frame.pack(anchor=tk.NW, side=tk.LEFT, fill=tk.X, padx=10, expand=True)
         
-        buttons_frame = ctk.CTkFrame(self.test_frame, bg_color='grey15', fg_color='grey15')
+        buttons_frame = ctk.CTkFrame(self.test_frame, bg_color='#0e1718', fg_color='#0e1718')
         buttons_frame.pack(pady=5, padx=5, anchor=tk.NE, side=tk.RIGHT)
         
+        
+        button_width = self.screenwidth / 15
+        button_height = self.screenheight / 27
+        button_font_size = self.screenwidth / 120
+        
         # Button to add a new name entry
-        add_button = ctk.CTkButton(buttons_frame, text="Add Name", command=lambda: self.add_name_entry_player(self.frameplayer, "Player"))
+        add_button = ctk.CTkButton(buttons_frame, text="Add Name", command=lambda: self.add_name_entry_player(self.frameplayer, "Player"), width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
         add_button.pack(pady=20, padx=20, anchor=tk.NE, side=tk.RIGHT)    
 
         # Button to retrieve the entered names
-        submit_button = ctk.CTkButton(buttons_frame, text="Submit", command=self.save_names_player)
+        submit_button = ctk.CTkButton(buttons_frame, text="Submit", command=self.save_names_player, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
         submit_button.pack(pady=20, padx=20, anchor=tk.NE, side=tk.RIGHT)    
 
-        reload_button = ctk.CTkButton(buttons_frame, text="Reload", command=self.reload_button_player_command)
+        reload_button = ctk.CTkButton(buttons_frame, text="Reload", command=self.reload_button_player_command, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
         reload_button.pack(pady=20, padx=20, anchor=tk.NE, side=tk.RIGHT)    
         
         self.selected_team = ""
@@ -427,9 +446,13 @@ class Window(ctk.CTk):
         teamNames.pop(0)
         #print("teamNames", teamNames, "team_IDs", team_IDs)
         
-        self.player_top_frame = ctk.CTkFrame(self.test_frame, width=1, height=1)
+        self.player_top_frame = ctk.CTkFrame(self.test_frame, width=1, height=1, fg_color="#0e1718")
 
-        self.player_bottom_frame = ctk.CTkFrame(self.test_frame, width=1, height=1)
+        self.player_bottom_frame = ctk.CTkFrame(self.test_frame, width=1, height=1, fg_color="#0e1718")
+        
+        self.team_button_font_size = self.screenwidth / 150
+        self.team_button_width = self.screenwidth / 15
+        self.team_button_height = self.screenheight / 30
 
         for i, teamID in enumerate(team_IDs):
             try:
@@ -440,12 +463,16 @@ class Window(ctk.CTk):
                 print("team_IDs", team_IDs)
                 print("i", i)
 
-            if i < 9:
+            if i < 8:
                 team_button = ctk.CTkButton(
                     self.player_top_frame,
                     text=teamName,
                     command=lambda id=teamID, i2=i: self.select_team(id, self.team_button_list, i2),
-                    width=120
+                    width=self.team_button_width,
+                    fg_color="#34757a",
+                    hover_color="#1f4346",
+                    font=("Helvetica", self.team_button_font_size),
+                    height=self.team_button_height,
                 )
                 team_button.pack(pady=5, padx=5, anchor=tk.N, side=tk.LEFT)
 
@@ -454,7 +481,11 @@ class Window(ctk.CTk):
                     self.player_bottom_frame,
                     text=teamName,
                     command=lambda id=teamID, i2=i: self.select_team(id, self.team_button_list, i2),
-                    width=120
+                    width=self.team_button_width,
+                    fg_color="#34757a",
+                    hover_color="#1f4346",
+                    font=("Helvetica", self.team_button_font_size),
+                    height=self.team_button_height,
                 )
                 team_button.pack(pady=5, padx=5, anchor=tk.N, side=tk.LEFT)
 
@@ -554,17 +585,20 @@ class Window(ctk.CTk):
         # Update the count in the dictionary
         self.variable_dict[varcountname] = count
 
+        label_font_size = self.screenwidth / 150
+        entry_width = self.screenwidth / 10
+        entry_height = self.screenheight / 30
         # Create a label with "Team 1" and the count
         label_text = f'{Counter} {count}'
-        label = ctk.CTkLabel(Frame, text=label_text, font=("Helvetica", 14))  # Increase font size
-        label.grid(row=len(self.variable_dict[varentrie1name]), column=0, padx=5, pady=5, sticky='e')
+        label = ctk.CTkLabel(Frame, text=label_text, font=("Helvetica", label_font_size * 1.2, "bold"))
+        label.grid(row=len(self.variable_dict[varentrie1name]), column=0, padx=10, pady=8, sticky='e')
 
         # Create a new entry field
-        new_entry = ctk.CTkEntry(Frame)  # Increase font size
+        new_entry = ctk.CTkEntry(Frame, font=("Helvetica", label_font_size), height=entry_height, width=entry_width)
         
-        new_entry2 = ctk.CTkEntry(Frame)  # Increase font size
+        new_entry2 = ctk.CTkEntry(Frame, font=("Helvetica", label_font_size), height=entry_height, width=entry_width)
         
-        new_entry3 = ctk.CTkEntry(Frame)  # Increase font size
+        new_entry3 = ctk.CTkEntry(Frame, font=("Helvetica", label_font_size), height=entry_height, width=entry_width)
         #print("entry_text", entry_text)
         #print("new_entry")
 
@@ -582,9 +616,9 @@ class Window(ctk.CTk):
         
         
 
-        new_entry.grid(row=len(self.variable_dict[varentrie1name]), column=1, pady=5, sticky='we')
-        new_entry2.grid(row=len(self.variable_dict[varentrie1name]), column=2, pady=5, sticky='we')
-        new_entry3.grid(row=len(self.variable_dict[varentrie1name]), column=3, pady=5, sticky='we')
+        new_entry.grid(row=len(self.variable_dict[varentrie1name]), column=1, pady=5, sticky='we', padx=3)
+        new_entry2.grid(row=len(self.variable_dict[varentrie1name]), column=2, pady=5, sticky='we', padx=3)
+        new_entry3.grid(row=len(self.variable_dict[varentrie1name]), column=3, pady=5, sticky='we', padx=3)
         self.variable_dict[varentrie1name].append(new_entry)
         self.variable_dict[varentrie2name].append(new_entry2)
         self.variable_dict[varentrie3name].append(new_entry3)
@@ -623,12 +657,16 @@ class Window(ctk.CTk):
         for i, teamID in enumerate(team_IDs):
             teamName = teamNames[int(teamID-1)]
 
-            if i < 9:
+            if i < 8:
                 team_button = ctk.CTkButton(
                     self.player_top_frame,
                     text=teamName,
                     command=lambda id=teamID, i2=i: self.select_team(id, self.team_button_list, i2),
-                    width=120
+                    width=self.team_button_width,
+                    fg_color="#34757a",
+                    hover_color="#1f4346",
+                    font=("Helvetica", self.team_button_font_size),
+                    height=self.team_button_height,
                 )
                 team_button.pack(pady=5, padx=5, anchor=tk.N, side=tk.LEFT)
 
@@ -637,7 +675,11 @@ class Window(ctk.CTk):
                     self.player_bottom_frame,
                     text=teamName,
                     command=lambda id=teamID, i2=i: self.select_team(id, self.team_button_list, i2),
-                    width=120
+                    width=self.team_button_width,
+                    fg_color="#34757a",
+                    hover_color="#1f4346",
+                    font=("Helvetica", self.team_button_font_size),
+                    height=self.team_button_height,
                 )
                 team_button.pack(pady=5, padx=5, anchor=tk.N, side=tk.LEFT)
 
@@ -834,10 +876,10 @@ class Window(ctk.CTk):
     def create_SPIEL_elements(self):
         
         # Create elements for the SPIEL frame
-        manual_frame = ctk.CTkFrame(self.SPIEL_frame, bg_color='grey17', fg_color='grey17')
+        manual_frame = ctk.CTkFrame(self.SPIEL_frame, bg_color='#0e1718', fg_color='#0e1718')
         manual_frame.pack(pady=5, anchor=tk.S, side=tk.BOTTOM, padx=5, fill=tk.X)
         
-        manual_manual_frame = ctk.CTkFrame(manual_frame, bg_color='grey17', fg_color='grey17')
+        manual_manual_frame = ctk.CTkFrame(manual_frame, bg_color='#0e1718', fg_color='#0e1718')
         manual_manual_frame.pack(pady=0, anchor=tk.SE, side=tk.RIGHT, padx=0)
         
         SPIEL_button = ctk.CTkButton(manual_manual_frame, text="Reload", command=lambda : self.reload_spiel_button_command())
@@ -876,21 +918,21 @@ class Window(ctk.CTk):
             # Initialize the dictionary for the current team
             self.spiel_buttons[team_id] = {}
                     
-            self.for_team_frame = ctk.CTkFrame(self.SPIEL_frame, bg_color='grey17', fg_color='grey17')
+            self.for_team_frame = ctk.CTkFrame(self.SPIEL_frame, bg_color='#0e1718', fg_color='#0e1718')
             self.for_team_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, fill="both", padx=10, expand=True)
             
             self.for_team_frame.tk_setPalette(
-                background='grey17', 
-                bg_color='grey17', 
-                fg_color='grey17',
-                activeBackground='grey17', 
-                activeForeground='grey17', 
-                foreground='grey17'
+                background='#0e1718', 
+                bg_color='#0e1718', 
+                fg_color='#0e1718',
+                activeBackground='#0e1718', 
+                activeForeground='#0e1718', 
+                foreground='#0e1718'
                 )
-            self.for_team_frame.configure(bg_color="grey17")
+            self.for_team_frame.configure(bg_color="#0e1718")
             
             # Create global scores buttons, one for up and one for down
-            score_button_frame = ctk.CTkFrame(self.for_team_frame, bg_color='grey17', fg_color='grey17')
+            score_button_frame = ctk.CTkFrame(self.for_team_frame, bg_color='#0e1718', fg_color='#0e1718')
             score_button_frame.pack(pady=10, anchor=tk.E, side=tk.RIGHT, padx=10)
             
             score_button_up = ctk.CTkButton(score_button_frame, text="UP", command=lambda team=team_id, team2=team2_id: self.global_scored_a_point(team, team2, "UP"))
@@ -910,7 +952,7 @@ class Window(ctk.CTk):
             
             self.spiel_buttons[team_id]["global"] = (self.for_team_frame, self.team_label, score_button_up, score_label_var, score_button_down)
             
-            frame_frame = ctk.CTkFrame(self.for_team_frame, bg_color='grey17', fg_color='grey17')
+            frame_frame = ctk.CTkFrame(self.for_team_frame, bg_color='#0e1718', fg_color='#0e1718')
             frame_frame.pack(side=tk.TOP, pady=0, anchor=tk.N)
 
             up_frame = ctk.CTkFrame(frame_frame)
@@ -925,10 +967,10 @@ class Window(ctk.CTk):
                 player_index = i 
                 player_id = self.get_player_id_from_player_name(player_name)
                 if i < 8:
-                    self.group_frame = ctk.CTkFrame(up_frame, bg_color='grey17', fg_color='grey15')
+                    self.group_frame = ctk.CTkFrame(up_frame, bg_color='#0e1718', fg_color='grey15')
                     self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
                 else:
-                    self.group_frame = ctk.CTkFrame(down_frame, bg_color='grey17', fg_color='grey15')
+                    self.group_frame = ctk.CTkFrame(down_frame, bg_color='#0e1718', fg_color='grey15')
                     self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
                 
                 #self.group_frame = tk.Frame(self.for_team_frame, background="lightcoral")
