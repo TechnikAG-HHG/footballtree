@@ -1,8 +1,8 @@
 var matchCount = 0; // Global variable to keep track of the total number of matches
-var timeInterval = 8;
+var timeInterval = 10;
 
 var startTime = new Date(); // Set the start time
-startTime.setHours(10, 0, 0, 0); // Set the start time to 10:00
+startTime.setHours(7, 50, 0, 0); // Set the start time to 10:00
 
 function calculateMatches() {
     matchCount = 0; // Reset matchCount to 0
@@ -36,36 +36,34 @@ function calculateMatches() {
 }
 
 function calculateMatchesForGroup(teams, groupName) {
-    var rounds = [];
+    var n = teams.length;
+    var matches = [];
 
-    for (var round = 0; round < teams.length - 1; round++) {
-        rounds[round] = [];
-        for (var match = 0; match < teams.length / 2; match++) {
-            var team1 = teams[match];
-            var team2 = teams[teams.length - 1 - match];
-            rounds[round][match] = [team1, team2];
+    // If the number of teams is odd, add a "dummy" team
+    var dummy = false;
+    if (n % 2 !== 0) {
+        teams.push("dummy");
+        n++;
+        dummy = true;
+    }
+
+    for (var round = 0; round < n - 1; round++) {
+        for (var i = 0; i < n / 2; i++) {
+            var team1 = teams[i];
+            var team2 = teams[n - 1 - i];
+            // Skip matches involving the "dummy" team
+            if (dummy && (team1 === "dummy" || team2 === "dummy")) {
+                continue;
+            }
+            matches.push([team1, team2]);
         }
         // Rotate the teams for the next round
         teams.splice(1, 0, teams.pop());
     }
 
-    // Remove matches with the "dummy" team
-    if (teams.includes("dummy")) {
-        rounds = rounds.map(function (round) {
-            return round.filter(function (match) {
-                return !match.includes("dummy");
-            });
-        });
-    }
-
-    var matches = rounds.reduce(function (allMatches, round) {
-        return allMatches.concat(round);
-    }, []);
-
-    matches = matches.map(function (match) {
-        matchCount++; // Increment the match count
+    matches = matches.map(function (match, index) {
         return {
-            number: "Spiel " + matchCount,
+            number: "Spiel " + (index + 1),
             teams: match,
             group: groupName,
         };

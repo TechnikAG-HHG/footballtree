@@ -103,7 +103,6 @@ td {
 }
 
 tbody tr:nth-child(-n + 2) td {
-    background-color: #daa520;
-    color: black;
+    color: rgb(237, 202, 6);
     font-weight: bold;
 }
