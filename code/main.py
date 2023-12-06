@@ -16,6 +16,7 @@ app.secret_key = "Felix.com"
 lock = threading.Lock()
 
 class Window(ctk.CTk):
+    
     def create_navigation_bar(self):
         navigation_frame = ctk.CTkFrame(self)
         navigation_frame.pack(side=tk.LEFT, fill=tk.Y, pady=8)
@@ -45,6 +46,10 @@ class Window(ctk.CTk):
         self.team_button_list = []
         self.spiel_buttons = {}
         self.teams_playing = [None, None]
+        self.active_match = -1
+        self.final_match_teams = []
+        self.spiel_um_platz_3 = []
+        self.matches = []
 
         # Set window title
         self.title("Football Tournament Manager")
@@ -151,6 +156,20 @@ class Window(ctk.CTk):
         self.cursor.execute(matchDataTableCreationQuery)
         self.connection.commit()
         
+        finalMatchesDataTableCreationQuery = """
+        CREATE TABLE IF NOT EXISTS finalMatchesData (
+            matchId INTEGER PRIMARY KEY,
+            groupNumber INTEGER,
+            team1Id INTEGER REFERENCES teamData(id),
+            team2Id INTEGER REFERENCES teamData(id),
+            team1Goals INTEGER DEFAULT 0,
+            team2Goals INTEGER DEFAULT 0,
+            matchTime TEXT
+        )
+        """
+        self.cursor.execute(finalMatchesDataTableCreationQuery)
+        self.connection.commit()
+        
         settingsDataTableCreationQuery = """
         CREATE TABLE IF NOT EXISTS settingsData (
             id INTEGER PRIMARY KEY,
@@ -188,10 +207,14 @@ class Window(ctk.CTk):
             self.volume.set(value=settings[5])
             
         if settings[6] is not None and settings[6] != "" and settings[6] != 0:
+            print("settings[6]", settings[6])
             self.active_mode.set(value=settings[6])
         
 
 ##############################################################################################
+##############################################################################################
+##############################################################################################
+
     def add_name_entry(self, entry_text="", mp3_path=""):
         #print(entry_text)
         count = len(self.name_entries) + 1
@@ -295,29 +318,34 @@ class Window(ctk.CTk):
         self.cursor.execute(teamDataTableCreationQuery)
         self.connection.commit()
         
+        total_entries = len(name_entries)
+        midpoint = total_entries // 2
         
-        for entry in name_entries:
+        for i, entry in enumerate(name_entries):
             entry_text = entry.get().strip()
-            print("entry_text", entry_text)
+            
+            group_number = 1 if (i < midpoint) or (total_entries % 2 != 0 and i == midpoint) else 2
+            
+            #print("entry_text", entry_text)
             if entry_text:
                 # Update existing team
                 try:
-                    insert_query = "INSERT INTO teamData (teamName) VALUES (?)"
-                    self.cursor.execute(insert_query, (entry_text,))
+                    insert_query = "INSERT INTO teamData (teamName, groupNumber) VALUES (?, ?)"
+                    self.cursor.execute(insert_query, (entry_text, group_number))
                 except sqlite3.IntegrityError:
                     for i in range(1, 100):
                         if f"{entry_text} {i}" not in self.read_teamNames():
                             entry_text = f"{entry_text} {i}"
                             break
-                    insert_query = "INSERT INTO teamData (teamName) VALUES (?)"
-                    self.cursor.execute(insert_query, (entry_text,))
+                    insert_query = "INSERT INTO teamData (teamName, groupNumber) VALUES (?, ?)"
+                    self.cursor.execute(insert_query, (entry_text, group_number))
                     
         #get all ids from teamData
         self.cursor.execute("SELECT id FROM teamData")
         team_ids = [row[0] for row in self.cursor.fetchall()]
         for team_id in team_ids:
             mp3_entry = self.mp3_list.get(team_id-1, "")
-            print("mp3_entry", mp3_entry.strip())
+            #print("mp3_entry", mp3_entry.strip())
             if mp3_entry.strip() == "" and old_mp3_list is not None and team_id - 1 < len(old_mp3_list) and old_mp3_list[team_id - 1] is not None:
                 self.mp3_list[team_id-1] = old_mp3_list[team_id-1][0]
 
@@ -381,7 +409,7 @@ class Window(ctk.CTk):
         
 
 ##############################################################################################
-
+##############################################################################################
 ##############################################################################################
 
     def create_player_elements(self):
@@ -421,6 +449,8 @@ class Window(ctk.CTk):
         
         self.selected_team = ""
         self.team_button_list = []
+        
+        self.get_teams_for_end_matches()
         
         team_IDs = self.read_teamIds()
         teamNames = self.read_teamNames()
@@ -768,44 +798,57 @@ class Window(ctk.CTk):
     def read_teamNames(self, teams_to_read=-1):
         teamNames = [""]
         
-        if teams_to_read != -1:
-            for team in teams_to_read:
-                if team != None:
-                    team = int(team) + 1
-                        
-                    selectTeam = """
-                    SELECT teamName FROM teamData
-                    WHERE id = ?
-                    ORDER BY id ASC
-                    """
-                    self.cursor.execute(selectTeam, (team,))
-                    result = self.cursor.fetchone()
-                    if result is not None:
-                        #print(result)
-                        teamNames.append(result[0])
-          
-        else:
-            selectTeams = """
-            SELECT teamName FROM teamData
-            ORDER BY id ASC
-            """
-            self.cursor.execute(selectTeams)
+        if self.active_mode.get() == 1:
         
-            for team in self.cursor.fetchall():
-                teamNames.append(team[0])
-        #print("teamNames", teamNames)
+            if teams_to_read != -1:
+                for team in teams_to_read:
+                    if team != None:
+                        team = int(team) + 1
+                            
+                        selectTeam = """
+                        SELECT teamName FROM teamData
+                        WHERE id = ?
+                        ORDER BY id ASC
+                        """
+                        self.cursor.execute(selectTeam, (team,))
+                        result = self.cursor.fetchone()
+                        if result is not None:
+                            #print(result)
+                            teamNames.append(result[0])
+            
+            else:
+                selectTeams = """
+                SELECT teamName FROM teamData
+                ORDER BY id ASC
+                """
+                self.cursor.execute(selectTeams)
+            
+                for team in self.cursor.fetchall():
+                    teamNames.append(team[0])
+            #print("teamNames", teamNames)
+        elif self.active_mode.get() == 2:
+            teamNames.append(self.endteam1[1])
+            teamNames.append(self.endteam2[1])
+            teamNames.append(self.endteam3[1])
+            teamNames.append(self.endteam4[1])
+            
+        
         return teamNames
     
     
     def read_teamIds(self):
         teamIds = []
         
-        self.cursor.execute("SELECT id FROM teamData")
+        if self.active_match == 1:
         
-        for id in self.cursor.fetchall():
-            teamIds.append(id[0])
-        teamIds.sort()
-
+            self.cursor.execute("SELECT id FROM teamData")
+            
+            for id in self.cursor.fetchall():
+                teamIds.append(id[0])
+            teamIds.sort()
+        elif self.active_match == 2:
+            teamIds = [1, 2, 3, 4]
+        
         return teamIds
 
 
@@ -840,24 +883,31 @@ class Window(ctk.CTk):
         manual_manual_frame = ctk.CTkFrame(manual_frame, bg_color='grey17', fg_color='grey17')
         manual_manual_frame.pack(pady=0, anchor=tk.SE, side=tk.RIGHT, padx=0)
         
-        SPIEL_button = ctk.CTkButton(manual_manual_frame, text="Reload", command=lambda : self.reload_spiel_button_command())
+        SPIEL_button = ctk.CTkButton(manual_manual_frame, text="Reload", command=lambda : self.reload_spiel_button_command(True))
         SPIEL_button.pack(pady=10, side=tk.BOTTOM, anchor=tk.S) 
         
         
         # Assuming self.spiel_buttons is initialized as an empty dictionary
         self.spiel_buttons = {}
+        
+        self.get_teams_for_end_matches()
 
         #print("self.teams_playing", self.teams_playing)
         
         for i, _ in enumerate(self.teams_playing):
             
-            #print(self.teams_playing)
+            print("kakarcsh",self.teams_playing)
             
             team_names = self.read_teamNames()
             if self.teams_playing[i] is not None:
-                #print("i" , i, "teamnames", team_names)
-                #print(self.teams_playing[i])
-                team_name = team_names[self.teams_playing[i]]
+                print("i" , i, "teamnames", team_names)
+                print(self.teams_playing[i])
+                try:
+                    team_name = team_names[self.teams_playing[i]]
+                except IndexError:
+                    self.teams_playing = [None, None]
+                    self.create_SPIEL_elements()
+                    return
                 
             else:
                 # Handle the case when self.teams_playing[i + 1] is None
@@ -897,6 +947,7 @@ class Window(ctk.CTk):
             score_button_up.pack(pady=2, anchor=tk.N, side=tk.TOP, expand=True, fill=tk.X)
             
             score_label_var = tk.StringVar()
+            print("team_id", team_id, "team2_id", team2_id)
             score_label_var.set(self.read_goals_for_match_from_db(team_id, team2_id))
             
             score_label = ctk.CTkLabel(score_button_frame, text="None", font=("Helvetica", 14), textvariable=score_label_var)
@@ -989,7 +1040,7 @@ class Window(ctk.CTk):
         self.create_matches_labels(manual_frame)
 
 
-        if self.teams_playing.count(None) == 0:
+        if self.teams_playing.count(None) == 0 and self.teams_playing != []:
             #print(self.teams_playing)
             #print(self.read_teamNames())
             self.manual_team_select_2.configure(state=tk.NORMAL)
@@ -1072,7 +1123,7 @@ class Window(ctk.CTk):
         frame.destroy()
     
     
-    def reload_spiel_button_command(self):
+    def reload_spiel_button_command(self, show_frame=False):
         
         self.calculate_points()
                 
@@ -1084,6 +1135,8 @@ class Window(ctk.CTk):
         
         self.SPIEL_frame = ctk.CTkFrame(self)
         
+        if show_frame:
+            self.show_frame(self.SPIEL_frame)
 
         self.create_SPIEL_elements()
 
@@ -1133,8 +1186,8 @@ class Window(ctk.CTk):
     
     
     def create_matches_labels(self, frame):
+        
         matches = self.calculate_matches()
-        #print(matches)
         
         spiel_select_frame = ctk.CTkFrame(frame)
         spiel_select_frame.pack(pady=10, padx=10, anchor=tk.SW, side=tk.LEFT)
@@ -1142,79 +1195,288 @@ class Window(ctk.CTk):
         spiel_select = ctk.CTkComboBox(spiel_select_frame, font=("Helvetica", 14), width=200, values=[""], command=lambda event: self.on_match_select(event, matches))
         spiel_select.pack(pady=10, side=tk.TOP, anchor=tk.N)
 
-        #spiel_select.bind("<<ComboboxSelected>>", lambda event: self.on_match_select(event, matches))
-    
-        # Initialize the values as an empty list
-        values_list = []
+        if self.active_mode.get() == 1:
 
-        for match in matches:
-            # Append each match label to the values list
-            #print(match)
-            #print(match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1])
-            #print("match", match)
-            values_list.append(match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1])
+            values_list = []
 
-        # Set the values of the Combobox after the loop
-        spiel_select.configure(values=values_list)
-        
-        # get the index of the match that is currently being played and set the Combobox value to that match without using self.match_count - 1
-        
-        for match in matches:
-            match_teams_indexes = [self.read_teamNames().index(match_team) for match_team in match["teams"]]
-            if match_teams_indexes == self.teams_playing or match_teams_indexes[::-1] == self.teams_playing:
-                se = match["number"]
-                self.active_match = int(se.replace("Spiel ", "")) - 1
-                #print("self.active_matchcreate_matches_labels", self.active_match)
-                #print("got it")
-                break
-            #print(match["teams"], self.teams_playing, match["number"], match_teams_indexes, match_teams_indexes[::-1])
-        else:
+            for match in matches:
+
+                #print(match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1])
+                #print("match", match)
+                values_list.append(match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1])
+
+            # Set the values of the Combobox after the loop
+            spiel_select.configure(values=values_list)
+            
+            # get the index of the match that is currently being played and set the Combobox value to that match without using self.match_count - 1
+            
+            for match in matches:
+                match_teams_indexes = [self.read_teamNames().index(match_team) for match_team in match["teams"]]
+                if match_teams_indexes == self.teams_playing or match_teams_indexes[::-1] == self.teams_playing:
+                    se = match["number"]
+                    self.active_match = int(se.replace("Spiel ", "")) - 1
+                    #print("self.active_matchcreate_matches_labels", self.active_match)
+                    break
+                #print(match["teams"], self.teams_playing, match["number"], match_teams_indexes, match_teams_indexes[::-1])
+            else:
+                if self.teams_playing.count(None) == 0:
+                    values_list = []
+                    values_list.append("No Match found")
+                    spiel_select["values"] = values_list
+                    spiel_select.set(values_list[0])
+                    #print("no match found")
+                    return
+            
             if self.teams_playing.count(None) == 0:
-                values_list = []
-                values_list.append("No Match found")
-                spiel_select["values"] = values_list
-                spiel_select.set(values_list[0])
-                #print("no match found")
-                return
-        
-        if self.teams_playing.count(None) == 0:
+                
+                se = int(se.replace("Spiel ", "")) - 1
+                current_match_index = se
+                spiel_select.set(values_list[current_match_index])
+                
+        elif self.active_mode.get() == 2:
             
-            se = int(se.replace("Spiel ", "")) - 1
-            current_match_index = se
-            spiel_select.set(values_list[current_match_index])
+            #get the best two teams from the database(with most points)
+            getTeams = """
+            SELECT id, teamName FROM teamData
+            WHERE groupNumber = 1
+            ORDER BY points DESC
+            LIMIT 2
+            """
+            self.cursor.execute(getTeams)
             
+            #get the two best teams
+            teams1 = self.cursor.fetchall()
+            print("teams1", teams1)
+            
+            getTeams2 = """
+            SELECT id, teamName FROM teamData
+            WHERE groupNumber = 2
+            ORDER BY points DESC
+            LIMIT 2 
+            """
+            self.cursor.execute(getTeams2)
+            
+            #get the two best teams
+            teams2 = self.cursor.fetchall()
+            
+            values_list = []
+            
+            self.get_teams_for_end_matches()
+            
+            values_list.append(f"Spiel 1 Halb: {self.endteam1[1]} vs {self.endteam3[1]}")
+            values_list.append(f"Spiel 2 Halb: {self.endteam2[1]} vs {self.endteam4[1]}")
+            
+            values_list.append(self.get_spiel_um_platz_3(teams1[0], teams1[1], teams2[0], teams2[1]))
+            
+            values_list.append(self.get_final_match(teams1[0], teams1[1], teams2[0], teams2[1]))
+            
+            print("self.spiel_um_platz_3", self.spiel_um_platz_3)
+            print("values_list", values_list)
+            spiel_select.configure(values=values_list)
+            
+            if self.active_match >= 0:
+                spiel_select.set(values_list[self.active_match])
             
         next_match_button = ctk.CTkButton(spiel_select_frame, text="Next Match", command=lambda : self.next_previous_match_button(spiel_select, matches))
         next_match_button.pack(pady=10, padx=5, side=tk.RIGHT, anchor=tk.SE)
         
         previous_match_button = ctk.CTkButton(spiel_select_frame, text="Previous Match", command=lambda : self.next_previous_match_button(spiel_select, matches, False))
         previous_match_button.pack(pady=10, padx=5, side=tk.LEFT, anchor=tk.SW)
+    
+    
+    def get_teams_for_end_matches(self):
+        #get the best two teams from the database(with most points)
+        getTeams = """
+        SELECT id, teamName FROM teamData
+        WHERE groupNumber = 1
+        ORDER BY points DESC
+        LIMIT 2
+        """
+        self.cursor.execute(getTeams)
+        
+        #get the two best teams
+        teams1 = self.cursor.fetchall()
+        print("teams1", teams1)
+        
+        getTeams2 = """
+        SELECT id, teamName FROM teamData
+        WHERE groupNumber = 2
+        ORDER BY points DESC
+        LIMIT 2 
+        """
+        self.cursor.execute(getTeams2)
+        
+        #get the two best teams
+        teams2 = self.cursor.fetchall()
+        
+        values_list = []
+        
+        if teams1 != [] and teams2 != []:
+        
+            self.endteam1 = teams1[0]
+            self.endteam2 = teams1[1]
+            self.endteam3 = teams2[0]
+            self.endteam4 = teams2[1]
+        
 
+    def get_spiel_um_platz_3(self, team1, team2, team3, team4):
+        #get the best two teams from the database(with most points)
+        getGoles1 = """
+        SELECT team1Goals, team2Goals FROM finalMatchesData
+        WHERE matchId = 1
+        """
+        
+        getGoles2 = """
+        SELECT team1Goals, team2Goals FROM finalMatchesData
+        WHERE matchId = 2
+        """
+        self.cursor.execute(getGoles1)
+        goles1 = self.cursor.fetchone()
+        self.cursor.execute(getGoles2)
+        goles2 = self.cursor.fetchone()
+        
+        self.spiel_um_platz_3 = []
+        
+        if goles1 != None and goles2 != None:
 
+            if goles1[0] < goles1[1]:
+                self.spiel_um_platz_3.append(team1)
+            else:
+                self.spiel_um_platz_3.append(team2)
+                
+            if goles2[0] < goles2[1]:
+                self.spiel_um_platz_3.append(team3)
+            else:
+                self.spiel_um_platz_3.append(team4)
+        
+        #print everything
+        print("self.spiel_um_platz_3", self.spiel_um_platz_3, "team1", team1, "team2", team2, "team3", team3, "team4", team4, "goles1", goles1, "goles2", goles2)
+        
+        if self.spiel_um_platz_3 != []:
+            return f"Spiel um Platz 3: {self.spiel_um_platz_3[0][1]} vs {self.spiel_um_platz_3[1][1]}"
+        else:
+            return "Spiel um Platz 3: None vs None"
+        
+    
+    def get_final_match(self, team1, team2, team3, team4):
+        #get the best two teams from the database(with most points)
+        getGoles1 = """
+        SELECT team1Goals, team2Goals FROM finalMatchesData
+        WHERE matchId = 1
+        """
+        
+        getGoles2 = """
+        SELECT team1Goals, team2Goals FROM finalMatchesData
+        WHERE matchId = 2
+        """
+        
+        self.final_match_teams = []
+        
+        self.cursor.execute(getGoles1)
+        goles1 = self.cursor.fetchone()
+        self.cursor.execute(getGoles2)
+        goles2 = self.cursor.fetchone()
+        
+        if goles1 != None and goles2 != None:
+
+            if goles1[0] > goles1[1]:
+                self.final_match_teams.append(team1)
+            else:
+                self.final_match_teams.append(team2)
+                
+            if goles2[0] > goles2[1]:
+                self.final_match_teams.append(team3)
+            else:
+                self.final_match_teams.append(team4)
+            
+        if self.final_match_teams != []:
+            return f"Finale: {self.final_match_teams[0][1]} vs {self.final_match_teams[1][1]}"
+        else:
+            return "Finale: None vs None"
+    
+           
+    def save_active_match_in_final_phase(self, team1id, team2id):
+        
+        print("ichkanneinfachnurnochmehr printen", "team1id", team1id, "team2id", team2id, "self.active_match", self.active_match)
+        active_match_id = self.active_match + 1
+
+        # Try to insert a new row
+        insertActiveMatch = """
+        INSERT OR IGNORE INTO finalMatchesData (matchId, team1Id, team2Id)
+        VALUES (?, ?, ?)
+        """
+        self.cursor.execute(insertActiveMatch, (active_match_id, team1id, team2id))
+
+        # If insertion failed due to a unique constraint, update the existing row
+        updateActiveMatch = """
+        UPDATE finalMatchesData
+        SET team1Id = ?, team2Id = ?
+        WHERE matchId = ?
+        """
+        self.cursor.execute(updateActiveMatch, (team1id, team2id, active_match_id))
+
+        self.connection.commit()
+        
+    
     def on_match_select(self, event, matches):
         selected_match = event
         #print(selected_match)
         #print(matches)
-        # Convert the value to the match index
-        match_index = [match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1] for match in matches].index(selected_match)
-        print("match_index", match_index)
-        # Get the teams playing in the selected match and if there are none, set teams_playing to None
-        team_names = self.read_teamNames()
-        
-        team1_index = team_names.index(matches[match_index]["teams"][0])
-        team2_index = team_names.index(matches[match_index]["teams"][1])
-
-        if team1_index and team2_index:
-            self.teams_playing = [team1_index, team2_index]
-        else:
-            self.teams_playing = [None, None]
+        if self.active_mode.get() == 1:
+            match_index = [match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1] for match in matches].index(selected_match)
+            #print("match_index", match_index)
+            # Get the teams playing in the selected match and if there are none, set teams_playing to None
+            team_names = self.read_teamNames()
             
-        self.active_match = match_index
-        #print("self.active_matchon_match_select", self.active_match)
-        
-        self.save_games_played_in_db(match_index)
-        
-        self.updated_data.update({"Games": get_data_for_website(2)})
+            team1_index = team_names.index(matches[match_index]["teams"][0])
+            team2_index = team_names.index(matches[match_index]["teams"][1])
+
+            if team1_index and team2_index:
+                self.teams_playing = [team1_index, team2_index]
+            else:
+                self.teams_playing = [None, None]
+                
+            self.active_match = match_index
+            #print("self.active_matchon_match_select", self.active_match)
+            
+            self.save_games_played_in_db(match_index)
+            
+            self.updated_data.update({"Games": get_data_for_website(2)})
+            
+        elif self.active_mode.get() == 2:
+            print("self.spiel_um_platz_3", self.spiel_um_platz_3)
+            print("self.final_match_teams", self.final_match_teams)
+            if selected_match == "Spiel 1 Halb: " + self.endteam1[1] + " vs " + self.endteam3[1]:
+                self.teams_playing = [self.endteam1[0], self.endteam3[0]]
+                self.active_match = 0
+                self.save_active_match_in_final_phase(self.endteam1[0], self.endteam3[0])
+            elif selected_match == "Spiel 2 Halb: " + self.endteam2[1] + " vs " + self.endteam4[1]:
+                self.teams_playing = [self.endteam2[0], self.endteam4[0]]
+                self.active_match = 1 
+                self.save_active_match_in_final_phase(self.endteam2[0], self.endteam4[0])
+            elif selected_match == self.get_spiel_um_platz_3(self.endteam1, self.endteam2, self.endteam3, self.endteam4) and self.spiel_um_platz_3 != []:
+                self.teams_playing = [self.spiel_um_platz_3[0][0], self.spiel_um_platz_3[1][0]]
+                self.active_match = 2
+                self.save_active_match_in_final_phase(self.spiel_um_platz_3[0][0], self.spiel_um_platz_3[1][0])
+            elif selected_match == self.get_final_match(self.endteam1, self.endteam2, self.endteam3, self.endteam4):
+                if self.final_match_teams == []:
+                    self.teams_playing = [None, None]
+                    self.active_match = 3
+                    self.save_active_match_in_final_phase(None, None)
+                
+                elif self.final_match_teams[0][0] != None and self.final_match_teams[1][0] != None:
+                    self.teams_playing = [self.final_match_teams[0][0], self.final_match_teams[1][0]]
+                    self.active_match = 3
+                    self.save_active_match_in_final_phase(self.final_match_teams[0][0], self.final_match_teams[1][0])
+                    
+            else:
+                self.teams_playing = [None, None]
+                self.active_match = -1
+            #print("self.active_matchon_match_select", self.active_match)
+            
+            self.save_games_played_in_db(self.active_match)
+            
+            self.updated_data.update({"Games": get_data_for_website(2)})
         
         self.reload_spiel_button_command()
         
@@ -1339,29 +1601,58 @@ class Window(ctk.CTk):
 
     def save_goals_for_match_in_db(self, teamID, team2ID, goals):
         
-        get_team1_or_team2 = """
-        SELECT 
-            CASE 
-                WHEN team1Id = ? THEN 'team1Goals'
-                WHEN team2Id = ? THEN 'team2Goals'
-                ELSE 'Not Found'
-            END AS TeamIdColumn
-        FROM matchData
-        WHERE (team1Id = ? AND team2Id = ?) OR (team1Id = ? AND team2Id = ?);
-        """
-        self.cursor.execute(get_team1_or_team2, (teamID, teamID, teamID, team2ID, team2ID, teamID))
+        if self.active_mode.get() == 1:
+            
+            print("accsed matchData in save_goals_for_match_in_db")
         
-        self.team1_or_team2 = self.cursor.fetchone()[0]
-        
-        print("self.team1_or_team2", self.team1_or_team2)
-        
-        
-        update_goals_for_match = """
-        UPDATE matchData
-        SET {column} = ?
-        WHERE (team1Id = ? AND team2Id = ?) OR (team1Id = ? AND team2Id = ?);
-        """
-        self.cursor.execute(update_goals_for_match.format(column=self.team1_or_team2), (goals, teamID, team2ID, team2ID, teamID))
+            get_team1_or_team2 = """
+            SELECT 
+                CASE 
+                    WHEN team1Id = ? THEN 'team1Goals'
+                    WHEN team2Id = ? THEN 'team2Goals'
+                    ELSE 'Not Found'
+                END AS TeamIdColumn
+            FROM matchData
+            WHERE (team1Id = ? AND team2Id = ?) OR (team1Id = ? AND team2Id = ?);
+            """
+            self.cursor.execute(get_team1_or_team2, (teamID, teamID, teamID, team2ID, team2ID, teamID))
+            
+            self.team1_or_team2 = self.cursor.fetchone()[0]
+            
+            #print("self.team1_or_team2", self.team1_or_team2)
+            
+            
+            update_goals_for_match = """
+            UPDATE matchData
+            SET {column} = ?
+            WHERE (team1Id = ? AND team2Id = ?) OR (team1Id = ? AND team2Id = ?);
+            """
+            self.cursor.execute(update_goals_for_match.format(column=self.team1_or_team2), (goals, teamID, team2ID, team2ID, teamID))
+            
+        elif self.active_mode.get() == 2:
+            get_team1_or_team2 = """
+            SELECT 
+                CASE 
+                    WHEN team1Id = ? THEN 'team1Goals'
+                    WHEN team2Id = ? THEN 'team2Goals'
+                    ELSE 'Not Found'
+                END AS TeamIdColumn
+            FROM finalMatchesData
+            WHERE matchId = ?;
+            """
+            self.cursor.execute(get_team1_or_team2, (teamID, teamID, self.active_match + 1))
+            
+            self.team1_or_team2 = self.cursor.fetchone()[0]
+            
+            #print("self.team1_or_team2", self.team1_or_team2)
+            
+            
+            update_goals_for_match = """
+            UPDATE finalMatchesData
+            SET {column} = ?
+            WHERE matchId = ?;
+            """
+            self.cursor.execute(update_goals_for_match.format(column=self.team1_or_team2), (goals, self.active_match + 1))
         
         self.connection.commit()
         
@@ -1370,37 +1661,73 @@ class Window(ctk.CTk):
         
         #print("read_goals_for_match_from_db", "teamID", teamID, "team2ID", team2ID)
         
-        get_team1_or_team2 = """
-        SELECT 
-            CASE 
-                WHEN team1Id = ? THEN 'team1Goals'
-                WHEN team2Id = ? THEN 'team2Goals'
-                ELSE 'Not Found'
-            END AS TeamIdColumn
-        FROM matchData
-        WHERE (team1Id = ? AND team2Id = ?) OR (team1Id = ? AND team2Id = ?);
-        """
-        self.cursor.execute(get_team1_or_team2, (teamID, teamID, teamID, team2ID, team2ID, teamID))
+        if self.active_mode.get() == 1:
+            print("accsed matchData in read_goals_for_match_from_db")
         
-        onefetched = self.cursor.fetchone() 
-        
-        if onefetched == None:
-            return "None"
-        
-        print(onefetched)
-        
-        self.team1_or_team2 = onefetched[0]
-        print("self.team1_or_team2", self.team1_or_team2)
-        
-        
-        get_goals_for_match = """
-        SELECT {column} FROM matchData
-        WHERE (team1Id = ? AND team2Id = ?) OR (team1Id = ? AND team2Id = ?);
-        """
-        self.cursor.execute(get_goals_for_match.format(column=self.team1_or_team2), (teamID, team2ID, team2ID, teamID))
-        
-        goals = self.cursor.fetchone()[0]
-        print("goals", goals)
+            get_team1_or_team2 = """
+            SELECT 
+                CASE 
+                    WHEN team1Id = ? THEN 'team1Goals'
+                    WHEN team2Id = ? THEN 'team2Goals'
+                    ELSE 'Not Found'
+                END AS TeamIdColumn
+            FROM matchData
+            WHERE (team1Id = ? AND team2Id = ?) OR (team1Id = ? AND team2Id = ?);
+            """
+            self.cursor.execute(get_team1_or_team2, (teamID, teamID, teamID, team2ID, team2ID, teamID))
+            
+            onefetched = self.cursor.fetchone() 
+            
+            if onefetched == None:
+                return "None"
+            
+            #print(onefetched)
+            
+            self.team1_or_team2 = onefetched[0]
+            #print("self.team1_or_team2", self.team1_or_team2)
+            
+            
+            get_goals_for_match = """
+            SELECT {column} FROM matchData
+            WHERE (team1Id = ? AND team2Id = ?) OR (team1Id = ? AND team2Id = ?);
+            """
+            self.cursor.execute(get_goals_for_match.format(column=self.team1_or_team2), (teamID, team2ID, team2ID, teamID))
+            
+            goals = self.cursor.fetchone()[0]
+            #print("goals", goals)
+        elif self.active_mode.get() == 2:
+            get_team1_or_team2 = """
+            SELECT 
+                CASE 
+                    WHEN team1Id = ? THEN 'team1Goals'
+                    WHEN team2Id = ? THEN 'team2Goals'
+                    ELSE 'Not Found'
+                END AS TeamIdColumn
+            FROM finalMatchesData
+            WHERE matchId = ?;
+            """
+            self.cursor.execute(get_team1_or_team2, (teamID, teamID, self.active_match + 1))
+            
+            onefetched = self.cursor.fetchone()
+            
+            if onefetched == None:
+                print("onefetched == None")
+                return "None"
+            
+            #print(onefetched)
+            
+            self.team1_or_team2 = onefetched[0]
+            #print("self.team1_or_team2", self.team1_or_team2)
+
+            
+            get_goals_for_match = """
+            SELECT {column} FROM finalMatchesData
+            WHERE matchId = ?;
+            """
+            self.cursor.execute(get_goals_for_match.format(column=self.team1_or_team2), (self.active_match + 1,))
+            
+            goals = self.cursor.fetchone()[0]
+            
         
         return goals
         
@@ -1439,6 +1766,7 @@ class Window(ctk.CTk):
         
         teams_ids = self.read_teamIds()
         for teamID in teams_ids:
+            print("accsed matchData in save_games_played_in_db")
             
             getPlayed = """
             SELECT matchId FROM matchData
@@ -1448,7 +1776,7 @@ class Window(ctk.CTk):
             
             played = self.cursor.fetchall()
             
-            print("played", played)
+            #print("played", played)
             
             played = len(played)
             
@@ -1463,7 +1791,7 @@ class Window(ctk.CTk):
         self.connection.commit()
     
 ##############################################################################################
-
+##############################################################################################
 ##############################################################################################
 
     def create_settings_elements(self):
@@ -1523,7 +1851,13 @@ class Window(ctk.CTk):
         """
         self.cursor.execute(saveModeInDB, (selected_value,))
         self.connection.commit()
+        
+        self.teams_playing = [None, None]
+        self.active_match = -1
+        self.reload_spiel_button_command()
             
+##############################################################################################
+##############################################################################################
 ##############################################################################################
 
     def show_frame(self, frame):
@@ -1541,7 +1875,9 @@ class Window(ctk.CTk):
         self.show_frame(self.player_frame)
 
     def show_SPIEL_frame(self):
-        self.reload_spiel_button_command()
+        if self.teams_playing.count(None) == 0:
+            self.reload_spiel_button_command()
+            
         #print(stored_data)
         self.calculate_matches()
         self.show_frame(self.SPIEL_frame)
@@ -1549,7 +1885,9 @@ class Window(ctk.CTk):
     def show_settings_frame(self):
         self.show_frame(self.settings_frame)
 
-    ##############################################################################################
+##############################################################################################
+##############################################################################################
+##############################################################################################
             
     def test(self):
         print("test")
@@ -1578,41 +1916,42 @@ class Window(ctk.CTk):
     ##############################################################################################
     def calculate_matches(self):
         
-        self.match_count = 0
+        if self.active_mode.get() == 1:
+            self.match_count = 0
 
-        initial_data = {
-        "Teams": self.read_teamNames()
-        }
-        
-        initial_data["Teams"].pop(0)
-        
-        teams = initial_data["Teams"][:]  # Create a copy of the teams array
-        #print("teams", teams)
-        
-        # If the number of teams is odd, add a "dummy" team
-        if len(teams) % 2 != 0:
-            teams.append("dummy")
+            initial_data = {
+            "Teams": self.read_teamNames()
+            }
+            
+            initial_data["Teams"].pop(0)
+            
+            teams = initial_data["Teams"][:]  # Create a copy of the teams array
+            #print("teams", teams)
+            
+            # If the number of teams is odd, add a "dummy" team
+            if len(teams) % 2 != 0:
+                teams.append("dummy")
 
-        midpoint = (len(teams) + 1) // 2
-        group1 = teams[:midpoint]
-        group2 = teams[midpoint:]
-        
-        print("group1", group1, "group2", group2, "teams", teams, "midpoint", midpoint)
+            midpoint = (len(teams) + 1) // 2
+            group1 = teams[:midpoint]
+            group2 = teams[midpoint:]
+            
+            #print("group1", group1, "group2", group2, "teams", teams, "midpoint", midpoint)
 
-        matches1 = self.calculate_matches_for_group(group1, "Gruppe 1")
-        matches2 = self.calculate_matches_for_group(group2, "Gruppe 2")
+            matches1 = self.calculate_matches_for_group(group1, "Gruppe 1")
+            matches2 = self.calculate_matches_for_group(group2, "Gruppe 2")
 
-        matches = self.interleave_matches(matches1, matches2)
-        
-        #print("matches", matches, "matches1", matches1, "matches2", matches2)
-        
-        self.match_count = 0
+            matches = self.interleave_matches(matches1, matches2)
+            
+            #print("matches", matches, "matches1", matches1, "matches2", matches2)
+            
+            self.match_count = 0
 
-        self.matches = list(map(lambda match: self.add_match_number(match), matches))
-        
-        #print(self.matches)
-        
-        self.save_matches_to_db()
+            self.matches = list(map(lambda match: self.add_match_number(match), matches))
+            
+            #print(self.matches)
+            
+            self.save_matches_to_db()
         
         return self.matches
     
@@ -1696,20 +2035,34 @@ class Window(ctk.CTk):
             team2ID = self.cursor.fetchone()[0]
 
             match_tuple = (int(team1ID), int(team2ID), int(str(group).replace('Gruppe ','')), int(str(number).replace('Spiel ','')))
+            match_tuple_reverse = (int(team2ID), int(team1ID), int(str(group).replace('Gruppe ','')), int(str(number).replace('Spiel ','')))
             match_tuple2 = (int(team1ID), int(team2ID), int(str(group).replace('Gruppe ','')))
-            
-            added_matches.append(match_tuple)
 
-            if match_tuple in existing_matches:
-                get_existing_match_data = """
-                SELECT * FROM matchData
-                WHERE team1Id = ? AND team2Id = ? AND groupNumber = ? AND matchId = ?
-                """
-                self.cursor.execute(get_existing_match_data, match_tuple)
-                existing_match_data = self.cursor.fetchone()
+            added_matches.append(match_tuple)
+            print("match_tuple", match_tuple, "existing_matches", existing_matches)
+
+            if match_tuple in existing_matches or match_tuple_reverse in existing_matches:
+                # Use either match_tuple or match_tuple_reverse to check for an existing match
+                existing_match_data = None
+
+                if match_tuple in existing_matches:
+                    get_existing_match_data = """
+                    SELECT * FROM matchData
+                    WHERE team1Id = ? AND team2Id = ? AND groupNumber = ? AND matchId = ?
+                    """
+                    self.cursor.execute(get_existing_match_data, match_tuple)
+                    existing_match_data = self.cursor.fetchone()
+                elif match_tuple_reverse in existing_matches:
+                    get_existing_match_data = """
+                    SELECT * FROM matchData
+                    WHERE team1Id = ? AND team2Id = ? AND groupNumber = ? AND matchId = ?
+                    """
+                    self.cursor.execute(get_existing_match_data, match_tuple_reverse)
+                    existing_match_data = self.cursor.fetchone()
 
                 # Copy the existing match data into the new match data
                 match_data = existing_match_data
+                print("accsed matchData in save_matches_to_db")
 
                 updateMatch = """
                     UPDATE matchData
@@ -1718,14 +2071,15 @@ class Window(ctk.CTk):
                 """
                 self.cursor.execute(updateMatch, match_data + match_tuple2)
             else:
+                print("accsed matchData in save_matches_to_db")
                 insertMatch = """
                     INSERT INTO matchData (team1Id, team2Id, groupNumber, matchId)
                     VALUES (?, ?, ?, ?)
                 """
-                try:
-                    self.cursor.execute(insertMatch, match_tuple)
-                except sqlite3.IntegrityError:
-                    print(f"matchId {match_tuple[3]} already exists. Skipping insertion.")
+                # try:
+                self.cursor.execute(insertMatch, match_tuple)
+                #except sqlite3.IntegrityError:
+                #    print(f"matchId {match_tuple[3]} already exists. Skipping insertion.")
         
         teams_to_delete = []
         
@@ -1736,6 +2090,7 @@ class Window(ctk.CTk):
                 
         #print("teams_to_delete", teams_to_delete)
         
+        print("accsed matchData in save_matches_to_db")
         for team_to_delete in teams_to_delete:
             deleteMatch = """
                 DELETE FROM matchData
@@ -2012,7 +2367,7 @@ global db_path
 
 db_path = "data/data.db"
 stored_data = {}
-tkapp = Window(True)
+tkapp = Window(False)
 
 if __name__ == "__main__":
     tkapp.mainloop()
