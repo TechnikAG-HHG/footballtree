@@ -364,6 +364,11 @@ class Window(ctk.CTk):
         #self.updated_data.update({"Teams": team_names})
         self.connection.commit()
         
+        self.calculate_matches()
+        self.reload_spiel_button_command()
+        self.get_teams_for_end_matches()
+        
+        
     
     def write_names_into_entry_fields(self):
         selectTeams = """
@@ -405,19 +410,17 @@ class Window(ctk.CTk):
         button_width = self.screenwidth / 15
         button_height = self.screenheight / 27
         button_font_size = self.screenwidth / 120
-
+        
+        self.get_teams_for_end_matches()
 
         # Button to add a new name entry
         add_button = ctk.CTkButton(self.Team_frame, text="Add Name", command=self.add_name_entry, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
         add_button.pack(pady=5, padx=15)
 
         # Button to retrieve the entered names
-
-
         submit_button = ctk.CTkButton(self.Team_frame, text="Submit", command=self.save_team_names_in_db, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
         submit_button.pack(pady=5, padx=15)
 
-        
         reload_button = ctk.CTkButton(self.Team_frame, text="Reload", command=self.reload_button_command, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
         reload_button.pack(pady=5, padx=15)
         
@@ -466,15 +469,14 @@ class Window(ctk.CTk):
         reload_button = ctk.CTkButton(buttons_frame, text="Reload", command=self.reload_button_player_command, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
         reload_button.pack(pady=20, padx=20, anchor=tk.NE, side=tk.RIGHT)    
         
-        self.selected_team = ""
+        self.selected_team_in_player = ""
         self.team_button_list = []
         
-        self.get_teams_for_end_matches()
         
         team_IDs = self.read_teamIds()
         teamNames = self.read_teamNames()
         teamNames.pop(0)
-        #print("teamNames", teamNames, "team_IDs", team_IDs)
+        #print("teamNames", teamNames, "team_IDs", team_IDs, "in create_player_elements")
         
         self.player_top_frame = ctk.CTkFrame(self.test_frame, width=1, height=1, fg_color="#0e1718")
 
@@ -494,6 +496,7 @@ class Window(ctk.CTk):
                 print("i", i)
 
             if i < 8:
+                #print("created button in upper frame")
                 team_button = ctk.CTkButton(
                     self.player_top_frame,
                     text=teamName,
@@ -531,7 +534,7 @@ class Window(ctk.CTk):
         entries3 = self.variable_dict.get(f"entries3{self.frameplayer}")
 
         if team_id == -1:
-            team_id = self.selected_team
+            team_id = self.selected_team_in_player
 
         if entries:
             
@@ -583,10 +586,13 @@ class Window(ctk.CTk):
             
             
 
-        ###self.updated_data.update({"Players": {self.selected_team: self.read_team_names_player(self.selected_team)}})
+        ###self.updated_data.update({"Players": {self.selected_team_in_player: self.read_team_names_player(self.selected_team_in_player)}})
             
     
     def add_name_entry_player(self, Frame, Counter, entry_text="", entry_text2="", entry_text3=""):
+        if self.selected_team_in_player == "":
+            return
+        
         varcountname = f"count{Frame}"
         varentrie1name = f"entries{Frame}"
         varentrie2name = f"entries2{Frame}"
@@ -676,7 +682,7 @@ class Window(ctk.CTk):
         for button in self.team_button_list:
             button.destroy()
         
-        self.selected_team = ""
+        self.selected_team_in_player = ""
         self.team_button_list = []
         
         team_IDs = self.read_teamIds()
@@ -738,8 +744,7 @@ class Window(ctk.CTk):
                 for entry in self.variable_dict[varentrie3name]:
                     entry.destroy()
     
-        
-        
+        self.selected_team_in_player = ""
         self.variable_dict[varcountname] = 0
     
     
@@ -773,7 +778,7 @@ class Window(ctk.CTk):
                 for entry in self.variable_dict[varentrie3name]:
                     entry.destroy()
         
-        self.selected_team = teamID
+        self.selected_team_in_player = teamID
         
         self.variable_dict[varcountname] = 0
         self.variable_dict[varentrie1name] = []
@@ -881,14 +886,14 @@ class Window(ctk.CTk):
     def read_teamIds(self):
         teamIds = []
         
-        if self.active_match == 1:
+        if self.active_mode.get() == 1:
         
             self.cursor.execute("SELECT id FROM teamData")
             
             for id in self.cursor.fetchall():
                 teamIds.append(id[0])
             teamIds.sort()
-        elif self.active_match == 2:
+        elif self.active_mode.get() == 2:
             teamIds = [1, 2, 3, 4]
         
         return teamIds
@@ -938,12 +943,12 @@ class Window(ctk.CTk):
         
         for i, _ in enumerate(self.teams_playing):
             
-            print("kakarcsh",self.teams_playing)
+            #print("kakarcsh",self.teams_playing)
             
             team_names = self.read_teamNames()
             if self.teams_playing[i] is not None:
-                print("i" , i, "teamnames", team_names)
-                print(self.teams_playing[i])
+                #print("i" , i, "teamnames", team_names)
+                #print(self.teams_playing[i])
                 try:
                     team_name = team_names[self.teams_playing[i]]
                 except IndexError:
@@ -989,7 +994,7 @@ class Window(ctk.CTk):
             score_button_up.pack(pady=2, anchor=tk.N, side=tk.TOP, expand=True, fill=tk.X)
             
             score_label_var = tk.StringVar()
-            print("team_id", team_id, "team2_id", team2_id)
+            #print("team_id", team_id, "team2_id", team2_id)
             score_label_var.set(self.read_goals_for_match_from_db(team_id, team2_id))
             
             score_label = ctk.CTkLabel(score_button_frame, text="None", font=("Helvetica", 14), textvariable=score_label_var)
@@ -1288,7 +1293,7 @@ class Window(ctk.CTk):
             
             #get the two best teams
             teams1 = self.cursor.fetchall()
-            print("teams1", teams1)
+            #print("teams1", teams1)
             
             getTeams2 = """
             SELECT id, teamName FROM teamData
@@ -1312,8 +1317,8 @@ class Window(ctk.CTk):
             
             values_list.append(self.get_final_match(teams1[0], teams1[1], teams2[0], teams2[1]))
             
-            print("self.spiel_um_platz_3", self.spiel_um_platz_3)
-            print("values_list", values_list)
+            #print("self.spiel_um_platz_3", self.spiel_um_platz_3)
+            #print("values_list", values_list)
             spiel_select.configure(values=values_list)
             
             if self.active_match >= 0:
@@ -1338,7 +1343,7 @@ class Window(ctk.CTk):
         
         #get the two best teams
         teams1 = self.cursor.fetchall()
-        print("teams1", teams1)
+        #print("teams1", teams1)
         
         getTeams2 = """
         SELECT id, teamName FROM teamData
@@ -1392,7 +1397,7 @@ class Window(ctk.CTk):
                 self.spiel_um_platz_3.append(team4)
         
         #print everything
-        print("self.spiel_um_platz_3", self.spiel_um_platz_3, "team1", team1, "team2", team2, "team3", team3, "team4", team4, "goles1", goles1, "goles2", goles2)
+        #print("self.spiel_um_platz_3", self.spiel_um_platz_3, "team1", team1, "team2", team2, "team3", team3, "team4", team4, "goles1", goles1, "goles2", goles2)
         
         if self.spiel_um_platz_3 != []:
             return f"Spiel um Platz 3: {self.spiel_um_platz_3[0][1]} vs {self.spiel_um_platz_3[1][1]}"
@@ -1439,7 +1444,7 @@ class Window(ctk.CTk):
            
     def save_active_match_in_final_phase(self, team1id, team2id):
         
-        print("ichkanneinfachnurnochmehr printen", "team1id", team1id, "team2id", team2id, "self.active_match", self.active_match)
+        #("ichkanneinfachnurnochmehr printen", "team1id", team1id, "team2id", team2id, "self.active_match", self.active_match)
         active_match_id = self.active_match + 1
 
         # Try to insert a new row
@@ -1486,8 +1491,8 @@ class Window(ctk.CTk):
             self.updated_data.update({"Games": get_data_for_website(2)})
             
         elif self.active_mode.get() == 2:
-            print("self.spiel_um_platz_3", self.spiel_um_platz_3)
-            print("self.final_match_teams", self.final_match_teams)
+            #print("self.spiel_um_platz_3", self.spiel_um_platz_3)
+            #print("self.final_match_teams", self.final_match_teams)
             if selected_match == "Spiel 1 Halb: " + self.endteam1[1] + " vs " + self.endteam3[1]:
                 self.teams_playing = [self.endteam1[0], self.endteam3[0]]
                 self.active_match = 0
@@ -1645,7 +1650,7 @@ class Window(ctk.CTk):
         
         if self.active_mode.get() == 1:
             
-            print("accsed matchData in save_goals_for_match_in_db")
+            #print("accsed matchData in save_goals_for_match_in_db")
         
             get_team1_or_team2 = """
             SELECT 
@@ -1704,7 +1709,6 @@ class Window(ctk.CTk):
         #print("read_goals_for_match_from_db", "teamID", teamID, "team2ID", team2ID)
         
         if self.active_mode.get() == 1:
-            print("accsed matchData in read_goals_for_match_from_db")
         
             get_team1_or_team2 = """
             SELECT 
@@ -1808,7 +1812,7 @@ class Window(ctk.CTk):
         
         teams_ids = self.read_teamIds()
         for teamID in teams_ids:
-            print("accsed matchData in save_games_played_in_db")
+            #print("accsed matchData in save_games_played_in_db")
             
             getPlayed = """
             SELECT matchId FROM matchData
@@ -2078,50 +2082,62 @@ class Window(ctk.CTk):
 
             match_tuple = (int(team1ID), int(team2ID), int(str(group).replace('Gruppe ','')), int(str(number).replace('Spiel ','')))
             match_tuple_reverse = (int(team2ID), int(team1ID), int(str(group).replace('Gruppe ','')), int(str(number).replace('Spiel ','')))
-            match_tuple2 = (int(team1ID), int(team2ID), int(str(group).replace('Gruppe ','')))
+            #match_tuple2 = (int(team1ID), int(team2ID), int(str(group).replace('Gruppe ','')))
 
             added_matches.append(match_tuple)
-            print("match_tuple", match_tuple, "existing_matches", existing_matches)
+            #print("match_tuple", match_tuple, "existing_matches", existing_matches)
 
-            if match_tuple in existing_matches or match_tuple_reverse in existing_matches:
-                # Use either match_tuple or match_tuple_reverse to check for an existing match
-                existing_match_data = None
+            # Use either match_tuple or match_tuple_reverse to check for an existing match
+            existing_match_data = None
 
-                if match_tuple in existing_matches:
-                    get_existing_match_data = """
-                    SELECT * FROM matchData
-                    WHERE team1Id = ? AND team2Id = ? AND groupNumber = ? AND matchId = ?
-                    """
-                    self.cursor.execute(get_existing_match_data, match_tuple)
-                    existing_match_data = self.cursor.fetchone()
-                elif match_tuple_reverse in existing_matches:
-                    get_existing_match_data = """
-                    SELECT * FROM matchData
-                    WHERE team1Id = ? AND team2Id = ? AND groupNumber = ? AND matchId = ?
-                    """
-                    self.cursor.execute(get_existing_match_data, match_tuple_reverse)
-                    existing_match_data = self.cursor.fetchone()
-
-                # Copy the existing match data into the new match data
-                match_data = existing_match_data
-                print("accsed matchData in save_matches_to_db")
-
-                updateMatch = """
-                    UPDATE matchData
-                    SET team1Id = ?, team2Id = ?, groupNumber = ?, team1Goals = ?, team2Goals = ?, matchTime = ?
-                    WHERE team1Id = ? AND team2Id = ? AND groupNumber = ? AND matchId = ?
+            if match_tuple in existing_matches:
+                get_existing_match_data = """
+                SELECT * FROM matchData
+                WHERE team1Id = ? AND team2Id = ? AND groupNumber = ? AND matchId = ?
                 """
-                self.cursor.execute(updateMatch, match_data + match_tuple2)
-            else:
-                print("accsed matchData in save_matches_to_db")
-                insertMatch = """
-                    INSERT INTO matchData (team1Id, team2Id, groupNumber, matchId)
-                    VALUES (?, ?, ?, ?)
+                self.cursor.execute(get_existing_match_data, match_tuple)
+                existing_match_data = self.cursor.fetchone()
+            elif match_tuple_reverse in existing_matches:
+                get_existing_match_data = """
+                SELECT * FROM matchData
+                WHERE team1Id = ? AND team2Id = ? AND groupNumber = ? AND matchId = ?
                 """
-                # try:
-                self.cursor.execute(insertMatch, match_tuple)
-                #except sqlite3.IntegrityError:
-                #    print(f"matchId {match_tuple[3]} already exists. Skipping insertion.")
+                self.cursor.execute(get_existing_match_data, match_tuple_reverse)
+                existing_match_data = self.cursor.fetchone()
+
+            # Copy the existing match data into the new match data
+            match_data = existing_match_data
+            #print("accsed matchData in save_matches_to_db")
+
+            insert_match_query = """
+                INSERT OR IGNORE INTO matchData (team1Id, team2Id, groupNumber, matchId)
+                VALUES (?, ?, ?, ?)
+            """
+
+            update_match_query = """
+                UPDATE matchData
+                SET team1Id = ?, team2Id = ?, groupNumber = ?
+                WHERE matchId = ?
+            """
+
+            # Execute INSERT OR IGNORE
+            try:
+                #print("accsed matchData in save_matches_to_db to insert or ignore + match_tuple", match_tuple, "existing_matches", existing_matches)
+                self.cursor.execute(insert_match_query, match_tuple)
+                self.connection.commit()  # Make sure to commit changes
+
+                ## Get the last inserted row id
+                #inserted_match_id = self.cursor.lastrowid
+
+                # Execute UPDATE
+                try:
+                    self.cursor.execute(update_match_query, match_tuple)
+                    self.connection.commit()  # Make sure to commit changes
+                except Exception as e:
+                    print(f"Error during UPDATE: {e}")
+
+            except Exception as e:
+                print(f"Error during INSERT OR IGNORE: {e}")
         
         teams_to_delete = []
         
@@ -2132,7 +2148,7 @@ class Window(ctk.CTk):
                 
         #print("teams_to_delete", teams_to_delete)
         
-        print("accsed matchData in save_matches_to_db")
+        #print("accsed matchData in save_matches_to_db")
         for team_to_delete in teams_to_delete:
             deleteMatch = """
                 DELETE FROM matchData
@@ -2147,6 +2163,8 @@ class Window(ctk.CTk):
         self.cursor.execute(delete_teams)
             
         self.connection.commit()
+        
+
         
         
     def reset_points_for_all_teams_in_db(self):
