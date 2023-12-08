@@ -139,7 +139,7 @@ class Window(ctk.CTk):
         playerDataTableCreationQuery = """
         CREATE TABLE IF NOT EXISTS playerData (
             id INTEGER PRIMARY KEY,
-            playerName TEXT UNIQUE,
+            playerName TEXT,
             playerNumber INTEGER,
             teamId INTEGER REFERENCES teamData(id) DEFAULT 0,
             goals INTEGER DEFAULT 0
@@ -367,7 +367,6 @@ class Window(ctk.CTk):
         self.calculate_matches()
         self.reload_spiel_button_command()
         self.get_teams_for_end_matches()
-        
         
     
     def write_names_into_entry_fields(self):
