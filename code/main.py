@@ -1968,47 +1968,68 @@ class Window(ctk.CTk):
     ##############################################################################################
     ##############################################################################################
     def calculate_matches(self):
-        
-        if self.active_mode.get() == 1:
-            self.match_count = 0
+        self.match_count = 0  # Reset matchCount to 0
 
+        if self.active_mode.get() == 1:
             initial_data = {
-            "Teams": self.read_teamNames()
+                "Teams": self.read_teamNames()
             }
-            
+
             initial_data["Teams"].pop(0)
-            
+
             teams = initial_data["Teams"][:]  # Create a copy of the teams array
-            #print("teams", teams)
-            
+
             # If the number of teams is odd, add a "dummy" team
             if len(teams) % 2 != 0:
                 teams.append("dummy")
 
+            teams.sort()
+
             midpoint = (len(teams) + 1) // 2
             group1 = teams[:midpoint]
             group2 = teams[midpoint:]
-            
-            #print("group1", group1, "group2", group2, "teams", teams, "midpoint", midpoint)
 
             matches1 = self.calculate_matches_for_group(group1, "Gruppe 1")
             matches2 = self.calculate_matches_for_group(group2, "Gruppe 2")
 
             matches = self.interleave_matches(matches1, matches2)
-            
-            #print("matches", matches, "matches1", matches1, "matches2", matches2)
-            
-            self.match_count = 0
+
+            self.match_count = 0  # Reset matchCount to 0
 
             self.matches = list(map(lambda match: self.add_match_number(match), matches))
-            
-            #print(self.matches)
-            
+
             self.save_matches_to_db()
-        
+
         return self.matches
-    
-    
+
+
+    def calculate_matches_for_group(self, teams, group_name):
+        n = len(teams)
+        matches = []
+
+        # If the number of teams is odd, add a "dummy" team
+        dummy = False
+        if n % 2 != 0:
+            teams.append("dummy")
+            n += 1
+            dummy = True
+
+        for round in range(n - 1):
+            for i in range(n // 2):
+                team1 = teams[i]
+                team2 = teams[n - 1 - i]
+                # Skip matches involving the "dummy" team
+                if dummy and (team1 == "dummy" or team2 == "dummy"):
+                    continue
+                matches.append([team1, team2])
+            # Rotate the teams for the next round
+            teams.insert(1, teams.pop())
+
+        matches = list(map(lambda match_index: {"number": "Spiel " + str(match_index[0] + 1), "teams": match_index[1], "group": group_name}, enumerate(matches)))
+
+        return matches
+
+
     def interleave_matches(self, matches1, matches2):
         matches = []
         i = j = 0
@@ -2022,31 +2043,7 @@ class Window(ctk.CTk):
         return matches
 
 
-    def calculate_matches_for_group(self, teams, group_name):
-        rounds = []
-
-        for _ in range(len(teams) - 1):
-            rounds.append([])
-            for match in range(len(teams) // 2):
-                team1 = teams[match]
-                team2 = teams[-1 - match]
-                rounds[-1].append([team1, team2])
-            # Rotate the teams for the next round
-            teams[1:1] = [teams.pop()]
-
-        # Remove matches with the "dummy" team
-        if "dummy" in teams:
-            rounds = list(map(lambda rnd: list(filter(lambda match: "dummy" not in match, rnd)), rounds))
-
-        matches = [match for rnd in rounds for match in rnd]
-
-        matches = list(map(lambda match: {"number": "", "teams": match, "group": group_name}, matches))
-
-        return matches
-
-
     def add_match_number(self, match):
-         
         self.match_count += 1
         match["number"] = "Spiel " + str(self.match_count)
         return match
@@ -2434,7 +2431,7 @@ global db_path
 
 db_path = "data/data.db"
 stored_data = {}
-tkapp = Window(False)
+tkapp = Window(True)
 
 if __name__ == "__main__":
     tkapp.mainloop()
