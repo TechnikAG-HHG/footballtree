@@ -165,7 +165,6 @@ class Window(ctk.CTk):
         finalMatchesDataTableCreationQuery = """
         CREATE TABLE IF NOT EXISTS finalMatchesData (
             matchId INTEGER PRIMARY KEY,
-            groupNumber INTEGER,
             team1Id INTEGER REFERENCES teamData(id),
             team2Id INTEGER REFERENCES teamData(id),
             team1Goals INTEGER DEFAULT 0,
@@ -1203,12 +1202,12 @@ class Window(ctk.CTk):
             current_goals -= 1
         
         start_time = time.time()
+        if current_goals < 0:
+            current_goals = 0
+            return
         
         # Update the score label
         self.spiel_buttons[teamID][player_index][3].configure(text=f"Tore {current_goals}")
-
-        
-        
         #print("Write", "teamID", teamID, "player_index", player_id)
         
         updateGoals = """
@@ -1220,17 +1219,12 @@ class Window(ctk.CTk):
         
         # Commit the changes to the database
         self.connection.commit()
-        
-        # Close the database self.connection
-        
+
         # Record the end time
         end_time = time.time()
 
         # Calculate the elapsed time in milliseconds
         elapsed_time_ms = (end_time - start_time) * 1000
-
-        # #print the result
-        #print(f"Elapsed Time: {elapsed_time_ms:.2f} ms")
         
         ###self.updated_data.update({"SPIEL": {team: self.read_team_names_player(team)}})
     
@@ -2002,7 +1996,7 @@ class Window(ctk.CTk):
 
             self.matches = list(map(lambda match: self.add_match_number(match), matches))
             
-            #print(self.matches)
+            #print("self.matches", self.matches)
             
             self.save_matches_to_db()
         
@@ -2172,8 +2166,6 @@ class Window(ctk.CTk):
         self.connection.commit()
         
 
-        
-        
     def reset_points_for_all_teams_in_db(self):
         resetPoints = """
         UPDATE teamData
