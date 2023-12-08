@@ -1247,7 +1247,6 @@ class Window(ctk.CTk):
             values_list = []
 
             for match in matches:
-
                 #print(match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1])
                 #print("match", match)
                 values_list.append(match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1])
@@ -1259,7 +1258,7 @@ class Window(ctk.CTk):
             
             for match in matches:
                 match_teams_indexes = [self.read_teamNames().index(match_team) for match_team in match["teams"]]
-                if match_teams_indexes == self.teams_playing or match_teams_indexes[::-1] == self.teams_playing:
+                if match_teams_indexes == self.teams_playing: # or match_teams_indexes[::-1] == self.teams_playing
                     se = match["number"]
                     self.active_match = int(se.replace("Spiel ", "")) - 1
                     #print("self.active_matchcreate_matches_labels", self.active_match)
