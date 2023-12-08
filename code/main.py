@@ -392,7 +392,7 @@ class Window(ctk.CTk):
     def create_Team_elements(self):
         # Create elements for the Team frame
         canvas = tk.Canvas(self.Team_frame, bg="#0e1718")
-        canvas.pack(side="left", fill="both", expand=True, padx=10, pady=15)
+        canvas.pack(side="left", fill="both", expand=True, padx=10)
         
         # Create a scrollbar and connect it to the canvas
         scrollbar = ctk.CTkScrollbar(self.Team_frame, orientation='vertical', command=canvas.yview)
@@ -930,7 +930,7 @@ class Window(ctk.CTk):
         manual_manual_frame = ctk.CTkFrame(manual_frame, bg_color='#0e1718', fg_color='#0e1718')
         manual_manual_frame.pack(pady=0, anchor=tk.SE, side=tk.RIGHT, padx=0)
         
-        SPIEL_button = ctk.CTkButton(manual_manual_frame, text="Reload", command=lambda : self.reload_spiel_button_command(True))
+        SPIEL_button = ctk.CTkButton(manual_manual_frame, text="Reload", command=lambda : self.reload_spiel_button_command(True), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)            
         SPIEL_button.pack(pady=10, side=tk.BOTTOM, anchor=tk.S) 
         
         
@@ -990,20 +990,20 @@ class Window(ctk.CTk):
             score_button_frame = ctk.CTkFrame(self.for_team_frame, bg_color='#0e1718', fg_color='#0e1718')
             score_button_frame.pack(pady=10, anchor=tk.E, side=tk.RIGHT, padx=10)
             
-            score_button_up = ctk.CTkButton(score_button_frame, text="UP", command=lambda team=team_id, team2=team2_id: self.global_scored_a_point(team, team2, "UP"))
+            score_button_up = ctk.CTkButton(score_button_frame, text="UP", command=lambda team=team_id, team2=team2_id: self.global_scored_a_point(team, team2, "UP"), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)
             score_button_up.pack(pady=2, anchor=tk.N, side=tk.TOP, expand=True, fill=tk.X)
             
             score_label_var = tk.StringVar()
             #print("team_id", team_id, "team2_id", team2_id)
             score_label_var.set(self.read_goals_for_match_from_db(team_id, team2_id))
             
-            score_label = ctk.CTkLabel(score_button_frame, text="None", font=("Helvetica", 14), textvariable=score_label_var)
+            score_label = ctk.CTkLabel(score_button_frame, text="None", textvariable=score_label_var, font=("Helvetica", self.team_button_font_size))
             score_label.pack(pady=2, anchor=tk.N, side=tk.TOP, expand=True, fill=tk.X)
             
-            score_button_down = ctk.CTkButton(score_button_frame, text="DOWN", command=lambda team=team_id, team2=team2_id: self.global_scored_a_point(team, team2, "DOWN"))
+            score_button_down = ctk.CTkButton(score_button_frame, text="DOWN", command=lambda team=team_id, team2=team2_id: self.global_scored_a_point(team, team2, "DOWN"), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)
             score_button_down.pack(pady=2, anchor=tk.N, side=tk.BOTTOM, expand=True, fill=tk.X)
             
-            self.team_label = ctk.CTkLabel(self.for_team_frame, text=team_name, font=("Helvetica", 14))
+            self.team_label = ctk.CTkLabel(self.for_team_frame, text=team_name, font=("Helvetica", self.team_button_font_size))
             self.team_label.pack(side=tk.LEFT, pady=2, anchor=tk.NW)
             
             self.spiel_buttons[team_id]["global"] = (self.for_team_frame, self.team_label, score_button_up, score_label_var, score_button_down)
@@ -1011,10 +1011,10 @@ class Window(ctk.CTk):
             frame_frame = ctk.CTkFrame(self.for_team_frame, bg_color='#0e1718', fg_color='#0e1718')
             frame_frame.pack(side=tk.TOP, pady=0, anchor=tk.N)
 
-            up_frame = ctk.CTkFrame(frame_frame)
+            up_frame = ctk.CTkFrame(frame_frame, bg_color='#0e1718', fg_color='#0e1718')
             up_frame.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.NW)
 
-            down_frame = ctk.CTkFrame(frame_frame)
+            down_frame = ctk.CTkFrame(frame_frame, bg_color='#0e1718', fg_color='#0e1718')
             down_frame.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.SW)
             
 
@@ -1043,10 +1043,10 @@ class Window(ctk.CTk):
                 playertext3 = ctk.CTkLabel(self.group_frame, text=f"Tore {str(goals)}", font=("Helvetica", 14))
                 playertext3.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
 
-                playerbutton1 = ctk.CTkButton(self.group_frame, text="UP", command=lambda team=team_id, player_id1=player_id, player_index = player_index: self.player_scored_a_point(team, player_id1, player_index,  "UP"))
+                playerbutton1 = ctk.CTkButton(self.group_frame, text="UP", command=lambda team=team_id, player_id1=player_id, player_index = player_index: self.player_scored_a_point(team, player_id1, player_index,  "UP"), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)  
                 playerbutton1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
                 
-                playerbutton2 = ctk.CTkButton(self.group_frame, text="DOWN", command=lambda team=team_id, player_id1=player_id, player_index = player_index: self.player_scored_a_point(team, player_id1, player_index, "DOWN"))
+                playerbutton2 = ctk.CTkButton(self.group_frame, text="DOWN", command=lambda team=team_id, player_id1=player_id, player_index = player_index: self.player_scored_a_point(team, player_id1, player_index, "DOWN"), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)
                 playerbutton2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
                 
                 
@@ -1077,7 +1077,8 @@ class Window(ctk.CTk):
             values=teams_list, 
             font=("Helvetica", 14), 
             state=tk.NORMAL, 
-            command=lambda event: self.on_team_select(event, nr=0)
+            command=lambda event: self.on_team_select(event, nr=0),
+            fg_color="#0e1718",
             )
         self.manual_team_select_2.set("None")
         self.manual_team_select_2.pack(pady=10, side=tk.BOTTOM, anchor=tk.S)
