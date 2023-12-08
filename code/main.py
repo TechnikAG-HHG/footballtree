@@ -922,15 +922,19 @@ class Window(ctk.CTk):
 
     def create_SPIEL_elements(self):
         
+        button_width = self.screenwidth / 15
+        button_height = self.screenheight / 27
+        button_font_size = self.screenwidth / 120
+        
         # Create elements for the SPIEL frame
         manual_frame = ctk.CTkFrame(self.SPIEL_frame, bg_color='#0e1718', fg_color='#0e1718')
         manual_frame.pack(pady=5, anchor=tk.S, side=tk.BOTTOM, padx=5, fill=tk.X)
         
-        manual_manual_frame = ctk.CTkFrame(manual_frame, bg_color='#0e1718', fg_color='#0e1718')
-        manual_manual_frame.pack(pady=0, anchor=tk.SE, side=tk.RIGHT, padx=0)
+        manual_manual_frame = ctk.CTkFrame(manual_frame, bg_color='#142324', fg_color='#142324')
+        manual_manual_frame.pack(anchor=tk.SE, side=tk.RIGHT, padx=10, pady=10)
         
-        SPIEL_button = ctk.CTkButton(manual_manual_frame, text="Reload", command=lambda : self.reload_spiel_button_command(True), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)            
-        SPIEL_button.pack(pady=10, side=tk.BOTTOM, anchor=tk.S) 
+        SPIEL_button = ctk.CTkButton(manual_manual_frame, text="Reload", command=lambda : self.reload_spiel_button_command(True), width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")            
+        SPIEL_button.pack(pady=10, side=tk.BOTTOM, anchor=tk.S, padx=10) 
         
         
         # Assuming self.spiel_buttons is initialized as an empty dictionary
@@ -986,23 +990,23 @@ class Window(ctk.CTk):
             self.for_team_frame.configure(bg_color="#0e1718")
             
             # Create global scores buttons, one for up and one for down
-            score_button_frame = ctk.CTkFrame(self.for_team_frame, bg_color='#0e1718', fg_color='#0e1718')
+            score_button_frame = ctk.CTkFrame(self.for_team_frame, bg_color='#142324', fg_color='#142324')
             score_button_frame.pack(pady=10, anchor=tk.E, side=tk.RIGHT, padx=10)
             
-            score_button_up = ctk.CTkButton(score_button_frame, text="UP", command=lambda team=team_id, team2=team2_id: self.global_scored_a_point(team, team2, "UP"), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)
+            score_button_up = ctk.CTkButton(score_button_frame, text="UP", command=lambda team=team_id, team2=team2_id: self.global_scored_a_point(team, team2, "UP"), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
             score_button_up.pack(pady=2, anchor=tk.N, side=tk.TOP, expand=True, fill=tk.X)
             
             score_label_var = tk.StringVar()
             #print("team_id", team_id, "team2_id", team2_id)
             score_label_var.set(self.read_goals_for_match_from_db(team_id, team2_id))
             
-            score_label = ctk.CTkLabel(score_button_frame, text="None", textvariable=score_label_var, font=("Helvetica", self.team_button_font_size))
+            score_label = ctk.CTkLabel(score_button_frame, text="None", textvariable=score_label_var, font=("Helvetica", self.team_button_font_size * 1.7, "bold"))
             score_label.pack(pady=2, anchor=tk.N, side=tk.TOP, expand=True, fill=tk.X)
             
-            score_button_down = ctk.CTkButton(score_button_frame, text="DOWN", command=lambda team=team_id, team2=team2_id: self.global_scored_a_point(team, team2, "DOWN"), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)
+            score_button_down = ctk.CTkButton(score_button_frame, text="DOWN", command=lambda team=team_id, team2=team2_id: self.global_scored_a_point(team, team2, "DOWN"), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
             score_button_down.pack(pady=2, anchor=tk.N, side=tk.BOTTOM, expand=True, fill=tk.X)
             
-            self.team_label = ctk.CTkLabel(self.for_team_frame, text=team_name, font=("Helvetica", self.team_button_font_size))
+            self.team_label = ctk.CTkLabel(self.for_team_frame, text=team_name, font=("Helvetica", self.team_button_font_size * 1.5, "bold"))
             self.team_label.pack(side=tk.LEFT, pady=2, anchor=tk.NW)
             
             self.spiel_buttons[team_id]["global"] = (self.for_team_frame, self.team_label, score_button_up, score_label_var, score_button_down)
@@ -1022,24 +1026,24 @@ class Window(ctk.CTk):
                 player_index = i 
                 player_id = self.get_player_id_from_player_name(player_name)
                 if i < 8:
-                    self.group_frame = ctk.CTkFrame(up_frame, bg_color='#0e1718', fg_color='grey15')
+                    self.group_frame = ctk.CTkFrame(up_frame, bg_color='#142324', fg_color='#142324')
                     self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
                 else:
-                    self.group_frame = ctk.CTkFrame(down_frame, bg_color='#0e1718', fg_color='grey15')
+                    self.group_frame = ctk.CTkFrame(down_frame, bg_color='#142324', fg_color='#142324')
                     self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
                 
                 #self.group_frame = tk.Frame(self.for_team_frame, background="lightcoral")
                 #self.group_frame.pack(side=tk.LEFT, padx=10, pady=10)
 
-                playertext1 = ctk.CTkLabel(self.group_frame, text=f"Player {i}", font=("Helvetica", 14))
+                playertext1 = ctk.CTkLabel(self.group_frame, text=f"Player {i}", font=("Helvetica", self.team_button_font_size))
                 playertext1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
                 
                 playertext2_text = f"{player_name} - {player_number}"
                 
-                playertext2 = ctk.CTkLabel(master=self.group_frame, text=playertext2_text , font=("Helvetica", 14))
+                playertext2 = ctk.CTkLabel(master=self.group_frame, text=playertext2_text , font=("Helvetica", self.team_button_font_size, "bold"))
                 playertext2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
                 
-                playertext3 = ctk.CTkLabel(self.group_frame, text=f"Tore {str(goals)}", font=("Helvetica", 14))
+                playertext3 = ctk.CTkLabel(self.group_frame, text=f"Tore {str(goals)}", font=("Helvetica", self.team_button_font_size))
                 playertext3.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
 
                 playerbutton1 = ctk.CTkButton(self.group_frame, text="UP", command=lambda team=team_id, player_id1=player_id, player_index = player_index: self.player_scored_a_point(team, player_id1, player_index,  "UP"), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)  
@@ -1063,9 +1067,9 @@ class Window(ctk.CTk):
         self.manual_team_select_1 = ctk.CTkComboBox(
             manual_manual_frame, 
             values=teams_list, 
-            font=("Helvetica", 14), 
+            font=("Helvetica", self.team_button_font_size), 
             state=tk.DISABLED, 
-            command=lambda event: self.on_team_select(event, nr=1)
+            command=lambda event: self.on_team_select(event, nr=1),
             )
         self.manual_team_select_1.set("None")
         self.manual_team_select_1.pack(pady=10, side=tk.BOTTOM, anchor=tk.S)
@@ -1074,10 +1078,9 @@ class Window(ctk.CTk):
         self.manual_team_select_2 = ctk.CTkComboBox(
             manual_manual_frame, 
             values=teams_list, 
-            font=("Helvetica", 14), 
+            font=("Helvetica", self.team_button_font_size), 
             state=tk.NORMAL, 
             command=lambda event: self.on_team_select(event, nr=0),
-            fg_color="#0e1718",
             )
         self.manual_team_select_2.set("None")
         self.manual_team_select_2.pack(pady=10, side=tk.BOTTOM, anchor=tk.S)
@@ -1180,7 +1183,7 @@ class Window(ctk.CTk):
         self.SPIEL_frame.destroy()
     
         
-        self.SPIEL_frame = ctk.CTkFrame(self)
+        self.SPIEL_frame = ctk.CTkFrame(self, fg_color='#0e1718', bg_color='#0e1718')
         
         if show_frame:
             self.show_frame(self.SPIEL_frame)
@@ -1236,10 +1239,12 @@ class Window(ctk.CTk):
         
         matches = self.calculate_matches()
         
-        spiel_select_frame = ctk.CTkFrame(frame)
+        spiel_select_frame = ctk.CTkFrame(frame, fg_color='#142324', bg_color='#142324')
         spiel_select_frame.pack(pady=10, padx=10, anchor=tk.SW, side=tk.LEFT)
         
-        spiel_select = ctk.CTkComboBox(spiel_select_frame, font=("Helvetica", 14), width=200, values=[""], command=lambda event: self.on_match_select(event, matches))
+        width = self.screenwidth / 9
+        
+        spiel_select = ctk.CTkComboBox(spiel_select_frame, font=("Helvetica", self.team_button_font_size * 1.2), width=width, values=[""], command=lambda event: self.on_match_select(event, matches))
         spiel_select.pack(pady=10, side=tk.TOP, anchor=tk.N)
 
         if self.active_mode.get() == 1:
@@ -1323,10 +1328,10 @@ class Window(ctk.CTk):
             if self.active_match >= 0:
                 spiel_select.set(values_list[self.active_match])
             
-        next_match_button = ctk.CTkButton(spiel_select_frame, text="Next Match", command=lambda : self.next_previous_match_button(spiel_select, matches))
+        next_match_button = ctk.CTkButton(spiel_select_frame, text="Next Match", command=lambda : self.next_previous_match_button(spiel_select, matches), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
         next_match_button.pack(pady=10, padx=5, side=tk.RIGHT, anchor=tk.SE)
         
-        previous_match_button = ctk.CTkButton(spiel_select_frame, text="Previous Match", command=lambda : self.next_previous_match_button(spiel_select, matches, False))
+        previous_match_button = ctk.CTkButton(spiel_select_frame, text="Previous Match", command=lambda : self.next_previous_match_button(spiel_select, matches, False), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
         previous_match_button.pack(pady=10, padx=5, side=tk.LEFT, anchor=tk.SW)
     
     
