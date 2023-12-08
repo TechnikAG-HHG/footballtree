@@ -1566,11 +1566,14 @@ class Window(ctk.CTk):
             
         elif direction == "DOWN" and current_score != "None":
             current_score -= 1
+        
+        if current_score < 0:
+            current_score = 0
+            return
             
         # Write the score into the database
         
         if self.write_score_for_team_into_db(teamID, team2ID, direction):
-
             # Update the score label
             self.spiel_buttons[teamID]["global"][3].set(str(current_score))
             self.updated_data.update({"Goals": get_data_for_website(1)})
