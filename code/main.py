@@ -139,7 +139,7 @@ class Window(ctk.CTk):
         playerDataTableCreationQuery = """
         CREATE TABLE IF NOT EXISTS playerData (
             id INTEGER PRIMARY KEY,
-            playerName TEXT UNIQUE,
+            playerName TEXT,
             playerNumber INTEGER,
             teamId INTEGER REFERENCES teamData(id) DEFAULT 0,
             goals INTEGER DEFAULT 0
@@ -367,7 +367,6 @@ class Window(ctk.CTk):
         self.calculate_matches()
         self.reload_spiel_button_command()
         self.get_teams_for_end_matches()
-        
         
     
     def write_names_into_entry_fields(self):
@@ -1248,7 +1247,6 @@ class Window(ctk.CTk):
             values_list = []
 
             for match in matches:
-
                 #print(match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1])
                 #print("match", match)
                 values_list.append(match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1])
@@ -1260,7 +1258,7 @@ class Window(ctk.CTk):
             
             for match in matches:
                 match_teams_indexes = [self.read_teamNames().index(match_team) for match_team in match["teams"]]
-                if match_teams_indexes == self.teams_playing or match_teams_indexes[::-1] == self.teams_playing:
+                if match_teams_indexes == self.teams_playing: # or match_teams_indexes[::-1] == self.teams_playing
                     se = match["number"]
                     self.active_match = int(se.replace("Spiel ", "")) - 1
                     #print("self.active_matchcreate_matches_labels", self.active_match)
@@ -1568,11 +1566,14 @@ class Window(ctk.CTk):
             
         elif direction == "DOWN" and current_score != "None":
             current_score -= 1
+        
+        if current_score < 0:
+            current_score = 0
+            return
             
         # Write the score into the database
         
         if self.write_score_for_team_into_db(teamID, team2ID, direction):
-
             # Update the score label
             self.spiel_buttons[teamID]["global"][3].set(str(current_score))
             self.updated_data.update({"Goals": get_data_for_website(1)})
