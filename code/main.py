@@ -2426,7 +2426,7 @@ def update_data():
     timeatstart = time.time()
     
     last_data_update = request.headers.get('Last-Data-Update', 0)
-    #print(last_data_update)
+    #print("last_data_update", last_data_update)
     
     updated_data = tkapp.updated_data
     
@@ -2459,8 +2459,10 @@ def update_data():
     #print("stored_data", stored_data, "updated_data", updated_data, "last_data_update", last_data_update)
         
     #print("updated_data", updated_data)
+
     tkapp.delete_updated_data()
-    #updated_data = {'Teams': tkapp.read_team_names(), 'Players': {"Player1":"Erik Van Doof","Player2":"Felix Schweigmann"}}  # You can modify this data as needed
+    
+    #updated_data = {'Players': {"Player1":"Erik Van Doof","Player2":"Felix Schweigmann"}}  # You can modify this data as needed
     return jsonify(updated_data)
 
     
