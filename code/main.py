@@ -1316,6 +1316,8 @@ class Window(ctk.CTk):
             
             values_list.append(self.get_final_match(teams1[0], teams1[1], teams2[0], teams2[1]))
             
+            self.updated_data.update({"finalMatches": values_list})
+            
             #print("self.spiel_um_platz_3", self.spiel_um_platz_3)
             #print("values_list", values_list)
             spiel_select.configure(values=values_list)
@@ -2388,6 +2390,7 @@ def get_data_for_website(which_data=-1):
     
     if which_data == 5:
         return tkapp.active_match
+        
             
 def get_initial_data(template_name):
     global initial_data
