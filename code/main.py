@@ -165,7 +165,6 @@ class Window(ctk.CTk):
         finalMatchesDataTableCreationQuery = """
         CREATE TABLE IF NOT EXISTS finalMatchesData (
             matchId INTEGER PRIMARY KEY,
-            groupNumber INTEGER,
             team1Id INTEGER REFERENCES teamData(id),
             team2Id INTEGER REFERENCES teamData(id),
             team1Goals INTEGER DEFAULT 0,
@@ -1203,12 +1202,12 @@ class Window(ctk.CTk):
             current_goals -= 1
         
         start_time = time.time()
+        if current_goals < 0:
+            current_goals = 0
+            return
         
         # Update the score label
         self.spiel_buttons[teamID][player_index][3].configure(text=f"Tore {current_goals}")
-
-        
-        
         #print("Write", "teamID", teamID, "player_index", player_id)
         
         updateGoals = """
@@ -1220,17 +1219,12 @@ class Window(ctk.CTk):
         
         # Commit the changes to the database
         self.connection.commit()
-        
-        # Close the database self.connection
-        
+
         # Record the end time
         end_time = time.time()
 
         # Calculate the elapsed time in milliseconds
         elapsed_time_ms = (end_time - start_time) * 1000
-
-        # #print the result
-        #print(f"Elapsed Time: {elapsed_time_ms:.2f} ms")
         
         ###self.updated_data.update({"SPIEL": {team: self.read_team_names_player(team)}})
     
@@ -1963,10 +1957,11 @@ class Window(ctk.CTk):
         player.audio_set_volume(int(volume.get()))
         player.play()
         
-    ##############################################################################################
-    #############################Calculatre########################################################
-    ##############################################################################################
-    ##############################################################################################
+##############################################################################################
+#############################Calculate########################################################
+##############################################################################################
+##############################################################################################
+
     def calculate_matches(self):
         self.match_count = 0  # Reset matchCount to 0
 
@@ -1997,9 +1992,13 @@ class Window(ctk.CTk):
             self.match_count = 0  # Reset matchCount to 0
 
             self.matches = list(map(lambda match: self.add_match_number(match), matches))
-
+            
+            #print("self.matches", self.matches)
+            
             self.save_matches_to_db()
-
+            
+            self.updated_data.update({"Matches": get_data_for_website(4)})
+        
         return self.matches
 
 
@@ -2169,8 +2168,6 @@ class Window(ctk.CTk):
         self.connection.commit()
         
 
-        
-        
     def reset_points_for_all_teams_in_db(self):
         resetPoints = """
         UPDATE teamData
@@ -2343,6 +2340,48 @@ def get_data_for_website(which_data=-1):
         connection.close()
         
         return points
+    
+    if which_data == 4:
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+        
+        get_all_matches = """
+        SELECT team1Id, team2Id, team1Goals, team2Goals FROM matchData
+        ORDER BY matchId ASC
+        """
+        
+        cursor.execute(get_all_matches)
+        
+        #get the team names instead of the team ids, remove the team id after the name for that team has been found
+        all_matches = []
+        
+        for match in cursor.fetchall():
+                
+            get_team1_name = """
+            SELECT teamName FROM teamData
+            WHERE id = ?
+            ORDER BY id ASC
+            """
+            cursor.execute(get_team1_name, (match[0],))
+            team1_name = cursor.fetchone()[0]
+            
+            get_team2_name = """
+            SELECT teamName FROM teamData
+            WHERE id = ?
+            ORDER BY id ASC
+            """
+            cursor.execute(get_team2_name, (match[1],))
+            team2_name = cursor.fetchone()[0]
+            
+            all_matches.append((team1_name, team2_name, match[2], match[3]))
+            # print every var
+            #print("team1_name", team1_name, "team2_name", team2_name, "match[2]", match[2], "match[3]", match[3])
+        
+        cursor.close()
+        connection.close()
+        
+        #print("all_matches", all_matches)
+        return all_matches
             
 def get_initial_data(template_name):
     global initial_data
@@ -2354,6 +2393,7 @@ def get_initial_data(template_name):
         "Goals": get_data_for_website(1),
         "Games": get_data_for_website(2),
         "Points": get_data_for_website(3),
+        "Matches": get_data_for_website(4),
         "ZeitIntervall": 10,
         "Startzeit": [9,30],
         "LastUpdate": 0
@@ -2385,7 +2425,7 @@ def update_data():
     timeatstart = time.time()
     
     last_data_update = request.headers.get('Last-Data-Update', 0)
-    #print(last_data_update)
+    #print("last_data_update", last_data_update)
     
     updated_data = tkapp.updated_data
     
@@ -2418,8 +2458,10 @@ def update_data():
     #print("stored_data", stored_data, "updated_data", updated_data, "last_data_update", last_data_update)
         
     #print("updated_data", updated_data)
+
     tkapp.delete_updated_data()
-    #updated_data = {'Teams': tkapp.read_team_names(), 'Players': {"Player1":"Erik Van Doof","Player2":"Felix Schweigmann"}}  # You can modify this data as needed
+    
+    #updated_data = {'Players': {"Player1":"Erik Van Doof","Player2":"Felix Schweigmann"}}  # You can modify this data as needed
     return jsonify(updated_data)
 
     
