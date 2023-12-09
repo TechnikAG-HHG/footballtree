@@ -48,6 +48,12 @@ function generateTableGroup(matches) {
     matches.forEach((match) => {
         var row = tbody.insertRow();
 
+        if (i == data["activeMatchNumber"]) {
+            row.style.backgroundColor = "black";
+        }
+
+        row.id = "section" + (i + 1); // Set the id of the row
+
         var cellTime = row.insertCell(0);
         var matchTime = new Date(
             startTime.getTime() + i * timeInterval * 60000
@@ -72,6 +78,12 @@ function generateTableGroup(matches) {
 
         i++;
     });
+
+    setTimeout(function () {
+        if (window.innerWidth > 1000) {
+            window.location.hash = `section${data["activeMatchNumber"]}`;
+        }
+    }, 500);
 }
 
 function updateData() {
