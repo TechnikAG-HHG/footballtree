@@ -19,7 +19,7 @@ class Window(ctk.CTk):
     
     def create_navigation_bar(self):
         navigation_frame = ctk.CTkFrame(self, fg_color='#142324', corner_radius=0)
-        navigation_frame.pack(side=tk.LEFT, fill=tk.Y)
+        navigation_frame.pack(side=tk.LEFT, fill=tk.Y, pady=10)
 
         buttons = [
             ("Team Creation", self.show_Team_frame),
@@ -230,11 +230,11 @@ class Window(ctk.CTk):
 
         # Create a label with "Team 1" and the count
         label_text = f'Team {count}'
-        label = ctk.CTkLabel(self.frame, text=label_text, font=("Helvetica", team_element_font_size * 1.2, "bold"))  # Increase font size
+        label = ctk.CTkLabel(self.team_entries_frame, text=label_text, font=("Helvetica", team_element_font_size * 1.2, "bold"))  # Increase font size
         label.grid(row=len(self.name_entries), column=0, padx=15, pady=5, sticky='e')
         
         # Create a new entry field
-        new_entry = ctk.CTkEntry(self.frame, font=("Helvetica", team_element_font_size), width=team_element_width, height=team_element_height)  # Increase font size
+        new_entry = ctk.CTkEntry(self.team_entries_frame, font=("Helvetica", team_element_font_size), width=team_element_width, height=team_element_height)  # Increase font size
         
         # Write entry_text to the entry field if it is not empty
         if entry_text:
@@ -242,7 +242,7 @@ class Window(ctk.CTk):
         
         new_entry.grid(row=len(self.name_entries), column=1, pady=5, sticky='we')
         
-        new_file_dialog = ctk.CTkButton(self.frame, text="Select mp3", command=lambda: self.save_mp3_path(new_file_dialog, team_id), width=team_element_width, height=team_element_height, font=("Helvetica", team_element_font_size), fg_color="#34757a", hover_color="#1f4346")
+        new_file_dialog = ctk.CTkButton(self.team_entries_frame, text="Select mp3", command=lambda: self.save_mp3_path(new_file_dialog, team_id), width=team_element_width, height=team_element_height, font=("Helvetica", team_element_font_size), fg_color="#34757a", hover_color="#1f4346")
         new_file_dialog.grid(row=len(self.name_entries), column=2, pady=5, sticky='we', padx=12)
         
         if mp3_path:
@@ -390,37 +390,40 @@ class Window(ctk.CTk):
     def create_Team_elements(self):
         # Create elements for the Team frame
         canvas = tk.Canvas(self.Team_frame, bg="#0e1718")
-        canvas.pack(side="left", fill="both", expand=True, padx=10)
+        canvas.pack(side="left", fill="both", expand=True, padx=10, pady=10)
         
         # Create a scrollbar and connect it to the canvas
         scrollbar = ctk.CTkScrollbar(self.Team_frame, orientation='vertical', command=canvas.yview)
         scrollbar.pack(side="right", fill="y")
         canvas.configure(yscrollcommand=scrollbar.set)
         
-        self.frame = ctk.CTkFrame(canvas, fg_color="#0e1718")
-        canvas.create_window((0, 0), window=self.frame, anchor="nw")
+        self.team_entries_frame = ctk.CTkFrame(canvas, fg_color="#0e1718")
+        canvas.create_window((0, 0), window=self.team_entries_frame, anchor="nw")
         
         name_entries = []
         self.write_names_into_entry_fields()
 
-        self.frame.bind("<Configure>", lambda event, canvas=canvas: self.on_frame_configure(canvas))
+        self.team_entries_frame.bind("<Configure>", lambda event, canvas=canvas: self.on_frame_configure(canvas))
 
         button_width = self.screenwidth / 15
         button_height = self.screenheight / 27
         button_font_size = self.screenwidth / 120
         
         self.get_teams_for_end_matches()
+        
+        team_button_frame = ctk.CTkFrame(self.Team_frame, bg_color='#142324', fg_color='#142324')
+        team_button_frame.pack(anchor=tk.NE, side=tk.TOP, pady=10, padx=10)
 
         # Button to add a new name entry
-        add_button = ctk.CTkButton(self.Team_frame, text="Add Name", command=self.add_name_entry, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
-        add_button.pack(pady=5, padx=15)
+        add_button = ctk.CTkButton(team_button_frame, text="Add Name", command=self.add_name_entry, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
+        add_button.pack(pady=8, padx=10)
 
         # Button to retrieve the entered names
-        submit_button = ctk.CTkButton(self.Team_frame, text="Submit", command=self.save_team_names_in_db, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
-        submit_button.pack(pady=5, padx=15)
+        submit_button = ctk.CTkButton(team_button_frame, text="Submit", command=self.save_team_names_in_db, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
+        submit_button.pack(pady=8, padx=10)
 
-        reload_button = ctk.CTkButton(self.Team_frame, text="Reload", command=self.reload_button_command, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
-        reload_button.pack(pady=5, padx=15)
+        reload_button = ctk.CTkButton(team_button_frame, text="Reload", command=self.reload_button_command, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
+        reload_button.pack(pady=8, padx=10)
         
 
 ##############################################################################################
@@ -448,7 +451,7 @@ class Window(ctk.CTk):
         self.test_frame = ctk.CTkFrame(self.player_frame, bg_color='#0e1718', fg_color='#0e1718')
         self.test_frame.pack(anchor=tk.NW, side=tk.LEFT, fill=tk.X, padx=10, expand=True)
         
-        buttons_frame = ctk.CTkFrame(self.test_frame, bg_color='#0e1718', fg_color='#0e1718')
+        buttons_frame = ctk.CTkFrame(self.player_frame, fg_color='#142324')
         buttons_frame.pack(pady=5, padx=5, anchor=tk.NE, side=tk.RIGHT)
         
         
@@ -458,14 +461,14 @@ class Window(ctk.CTk):
         
         # Button to add a new name entry
         add_button = ctk.CTkButton(buttons_frame, text="Add Name", command=lambda: self.add_name_entry_player(self.frameplayer, "Player"), width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
-        add_button.pack(pady=20, padx=20, anchor=tk.NE, side=tk.RIGHT)    
+        add_button.pack(pady=8, padx=10, anchor=tk.NE, side=tk.TOP)    
 
         # Button to retrieve the entered names
         submit_button = ctk.CTkButton(buttons_frame, text="Submit", command=self.save_names_player, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
-        submit_button.pack(pady=20, padx=20, anchor=tk.NE, side=tk.RIGHT)    
+        submit_button.pack(pady=8, padx=10, anchor=tk.NE, side=tk.TOP)    
 
         reload_button = ctk.CTkButton(buttons_frame, text="Reload", command=self.reload_button_player_command, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
-        reload_button.pack(pady=20, padx=20, anchor=tk.NE, side=tk.RIGHT)    
+        reload_button.pack(pady=8, padx=10, anchor=tk.NE, side=tk.TOP)    
         
         self.selected_team_in_player = ""
         self.team_button_list = []
@@ -929,8 +932,8 @@ class Window(ctk.CTk):
         manual_frame = ctk.CTkFrame(self.SPIEL_frame, bg_color='#0e1718', fg_color='#0e1718')
         manual_frame.pack(pady=5, anchor=tk.S, side=tk.BOTTOM, padx=5, fill=tk.X)
         
-        manual_manual_frame = ctk.CTkFrame(manual_frame, bg_color='#142324', fg_color='#142324')
-        manual_manual_frame.pack(anchor=tk.SE, side=tk.RIGHT, padx=10, pady=10)
+        manual_manual_frame = ctk.CTkFrame(manual_frame, fg_color='#142324', corner_radius=5)
+        manual_manual_frame.pack(anchor=tk.SE, side=tk.RIGHT, padx=10, pady=10, expand=True)
         
         SPIEL_button = ctk.CTkButton(manual_manual_frame, text="Reload", command=lambda : self.reload_spiel_button_command(True), width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")            
         SPIEL_button.pack(pady=10, side=tk.BOTTOM, anchor=tk.S, padx=10) 
@@ -1025,31 +1028,31 @@ class Window(ctk.CTk):
                 player_index = i 
                 player_id = self.get_player_id_from_player_name(player_name)
                 if i < 8:
-                    self.group_frame = ctk.CTkFrame(up_frame, bg_color='#142324', fg_color='#142324')
+                    self.group_frame = ctk.CTkFrame(up_frame, fg_color='#142324', corner_radius=10)
                     self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
                 else:
-                    self.group_frame = ctk.CTkFrame(down_frame, bg_color='#142324', fg_color='#142324')
+                    self.group_frame = ctk.CTkFrame(down_frame, fg_color='#142324', corner_radius=10)
                     self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
                 
                 #self.group_frame = tk.Frame(self.for_team_frame, background="lightcoral")
                 #self.group_frame.pack(side=tk.LEFT, padx=10, pady=10)
 
                 playertext1 = ctk.CTkLabel(self.group_frame, text=f"Player {i}", font=("Helvetica", self.team_button_font_size))
-                playertext1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
+                playertext1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
                 
                 playertext2_text = f"{player_name} - {player_number}"
                 
                 playertext2 = ctk.CTkLabel(master=self.group_frame, text=playertext2_text , font=("Helvetica", self.team_button_font_size, "bold"))
-                playertext2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
+                playertext2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
                 
                 playertext3 = ctk.CTkLabel(self.group_frame, text=f"Tore {str(goals)}", font=("Helvetica", self.team_button_font_size))
-                playertext3.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
+                playertext3.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
 
                 playerbutton1 = ctk.CTkButton(self.group_frame, text="UP", command=lambda team=team_id, player_id1=player_id, player_index = player_index: self.player_scored_a_point(team, player_id1, player_index,  "UP"), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)  
-                playerbutton1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
+                playerbutton1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
                 
                 playerbutton2 = ctk.CTkButton(self.group_frame, text="DOWN", command=lambda team=team_id, player_id1=player_id, player_index = player_index: self.player_scored_a_point(team, player_id1, player_index, "DOWN"), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)
-                playerbutton2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X)
+                playerbutton2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
                 
                 
                 #print("team", team, "i", i)
@@ -1071,7 +1074,7 @@ class Window(ctk.CTk):
             command=lambda event: self.on_team_select(event, nr=1),
             )
         self.manual_team_select_1.set("None")
-        self.manual_team_select_1.pack(pady=10, side=tk.BOTTOM, anchor=tk.S)
+        self.manual_team_select_1.pack(pady=10, side=tk.BOTTOM, anchor=tk.S, padx=10)
         #self.manual_team_select_1.bind("<<ComboboxSelected>>", lambda event, nr=1: self.on_team_select(event, nr))
         
         self.manual_team_select_2 = ctk.CTkComboBox(
@@ -1082,7 +1085,7 @@ class Window(ctk.CTk):
             command=lambda event: self.on_team_select(event, nr=0),
             )
         self.manual_team_select_2.set("None")
-        self.manual_team_select_2.pack(pady=10, side=tk.BOTTOM, anchor=tk.S)
+        self.manual_team_select_2.pack(pady=10, side=tk.BOTTOM, anchor=tk.S, padx=10)
         #self.manual_team_select_2.bind("<<ComboboxSelected>>", lambda event, nr=0: self.on_team_select(event, nr))
 
 
@@ -1233,13 +1236,13 @@ class Window(ctk.CTk):
         
         matches = self.calculate_matches()
         
-        spiel_select_frame = ctk.CTkFrame(frame, fg_color='#142324', bg_color='#142324')
+        spiel_select_frame = ctk.CTkFrame(frame, fg_color='#142324', corner_radius=5)
         spiel_select_frame.pack(pady=10, padx=10, anchor=tk.SW, side=tk.LEFT)
         
         width = self.screenwidth / 9
         
         spiel_select = ctk.CTkComboBox(spiel_select_frame, font=("Helvetica", self.team_button_font_size * 1.2), width=width, values=[""], command=lambda event: self.on_match_select(event, matches))
-        spiel_select.pack(pady=10, side=tk.TOP, anchor=tk.N)
+        spiel_select.pack(pady=10, side=tk.TOP, anchor=tk.N, padx=10)
 
         if self.active_mode.get() == 1:
 
@@ -1323,10 +1326,9 @@ class Window(ctk.CTk):
                 spiel_select.set(values_list[self.active_match])
             
         next_match_button = ctk.CTkButton(spiel_select_frame, text="Next Match", command=lambda : self.next_previous_match_button(spiel_select, matches), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
-        next_match_button.pack(pady=10, padx=5, side=tk.RIGHT, anchor=tk.SE)
-        
+        next_match_button.pack(pady=10, padx=10, side=tk.RIGHT, anchor=tk.SE)
         previous_match_button = ctk.CTkButton(spiel_select_frame, text="Previous Match", command=lambda : self.next_previous_match_button(spiel_select, matches, False), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
-        previous_match_button.pack(pady=10, padx=5, side=tk.LEFT, anchor=tk.SW)
+        previous_match_button.pack(pady=10, padx=10, side=tk.LEFT, anchor=tk.SW)
     
     
     def get_teams_for_end_matches(self):
@@ -1844,7 +1846,7 @@ class Window(ctk.CTk):
     def create_settings_elements(self):
         
         # Create elements for the Contact frame
-        option_frame = ctk.CTkFrame(self.settings_frame, bg_color='grey15', fg_color='grey15')
+        option_frame = ctk.CTkFrame(self.settings_frame, bg_color='#0e1718', fg_color='#0e1718')
         option_frame.pack(pady=10, anchor=tk.NW, side=tk.LEFT, padx=10)
         
         
@@ -1956,6 +1958,7 @@ class Window(ctk.CTk):
         player.set_media(media)
         player.audio_set_volume(int(volume.get()))
         player.play()
+        #print("play_mp3", file_path, "volume", volume.get(), "self.volume", self.volume.get(), "player", player,"media", media)
         
 ##############################################################################################
 #############################Calculate########################################################
@@ -2473,7 +2476,7 @@ global db_path
 
 db_path = "data/data.db"
 stored_data = {}
-tkapp = Window(True)
+tkapp = Window(False)
 
 if __name__ == "__main__":
     tkapp.mainloop()
