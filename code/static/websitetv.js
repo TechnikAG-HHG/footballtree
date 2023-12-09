@@ -17,5 +17,31 @@ function getTeamData() {
     scoreElement.textContent = `${score1} : ${score2}`;
 }
 
+function updateData() {
+    // Include the last data version in the request headers
+    var headers = new Headers();
+    headers.append("Last-Data-Update", data["LastUpdate"]);
+
+    fetch("/update_data", {
+        headers: headers,
+    })
+        .then((response) => response.json())
+        .then((updatedData) => {
+            console.log("Updated data:", updatedData);
+
+            // Update variables in JavaScript
+            for (var key in updatedData) {
+                if (updatedData.hasOwnProperty(key)) {
+                    data[key] = updatedData[key];
+                }
+            }
+        })
+        .catch((error) => console.error("Error fetching data:", error));
+
+    setTimeout(function () {
+        getTeamData();
+    }, 500);
+}
+
 getTeamData();
-setInterval(getTeamData, 2000);
+setInterval(updateData, 2000);

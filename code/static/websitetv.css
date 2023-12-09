@@ -6,6 +6,7 @@ html {
     height: 100%;
     overflow: hidden;
     font-family: "Roboto", sans-serif;
+    scroll-behavior: smooth;
 }
 
 body {
@@ -35,7 +36,7 @@ iframe {
 .nextTeams {
     color: white;
     align-self: center;
-    font-size: 2vw;
+    font-size: 3vw;
     font-weight: bold;
 }
 
