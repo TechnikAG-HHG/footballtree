@@ -41,5 +41,17 @@
     </head>
     <body>
         <!-- Initial content will be replaced dynamically -->
+        <div id="subbox">
+            <a id="nextTeam1" class="nextTeams">Next Team 1</a>
+            <a id="scoreTeams" class="nextTeams">3 : 4</a>
+            <a id="nextTeam2" class="nextTeams">Next Team 2</a>
+        </div>
+
+        <script>
+            var data = {{ initial_data|tojson|safe }};
+            console.log('Initial data:', data);
+        </script>
+
+        <script src="{{url_for('static', filename='websitetv.js')}}"></script>
     </body>
 </html>

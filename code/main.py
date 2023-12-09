@@ -2476,7 +2476,7 @@ global db_path
 
 db_path = "data/data.db"
 stored_data = {}
-tkapp = Window(False)
+tkapp = Window(True)
 
 if __name__ == "__main__":
     tkapp.mainloop()
