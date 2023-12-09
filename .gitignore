@@ -4,3 +4,4 @@
 *.db
 data/data.db
 *.db
+.vscode/settings.json
