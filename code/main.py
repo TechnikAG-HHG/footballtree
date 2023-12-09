@@ -2339,7 +2339,7 @@ def get_data_for_website(which_data=-1):
         cursor = connection.cursor()
         
         get_all_matches = """
-        SELECT team1Id, team2Id, team1Goals, team2Goals FROM matchData
+        SELECT team1Id, team2Id, team1Goals, team2Goals, groupNumber FROM matchData
         ORDER BY matchId ASC
         """
         
@@ -2366,7 +2366,7 @@ def get_data_for_website(which_data=-1):
             cursor.execute(get_team2_name, (match[1],))
             team2_name = cursor.fetchone()[0]
             
-            all_matches.append((team1_name, team2_name, match[2], match[3]))
+            all_matches.append((team1_name, team2_name, match[2], match[3], match[4]))
             # print every var
             #print("team1_name", team1_name, "team2_name", team2_name, "match[2]", match[2], "match[3]", match[3])
         
@@ -2382,7 +2382,6 @@ def get_data_for_website(which_data=-1):
 def get_initial_data(template_name):
     global initial_data
     tkapp.test()
-    
     
     initial_data = {
         "Teams": get_data_for_website(0),
