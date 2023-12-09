@@ -538,50 +538,48 @@ class Window(ctk.CTk):
             team_id = self.selected_team_in_player
 
         if entries:
-            
-            # Get existing players for the team from the database
-            self.cursor.execute("SELECT playerName FROM playerData WHERE teamId = ?", (team_id,))
-            existing_players = {row[0] for row in self.cursor.fetchall()}
+            # Store existing playerData for the team
+            self.cursor.execute("SELECT * FROM playerData WHERE teamId = ?", (team_id,))
+            existing_players = self.cursor.fetchall()
 
-            # Iterate through the current entries and update or insert as needed
+            # Drop the playerData table
+            self.cursor.execute("DROP TABLE playerData")
+
+            # Create a new playerData table
+            playerDataTableCreationQuery = """
+            CREATE TABLE IF NOT EXISTS playerData (
+                id INTEGER PRIMARY KEY,
+                playerName TEXT,
+                playerNumber INTEGER,
+                teamId INTEGER REFERENCES teamData(id) DEFAULT 0,
+                goals INTEGER DEFAULT 0
+            )
+            """
+            self.cursor.execute(playerDataTableCreationQuery)
+            self.connection.commit()
+
+            # Insert new players into the playerData table
             for entry, entrie2, entrie3 in zip(entries, entries2, entries3):
-                #print(entries)
                 entry_text = str(entry.get())
                 entry_text2 = str(entrie2.get())
                 entry_text3 = str(entrie3.get())
 
                 if entry_text:
-                    # Update existing player
-                    if entry_text in existing_players:
-                        update_query = "UPDATE playerData SET playerNumber = ?, goals = ? WHERE playerName = ? AND teamId = ?"
-                        self.cursor.execute(update_query, (entry_text2, entry_text3, entry_text, team_id))
-                    else:
-                        # Add new player
-                        try:
-                            insert_query = "INSERT INTO playerData (playerName, playerNumber, goals, teamId) VALUES (?, ?, ?, ?)"
-                            self.cursor.execute(insert_query, (entry_text, entry_text2, entry_text3, team_id))
-                            existing_players.add(entry_text)
-                        except sqlite3.IntegrityError:
-                            
-                            for i in range(1, 100):
-                                if f"{entry_text} {i}" not in existing_players:
-                                    entry_text = f"{entry_text} {i}"
-                                    break
-                            insert_query = "INSERT INTO playerData (playerName, playerNumber, goals, teamId) VALUES (?, ?, ?, ?)"
-                            self.cursor.execute(insert_query, (entry_text, entry_text2, entry_text3, team_id))
-                                
-            #get all ids from playerData
-            self.cursor.execute("SELECT id FROM playerData")
-            player_ids = [row[0] for row in self.cursor.fetchall()]
-            for i, player_id in enumerate(player_ids):
-                if i + 1 != player_id:
-                    self.cursor.execute("UPDATE playerData SET id = ? WHERE id = ?", (i+1, player_id))
-            
+                    try:
+                        insert_query = "INSERT INTO playerData (playerName, playerNumber, goals, teamId) VALUES (?, ?, ?, ?)"
+                        self.cursor.execute(insert_query, (entry_text, entry_text2, entry_text3, team_id))
+                    except sqlite3.IntegrityError:
+                        for i in range(1, 100):
+                            if f"{entry_text} {i}" not in [player[1] for player in existing_players]:
+                                entry_text = f"{entry_text} {i}"
+                                break
+                        insert_query = "INSERT INTO playerData (playerName, playerNumber, goals, teamId) VALUES (?, ?, ?, ?)"
+                        self.cursor.execute(insert_query, (entry_text, entry_text2, entry_text3, team_id))
 
-            # Delete players not in the entries
-            players_to_delete = existing_players - {entry.get() for entry in entries}
-            for player_name in players_to_delete:
-                self.cursor.execute("DELETE FROM playerData WHERE playerName = ? AND teamId = ?", (player_name, team_id))
+            # Update playerNumber and goals for each player in the playerData table
+            for player in existing_players:
+                update_query = "UPDATE playerData SET playerNumber = ?, goals = ? WHERE playerName = ? AND teamId = ?"
+                self.cursor.execute(update_query, (player[2], player[4], player[1], player[3]))
 
             self.connection.commit()
             
@@ -1489,6 +1487,7 @@ class Window(ctk.CTk):
             self.save_games_played_in_db(match_index)
             
             self.updated_data.update({"Games": get_data_for_website(2)})
+            self.updated_data.update({"activeMatchNumber": self.active_match})
             
         elif self.active_mode.get() == 2:
             #print("self.spiel_um_platz_3", self.spiel_um_platz_3)
@@ -1578,6 +1577,7 @@ class Window(ctk.CTk):
             # Update the score label
             self.spiel_buttons[teamID]["global"][3].set(str(current_score))
             self.updated_data.update({"Goals": get_data_for_website(1)})
+            self.updated_data.update({"Matches": get_data_for_website(4)})
     
     
     def read_mp3_path_from_db_for_team(self, teamID):
@@ -2385,6 +2385,9 @@ def get_data_for_website(which_data=-1):
         
         #print("all_matches", all_matches)
         return all_matches
+    
+    if which_data == 5:
+        return tkapp.active_match
             
 def get_initial_data(template_name):
     global initial_data
@@ -2397,6 +2400,7 @@ def get_initial_data(template_name):
         "Games": get_data_for_website(2),
         "Points": get_data_for_website(3),
         "Matches": get_data_for_website(4),
+        "activeMatchNumber": get_data_for_website(5),
         "ZeitIntervall": 10,
         "Startzeit": [9,30],
         "LastUpdate": 0
@@ -2445,7 +2449,7 @@ def update_data():
                     break
             
             stored_data.update({time.time()-3:{key:value}})
-            print("stored_data", stored_data)
+            #print("stored_data", stored_data)
         
         updated_data.update({"LastUpdate": timeatstart})
         
@@ -2476,7 +2480,7 @@ global db_path
 
 db_path = "data/data.db"
 stored_data = {}
-tkapp = Window(False)
+tkapp = Window(True)
 
 if __name__ == "__main__":
     tkapp.mainloop()
