@@ -1957,10 +1957,11 @@ class Window(ctk.CTk):
         player.audio_set_volume(int(volume.get()))
         player.play()
         
-    ##############################################################################################
-    #############################Calculatre########################################################
-    ##############################################################################################
-    ##############################################################################################
+##############################################################################################
+#############################Calculate########################################################
+##############################################################################################
+##############################################################################################
+
     def calculate_matches(self):
         
         if self.active_mode.get() == 1:
@@ -1999,6 +2000,8 @@ class Window(ctk.CTk):
             #print("self.matches", self.matches)
             
             self.save_matches_to_db()
+            
+            self.updated_data.update({"Matches": get_data_for_website(4)})
         
         return self.matches
     
@@ -2338,6 +2341,48 @@ def get_data_for_website(which_data=-1):
         connection.close()
         
         return points
+    
+    if which_data == 4:
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+        
+        get_all_matches = """
+        SELECT team1Id, team2Id, team1Goals, team2Goals FROM matchData
+        ORDER BY matchId ASC
+        """
+        
+        cursor.execute(get_all_matches)
+        
+        #get the team names instead of the team ids, remove the team id after the name for that team has been found
+        all_matches = []
+        
+        for match in cursor.fetchall():
+                
+            get_team1_name = """
+            SELECT teamName FROM teamData
+            WHERE id = ?
+            ORDER BY id ASC
+            """
+            cursor.execute(get_team1_name, (match[0],))
+            team1_name = cursor.fetchone()[0]
+            
+            get_team2_name = """
+            SELECT teamName FROM teamData
+            WHERE id = ?
+            ORDER BY id ASC
+            """
+            cursor.execute(get_team2_name, (match[1],))
+            team2_name = cursor.fetchone()[0]
+            
+            all_matches.append((team1_name, team2_name, match[2], match[3]))
+            # print every var
+            #print("team1_name", team1_name, "team2_name", team2_name, "match[2]", match[2], "match[3]", match[3])
+        
+        cursor.close()
+        connection.close()
+        
+        #print("all_matches", all_matches)
+        return all_matches
             
 def get_initial_data(template_name):
     global initial_data
@@ -2349,6 +2394,7 @@ def get_initial_data(template_name):
         "Goals": get_data_for_website(1),
         "Games": get_data_for_website(2),
         "Points": get_data_for_website(3),
+        "Matches": get_data_for_website(4),
         "ZeitIntervall": 10,
         "Startzeit": [9,30],
         "LastUpdate": 0
@@ -2426,7 +2472,7 @@ global db_path
 
 db_path = "data/data.db"
 stored_data = {}
-tkapp = Window(False)
+tkapp = Window(True)
 
 if __name__ == "__main__":
     tkapp.mainloop()
