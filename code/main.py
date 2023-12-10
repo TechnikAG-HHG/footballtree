@@ -1304,7 +1304,15 @@ class Window(ctk.CTk):
             
             values_list.append(self.get_final_match(teams1[0], teams1[1], teams2[0], teams2[1]))
             
-            self.updated_data.update({"finalMatches": values_list})
+            goles_spiele = []
+            goles_spiele.append([self.read_goals_for_match_from_db(teams1[0][0], teams1[1][0]), self.read_goals_for_match_from_db(teams1[1][0], teams1[0][0])])
+            goles_spiele.append([self.read_goals_for_match_from_db(teams2[0][0], teams2[1][0]), self.read_goals_for_match_from_db(teams2[1][0], teams2[0][0])])
+            goles_spiele.append([self.read_goals_for_match_from_db(self.spiel_um_platz_3[0][0], self.spiel_um_platz_3[1][0]), self.read_goals_for_match_from_db(self.spiel_um_platz_3[1][0], self.spiel_um_platz_3[0][0])])
+            goles_spiele.append([self.read_goals_for_match_from_db(self.final_match_teams[0][0], self.final_match_teams[1][0]), self.read_goals_for_match_from_db(self.final_match_teams[1][0], self.final_match_teams[0][0])])
+            
+            self.updated_data.update({"finalMatches": [[self.endteam1[1], self.endteam3[1], goles_spiele[0]], [self.endteam2[1], self.endteam4[1], goles_spiele[1]], [self.spiel_um_platz_3[0][1], self.spiel_um_platz_3[1][1], goles_spiele[2]], [self.final_match_teams[0][1], self.final_match_teams[1][1], goles_spiele[3]]]})
+            
+            print("self.updated_data", self.updated_data)
             
             #print("self.spiel_um_platz_3", self.spiel_um_platz_3)
             #print("values_list", values_list)
@@ -1758,7 +1766,6 @@ class Window(ctk.CTk):
             self.team1_or_team2 = onefetched[0]
             #print("self.team1_or_team2", self.team1_or_team2)
 
-            
             get_goals_for_match = """
             SELECT {column} FROM finalMatchesData
             WHERE matchId = ?;
@@ -1766,7 +1773,6 @@ class Window(ctk.CTk):
             self.cursor.execute(get_goals_for_match.format(column=self.team1_or_team2), (self.active_match + 1,))
             
             goals = self.cursor.fetchone()[0]
-            
         
         return goals
         
@@ -2214,7 +2220,6 @@ class Window(ctk.CTk):
                 
         self.updated_data.update({"Points": get_data_for_website(3)})    
                 
-            
     ##############################################################################################
     ##############################################################################################
     ##############################################################################################
