@@ -65,7 +65,7 @@ function generateTableGroup(matches) {
         cellMatchNumber.textContent = "Spiel " + matchNumber;
 
         var cellGroup = row.insertCell(2);
-        cellGroup.textContent = "0";
+        cellGroup.textContent = `Gruppe ${match[4]}`;
 
         var cellFirstTeam = row.insertCell(3);
         cellFirstTeam.textContent = match[0];
