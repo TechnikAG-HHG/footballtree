@@ -1,7 +1,7 @@
 function drawTree() {
     var teamCount = 4;
     var boxes = teamCount;
-    var boxheight = 80;
+    var boxheight = 120;
     var boxestodraw = 0;
     var textsdrawn = 0;
     var marginsubbox = 800;
@@ -206,6 +206,44 @@ function drawLinesBetweenBoxes(box, nextBox, svg) {
     }
 }
 
+function writeTeamData(matchCount = 2) {
+    if ("finalMatches" in data) {
+        var matchData = data["finalMatches"];
+        console.log(data["finalMatches"]);
+        matchData.reverse();
+
+        console.log(matchData);
+
+        for (var i = 1; i < matchCount * 2; i++) {
+            var match = matchData[i - 1];
+            var team1 = match[0];
+            var team2 = match[1];
+            var score1 = 0;
+            var score2 = 0;
+
+            var matchElement = document.querySelector(`.text${i - 1}`);
+
+            if (matchElement) {
+                while (matchElement.firstChild) {
+                    matchElement.removeChild(matchElement.firstChild);
+                }
+
+                let div1 = document.createElement("div");
+                div1.textContent = team1;
+                matchElement.appendChild(div1);
+
+                let div2 = document.createElement("div");
+                div2.textContent = `${score1} : ${score2}`;
+                matchElement.appendChild(div2);
+
+                let div3 = document.createElement("div");
+                div3.textContent = team2;
+                matchElement.appendChild(div3);
+            }
+        }
+    }
+}
+
 function updateData() {
     // Include the last data version in the request headers
     var headers = new Headers();
@@ -221,6 +259,7 @@ function updateData() {
             // Update variables in JavaScript
             for (var key in updatedData) {
                 if (updatedData.hasOwnProperty(key)) {
+                    console.log("updatedData[key]:", updatedData[key]);
                     data[key] = updatedData[key];
                 }
             }
@@ -228,11 +267,9 @@ function updateData() {
         .catch((error) => console.error("Error fetching data:", error));
 
     setTimeout(function () {
-        drawTeams();
+        writeTeamData();
     }, 500);
 }
-
-function drawTeams() {}
 
 // Function to handle button clicks and redirect
 function redirectTo(path) {
@@ -247,7 +284,7 @@ drawTree();
 
 drawLines();
 
-drawTeams();
+writeTeamData();
 
 window.onresize = function () {
     drawLines();
