@@ -62,12 +62,20 @@ body {
     justify-content: center;
     align-items: center;
     margin: 2%;
+    flex-wrap: wrap;
 }
 
 .tableGroup {
     color: white;
     width: 100%;
     font-size: 1.5vw;
+}
+
+.tableFinalMatches {
+    color: white;
+    width: 100%;
+    font-size: 1.5vw;
+    margin-top: 3vh;
 }
 
 table {
