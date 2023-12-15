@@ -1,5 +1,5 @@
 function drawTree() {
-    var teamCount = 4;
+    var teamCount = 2;
     var boxes = teamCount;
     var boxheight = 120;
     var boxestodraw = 0;
@@ -23,13 +23,51 @@ function drawTree() {
 
     var subboxmargintodraw = marginsubbox / Math.pow(3, 1);
     subboxfinal.style.marginTop = `${subboxmargintodraw}px`;
-    subboxfinal.style.marginBottom = `${subboxmargintodraw}px`;
     boxfinal.appendChild(subboxfinal);
 
     var subboxfinaltext = document.createElement("div");
     subboxfinaltext.className = "team-name";
     subboxfinaltext.className += ` text0`;
     subboxfinal.appendChild(subboxfinaltext);
+
+    // Create a new box under the subboxfinal
+    var newBox = document.createElement("div");
+    newBox.className = "threeGame-box";
+    newBox.style.marginBottom = `${subboxmargintodraw}px`;
+    newBox.style.marginTop = `5vh`;
+    newBox.style.height = `${subboxfinal.offsetHeight}px`; // set the height of newBox to the height of subboxfinal
+    boxfinal.appendChild(newBox);
+
+    window.onload = function () {
+        var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.style.position = "absolute";
+        svg.style.top = "0";
+        svg.style.left = "0";
+        svg.style.width = "100%";
+        svg.style.height = "100%";
+        document.getElementById("main-container").appendChild(svg);
+
+        // Calculate the coordinates of the start and end points of the line
+        var x1 = subboxfinal.offsetLeft + subboxfinal.offsetWidth / 2;
+        var y1 = subboxfinal.offsetTop + subboxfinal.offsetHeight;
+        var x2 = newBox.offsetLeft + newBox.offsetWidth / 2;
+        var y2 = newBox.offsetTop;
+
+        // Create an SVG line element
+        var line = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "line"
+        );
+        line.setAttribute("x1", x1);
+        line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+        line.setAttribute("stroke", "#73deb9"); // Change this to the color you want
+        line.setAttribute("stroke-width", "5"); // Change this to the width you want
+
+        // Append the line to the SVG element
+        svg.appendChild(line);
+    };
 
     // calculate how many boxes to draw in each direction
     while (boxes > 2) {
@@ -156,6 +194,15 @@ function drawLinesBetweenBoxes(box, nextBox, svg) {
     // Get the subboxes of the box and the next box
     var subboxes = box.getElementsByClassName("drawn-sub-box");
     var nextSubboxes = nextBox.getElementsByClassName("drawn-sub-box");
+
+    // If the box is the final box, add the new box to the list of subboxes
+    if (box.className.includes("drawn-box-final")) {
+        var newBox = box.getElementsByClassName("threeGame-box")[0];
+        if (newBox) {
+            subboxes = Array.from(subboxes);
+            subboxes.push(newBox);
+        }
+    }
 
     // For each subbox
     for (var j = 0; j < subboxes.length; j++) {
