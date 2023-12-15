@@ -132,11 +132,13 @@ function finalMatchTable() {
     data["finalMatches"].forEach((match) => {
         var row = tbody.insertRow();
 
-        if (i == data["activeMatchNumber"]) {
-            row.style.backgroundColor = "black";
+        if (data["activeMatchNumber"] < 0) {
+            if (i + 1 == Math.abs(data["activeMatchNumber"])) {
+                row.style.backgroundColor = "black";
+            }
         }
 
-        row.id = "section" + (i + 1); // Set the id of the row
+        row.id = "section" + (i + 1) * -1; // Set the id of the row
 
         var cellTime = row.insertCell(0);
         var matchTime = new Date(
@@ -161,7 +163,7 @@ function finalMatchTable() {
         cellSecondTeam.textContent = match[1];
 
         var cellT = row.insertCell(4);
-        cellT.textContent = match[2][0] + " : " + match[2][0];
+        cellT.textContent = match[2][0] + " : " + match[2][1];
 
         i++;
     });
