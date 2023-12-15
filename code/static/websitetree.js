@@ -27,7 +27,7 @@ function drawTree() {
 
     var subboxfinaltext = document.createElement("div");
     subboxfinaltext.className = "team-name";
-    subboxfinaltext.className += ` text0`;
+    subboxfinaltext.className += ` text-1`;
     subboxfinal.appendChild(subboxfinaltext);
 
     // Create a new box under the subboxfinal
@@ -35,6 +35,7 @@ function drawTree() {
     newBox.className = "threeGame-box";
     newBox.style.marginBottom = `${subboxmargintodraw}px`;
     newBox.style.marginTop = `5vh`;
+    newBox.className += ` text0`;
     newBox.style.height = `${subboxfinal.offsetHeight}px`; // set the height of newBox to the height of subboxfinal
     boxfinal.appendChild(newBox);
 
@@ -261,12 +262,12 @@ function writeTeamData(matchCount = 2) {
 
         console.log(matchData);
 
-        for (var i = 1; i < matchCount * 2; i++) {
-            var match = matchData[i - 1];
+        for (var i = 0; i < matchCount * 2; i++) {
+            var match = matchData[i];
             var team1 = match[0];
             var team2 = match[1];
-            var score1 = 0;
-            var score2 = 0;
+            var score1 = match[2][0];
+            var score2 = match[2][1];
 
             var matchElement = document.querySelector(`.text${i - 1}`);
 
@@ -288,6 +289,7 @@ function writeTeamData(matchCount = 2) {
                 matchElement.appendChild(div3);
             }
         }
+        matchData.reverse();
     }
 }
 
