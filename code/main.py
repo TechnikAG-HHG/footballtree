@@ -1581,9 +1581,9 @@ class Window(ctk.CTk):
                 print("Selected match not found in the list.")
        
 
-
     def global_scored_a_point(self, teamID, team2ID, direction="UP"):
         # Get the current score
+        print("global_scored_a_point", "teamID", teamID, "team2ID", team2ID, "direction", direction)
         current_score = self.read_goals_for_match_from_db(teamID, team2ID)
         
         # Update the score
@@ -1624,7 +1624,9 @@ class Window(ctk.CTk):
         
     def write_score_for_team_into_db(self, teamID, team2ID, direction="UP"):
         
+        
         goals = self.read_goals_for_match_from_db(teamID, team2ID)
+        previous_goals = goals
         
         if goals == "None":
             return False
@@ -1633,10 +1635,13 @@ class Window(ctk.CTk):
             goals += 1
         else:
             goals -= 1
+            
+        print("write_score_for_team_into_db", "teamID", teamID, "team2ID", team2ID, "direction", direction, "goals", goals, "previous_goals", previous_goals)
         
         self.save_goals_for_match_in_db(teamID, team2ID, goals)
         
-        self.save_goals_for_teams_in_db(teamID, team2ID, direction)
+        if self.active_mode.get() == 1:
+            self.save_goals_for_teams_in_db(teamID, team2ID, direction)
         
         return True
     
@@ -1715,21 +1720,21 @@ class Window(ctk.CTk):
                     ELSE 'Not Found'
                 END AS TeamIdColumn
             FROM finalMatchesData
-            WHERE matchId = ?;
+            WHERE (team1Id = ? OR team2Id = ?) AND (team1Id = ? OR team2Id = ?);
             """
-            self.cursor.execute(get_team1_or_team2, (teamID, teamID, self.active_match + 1))
+            self.cursor.execute(get_team1_or_team2, (teamID, teamID, teamID, teamID, team2ID, team2ID))
             
             self.team1_or_team2 = self.cursor.fetchone()[0]
             
-            #print("self.team1_or_team2", self.team1_or_team2)
+            print("save_goals_for_match_in_db", "self.team1_or_team2", self.team1_or_team2, "teamID", teamID, "team2ID", team2ID, "goals", goals, "self.active_match", self.active_match + 1, "self.active_mode.get()", self.active_mode.get())
             
             
             update_goals_for_match = """
             UPDATE finalMatchesData
             SET {column} = ?
-            WHERE matchId = ?;
+            WHERE (team1Id = ? OR team2Id = ?) AND (team1Id = ? OR team2Id = ?);
             """
-            self.cursor.execute(update_goals_for_match.format(column=self.team1_or_team2), (goals, self.active_match + 1))
+            self.cursor.execute(update_goals_for_match.format(column=self.team1_or_team2), (goals, teamID, teamID, team2ID, team2ID))
         
         self.connection.commit()
         
@@ -1794,15 +1799,15 @@ class Window(ctk.CTk):
             print("onefetched", onefetched)
             
             self.team1_or_team2 = onefetched[0]
-            print("self.team1_or_team2", self.team1_or_team2)
 
             get_goals_for_match = """
             SELECT {column} FROM finalMatchesData
-            WHERE team1Id = ? OR team2Id = ? AND team1Id = ? OR team2Id = ?;
+            WHERE (team1Id = ? OR team2Id = ?) AND (team1Id = ? OR team2Id = ?);
             """
             self.cursor.execute(get_goals_for_match.format(column=self.team1_or_team2), (teamID, teamID, team2ID, team2ID))
             
             goals = self.cursor.fetchone()[0]
+            print("read_goals_for_match_from_db", "self.team1_or_team2", self.team1_or_team2, "teamID", teamID, "team2ID", team2ID, "goals", goals, "self.active_match", self.active_match + 1, "self.active_mode.get()", self.active_mode.get())
         
         return goals
         
@@ -2412,7 +2417,13 @@ def get_data_for_website(which_data=-1):
         return all_matches
     
     if which_data == 5:
-        return tkapp.active_match
+        
+        a_m = tkapp.active_match
+        
+        if tkapp.active_mode.get() == 2:
+            a_m *= -1
+        
+        return a_m
             
 def get_initial_data(template_name):
     global initial_data
