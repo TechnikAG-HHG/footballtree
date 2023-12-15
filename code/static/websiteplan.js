@@ -76,6 +76,10 @@ function generateTableGroup(matches) {
         var cellT = row.insertCell(5);
         cellT.textContent = match[2] + " : " + match[3];
 
+        finalMatchesTime = new Date(
+            startTime.getTime() + (i + 1) * timeInterval * 60000
+        );
+
         i++;
     });
 
@@ -112,7 +116,7 @@ function finalMatchTable() {
         var headerCellGroup = headerRow.insertCell(1);
         headerCellGroup.textContent = "Spiele";
         headerCellGroup.className = "headerCell";
-        headerCellGroup.colSpan = 4;
+        headerCellGroup.colSpan = 3;
 
         var headerCellT = headerRow.insertCell(2);
         headerCellT.textContent = "Tore";
@@ -125,7 +129,7 @@ function finalMatchTable() {
 
     // Add the new matches to the table
     var i = 0;
-    data["FinalMatches"].forEach((match) => {
+    data["finalMatches"].forEach((match) => {
         var row = tbody.insertRow();
 
         if (i == data["activeMatchNumber"]) {
@@ -136,25 +140,28 @@ function finalMatchTable() {
 
         var cellTime = row.insertCell(0);
         var matchTime = new Date(
-            startTime.getTime() + i * timeInterval * 60000
+            finalMatchesTime.getTime() + i * timeInterval * 60000
         );
         cellTime.textContent = formatTime(matchTime);
 
         var cellMatchNumber = row.insertCell(1);
         var matchNumber = i + 1;
-        cellMatchNumber.textContent = "Spiel " + matchNumber;
+        if (i == data["finalMatches"].length - 1) {
+            cellMatchNumber.textContent = "Finale";
+        } else if (i == data["finalMatches"].length - 2) {
+            cellMatchNumber.textContent = "Spiel um Platz 3";
+        } else {
+            cellMatchNumber.textContent = "Halbfinalspiel " + matchNumber;
+        }
 
-        var cellGroup = row.insertCell(2);
-        cellGroup.textContent = `Gruppe ${match[4]}`;
-
-        var cellFirstTeam = row.insertCell(3);
+        var cellFirstTeam = row.insertCell(2);
         cellFirstTeam.textContent = match[0];
 
-        var cellSecondTeam = row.insertCell(4);
+        var cellSecondTeam = row.insertCell(3);
         cellSecondTeam.textContent = match[1];
 
-        var cellT = row.insertCell(5);
-        cellT.textContent = match[2] + " : " + match[3];
+        var cellT = row.insertCell(4);
+        cellT.textContent = match[2][0] + " : " + match[2][0];
 
         i++;
     });
