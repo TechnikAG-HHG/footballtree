@@ -1548,6 +1548,7 @@ class Window(ctk.CTk):
             self.save_games_played_in_db(self.active_match)
             
             self.updated_data.update({"Games": get_data_for_website(2)})
+            self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
         
         self.reload_spiel_button_command()
         
@@ -2421,6 +2422,7 @@ def get_data_for_website(which_data=-1):
         a_m = tkapp.active_match
         
         if tkapp.active_mode.get() == 2:
+            a_m += 1
             a_m *= -1
         
         return a_m
