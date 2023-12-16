@@ -195,7 +195,9 @@ class Window(ctk.CTk):
             isBreak BOOLEAN DEFAULT 0,
             volume INTEGER DEFAULT 0,
             activeMode INTEGER DEFAULT 0,
-            debugMode INTEGER DEFAULT 0
+            debugMode INTEGER DEFAULT 0,
+            startTime TEXT DEFAULT "",
+            timeInterval TEXT DEFAULT ""
         )
         """
         self.cursor.execute(settingsDataTableCreationQuery)
@@ -215,6 +217,8 @@ class Window(ctk.CTk):
         self.volume = tk.IntVar(value=100)
         self.active_mode = tk.IntVar(value=1)
         self.debug_mode = tk.IntVar(value=0)
+        self.start_time = tk.StringVar(value="08:00")
+        self.time_interval = tk.StringVar(value="10m")
 
         
         #self.round_time = settings[1]
@@ -231,6 +235,12 @@ class Window(ctk.CTk):
         if settings[7] is not None and settings[7] != "" and settings[7] != 0:
             self.custom_print("settings[7]", settings[7])
             self.debug_mode.set(value=settings[7])
+        
+        if settings[8] is not None and settings[8] != "" and settings[8] != 0:
+            self.start_time.set(value=settings[8])
+            
+        if settings[9] is not None and settings[9] != "" and settings[9] != 0:
+            self.time_interval.set(value=settings[9])
         
     
 ##############################################################################################
@@ -1874,6 +1884,20 @@ class Window(ctk.CTk):
         radio_button_4 = ctk.CTkRadioButton(option_frame, text="Debug Off", variable=self.debug_mode, value=0, font=("Helvetica", 17), command=self.on_radio_debug_button_change)
         radio_button_4.pack(side=tk.TOP, pady=5, padx = 5, anchor=tk.NW)
         
+        start_time_label = ctk.CTkLabel(option_frame, text="Start Time", font=("Helvetica", 19))
+        start_time_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        
+        start_time_entry = ctk.CTkEntry(option_frame, textvariable=self.start_time, font=("Helvetica", 17))
+        start_time_entry.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        start_time_entry.bind("<KeyRelease>", lambda event: self.on_start_time_change(event))
+        
+        time_interval_label = ctk.CTkLabel(option_frame, text="Time Interval", font=("Helvetica", 19))
+        time_interval_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        
+        time_interval_entry = ctk.CTkEntry(option_frame, textvariable=self.time_interval, font=("Helvetica", 17))
+        time_interval_entry.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        time_interval_entry.bind("<KeyRelease>", lambda event: self.on_time_interval_change(event))
+        
     
     def on_volume_change(self, event):
         saveVolumeInDB = """
@@ -1897,6 +1921,10 @@ class Window(ctk.CTk):
         
         self.teams_playing = [None, None]
         self.active_match = -1
+        if stored_data.get("finalMatches") != None:
+            del stored_data["finalMatches"]
+        if self.updated_data.get("finalMatches") != None:
+            del self.updated_data["finalMatches"]
         self.reload_spiel_button_command()
         
         
@@ -1911,6 +1939,41 @@ class Window(ctk.CTk):
         self.connection.commit()
 
         self.reload_spiel_button_command()
+        
+        
+    def on_start_time_change(self, event):
+        if self.start_time.get() == "":
+            return
+        if self.start_time.get()[-1] not in "0123456789:" or len(self.start_time.get()) < 5:
+            return
+        
+        saveStartTimeInDB = """
+        UPDATE settingsData
+        SET startTime = ?
+        WHERE id = 1
+        """
+        print("on_start_time_change", self.start_time.get())
+        self.cursor.execute(saveStartTimeInDB, (self.start_time.get(),))
+        self.connection.commit()
+        
+        self.updated_data.update({"startTime": self.start_time.get()})
+        
+        
+    def on_time_interval_change(self, event):
+        if self.time_interval.get() == "":
+            return
+        if self.time_interval.get()[-1] not in "0123456789m" or not "m" in self.time_interval.get() or len(self.time_interval.get()) < 1:
+            return
+        saveTimeIntervalInDB = """
+        UPDATE settingsData
+        SET timeInterval = ?
+        WHERE id = 1
+        """
+        print("on_time_interval_change", self.time_interval.get())
+        self.cursor.execute(saveTimeIntervalInDB, (self.time_interval.get(),))
+        self.connection.commit()
+        
+        self.updated_data.update({"timeInterval": self.time_interval.get()})
    
             
 ##############################################################################################
@@ -2486,8 +2549,8 @@ def get_initial_data(template_name):
         "Matches": get_data_for_website(4),
         "activeMatchNumber": get_data_for_website(5),
         "finalMatches": get_data_for_website(6),
-        "ZeitIntervall": 10,
-        "Startzeit": [9,30],
+        "timeInterval": 10,
+        "startTime": [9,30],
         "LastUpdate": 0
     }
     return make_response(render_template(template_name, initial_data=initial_data))
