@@ -1510,7 +1510,7 @@ class Window(ctk.CTk):
                 self.active_match = -1
             #self.custom_print("self.active_matchon_match_select", self.active_match)
             
-            self.save_games_played_in_db(self.active_match)
+            #self.save_games_played_in_db(self.active_match)
             
             self.updated_data.update({"Games": get_data_for_website(2)})
             self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
@@ -2493,6 +2493,7 @@ def get_data_for_website(which_data=-1):
     if which_data == 6 and tkapp.active_mode.get() == 2:
       
         final_goles = []
+        print(tkapp.endteam1[0], tkapp.endteam3[0])
         final_goles.append([ich_kann_nicht_mehr(tkapp.endteam1[0], tkapp.endteam3[0]), ich_kann_nicht_mehr(tkapp.endteam3[0], tkapp.endteam1[0])])
         final_goles.append([ich_kann_nicht_mehr(tkapp.endteam2[0], tkapp.endteam4[0]), ich_kann_nicht_mehr(tkapp.endteam4[0], tkapp.endteam2[0])])
         final_goles.append([ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[0][0], tkapp.spiel_um_platz_3[1][0]), ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[1][0], tkapp.spiel_um_platz_3[0][0])])

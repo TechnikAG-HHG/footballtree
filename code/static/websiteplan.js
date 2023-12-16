@@ -1,5 +1,5 @@
 var matchCount = 0; // Global variable to keep track of the total number of matches
-var timeInterval = 10;
+var timeInterval = data["timeInterval"]; // Global variable to keep track of the time interval between matches
 
 var startTime = new Date(); // Set the start time
 
@@ -207,7 +207,8 @@ function updateData() {
         })
         .catch((error) => console.error("Error fetching data:", error));
 
-    startTime.setHours(data["Startzeit"][0], data["Startzeit"][1], 0, 0);
+    startTime.setHours(data["startTime"][0], data["startTime"][1], 0, 0);
+    timeInterval = data["timeInterval"];
 
     setTimeout(function () {
         generateTableGroup(data["Matches"]);
@@ -237,7 +238,7 @@ document.getElementById("returnButton").addEventListener("click", function () {
     redirectTo("/");
 });
 
-startTime.setHours(data["Startzeit"][0], data["Startzeit"][1], 0, 0);
+startTime.setHours(data["startTime"][0], data["startTime"][1], 0, 0);
 generateTableGroup(data["Matches"]);
 finalMatchTable();
 // call updateData() every 5 seconds
