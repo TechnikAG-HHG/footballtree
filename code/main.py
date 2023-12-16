@@ -1956,7 +1956,7 @@ class Window(ctk.CTk):
         self.cursor.execute(saveStartTimeInDB, (self.start_time.get(),))
         self.connection.commit()
         
-        self.updated_data.update({"startTime": self.start_time.get()})
+        self.updated_data.update({"startTime": get_data_for_website(7)})
         
         
     def on_time_interval_change(self, event):
@@ -2500,6 +2500,11 @@ def get_data_for_website(which_data=-1):
 
         v = [[tkapp.endteam1[1], tkapp.endteam3[1], final_goles[0]], [tkapp.endteam2[1], tkapp.endteam4[1], final_goles[1]], [tkapp.spiel_um_platz_3[0][1], tkapp.spiel_um_platz_3[1][1], final_goles[2]], [tkapp.final_match_teams[0][1], tkapp.final_match_teams[1][1], final_goles[3]]]
         return v
+    
+    if which_data == 7:
+        start_time = tkapp.start_time.get()
+        a, b = start_time.split(":")
+        return [int(a), int(b)]
 
 def ich_kann_nicht_mehr(teamID, team2ID):
       
@@ -2549,8 +2554,8 @@ def get_initial_data(template_name):
         "Matches": get_data_for_website(4),
         "activeMatchNumber": get_data_for_website(5),
         "finalMatches": get_data_for_website(6),
-        "timeInterval": 10,
-        "startTime": [9,30],
+        "timeInterval": tkapp.time_interval.get(),
+        "startTime": get_data_for_website(7),
         "LastUpdate": 0
     }
     return make_response(render_template(template_name, initial_data=initial_data))
