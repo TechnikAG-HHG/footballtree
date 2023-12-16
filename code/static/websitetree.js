@@ -256,6 +256,9 @@ function drawLinesBetweenBoxes(box, nextBox, svg) {
 
 function writeTeamData(matchCount = 2) {
     if ("finalMatches" in data) {
+        if (data["finalMatches"] == null) {
+            return;
+        }
         var matchData = data["finalMatches"];
         console.log(data["finalMatches"]);
 
