@@ -258,12 +258,24 @@ function writeTeamData(matchCount = 2) {
     if ("finalMatches" in data) {
         var matchData = data["finalMatches"];
         console.log(data["finalMatches"]);
-        matchData.reverse();
+
+        if (matchData.length > Math.abs(data["activeMatchNumber"])) {
+            if (matchData.length / 2 < Math.abs(data["activeMatchNumber"])) {
+                var finalMatchesSliced = matchData;
+            } else {
+                var finalMatchesSliced = matchData.slice(0, 2);
+            }
+            while (finalMatchesSliced.length < matchData.length) {
+                finalMatchesSliced.push(["???", "???", ["0", "0"]]);
+            }
+        }
+
+        finalMatchesSliced.reverse();
 
         console.log(matchData);
 
         for (var i = 0; i < matchCount * 2; i++) {
-            var match = matchData[i];
+            var match = finalMatchesSliced[i];
             var team1 = match[0];
             var team2 = match[1];
             var score1 = match[2][0];
@@ -289,7 +301,7 @@ function writeTeamData(matchCount = 2) {
                 matchElement.appendChild(div3);
             }
         }
-        matchData.reverse();
+        finalMatchesSliced.reverse();
     }
 }
 
