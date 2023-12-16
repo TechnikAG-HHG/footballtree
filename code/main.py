@@ -1237,131 +1237,69 @@ class Window(ctk.CTk):
     
     
     def create_matches_labels(self, frame):
-        
         matches = self.calculate_matches()
-        
         spiel_select_frame = ctk.CTkFrame(frame, fg_color='#142324', corner_radius=5)
         spiel_select_frame.pack(pady=10, padx=10, anchor=tk.SW, side=tk.LEFT)
-        
         width = self.screenwidth / 9
-        
         spiel_select = ctk.CTkComboBox(spiel_select_frame, font=("Helvetica", self.team_button_font_size * 1.2), width=width, values=[""], command=lambda event: self.on_match_select(event, matches))
         spiel_select.pack(pady=10, side=tk.TOP, anchor=tk.N, padx=10)
 
         if self.active_mode.get() == 1:
-
-            values_list = []
-
-            for match in matches:
-                #self.custom_print(match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1])
-                #self.custom_print("match", match)
-                values_list.append(match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1])
-
-            # Set the values of the Combobox after the loop
+            values_list = self.get_values_list_mode1(matches)
             spiel_select.configure(values=values_list)
-            
-            # get the index of the match that is currently being played and set the Combobox value to that match without using self.match_count - 1
-            
-            for match in matches:
-                match_teams_indexes = [self.read_teamNames().index(match_team) for match_team in match["teams"]]
-                if match_teams_indexes == self.teams_playing: # or match_teams_indexes[::-1] == self.teams_playing
-                    se = match["number"]
-                    self.active_match = int(se.replace("Spiel ", "")) - 1
-                    #self.custom_print("self.active_matchcreate_matches_labels", self.active_match)
-                    break
-                #self.custom_print(match["teams"], self.teams_playing, match["number"], match_teams_indexes, match_teams_indexes[::-1])
-            else:
-                if self.teams_playing.count(None) == 0:
-                    values_list = []
-                    values_list.append("No Match found")
-                    spiel_select["values"] = values_list
-                    spiel_select.set(values_list[0])
-                    #self.custom_print("no match found")
-                    return
-            
-            if self.teams_playing.count(None) == 0:
-                
-                se = int(se.replace("Spiel ", "")) - 1
-                current_match_index = se
-                spiel_select.set(values_list[current_match_index])
-                
-        elif self.active_mode.get() == 2:
-            
-            #get the best two teams from the database(with most points)
-            getTeams = """
-            SELECT id, teamName FROM teamData
-            WHERE groupNumber = 1
-            ORDER BY points DESC
-            LIMIT 2
-            """
-            self.cursor.execute(getTeams)
-            
-            #get the two best teams
-            teams1 = self.cursor.fetchall()
-            self.custom_print("teams1", teams1)
-            
-            getTeams2 = """
-            SELECT id, teamName FROM teamData
-            WHERE groupNumber = 2
-            ORDER BY points DESC
-            LIMIT 2 
-            """
-            self.cursor.execute(getTeams2)
-            
-            #get the two best teams
-            teams2 = self.cursor.fetchall()
-            
-            values_list = []
-            
-            self.get_teams_for_end_matches()
-            
-            values_list.append(f"Spiel 1 Halb: {self.endteam1[1]} vs {self.endteam3[1]}")
-            values_list.append(f"Spiel 2 Halb: {self.endteam2[1]} vs {self.endteam4[1]}")
-            
-            values_list.append(self.get_spiel_um_platz_3(self.endteam1, self.endteam2, self.endteam3, self.endteam4))
-            
-            values_list.append(self.get_final_match(self.endteam1, self.endteam3, self.endteam2, self.endteam4))
-            
-            spiel_select.configure(values=values_list)
-            
             if self.active_match >= 0:
                 spiel_select.set(values_list[self.active_match])
-                
-            temp = self.active_match
-            
-            if self.spiel_um_platz_3 != None and self.final_match_teams != None and self.spiel_um_platz_3 != [] and self.final_match_teams != []:
-                self.active_match = 0
-                self.save_active_match_in_final_phase(self.endteam1[0], self.endteam3[0])   
-                self.active_match = 1
-                self.save_active_match_in_final_phase(self.endteam2[0], self.endteam4[0])
-                self.active_match = 2
-                self.save_active_match_in_final_phase(self.spiel_um_platz_3[0][0], self.spiel_um_platz_3[1][0])
-                self.active_match = 3
-                self.save_active_match_in_final_phase(self.final_match_teams[0][0], self.final_match_teams[1][0])
-            self.active_match = temp
-            
-            
-            self.custom_print("self.endteam1", self.endteam1, "self.endteam2", self.endteam2, "self.endteam3", self.endteam3, "self.endteam4", self.endteam4)
-            
-            if self.spiel_um_platz_3 != None and self.final_match_teams != None and self.spiel_um_platz_3 != [] and self.final_match_teams != []:
-                goles_spiele = []
-                goles_spiele.append([self.read_goals_for_match_from_db(self.endteam1[0], self.endteam3[0]), self.read_goals_for_match_from_db(self.endteam3[0], self.endteam1[0])])
-                goles_spiele.append([self.read_goals_for_match_from_db(self.endteam2[0], self.endteam4[0]), self.read_goals_for_match_from_db(self.endteam4[0], self.endteam2[0])])
-                goles_spiele.append([self.read_goals_for_match_from_db(self.spiel_um_platz_3[0][0], self.spiel_um_platz_3[1][0]), self.read_goals_for_match_from_db(self.spiel_um_platz_3[1][0], self.spiel_um_platz_3[0][0])])
-                goles_spiele.append([self.read_goals_for_match_from_db(self.final_match_teams[0][0], self.final_match_teams[1][0]), self.read_goals_for_match_from_db(self.final_match_teams[1][0], self.final_match_teams[0][0])])
-            
-                self.updated_data.update({"finalMatches": [[self.endteam1[1], self.endteam3[1], goles_spiele[0]], [self.endteam2[1], self.endteam4[1], goles_spiele[1]], [self.spiel_um_platz_3[0][1], self.spiel_um_platz_3[1][1], goles_spiele[2]], [self.final_match_teams[0][1], self.final_match_teams[1][1], goles_spiele[3]]]})
-            
-                self.custom_print("self.updated_data", self.updated_data)
-            
-            #self.custom_print("self.spiel_um_platz_3", self.spiel_um_platz_3)
-            #self.custom_print("values_list", values_list)
+        elif self.active_mode.get() == 2:
+            values_list, active_match = self.get_values_list_mode2()
+            spiel_select.configure(values=values_list)
+            if active_match >= 0:
+                spiel_select.set(values_list[active_match])
 
             
         next_match_button = ctk.CTkButton(spiel_select_frame, text="Next Match", command=lambda : self.next_previous_match_button(spiel_select, matches), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
         next_match_button.pack(pady=10, padx=10, side=tk.RIGHT, anchor=tk.SE)
         previous_match_button = ctk.CTkButton(spiel_select_frame, text="Previous Match", command=lambda : self.next_previous_match_button(spiel_select, matches, False), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
         previous_match_button.pack(pady=10, padx=10, side=tk.LEFT, anchor=tk.SW)
+
+    
+    def get_values_list_mode1(self, matches):
+        values_list = []
+        for match in matches:
+            values_list.append(match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1])
+        return values_list
+
+
+    def get_values_list_mode2(self):
+        values_list = []
+        self.get_teams_for_end_matches()
+        values_list.append(f"Spiel 1 Halb: {self.endteam1[1]} vs {self.endteam3[1]}")
+        values_list.append(f"Spiel 2 Halb: {self.endteam2[1]} vs {self.endteam4[1]}")
+        values_list.append(self.get_spiel_um_platz_3(self.endteam1, self.endteam3, self.endteam2, self.endteam4))
+        values_list.append(self.get_final_match(self.endteam1, self.endteam3, self.endteam2, self.endteam4))
+        
+        active_match = self.active_match
+        if self.spiel_um_platz_3 != None and self.final_match_teams != None and self.spiel_um_platz_3 != [] and self.final_match_teams != []:
+            self.active_match = 0
+            self.save_active_match_in_final_phase(self.endteam1[0], self.endteam3[0])   
+            self.active_match = 1
+            self.save_active_match_in_final_phase(self.endteam2[0], self.endteam4[0])
+            self.active_match = 2
+            self.save_active_match_in_final_phase(self.spiel_um_platz_3[0][0], self.spiel_um_platz_3[1][0])
+            self.active_match = 3
+            self.save_active_match_in_final_phase(self.final_match_teams[0][0], self.final_match_teams[1][0])
+        self.active_match = active_match
+        
+        goles_spiele = []
+        
+        if self.spiel_um_platz_3 != None and self.final_match_teams != None and self.spiel_um_platz_3 != [] and self.final_match_teams != []:
+            goles_spiele.append([self.read_goals_for_match_from_db(self.endteam1[0], self.endteam3[0]), self.read_goals_for_match_from_db(self.endteam3[0], self.endteam1[0])])
+            goles_spiele.append([self.read_goals_for_match_from_db(self.endteam2[0], self.endteam4[0]), self.read_goals_for_match_from_db(self.endteam4[0], self.endteam2[0])])
+            goles_spiele.append([self.read_goals_for_match_from_db(self.spiel_um_platz_3[0][0], self.spiel_um_platz_3[1][0]), self.read_goals_for_match_from_db(self.spiel_um_platz_3[1][0], self.spiel_um_platz_3[0][0])])
+            goles_spiele.append([self.read_goals_for_match_from_db(self.final_match_teams[0][0], self.final_match_teams[1][0]), self.read_goals_for_match_from_db(self.final_match_teams[1][0], self.final_match_teams[0][0])])
+        
+            self.updated_data.update({"finalMatches": [[self.endteam1[1], self.endteam3[1], goles_spiele[0]], [self.endteam2[1], self.endteam4[1], goles_spiele[1]], [self.spiel_um_platz_3[0][1], self.spiel_um_platz_3[1][1], goles_spiele[2]], [self.final_match_teams[0][1], self.final_match_teams[1][1], goles_spiele[3]]]})
+            
+        return values_list, self.active_match
     
     
     def get_teams_for_end_matches(self):
@@ -1536,7 +1474,7 @@ class Window(ctk.CTk):
                 self.teams_playing = [self.endteam2[0], self.endteam4[0]]
                 self.active_match = 1 
                 self.save_active_match_in_final_phase(self.endteam2[0], self.endteam4[0])
-            elif selected_match == self.get_spiel_um_platz_3(self.endteam1, self.endteam2, self.endteam3, self.endteam4) and self.spiel_um_platz_3 != []:
+            elif selected_match == self.get_spiel_um_platz_3(self.endteam1, self.endteam3, self.endteam2, self.endteam4) and self.spiel_um_platz_3 != []:
                 if self.spiel_um_platz_3[0][0] != None and self.spiel_um_platz_3[1][0] != None:
                     self.teams_playing = [self.spiel_um_platz_3[0][0], self.spiel_um_platz_3[1][0]]
                     self.active_match = 2
@@ -2489,7 +2427,51 @@ def get_data_for_website(which_data=-1):
             a_m *= -1
         
         return a_m
-  
+    
+    if which_data == 6:
+      
+        final_matches = []
+        final_matches.append([ich_kann_nicht_mehr(tkapp.endteam1[0], tkapp.endteam3[0]), ich_kann_nicht_mehr(tkapp.endteam3[0], tkapp.endteam1[0])])
+        final_matches.append([ich_kann_nicht_mehr(tkapp.endteam2[0], tkapp.endteam4[0]), ich_kann_nicht_mehr(tkapp.endteam4[0], tkapp.endteam2[0])])
+        final_matches.append([ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[0][0], tkapp.spiel_um_platz_3[1][0]), ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[1][0], tkapp.spiel_um_platz_3[0][0])])
+        final_matches.append([ich_kann_nicht_mehr(tkapp.final_match_teams[0][0], tkapp.final_match_teams[1][0]), ich_kann_nicht_mehr(tkapp.final_match_teams[1][0], tkapp.final_match_teams[0][0])])
+
+def ich_kann_nicht_mehr(teamID, team2ID):
+      
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+        
+    get_team1_or_team2 = """
+    SELECT 
+        CASE 
+            WHEN team1Id = ? THEN 'team1Goals'
+            WHEN team2Id = ? THEN 'team2Goals'
+            ELSE 'Not Found'
+        END AS TeamIdColumn
+    FROM finalMatchesData
+    WHERE (team1Id = ? OR team2Id = ?) AND (team1Id = ? OR team2Id = ?);
+    """
+    cursor.execute(get_team1_or_team2, (teamID, teamID, teamID, teamID, team2ID, team2ID))
+    
+    onefetched = cursor.fetchone()
+    
+            
+    team1_or_team2 = onefetched[0]
+
+    get_goals_for_match = """
+    SELECT {column} FROM finalMatchesData
+    WHERE (team1Id = ? OR team2Id = ?) AND (team1Id = ? OR team2Id = ?);
+    """
+    cursor.execute(get_goals_for_match.format(column=team1_or_team2), (teamID, teamID, team2ID, team2ID))
+    
+    goals = cursor.fetchone()[0]
+    
+    cursor.close()
+    connection.close()
+    
+    return goals
+        
+
             
 def get_initial_data(template_name):
     global initial_data
@@ -2502,6 +2484,7 @@ def get_initial_data(template_name):
         "Points": get_data_for_website(3),
         "Matches": get_data_for_website(4),
         "activeMatchNumber": get_data_for_website(5),
+        "finalMatches": get_data_for_website(6),
         "ZeitIntervall": 10,
         "Startzeit": [9,30],
         "LastUpdate": 0
