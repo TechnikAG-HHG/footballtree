@@ -92,6 +92,9 @@ function generateTableGroup(matches) {
 
 function finalMatchTable() {
     if ("finalMatches" in data) {
+        if (data["finalMatches"] == null) {
+            return;
+        }
         var tablesContainer = document.getElementById("tablesContainer");
 
         // If the table already exists, clear its contents
