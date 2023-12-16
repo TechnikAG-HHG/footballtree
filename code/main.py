@@ -22,7 +22,9 @@ debug_mode = True
 class Window(ctk.CTk):
     
     def custom_print(self, *args, **kwargs):
+        #print(self.debug_mode.get())
         if self.debug_mode.get() == 1:
+            #print("custom_print", *args, **kwargs)
             print(*args, **kwargs)
     
     def create_navigation_bar(self):
@@ -1922,9 +1924,15 @@ class Window(ctk.CTk):
 
         radio_button_2 = ctk.CTkRadioButton(option_frame, text="Final Phase", variable=self.active_mode, value=2, font=("Helvetica", 17), command=self.on_radio_button_change)
         radio_button_2.pack(side=tk.TOP, pady=2, padx = 5, anchor=tk.NW)
+        
+        debug_label = ctk.CTkLabel(option_frame, text="Debug Mode", font=("Helvetica", 19))
+        debug_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
 
-        radio_button_3 = ctk.CTkRadioButton(option_frame, text="Debug", variable=self.debug_mode, value=3, font=("Helvetica", 17), command=self.on_radio_debug_button_change)
+        radio_button_3 = ctk.CTkRadioButton(option_frame, text="Debug", variable=self.debug_mode, value=1, font=("Helvetica", 17), command=self.on_radio_debug_button_change)
         radio_button_3.pack(side=tk.TOP, pady=5, padx = 5, anchor=tk.NW)
+        
+        radio_button_4 = ctk.CTkRadioButton(option_frame, text="Debug Off", variable=self.debug_mode, value=0, font=("Helvetica", 17), command=self.on_radio_debug_button_change)
+        radio_button_4.pack(side=tk.TOP, pady=5, padx = 5, anchor=tk.NW)
         
     
     def on_volume_change(self, event):
@@ -1950,6 +1958,7 @@ class Window(ctk.CTk):
         self.teams_playing = [None, None]
         self.active_match = -1
         self.reload_spiel_button_command()
+        
         
     def on_radio_debug_button_change(self):
         selected_value = self.debug_mode.get()
@@ -2026,7 +2035,7 @@ class Window(ctk.CTk):
     def calculate_matches(self):
         self.match_count = 0  # Reset matchCount to 0
 
-        if self.active_mode.get() == 1:
+        if self.active_mode.get() == 1 or True:
             initial_data = {
                 "Teams": self.read_teamNames()
             }
@@ -2034,12 +2043,15 @@ class Window(ctk.CTk):
             initial_data["Teams"].pop(0)
 
             teams = initial_data["Teams"][:]  # Create a copy of the teams array
+            
+            teams.sort()
+            
+            #print("calculate_matches: teams", teams)
 
             # If the number of teams is odd, add a "dummy" team
-            if len(teams) % 2 != 0:
-                teams.append("dummy")
-
-            teams.sort()
+            #if len(teams) % 2 != 0:
+            #    print("calculate_matches: uneven number of teams, appending dummy team")
+            #    teams.append("dummy")
 
             midpoint = (len(teams) + 1) // 2
             group1 = teams[:midpoint]
@@ -2070,6 +2082,7 @@ class Window(ctk.CTk):
         # If the number of teams is odd, add a "dummy" team
         dummy = False
         if n % 2 != 0:
+            #print("calculate_matches_for_group: uneven number of teams, appending dummy team", "teams", teams)
             teams.append("dummy")
             n += 1
             dummy = True
@@ -2087,6 +2100,8 @@ class Window(ctk.CTk):
 
         matches = list(map(lambda match_index: {"number": "Spiel " + str(match_index[0] + 1), "teams": match_index[1], "group": group_name}, enumerate(matches)))
 
+        #print("calculate_matches_for_group: matches", matches)
+        
         return matches
 
 
@@ -2139,7 +2154,7 @@ class Window(ctk.CTk):
             except:
                 continue
             
-            print("team1ID", team1ID, "team1", team1, "team2", team2, "group", group, "number", number)
+            #print("team1ID", team1ID, "team1", team1, "team2", team2, "group", group, "number", number)
             
             if team2 == "dummy":
                 continue
