@@ -2429,12 +2429,14 @@ def get_data_for_website(which_data=-1):
     
     if which_data == 6 and tkapp.active_mode.get() == 2:
       
-        final_matches = []
-        final_matches.append([ich_kann_nicht_mehr(tkapp.endteam1[0], tkapp.endteam3[0]), ich_kann_nicht_mehr(tkapp.endteam3[0], tkapp.endteam1[0])])
-        final_matches.append([ich_kann_nicht_mehr(tkapp.endteam2[0], tkapp.endteam4[0]), ich_kann_nicht_mehr(tkapp.endteam4[0], tkapp.endteam2[0])])
-        final_matches.append([ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[0][0], tkapp.spiel_um_platz_3[1][0]), ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[1][0], tkapp.spiel_um_platz_3[0][0])])
-        final_matches.append([ich_kann_nicht_mehr(tkapp.final_match_teams[0][0], tkapp.final_match_teams[1][0]), ich_kann_nicht_mehr(tkapp.final_match_teams[1][0], tkapp.final_match_teams[0][0])])
+        final_goles = []
+        final_goles.append([ich_kann_nicht_mehr(tkapp.endteam1[0], tkapp.endteam3[0]), ich_kann_nicht_mehr(tkapp.endteam3[0], tkapp.endteam1[0])])
+        final_goles.append([ich_kann_nicht_mehr(tkapp.endteam2[0], tkapp.endteam4[0]), ich_kann_nicht_mehr(tkapp.endteam4[0], tkapp.endteam2[0])])
+        final_goles.append([ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[0][0], tkapp.spiel_um_platz_3[1][0]), ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[1][0], tkapp.spiel_um_platz_3[0][0])])
+        final_goles.append([ich_kann_nicht_mehr(tkapp.final_match_teams[0][0], tkapp.final_match_teams[1][0]), ich_kann_nicht_mehr(tkapp.final_match_teams[1][0], tkapp.final_match_teams[0][0])])
 
+        v = [[tkapp.endteam1[1], tkapp.endteam3[1], final_goles[0]], [tkapp.endteam2[1], tkapp.endteam4[1], final_goles[1]], [tkapp.spiel_um_platz_3[0][1], tkapp.spiel_um_platz_3[1][1], final_goles[2]], [tkapp.final_match_teams[0][1], tkapp.final_match_teams[1][1], final_goles[3]]]
+        return v
 
 def ich_kann_nicht_mehr(teamID, team2ID):
       
