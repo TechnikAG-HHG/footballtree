@@ -2256,12 +2256,11 @@ class Window(ctk.CTk):
         self.updated_data.update({"Points": get_data_for_website(3)})    
        
                 
-    ##############################################################################################
-    ##############################################################################################
-    ##############################################################################################
-    ##############################################################################################
-
-        
+##############################################################################################
+##############################################################################################
+##############################################################################################
+##############################################################################################
+ 
 def get_data_for_website(which_data=-1):
     
     if which_data == 0:
@@ -2428,13 +2427,14 @@ def get_data_for_website(which_data=-1):
         
         return a_m
     
-    if which_data == 6:
+    if which_data == 6 and tkapp.active_mode.get() == 2:
       
         final_matches = []
         final_matches.append([ich_kann_nicht_mehr(tkapp.endteam1[0], tkapp.endteam3[0]), ich_kann_nicht_mehr(tkapp.endteam3[0], tkapp.endteam1[0])])
         final_matches.append([ich_kann_nicht_mehr(tkapp.endteam2[0], tkapp.endteam4[0]), ich_kann_nicht_mehr(tkapp.endteam4[0], tkapp.endteam2[0])])
         final_matches.append([ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[0][0], tkapp.spiel_um_platz_3[1][0]), ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[1][0], tkapp.spiel_um_platz_3[0][0])])
         final_matches.append([ich_kann_nicht_mehr(tkapp.final_match_teams[0][0], tkapp.final_match_teams[1][0]), ich_kann_nicht_mehr(tkapp.final_match_teams[1][0], tkapp.final_match_teams[0][0])])
+
 
 def ich_kann_nicht_mehr(teamID, team2ID):
       
@@ -2471,8 +2471,7 @@ def ich_kann_nicht_mehr(teamID, team2ID):
     
     return goals
         
-
-            
+  
 def get_initial_data(template_name):
     global initial_data
     tkapp.test()
