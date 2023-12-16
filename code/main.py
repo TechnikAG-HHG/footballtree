@@ -1973,7 +1973,7 @@ class Window(ctk.CTk):
         self.cursor.execute(saveTimeIntervalInDB, (self.time_interval.get(),))
         self.connection.commit()
         
-        self.updated_data.update({"timeInterval": self.time_interval.get()})
+        self.updated_data.update({"timeInterval": self.time_interval.get().replace("m", "")})
    
             
 ##############################################################################################
@@ -2507,6 +2507,7 @@ def get_data_for_website(which_data=-1):
         a, b = start_time.split(":")
         return [int(a), int(b)]
 
+
 def ich_kann_nicht_mehr(teamID, team2ID):
       
     connection = sqlite3.connect(db_path)
@@ -2555,7 +2556,7 @@ def get_initial_data(template_name):
         "Matches": get_data_for_website(4),
         "activeMatchNumber": get_data_for_website(5),
         "finalMatches": get_data_for_website(6),
-        "timeInterval": tkapp.time_interval.get(),
+        "timeInterval": tkapp.time_interval.get().replace("m", ""),
         "startTime": get_data_for_website(7),
         "LastUpdate": 0
     }
