@@ -27,6 +27,7 @@ class Window(ctk.CTk):
             #print("custom_print", *args, **kwargs)
             print(*args, **kwargs)
     
+    
     def create_navigation_bar(self):
         navigation_frame = ctk.CTkFrame(self, fg_color='#142324', corner_radius=0)
         navigation_frame.pack(side=tk.LEFT, fill=tk.Y, pady=10)
@@ -1886,6 +1887,7 @@ class Window(ctk.CTk):
             self.cursor.execute(updatePlayed, (played, teamID))
             
         self.connection.commit()
+   
     
 ##############################################################################################
 ##############################################################################################
@@ -1971,6 +1973,7 @@ class Window(ctk.CTk):
         self.connection.commit()
 
         self.reload_spiel_button_command()
+   
             
 ##############################################################################################
 ##############################################################################################
@@ -1982,13 +1985,16 @@ class Window(ctk.CTk):
             frm.pack_forget()
         frame.pack(fill=tk.BOTH, expand=True)
 
+
     def show_Team_frame(self):
         self.reload_button_command()
         self.show_frame(self.Team_frame)
 
+
     def show_player_frame(self):
         self.reload_button_player_command()
         self.show_frame(self.player_frame)
+
 
     def show_SPIEL_frame(self):
         if self.teams_playing.count(None) == 0:
@@ -1997,9 +2003,11 @@ class Window(ctk.CTk):
         #self.custom_print(stored_data)
         self.calculate_matches()
         self.show_frame(self.SPIEL_frame)
+
         
     def show_settings_frame(self):
         self.show_frame(self.settings_frame)
+
 
 ##############################################################################################
 ##############################################################################################
@@ -2026,6 +2034,7 @@ class Window(ctk.CTk):
         player.audio_set_volume(int(volume.get()))
         player.play()
         #self.custom_print("play_mp3", file_path, "volume", volume.get(), "self.volume", self.volume.get(), "player", player,"media", media)
+   
         
 ##############################################################################################
 #############################Calculate########################################################
@@ -2307,6 +2316,7 @@ class Window(ctk.CTk):
                 self.add_points_for_team_in_db(match[1], 1)
                 
         self.updated_data.update({"Points": get_data_for_website(3)})    
+       
                 
     ##############################################################################################
     ##############################################################################################
@@ -2479,6 +2489,7 @@ def get_data_for_website(which_data=-1):
             a_m *= -1
         
         return a_m
+  
             
 def get_initial_data(template_name):
     global initial_data
@@ -2496,6 +2507,7 @@ def get_initial_data(template_name):
         "LastUpdate": 0
     }
     return make_response(render_template(template_name, initial_data=initial_data))
+
 
 @app.route("/")
 def home():
