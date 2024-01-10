@@ -17,8 +17,6 @@ lock = threading.Lock()
 
 debug_mode = True
 
-
-
 class Window(ctk.CTk):
     
     def custom_print(self, *args, **kwargs):
@@ -2627,7 +2625,7 @@ def update_data():
     #updated_data = {'Players': {"Player1":"Erik Van Doof","Player2":"Felix Schweigmann"}}  # You can modify this data as needed
     return jsonify(updated_data)
 
-    
+
 global tkapp
 global server_thread
 global stored_data
