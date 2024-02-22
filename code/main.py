@@ -1291,6 +1291,7 @@ class Window(ctk.CTk):
             values_list.append(match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1])
         return values_list
 
+
     def get_active_match(self, team1, team2):
         #get the active match by looking in the matches databesa and where these teams play together you get the match number
         getActiveMatch = """
@@ -1303,6 +1304,7 @@ class Window(ctk.CTk):
             return active_match[0]
         else:
             return -1
+
 
     def get_values_list_mode2(self):
         values_list = []
@@ -2002,21 +2004,35 @@ class Window(ctk.CTk):
         self.reload_spiel_button_command()
         
         
+    def is_valid_time(self, time_str):
+        time_parts = time_str.split(":")
+        if len(time_parts) != 2:
+            return False
+        hour, minute = time_parts
+        if not hour.isdigit() or not minute.isdigit():
+            return False
+        if not (0 <= int(hour) <= 23 and 0 <= int(minute) <= 59):
+            return False
+        if len(minute) != 2:
+            return False
+        return True
+
     def on_start_time_change(self, event):
         if self.start_time.get() == "":
             return
-        if self.start_time.get()[-1] not in "0123456789:" or len(self.start_time.get()) < 5:
+        if not self.is_valid_time(str(self.start_time.get())):
+            self.custom_print("Invalid time format. Please enter time in HH:MM format.")
             return
-        
+
         saveStartTimeInDB = """
         UPDATE settingsData
         SET startTime = ?
         WHERE id = 1
         """
-        print("on_start_time_change", self.start_time.get())
+        self.custom_print("on_start_time_change", self.start_time.get())
         self.cursor.execute(saveStartTimeInDB, (self.start_time.get(),))
         self.connection.commit()
-        
+
         self.updated_data.update({"startTime": get_data_for_website(7)})
         
         
@@ -2602,15 +2618,35 @@ def get_data_for_website(which_data=-1):
         return a_m
     
     if which_data == 6 and tkapp.active_mode.get() == 2:
-      
+          
         final_goles = []
-        print(tkapp.endteam1[0], tkapp.endteam3[0])
-        final_goles.append([ich_kann_nicht_mehr(tkapp.endteam1[0], tkapp.endteam3[0]), ich_kann_nicht_mehr(tkapp.endteam3[0], tkapp.endteam1[0])])
-        final_goles.append([ich_kann_nicht_mehr(tkapp.endteam2[0], tkapp.endteam4[0]), ich_kann_nicht_mehr(tkapp.endteam4[0], tkapp.endteam2[0])])
-        final_goles.append([ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[0][0], tkapp.spiel_um_platz_3[1][0]), ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[1][0], tkapp.spiel_um_platz_3[0][0])])
-        final_goles.append([ich_kann_nicht_mehr(tkapp.final_match_teams[0][0], tkapp.final_match_teams[1][0]), ich_kann_nicht_mehr(tkapp.final_match_teams[1][0], tkapp.final_match_teams[0][0])])
+        
+        if tkapp.endteam1 and tkapp.endteam3:
+            final_goles.append([ich_kann_nicht_mehr(tkapp.endteam1[0], tkapp.endteam3[0]), ich_kann_nicht_mehr(tkapp.endteam3[0], tkapp.endteam1[0])])
+        else:
+            final_goles.append([None, None])
+            
+        if tkapp.endteam2 and tkapp.endteam4:
+            final_goles.append([ich_kann_nicht_mehr(tkapp.endteam2[0], tkapp.endteam4[0]), ich_kann_nicht_mehr(tkapp.endteam4[0], tkapp.endteam2[0])])
+        else:
+            final_goles.append([None, None])
+            
+        if tkapp.spiel_um_platz_3:
+            final_goles.append([ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[0][0], tkapp.spiel_um_platz_3[1][0]), ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[1][0], tkapp.spiel_um_platz_3[0][0])])
+        else:
+            final_goles.append([None, None])
+            
+        if tkapp.final_match_teams:
+            final_goles.append([ich_kann_nicht_mehr(tkapp.final_match_teams[0][0], tkapp.final_match_teams[1][0]), ich_kann_nicht_mehr(tkapp.final_match_teams[1][0], tkapp.final_match_teams[0][0])])
+        else:
+            final_goles.append([None, None])
 
-        v = [[tkapp.endteam1[1], tkapp.endteam3[1], final_goles[0]], [tkapp.endteam2[1], tkapp.endteam4[1], final_goles[1]], [tkapp.spiel_um_platz_3[0][1], tkapp.spiel_um_platz_3[1][1], final_goles[2]], [tkapp.final_match_teams[0][1], tkapp.final_match_teams[1][1], final_goles[3]]]
+        v = [
+            [tkapp.endteam1[1] if tkapp.endteam1 else None, tkapp.endteam3[1] if tkapp.endteam3 else None, final_goles[0]], 
+            [tkapp.endteam2[1] if tkapp.endteam2 else None, tkapp.endteam4[1] if tkapp.endteam4 else None, final_goles[1]], 
+            [tkapp.spiel_um_platz_3[0][1] if tkapp.spiel_um_platz_3 else None, tkapp.spiel_um_platz_3[1][1] if tkapp.spiel_um_platz_3 else None, final_goles[2]], 
+            [tkapp.final_match_teams[0][1] if tkapp.final_match_teams else None, tkapp.final_match_teams[1][1] if tkapp.final_match_teams else None, final_goles[3]]
+        ]
         return v
     
     if which_data == 7:
@@ -2638,6 +2674,8 @@ def ich_kann_nicht_mehr(teamID, team2ID):
     
     onefetched = cursor.fetchone()
     
+    if onefetched is None:
+        return None
             
     team1_or_team2 = onefetched[0]
 
