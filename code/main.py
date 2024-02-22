@@ -196,6 +196,7 @@ class Window(ctk.CTk):
             debugMode INTEGER DEFAULT 0,
             startTime TEXT DEFAULT "",
             timeInterval TEXT DEFAULT "",
+            timeIntervalFM TEXT DEFAULT "",
             pauseBeforeFM TEXT DEFAULT ""
         )
         """
@@ -218,6 +219,7 @@ class Window(ctk.CTk):
         self.debug_mode = tk.IntVar(value=0)
         self.start_time = tk.StringVar(value="08:00")
         self.time_interval = tk.StringVar(value="10m")
+        self.time_intervalFM = tk.StringVar(value="10m")
         self.time_pause_before_FM = tk.StringVar(value="0m") 
 
         
@@ -243,7 +245,10 @@ class Window(ctk.CTk):
             self.time_interval.set(value=settings[9])
             
         if settings[10] is not None and settings[10] != "" and settings[10] != 0:
-            self.time_pause_before_FM.set(value=settings[10])
+            self.time_intervalFM.set(value=settings[10])
+            
+        if settings[11] is not None and settings[11] != "" and settings[11] != 0:
+            self.time_pause_before_FM.set(value=settings[11])
         
     
 ##############################################################################################
@@ -1906,6 +1911,15 @@ class Window(ctk.CTk):
         time_interval_entry.bind("<KeyRelease>", lambda event: self.on_time_interval_change(event))
         
         
+        # time interval for final matches
+        time_intervalFM_label = ctk.CTkLabel(option_frame, text="Time Interval Final Matches", font=("Helvetica", 19))
+        time_intervalFM_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        
+        time_intervalFM_entry = ctk.CTkEntry(option_frame, textvariable=self.time_intervalFM, font=("Helvetica", 17))
+        time_intervalFM_entry.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        time_intervalFM_entry.bind("<KeyRelease>", lambda event: self.on_time_intervalFM_change(event))
+        
+        
         # pause time before final matches
         time_pause_before_FM_label = ctk.CTkLabel(option_frame, text="Time Pause Before Final Matches", font=("Helvetica", 19))
         time_pause_before_FM_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
@@ -1990,6 +2004,23 @@ class Window(ctk.CTk):
         self.connection.commit()
         
         self.updated_data.update({"timeInterval": self.time_interval.get().replace("m", "")})
+        
+
+    def on_time_intervalFM_change(self, event):
+        if self.time_intervalFM.get() == "":
+            return
+        if self.time_intervalFM.get()[-1] not in "0123456789m" or not "m" in self.time_intervalFM.get() or len(self.time_intervalFM.get()) < 1:
+            return
+        saveTimeIntervalFMInDB = """
+        UPDATE settingsData
+        SET timeIntervalFM = ?
+        WHERE id = 1
+        """
+        print("on_time_intervalFM_change", self.time_intervalFM.get())
+        self.cursor.execute(saveTimeIntervalFMInDB, (self.time_intervalFM.get(),))
+        self.connection.commit()
+        
+        self.updated_data.update({"timeIntervalFM": self.time_intervalFM.get().replace("m", "")})
         
         
     def on_time_pause_before_FM_change(self, event):
@@ -2591,6 +2622,7 @@ def get_initial_data(template_name):
         "activeMatchNumber": get_data_for_website(5),
         "finalMatches": get_data_for_website(6),
         "timeInterval": tkapp.time_interval.get().replace("m", ""),
+        "timeIntervalFM": tkapp.time_intervalFM.get().replace("m", ""),
         "pauseBeforeFM": tkapp.time_pause_before_FM.get().replace("m", ""),
         "startTime": get_data_for_website(7),
         "LastUpdate": 0
