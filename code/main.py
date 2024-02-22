@@ -195,7 +195,8 @@ class Window(ctk.CTk):
             activeMode INTEGER DEFAULT 0,
             debugMode INTEGER DEFAULT 0,
             startTime TEXT DEFAULT "",
-            timeInterval TEXT DEFAULT ""
+            timeInterval TEXT DEFAULT "",
+            finalTimeInterval TEXT DEFAULT ""
         )
         """
         self.cursor.execute(settingsDataTableCreationQuery)
@@ -217,6 +218,7 @@ class Window(ctk.CTk):
         self.debug_mode = tk.IntVar(value=0)
         self.start_time = tk.StringVar(value="08:00")
         self.time_interval = tk.StringVar(value="10m")
+        self.final_time_interval = tk.StringVar(value="10m")
 
         
         #self.round_time = settings[1]
@@ -1903,7 +1905,7 @@ class Window(ctk.CTk):
         SET volume = ?
         WHERE id = 1
         """
-        self.cursor.execute(saveVolumeInDB, (event,))
+        self.cursor.execute(saveVolumeInDB, (int(event),))
         self.connection.commit()
        
         
