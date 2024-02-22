@@ -90,46 +90,76 @@ function generateTableGroup(matches) {
     }, 500);
 }
 
+function generatePauseTime(time) {
+    if (time == 0 || time == null) {
+        let pauseTimeElement = document.getElementById("pauseTime");
+        if (pauseTimeElement) {
+            pauseTimeElement.remove();
+        }
+        return;
+    }
+
+    let tablesContainer = document.getElementById("tablesContainer");
+
+    let pauseTimeElement = document.getElementById("pauseTime");
+
+    if (pauseTimeElement) {
+        pauseTimeElement.textContent = `Pause ${time} Minuten`;
+    } else {
+        pauseTimeElement = document.createElement("div");
+        pauseTimeElement.id = "pauseTime";
+        pauseTimeElement.textContent = `Pause ${time} Minuten`;
+
+        tablesContainer.appendChild(pauseTimeElement);
+    }
+
+    finalMatchesTime = new Date(
+        finalMatchesTime.getTime() + time * 60000 - timeInterval * 60000
+    );
+}
+
 function finalMatchTable() {
     if ("finalMatches" in data) {
-        if (data["finalMatches"] == null) {
-            return;
+        if (data["pauseBeforeFM"] != null && data["pauseBeforeFM"] != "0") {
+            let requestedtime = parseInt(data["pauseBeforeFM"]);
+            generatePauseTime(requestedtime);
+        } else {
+            let pauseTimeElement = document.getElementById("pauseTime");
+            if (pauseTimeElement) {
+                pauseTimeElement.remove();
+            }
         }
+
         var tablesContainer = document.getElementById("tablesContainer");
 
-        // If the table already exists, clear its contents
         var table = tablesContainer.querySelector(".tableFinalMatches");
         if (table) {
-            var tbody = table.querySelector("tbody");
-            while (tbody.firstChild) {
-                tbody.removeChild(tbody.firstChild);
-            }
-        } else {
-            // If the table doesn't exist, create it
-            table = document.createElement("table");
-            var thead = document.createElement("thead");
-            var tbody = document.createElement("tbody");
-
-            table.className = "tableFinalMatches";
-
-            var headerRow = thead.insertRow(0);
-            var headerCellTime = headerRow.insertCell(0);
-            headerCellTime.textContent = "Zeit";
-            headerCellTime.className = "headerCell";
-
-            var headerCellGroup = headerRow.insertCell(1);
-            headerCellGroup.textContent = "Finalspiele";
-            headerCellGroup.className = "headerCell";
-            headerCellGroup.colSpan = 3;
-
-            var headerCellT = headerRow.insertCell(2);
-            headerCellT.textContent = "Tore";
-            headerCellT.className = "headerCell";
-
-            table.appendChild(thead);
-            table.appendChild(tbody);
-            tablesContainer.appendChild(table);
+            table.remove();
         }
+
+        table = document.createElement("table");
+        var thead = document.createElement("thead");
+        var tbody = document.createElement("tbody");
+
+        table.className = "tableFinalMatches";
+
+        var headerRow = thead.insertRow(0);
+        var headerCellTime = headerRow.insertCell(0);
+        headerCellTime.textContent = "Zeit";
+        headerCellTime.className = "headerCell";
+
+        var headerCellGroup = headerRow.insertCell(1);
+        headerCellGroup.textContent = "Finalspiele";
+        headerCellGroup.className = "headerCell";
+        headerCellGroup.colSpan = 3;
+
+        var headerCellT = headerRow.insertCell(2);
+        headerCellT.textContent = "Tore";
+        headerCellT.className = "headerCell";
+
+        table.appendChild(thead);
+        table.appendChild(tbody);
+        tablesContainer.appendChild(table);
 
         var finalMatches = data["finalMatches"];
         if (finalMatches.length > Math.abs(data["activeMatchNumber"])) {
