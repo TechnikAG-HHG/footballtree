@@ -221,6 +221,7 @@ class Window(ctk.CTk):
         self.time_interval = tk.StringVar(value="10m")
         self.time_intervalFM = tk.StringVar(value="10m")
         self.time_pause_before_FM = tk.StringVar(value="0m") 
+        self.final_time_interval = tk.StringVar(value="10m")
 
         
         #self.round_time = settings[1]
@@ -1157,6 +1158,8 @@ class Window(ctk.CTk):
             self.manual_team_select_1.configure(state=tk.NORMAL)
             self.manual_team_select_1.set(self.read_teamNames()[self.teams_playing[1]])
             self.manual_team_select_2.set(self.read_teamNames()[self.teams_playing[0]])
+            if self.active_mode.get() == 1:
+                self.active_match = self.get_active_match(self.teams_playing[0], self.teams_playing[1]) - 1
         
         #self.custom_print("self.teams_playing", self.teams_playing)
         if self.teams_playing.count(None) == 1:
@@ -1167,7 +1170,8 @@ class Window(ctk.CTk):
         if self.teams_playing.count(None) == 2:
             self.manual_team_select_1.configure(tk.DISABLED)
             self.manual_team_select_1.set("None")
-            
+        
+        
         
         self.reload_spiel_button_command()
         
@@ -1265,6 +1269,7 @@ class Window(ctk.CTk):
         if self.active_mode.get() == 1:
             values_list = self.get_values_list_mode1(matches)
             spiel_select.configure(values=values_list)
+            print("active_match in create_matches_labels", self.active_match)
             if self.active_match >= 0:
                 spiel_select.set(values_list[self.active_match])
         elif self.active_mode.get() == 2:
@@ -1286,6 +1291,18 @@ class Window(ctk.CTk):
             values_list.append(match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1])
         return values_list
 
+    def get_active_match(self, team1, team2):
+        #get the active match by looking in the matches databesa and where these teams play together you get the match number
+        getActiveMatch = """
+        SELECT matchId FROM matchData
+        WHERE team1Id = ? AND team2Id = ?
+        """
+        self.cursor.execute(getActiveMatch, (team1, team2))
+        active_match = self.cursor.fetchone()
+        if active_match != None:
+            return active_match[0]
+        else:
+            return -1
 
     def get_values_list_mode2(self):
         values_list = []
@@ -1474,6 +1491,7 @@ class Window(ctk.CTk):
                 self.teams_playing = [None, None]
                 
             self.active_match = match_index
+            print("self.active_match###################################", self.active_match)
             #self.custom_print("self.active_matchon_match_select", self.active_match)
             
             self.save_games_played_in_db(match_index)
@@ -1543,6 +1561,8 @@ class Window(ctk.CTk):
                 # Get the teams playing in the selected match
                 team_names = self.read_teamNames()
                 teams_playing = [team_names.index(matches[new_match_index - 1]["teams"][0]), team_names.index(matches[new_match_index - 1]["teams"][1])] if new_match_index > 0 else [None, None]
+                
+                self.active_match = new_match_index - 1
 
                 # Update the buttons
                 self.teams_playing = teams_playing
@@ -1550,10 +1570,16 @@ class Window(ctk.CTk):
                 self.show_frame(self.SPIEL_frame)
                 
 
+                # Print statements
+                print("current_match_index:", current_match_index)
+                print("new_match_index:", new_match_index)
+                print("teams_playing:", teams_playing)
+                
+
             except ValueError:
                 # Handle the case where the selected match is not found in the list
-                self.custom_print("Selected match not found in the list.")
-       
+                print("Selected match not found in the list.")
+
 
     def global_scored_a_point(self, teamID, team2ID, direction="UP"):
         # Get the current score
@@ -1843,11 +1869,11 @@ class Window(ctk.CTk):
             self.cursor.execute(updatePlayed, (played, teamID))
             
         self.connection.commit()
-   
-    
-##############################################################################################
-##############################################################################################
-##############################################################################################
+
+    ###########################################################################################################
+    ###########################################################################################################
+    ###########################################################################################################
+    ###########################################################################################################   
 
     def create_settings_elements(self):
         
@@ -1921,14 +1947,19 @@ class Window(ctk.CTk):
         
         
         # pause time before final matches
-        time_pause_before_FM_label = ctk.CTkLabel(option_frame, text="Time Pause Before Final Matches", font=("Helvetica", 19))
+        time_pause_before_FM_label = ctk.CTkLabel(option_frame, text="Time Pause for Final Matches", font=("Helvetica", 19))
         time_pause_before_FM_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
         
         time_pause_before_FM_entry = ctk.CTkEntry(option_frame, textvariable=self.time_pause_before_FM, font=("Helvetica", 17))
         time_pause_before_FM_entry.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
         time_pause_before_FM_entry.bind("<KeyRelease>", lambda event: self.on_time_pause_before_FM_change(event))
         
-    
+        final_time_interval_label = ctk.CTkLabel(option_frame, text="Final Time Interval", font=("Helvetica", 19))
+        final_time_interval_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        final_time_interval_entry = ctk.CTkEntry(option_frame, textvariable=self.final_time_interval, font=("Helvetica", 17))
+        final_time_interval_entry.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        
+        
     def on_volume_change(self, event):
         saveVolumeInDB = """
         UPDATE settingsData
@@ -2038,7 +2069,22 @@ class Window(ctk.CTk):
         self.connection.commit()
         
         self.updated_data.update({"pauseBeforeFM": self.time_pause_before_FM.get().replace("m", "")})
+    
+    def on_final_time_interval_change(self, event):
+        if self.final_time_interval.get() == "":
+            return
+        if self.final_time_interval.get()[-1] not in "0123456789m" or not "m" in self.final_time_interval.get() or len(self.final_time_interval.get()) < 1:
+            return
+        saveFinalTimeIntervalInDB = """
+        UPDATE settingsData
+        SET finalTimeInterval = ?
+        WHERE id = 1
+        """
+        print("on_final_time_interval_change", self.final_time_interval.get())
+        self.cursor.execute(saveFinalTimeIntervalInDB, (self.final_time_interval.get(),))
+        self.connection.commit()
         
+        self.updated_data.update({"finalTimeInterval": self.final_time_interval.get().replace("m", "")})
    
             
 ##############################################################################################
@@ -2624,6 +2670,7 @@ def get_initial_data(template_name):
         "timeInterval": tkapp.time_interval.get().replace("m", ""),
         "timeIntervalFM": tkapp.time_intervalFM.get().replace("m", ""),
         "pauseBeforeFM": tkapp.time_pause_before_FM.get().replace("m", ""),
+        "finalTimeInterval": tkapp.final_time_interval.get().replace("m", ""),
         "startTime": get_data_for_website(7),
         "LastUpdate": 0
     }
