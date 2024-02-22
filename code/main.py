@@ -1581,7 +1581,21 @@ class Window(ctk.CTk):
             except ValueError:
                 # Handle the case where the selected match is not found in the list
                 print("Selected match not found in the list.")
-
+        elif self.active_mode.get() == 2:
+            if next_match:
+                self.active_match += 1
+            else:
+                self.active_match -= 1
+            self.reload_spiel_button_command()
+            self.show_frame(self.SPIEL_frame)
+            
+            self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
+            
+            #self.custom_print("self.active_match", self.active_match)
+            
+            #self.save_games_played_in_db(self.active_match)
+            
+            self.updated_data.update({"Games": get_data_for_website(2)})
 
     def global_scored_a_point(self, teamID, team2ID, direction="UP"):
         # Get the current score
