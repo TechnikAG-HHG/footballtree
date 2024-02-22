@@ -162,17 +162,31 @@ function finalMatchTable() {
         tablesContainer.appendChild(table);
 
         var finalMatches = data["finalMatches"];
-        if (finalMatches.length > Math.abs(data["activeMatchNumber"])) {
-            if (finalMatches.length / 2 < Math.abs(data["activeMatchNumber"])) {
-                var finalMatchesSliced = finalMatches;
-            } else {
-                var finalMatchesSliced = finalMatches.slice(0, 2);
-            }
-            while (finalMatchesSliced.length < finalMatches.length) {
+        if (finalMatches == null) {
+            var finalMatchesSliced = [];
+            while (finalMatchesSliced.length < 4) {
                 finalMatchesSliced.push(["???", "???", ["0", "0"]]);
             }
+
+            var totalMatchNumber = 4;
         } else {
-            var finalMatchesSliced = finalMatches;
+            if (finalMatches.length > Math.abs(data["activeMatchNumber"])) {
+                if (
+                    finalMatches.length / 2 <
+                    Math.abs(data["activeMatchNumber"])
+                ) {
+                    var finalMatchesSliced = finalMatches;
+                } else {
+                    var finalMatchesSliced = finalMatches.slice(0, 2);
+                }
+                while (finalMatchesSliced.length < finalMatches.length) {
+                    finalMatchesSliced.push(["???", "???", ["0", "0"]]);
+                }
+            } else {
+                var finalMatchesSliced = finalMatches;
+            }
+
+            var totalMatchNumber = finalMatchesSliced.length;
         }
 
         // Add the new matches to the table
@@ -189,16 +203,28 @@ function finalMatchTable() {
             row.id = "section" + (i + 1) * -1; // Set the id of the row
 
             var cellTime = row.insertCell(0);
-            var matchTime = new Date(
-                finalMatchesTime.getTime() + i * timeInterval * 60000
-            );
+
+            if (
+                data["timeIntervalFM"] == null ||
+                data["timeIntervalFM"] == "0"
+            ) {
+                var matchTime = new Date(
+                    finalMatchesTime.getTime() + i * timeInterval * 60000
+                );
+            } else {
+                var matchTime = new Date(
+                    finalMatchesTime.getTime() +
+                        i * data["timeIntervalFM"] * 60000
+                );
+            }
+
             cellTime.textContent = formatTime(matchTime);
 
             var cellMatchNumber = row.insertCell(1);
             var matchNumber = i + 1;
-            if (i == data["finalMatches"].length - 1) {
+            if (i == totalMatchNumber - 1) {
                 cellMatchNumber.textContent = "Finale";
-            } else if (i == data["finalMatches"].length - 2) {
+            } else if (i == totalMatchNumber - 2) {
                 cellMatchNumber.textContent = "Spiel um Platz 3";
             } else {
                 cellMatchNumber.textContent = "Halbfinalspiel " + matchNumber;
