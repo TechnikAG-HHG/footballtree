@@ -51,6 +51,9 @@ body {
     flex-direction: column;
     align-self: center;
     margin-left: 1.5vw;
+    font-size: 3vw;
+    font-weight: bold;
+    color: white;
 }
 
 .drawn-box-final {
@@ -147,4 +150,17 @@ body {
     align-items: center;
     border-radius: 0.3vw;
     border: 0.3vw solid burlywood;
+}
+
+.text-final {
+    width: 100%;
+    margin-right: 0.5vw;
+    margin-left: 0.5vw;
+    font-size: 3vw;
+    font-weight: bold;
+    color: white;
+    font-family: "Roboto", sans-serif;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
 }
