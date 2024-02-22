@@ -141,6 +141,8 @@ function finalMatchTable() {
             while (finalMatchesSliced.length < finalMatches.length) {
                 finalMatchesSliced.push(["???", "???", ["0", "0"]]);
             }
+        } else {
+            var finalMatchesSliced = finalMatches;
         }
 
         // Add the new matches to the table
