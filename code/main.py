@@ -11,7 +11,7 @@ import sqlite3
 import vlc
 
 app = Flask(__name__)
-app.secret_key = "Felix.com"
+#app.secret_key = "Felix.com"
 
 lock = threading.Lock()
 
@@ -195,7 +195,8 @@ class Window(ctk.CTk):
             activeMode INTEGER DEFAULT 0,
             debugMode INTEGER DEFAULT 0,
             startTime TEXT DEFAULT "",
-            timeInterval TEXT DEFAULT ""
+            timeInterval TEXT DEFAULT "",
+            pauseBeforeFM TEXT DEFAULT ""
         )
         """
         self.cursor.execute(settingsDataTableCreationQuery)
@@ -217,6 +218,7 @@ class Window(ctk.CTk):
         self.debug_mode = tk.IntVar(value=0)
         self.start_time = tk.StringVar(value="08:00")
         self.time_interval = tk.StringVar(value="10m")
+        self.time_pause_before_FM = tk.StringVar(value="0m") 
 
         
         #self.round_time = settings[1]
@@ -239,6 +241,9 @@ class Window(ctk.CTk):
             
         if settings[9] is not None and settings[9] != "" and settings[9] != 0:
             self.time_interval.set(value=settings[9])
+            
+        if settings[10] is not None and settings[10] != "" and settings[10] != 0:
+            self.time_pause_before_FM.set(value=settings[10])
         
     
 ##############################################################################################
@@ -1882,6 +1887,8 @@ class Window(ctk.CTk):
         radio_button_4 = ctk.CTkRadioButton(option_frame, text="Debug Off", variable=self.debug_mode, value=0, font=("Helvetica", 17), command=self.on_radio_debug_button_change)
         radio_button_4.pack(side=tk.TOP, pady=5, padx = 5, anchor=tk.NW)
         
+        
+        # start time for matches
         start_time_label = ctk.CTkLabel(option_frame, text="Start Time", font=("Helvetica", 19))
         start_time_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
         
@@ -1889,12 +1896,23 @@ class Window(ctk.CTk):
         start_time_entry.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
         start_time_entry.bind("<KeyRelease>", lambda event: self.on_start_time_change(event))
         
+        
+        # time interval for matches
         time_interval_label = ctk.CTkLabel(option_frame, text="Time Interval", font=("Helvetica", 19))
         time_interval_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
         
         time_interval_entry = ctk.CTkEntry(option_frame, textvariable=self.time_interval, font=("Helvetica", 17))
         time_interval_entry.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
         time_interval_entry.bind("<KeyRelease>", lambda event: self.on_time_interval_change(event))
+        
+        
+        # pause time before final matches
+        time_pause_before_FM_label = ctk.CTkLabel(option_frame, text="Time Pause Before Final Matches", font=("Helvetica", 19))
+        time_pause_before_FM_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        
+        time_pause_before_FM_entry = ctk.CTkEntry(option_frame, textvariable=self.time_pause_before_FM, font=("Helvetica", 17))
+        time_pause_before_FM_entry.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        time_pause_before_FM_entry.bind("<KeyRelease>", lambda event: self.on_time_pause_before_FM_change(event))
         
     
     def on_volume_change(self, event):
@@ -1972,6 +1990,24 @@ class Window(ctk.CTk):
         self.connection.commit()
         
         self.updated_data.update({"timeInterval": self.time_interval.get().replace("m", "")})
+        
+        
+    def on_time_pause_before_FM_change(self, event):
+        if self.time_pause_before_FM.get() == "":
+            return
+        if self.time_pause_before_FM.get()[-1] not in "0123456789m" or not "m" in self.time_pause_before_FM.get() or len(self.time_pause_before_FM.get()) < 1:
+            return
+        saveTimePauseBeforeFMInDB = """
+        UPDATE settingsData
+        SET pauseBeforeFM = ?
+        WHERE id = 1
+        """
+        print("on_time_pause_before_FM_change", self.time_pause_before_FM.get())
+        self.cursor.execute(saveTimePauseBeforeFMInDB, (self.time_pause_before_FM.get(),))
+        self.connection.commit()
+        
+        self.updated_data.update({"pauseBeforeFM": self.time_pause_before_FM.get().replace("m", "")})
+        
    
             
 ##############################################################################################
@@ -2555,6 +2591,7 @@ def get_initial_data(template_name):
         "activeMatchNumber": get_data_for_website(5),
         "finalMatches": get_data_for_website(6),
         "timeInterval": tkapp.time_interval.get().replace("m", ""),
+        "pauseBeforeFM": tkapp.time_pause_before_FM.get().replace("m", ""),
         "startTime": get_data_for_website(7),
         "LastUpdate": 0
     }
