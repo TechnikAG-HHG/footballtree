@@ -718,6 +718,8 @@ class Window(ctk.CTk):
         self.selected_team_in_player = ""
         self.team_button_list = []
         
+        self.cool_current_team_label.configure(text="")
+        
         team_IDs = self.read_teamIds()
         teamNames = self.read_teamNames()
         teamNames.pop(0)
@@ -819,6 +821,9 @@ class Window(ctk.CTk):
         self.variable_dict[varentrie3name] = []
         self.variable_dict[varlabelname] = []
         
+        #print("teamName", teamName)
+        
+        self.cool_current_team_label.configure(text=str(teamName))
         
         self.write_names_into_entry_fields_players(teamID, "Player", self.frameplayer)
           
