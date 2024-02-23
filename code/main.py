@@ -62,6 +62,9 @@ class Window(ctk.CTk):
         self.final_match_teams = []
         self.spiel_um_platz_3 = []
         self.matches = []
+        
+        self.settingsconnection = None
+        self.settingscursor = None
 
         self.screenheight = self.winfo_screenheight()
         self.screenwidth = self.winfo_screenwidth()
@@ -127,9 +130,13 @@ class Window(ctk.CTk):
     
     def init_sqlite_db(self):
         self.db_path = "data/data.db"
+        self.settings_db_path = "data/settings.db"
         
         self.connection = sqlite3.connect(self.db_path)
         self.cursor = self.connection.cursor()
+        
+        self.settingsconnection = sqlite3.connect(self.settings_db_path)
+        self.settingscursor = self.settingsconnection.cursor()
         
         teamDataTableCreationQuery = """
         CREATE TABLE IF NOT EXISTS teamData (
@@ -202,20 +209,20 @@ class Window(ctk.CTk):
             websiteTitle TEXT DEFAULT ""
         )
         """
-        self.cursor.execute(settingsDataTableCreationQuery)
-        self.connection.commit()
+        self.settingscursor.execute(settingsDataTableCreationQuery)
+        self.settingsconnection.commit()
 
         # Create a first row if there is no row
-        self.cursor.execute("SELECT * FROM settingsData")
-        if self.cursor.fetchone() is None:
+        self.settingscursor.execute("SELECT * FROM settingsData")
+        if self.settingscursor.fetchone() is None:
             insert_query = "INSERT INTO settingsData (id) VALUES (?)"
-            self.cursor.execute(insert_query, (1,))
+            self.settingscursor.execute(insert_query, (1,))
         
     
     def load_settings(self):
         # get the settings from the database
-        self.cursor.execute("SELECT * FROM settingsData")
-        settings = self.cursor.fetchone()
+        self.settingscursor.execute("SELECT * FROM settingsData")
+        settings = self.settingscursor.fetchone()
         
         # create the variables for the settings
         self.volume = tk.IntVar(value=100)
@@ -2076,8 +2083,8 @@ class Window(ctk.CTk):
         SET volume = ?
         WHERE id = 1
         """
-        self.cursor.execute(saveVolumeInDB, (event,))
-        self.connection.commit()
+        self.settingscursor.execute(saveVolumeInDB, (event,))
+        self.settingsconnection.commit()
        
         
     def on_radio_button_change(self):
@@ -2087,8 +2094,8 @@ class Window(ctk.CTk):
         SET activeMode = ?
         WHERE id = 1
         """
-        self.cursor.execute(saveModeInDB, (selected_value,))
-        self.connection.commit()
+        self.settingscursor.execute(saveModeInDB, (selected_value,))
+        self.settingsconnection.commit()
         
         self.teams_playing = [None, None]
         self.active_match = -1
@@ -2106,8 +2113,8 @@ class Window(ctk.CTk):
         SET debugMode = ?
         WHERE id = 1
         """
-        self.cursor.execute(saveModeInDB, (selected_value,))
-        self.connection.commit()
+        self.settingscursor.execute(saveModeInDB, (selected_value,))
+        self.settingsconnection.commit()
 
         self.reload_spiel_button_command()
         
@@ -2139,8 +2146,8 @@ class Window(ctk.CTk):
         WHERE id = 1
         """
         self.custom_print("on_start_time_change", self.start_time.get())
-        self.cursor.execute(saveStartTimeInDB, (self.start_time.get(),))
-        self.connection.commit()
+        self.settingscursor.execute(saveStartTimeInDB, (self.start_time.get(),))
+        self.settingsconnection.commit()
 
         self.updated_data.update({"startTime": get_data_for_website(7)})
         
@@ -2156,8 +2163,8 @@ class Window(ctk.CTk):
         WHERE id = 1
         """
         print("on_time_interval_change", self.time_interval.get())
-        self.cursor.execute(saveTimeIntervalInDB, (self.time_interval.get(),))
-        self.connection.commit()
+        self.settingscursor.execute(saveTimeIntervalInDB, (self.time_interval.get(),))
+        self.settingsconnection.commit()
         
         self.updated_data.update({"timeInterval": self.time_interval.get().replace("m", "")})
         
@@ -2173,8 +2180,8 @@ class Window(ctk.CTk):
         WHERE id = 1
         """
         print("on_time_intervalFM_change", self.time_intervalFM.get())
-        self.cursor.execute(saveTimeIntervalFMInDB, (self.time_intervalFM.get(),))
-        self.connection.commit()
+        self.settingscursor.execute(saveTimeIntervalFMInDB, (self.time_intervalFM.get(),))
+        self.settingsconnection.commit()
         
         self.updated_data.update({"timeIntervalFM": self.time_intervalFM.get().replace("m", "")})
         
@@ -2190,8 +2197,8 @@ class Window(ctk.CTk):
         WHERE id = 1
         """
         print("on_time_pause_before_FM_change", self.time_pause_before_FM.get())
-        self.cursor.execute(saveTimePauseBeforeFMInDB, (self.time_pause_before_FM.get(),))
-        self.connection.commit()
+        self.settingscursor.execute(saveTimePauseBeforeFMInDB, (self.time_pause_before_FM.get(),))
+        self.settingsconnection.commit()
         
         self.updated_data.update({"pauseBeforeFM": self.time_pause_before_FM.get().replace("m", "")})
         
@@ -2205,8 +2212,8 @@ class Window(ctk.CTk):
         WHERE id = 1
         """
         print("on_website_title_change", self.website_title.get())
-        self.cursor.execute(saveWebsiteTitleInDB, (self.website_title.get(),))
-        self.connection.commit()
+        self.settingscursor.execute(saveWebsiteTitleInDB, (self.website_title.get(),))
+        self.settingsconnection.commit()
         
         self.updated_data.update({"websiteTitle": self.website_title.get()})
    
