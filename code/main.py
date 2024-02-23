@@ -532,6 +532,8 @@ class Window(ctk.CTk):
         self.team_button_font_size = self.screenwidth / 150
         self.team_button_width = self.screenwidth / 15
         self.team_button_height = self.screenheight / 30
+        
+        self.cool_current_team_label = ctk.CTkLabel(self.test_frame, text="", font=("Helvetica", self.team_button_font_size * 1.4, "bold"), fg_color="#0e1718")
 
         for i, teamID in enumerate(team_IDs):
             try:
@@ -547,7 +549,7 @@ class Window(ctk.CTk):
                 team_button = ctk.CTkButton(
                     self.player_top_frame,
                     text=teamName,
-                    command=lambda id=teamID, i2=i: self.select_team(id, self.team_button_list, i2),
+                    command=lambda id=teamID, text=teamName, i2=i: self.select_team(id, self.team_button_list, i2, text),
                     width=self.team_button_width,
                     fg_color="#34757a",
                     hover_color="#1f4346",
@@ -560,7 +562,7 @@ class Window(ctk.CTk):
                 team_button = ctk.CTkButton(
                     self.player_bottom_frame,
                     text=teamName,
-                    command=lambda id=teamID, i2=i: self.select_team(id, self.team_button_list, i2),
+                    command=lambda id=teamID, text=teamName, i2=i: self.select_team(id, self.team_button_list, i2, text),
                     width=self.team_button_width,
                     fg_color="#34757a",
                     hover_color="#1f4346",
@@ -573,7 +575,8 @@ class Window(ctk.CTk):
             
         self.player_top_frame.pack(anchor=tk.NW, side=tk.TOP, pady=5, padx=5)
         self.player_bottom_frame.pack(anchor=tk.NW, side=tk.TOP, pady=5, padx=5)
-        
+        self.cool_current_team_label.pack(anchor=tk.NW, side=tk.BOTTOM, pady=5, padx=5)
+
         
     def save_names_player(self, team_id=-1):
         entries = self.variable_dict.get(f"entries{self.frameplayer}")
@@ -732,7 +735,7 @@ class Window(ctk.CTk):
                 team_button = ctk.CTkButton(
                     self.player_top_frame,
                     text=teamName,
-                    command=lambda id=teamID, i2=i: self.select_team(id, self.team_button_list, i2),
+                    command=lambda id=teamID, text=teamName, i2=i: self.select_team(id, self.team_button_list, i2, text),
                     width=self.team_button_width,
                     fg_color="#34757a",
                     hover_color="#1f4346",
@@ -745,7 +748,7 @@ class Window(ctk.CTk):
                 team_button = ctk.CTkButton(
                     self.player_bottom_frame,
                     text=teamName,
-                    command=lambda id=teamID, i2=i: self.select_team(id, self.team_button_list, i2),
+                    command=lambda id=teamID, text=teamName, i2=i: self.select_team(id, self.team_button_list, i2, text),
                     width=self.team_button_width,
                     fg_color="#34757a",
                     hover_color="#1f4346",
@@ -783,7 +786,7 @@ class Window(ctk.CTk):
         self.variable_dict[varcountname] = 0
     
     
-    def select_team(self, teamID, team_button_list, index):
+    def select_team(self, teamID, team_button_list, index, teamName=""):
         
         #for button in team_button_list:
         #    button.configure(bg="lightgray")
@@ -821,6 +824,9 @@ class Window(ctk.CTk):
         self.variable_dict[varentrie3name] = []
         self.variable_dict[varlabelname] = []
         
+        print("teamName", teamName)
+        
+        self.cool_current_team_label.configure(text=str(teamName))
         #print("teamName", teamName)
         
         self.cool_current_team_label.configure(text=str(teamName))
