@@ -824,7 +824,7 @@ class Window(ctk.CTk):
         self.variable_dict[varentrie3name] = []
         self.variable_dict[varlabelname] = []
         
-        print("teamName", teamName)
+        #print("teamName", teamName)
         
         self.cool_current_team_label.configure(text=str(teamName))
         #print("teamName", teamName)
