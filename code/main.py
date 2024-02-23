@@ -1113,7 +1113,7 @@ class Window(ctk.CTk):
         
             ######################################################
             #Time Display
-            
+            print(f"Time Display, here are the teams: {self.teams_playing} and the active_match: {self.active_match}")
             # Create a new frame
             time_frame = ctk.CTkFrame(manual_frame, fg_color='#142324', corner_radius=5)
             time_frame.pack(anchor=tk.SE, side=tk.RIGHT, padx=10, pady=10, expand=True)
@@ -1194,16 +1194,20 @@ class Window(ctk.CTk):
             starttime = datetime.datetime.strptime(starttime_str, '%H:%M')
 
             # get the number of the active match
-            active_match = self.get_active_match(self.teams_playing[0], self.teams_playing[1]) - 1
+            active_match = self.active_match
 
             # get the time interval from settings
             timeinterval = int(self.time_interval.get().replace("m", ""))
             
+            time_interval_final_matches = int(self.time_intervalFM.get().replace("m", ""))
+            
             # get time pause final matches
             pause_between_final_matches = int(self.time_pause_before_FM.get().replace("m", ""))
+            
+            print(f"active_match: {active_match}, time_interval_final_matches: {time_interval_final_matches}, timeinterval: {timeinterval}, match_count: {match_count}, pause_between_final_matches: {pause_between_final_matches}")
 
             # calculate the time for the current match
-            current_match_time = starttime + datetime.timedelta(minutes=(timeinterval * active_match) + (timeinterval * match_count) + pause_between_final_matches)
+            current_match_time = starttime + datetime.timedelta(minutes=(time_interval_final_matches * active_match) + (timeinterval * match_count) + pause_between_final_matches)
 
             if next_match:
                 return current_match_time.strftime('%H:%M'), (current_match_time + datetime.timedelta(minutes=timeinterval)).strftime('%H:%M')
