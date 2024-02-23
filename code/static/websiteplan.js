@@ -73,6 +73,19 @@ function generateTableGroup(matches) {
         var cellSecondTeam = row.insertCell(4);
         cellSecondTeam.textContent = match[1];
 
+        if (data["activeMatchNumber"] > i) {
+            if (match[2] > match[3]) {
+                cellFirstTeam.className = "style-winner";
+                cellSecondTeam.className = "style-loser";
+            } else if (match[2] < match[3]) {
+                cellSecondTeam.className = "style-winner";
+                cellFirstTeam.className = "style-loser";
+            } else {
+                cellFirstTeam.className = "style-draw";
+                cellSecondTeam.className = "style-draw";
+            }
+        }
+
         var cellT = row.insertCell(5);
         cellT.textContent = match[2] + " : " + match[3];
 

@@ -256,26 +256,37 @@ function drawLinesBetweenBoxes(box, nextBox, svg) {
 
 function writeTeamData(matchCount = 2) {
     if ("finalMatches" in data) {
-        if (data["finalMatches"] == null) {
-            return;
-        }
         var matchData = data["finalMatches"];
-        console.log(data["finalMatches"]);
 
-        if (matchData.length > Math.abs(data["activeMatchNumber"])) {
-            if (matchData.length / 2 < Math.abs(data["activeMatchNumber"])) {
-                var finalMatchesSliced = matchData;
-            } else {
-                var finalMatchesSliced = matchData.slice(0, 2);
-            }
-            while (finalMatchesSliced.length < matchData.length) {
+        var finalMatches = data["finalMatches"];
+        if (finalMatches == null) {
+            var finalMatchesSliced = [];
+            while (finalMatchesSliced.length < 4) {
                 finalMatchesSliced.push(["???", "???", ["0", "0"]]);
             }
+
+            var totalMatchNumber = 4;
+        } else {
+            if (finalMatches.length > Math.abs(data["activeMatchNumber"])) {
+                if (
+                    finalMatches.length / 2 <
+                    Math.abs(data["activeMatchNumber"])
+                ) {
+                    var finalMatchesSliced = finalMatches;
+                } else {
+                    var finalMatchesSliced = finalMatches.slice(0, 2);
+                }
+                while (finalMatchesSliced.length < finalMatches.length) {
+                    finalMatchesSliced.push(["???", "???", ["0", "0"]]);
+                }
+            } else {
+                var finalMatchesSliced = finalMatches;
+            }
+
+            var totalMatchNumber = finalMatchesSliced.length;
         }
 
         finalMatchesSliced.reverse();
-
-        console.log(matchData);
 
         for (var i = 0; i < matchCount * 2; i++) {
             var match = finalMatchesSliced[i];
