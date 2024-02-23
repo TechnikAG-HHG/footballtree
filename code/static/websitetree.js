@@ -15,10 +15,6 @@ function drawTree() {
     boxfinal.className += ` drawn-box`;
     boxfinal.className += ` box${0}`;
     boxfinal.style.height = `${boxheight}%`;
-    var textfinal = document.createElement("div");
-    textfinal.className = "text-final";
-    textfinal.textContent = "Finale";
-    boxfinal.appendChild(textfinal);
     document.getElementById("main-container").appendChild(boxfinal);
 
     var subboxfinal = document.createElement("div");
@@ -88,14 +84,12 @@ function drawTree() {
         box1.className = `box${i}`;
         box1.className += " drawn-box";
         box1.style.height = `${boxheight}%`;
-        box1.textContent = "Halbfinale";
 
         //create the box2
         var box2 = document.createElement("div");
         box2.className = `box${i}`;
         box2.className += " drawn-box";
         box2.style.height = `${boxheight}%`;
-        box2.textContent = "Halbfinale";
 
         // Append the boxes to the container
         document.getElementById("main-container").appendChild(box1);

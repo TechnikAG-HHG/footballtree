@@ -1,10 +1,11 @@
 html,
 body {
     width: 100%;
-    margin: 0; /* Add this line */
-    padding: 0; /* Add this line */
+    margin: 0;
+    padding: 0;
     font-family: "Roboto", sans-serif;
     scroll-behavior: smooth;
+    overflow: hidden; /* Add this line */
 }
 
 .header {
@@ -152,15 +153,17 @@ body {
     border: 0.3vw solid burlywood;
 }
 
-.text-final {
-    width: 100%;
-    margin-right: 0.5vw;
-    margin-left: 0.5vw;
-    font-size: 3vw;
-    font-weight: bold;
+.text-labels {
+    height: 100%;
+    font-size: 2vw;
+    margin-left: 13vw;
+    margin-right: 13vw;
     color: white;
     font-family: "Roboto", sans-serif;
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
     align-items: center;
+    list-style: none;
+    padding: 0%;
+    font-weight: bold;
 }
