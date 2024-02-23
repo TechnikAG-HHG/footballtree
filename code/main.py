@@ -156,7 +156,7 @@ class Window(ctk.CTk):
         playerDataTableCreationQuery = """
         CREATE TABLE IF NOT EXISTS playerData (
             id INTEGER PRIMARY KEY,
-            playerName TEXT UNIQUE,
+            playerName TEXT,
             playerNumber INTEGER,
             teamId INTEGER REFERENCES teamData(id) DEFAULT 0,
             goals INTEGER DEFAULT 0
@@ -585,27 +585,15 @@ class Window(ctk.CTk):
 
         if team_id == -1:
             team_id = self.selected_team_in_player
-
+            
         # Fetch existing player names
         self.cursor.execute("SELECT playerName FROM playerData")
         existing_players = [row[0] for row in self.cursor.fetchall()]
 
+        # Delete all entries related to the specified team ID
+        self.cursor.execute("DELETE FROM playerData WHERE teamId = ?", (team_id,))
+
         if entries:
-            # Drop the table
-            self.cursor.execute("DROP TABLE IF EXISTS playerData")
-
-            # Create the table
-            playerDataTableCreationQuery = """
-            CREATE TABLE IF NOT EXISTS playerData (
-                id INTEGER PRIMARY KEY,
-                playerName TEXT UNIQUE,
-                playerNumber INTEGER,
-                teamId INTEGER REFERENCES teamData(id) DEFAULT 0,
-                goals INTEGER DEFAULT 0
-            )
-            """
-            self.cursor.execute(playerDataTableCreationQuery)
-
             # Iterate through the current entries and insert
             for entry, entrie2, entrie3 in zip(entries, entries2, entries3):
                 entry_text = str(entry.get())
@@ -627,6 +615,7 @@ class Window(ctk.CTk):
                         self.cursor.execute(insert_query, (entry_text, entry_text2, entry_text3, team_id))
 
             self.connection.commit()
+
     
     def add_name_entry_player(self, Frame, Counter, entry_text="", entry_text2="", entry_text3=""):
         if self.selected_team_in_player == "":
@@ -850,7 +839,6 @@ class Window(ctk.CTk):
 
             for row in self.cursor.fetchall():
                 output.append(row)
-                print("row", row)
 
         elif readGoals and playerID != -1:
             #self.custom_print("readGoals", readGoals, "playerID", playerID, "teamID", teamID)
@@ -981,6 +969,7 @@ class Window(ctk.CTk):
         SPIEL_button = ctk.CTkButton(manual_manual_frame, text="Reload", command=lambda : self.reload_spiel_button_command(True), width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")            
         SPIEL_button.pack(pady=10, side=tk.BOTTOM, anchor=tk.S, padx=10) 
         
+        
         # Assuming self.spiel_buttons is initialized as an empty dictionary
         self.spiel_buttons = {}
         
@@ -1084,9 +1073,6 @@ class Window(ctk.CTk):
 
                 playertext1 = ctk.CTkLabel(self.group_frame, text=f"Player {i}", font=("Helvetica", self.team_button_font_size))
                 playertext1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
-                
-                if player_number == "" or player_number == None:
-                    player_number = "None"
                 
                 playertext2_text = f"{player_name} - {player_number}"
                 
@@ -1419,16 +1405,10 @@ class Window(ctk.CTk):
     def get_values_list_mode2(self):
         values_list = []
         self.get_teams_for_end_matches()
-
-        endteam1 = getattr(self, 'endteam1', [None, None])
-        endteam2 = getattr(self, 'endteam2', [None, None])
-        endteam3 = getattr(self, 'endteam3', [None, None])
-        endteam4 = getattr(self, 'endteam4', [None, None])
-
-        values_list.append(f"Spiel 1 Halb: {endteam1[1]} vs {endteam3[1]}")
-        values_list.append(f"Spiel 2 Halb: {endteam2[1]} vs {endteam4[1]}")
-        values_list.append(self.get_spiel_um_platz_3(endteam1, endteam3, endteam2, endteam4))
-        values_list.append(self.get_final_match(endteam1, endteam3, endteam2, endteam4))
+        values_list.append(f"Spiel 1 Halb: {self.endteam1[1]} vs {self.endteam3[1]}")
+        values_list.append(f"Spiel 2 Halb: {self.endteam2[1]} vs {self.endteam4[1]}")
+        values_list.append(self.get_spiel_um_platz_3(self.endteam1, self.endteam3, self.endteam2, self.endteam4))
+        values_list.append(self.get_final_match(self.endteam1, self.endteam3, self.endteam2, self.endteam4))
         
         active_match = self.active_match
         if self.spiel_um_platz_3 != None and self.final_match_teams != None and self.spiel_um_platz_3 != [] and self.final_match_teams != []:
@@ -1479,6 +1459,8 @@ class Window(ctk.CTk):
         
         #get the two best teams
         teams2 = self.cursor.fetchall()
+        
+        values_list = []
         
         if teams1 != [] and teams2 != []:
         
