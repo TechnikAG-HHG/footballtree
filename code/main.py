@@ -9,6 +9,7 @@ import time
 from flask import Flask, send_file, request, abort, render_template, make_response, session, redirect, jsonify
 import sqlite3
 import vlc
+import datetime
 
 app = Flask(__name__)
 #app.secret_key = "Felix.com"
@@ -867,39 +868,39 @@ class Window(ctk.CTk):
     def read_teamNames(self, teams_to_read=-1):
         teamNames = [""]
         
-        if self.active_mode.get() == 1 or True:
+        #if self.active_mode.get() == 1 or True:
         
-            if teams_to_read != -1:
-                for team in teams_to_read:
-                    if team != None:
-                        team = int(team) + 1
-                            
-                        selectTeam = """
-                        SELECT teamName FROM teamData
-                        WHERE id = ?
-                        ORDER BY id ASC
-                        """
-                        self.cursor.execute(selectTeam, (team,))
-                        result = self.cursor.fetchone()
-                        if result is not None:
-                            #self.custom_print(result)
-                            teamNames.append(result[0])
-            
-            else:
-                selectTeams = """
-                SELECT teamName FROM teamData
-                ORDER BY id ASC
-                """
-                self.cursor.execute(selectTeams)
-            
-                for team in self.cursor.fetchall():
-                    teamNames.append(team[0])
+        if teams_to_read != -1:
+            for team in teams_to_read:
+                if team != None:
+                    team = int(team) + 1
+                        
+                    selectTeam = """
+                    SELECT teamName FROM teamData
+                    WHERE id = ?
+                    ORDER BY id ASC
+                    """
+                    self.cursor.execute(selectTeam, (team,))
+                    result = self.cursor.fetchone()
+                    if result is not None:
+                        #self.custom_print(result)
+                        teamNames.append(result[0])
+        
+        else:
+            selectTeams = """
+            SELECT teamName FROM teamData
+            ORDER BY id ASC
+            """
+            self.cursor.execute(selectTeams)
+        
+            for team in self.cursor.fetchall():
+                teamNames.append(team[0])
             #self.custom_print("teamNames", teamNames)
-        elif self.active_mode.get() == 2:
-            teamNames.append(self.endteam1[1])
-            teamNames.append(self.endteam2[1])
-            teamNames.append(self.endteam3[1])
-            teamNames.append(self.endteam4[1])
+        #elif self.active_mode.get() == 2:
+        #    teamNames.append(self.endteam1[1])
+        #    teamNames.append(self.endteam2[1])
+        #    teamNames.append(self.endteam3[1])
+        #    teamNames.append(self.endteam4[1])
             
         
         return teamNames
@@ -908,16 +909,12 @@ class Window(ctk.CTk):
     def read_teamIds(self):
         teamIds = []
         
-        if self.active_mode.get() == 1 or True:
+        self.cursor.execute("SELECT id FROM teamData")
         
-            self.cursor.execute("SELECT id FROM teamData")
-            
-            for id in self.cursor.fetchall():
-                teamIds.append(id[0])
-            teamIds.sort()
-        elif self.active_mode.get() == 2:
-            teamIds = [1, 2, 3, 4]
-        
+        for id in self.cursor.fetchall():
+            teamIds.append(id[0])
+        teamIds.sort()
+
         return teamIds
 
 
@@ -975,13 +972,13 @@ class Window(ctk.CTk):
             if self.teams_playing[i] is not None:
                 self.custom_print("i" , i, "teamnames", team_names)
                 #self.custom_print(self.teams_playing[i])
-                try:
-                    team_name = team_names[self.teams_playing[i]]
-                except IndexError:
-                    self.teams_playing = [None, None]
-                    self.custom_print("IndexError in create_SPIEL_elements")
-                    self.create_SPIEL_elements()
-                    return
+                #try:
+                team_name = team_names[self.teams_playing[i]]
+                #except IndexError:
+                #    self.teams_playing = [None, None]
+                #    self.custom_print("IndexError in create_SPIEL_elements")
+                #    self.create_SPIEL_elements()
+                #    return
                 
             else:
                 # Handle the case when self.teams_playing[i + 1] is None
@@ -991,10 +988,11 @@ class Window(ctk.CTk):
             team_id = self.teams_playing[i]
             
             if i == 0:
-                team2_id = self.teams_playing[i + 1]
-            elif i == 1:
-                team2_id = self.teams_playing[i - 1]
+                team2_id = self.teams_playing[1]
+            else:
+                team2_id = self.teams_playing[0]
 
+            
             #self.custom_print(team)
             
             # Initialize the dictionary for the current team
@@ -1003,15 +1001,16 @@ class Window(ctk.CTk):
             self.for_team_frame = ctk.CTkFrame(self.SPIEL_frame, bg_color='#0e1718', fg_color='#0e1718')
             self.for_team_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, fill="both", padx=10, expand=True)
             
-            self.for_team_frame.tk_setPalette(
-                background='#0e1718', 
-                bg_color='#0e1718', 
-                fg_color='#0e1718',
-                activeBackground='#0e1718', 
-                activeForeground='#0e1718', 
-                foreground='#0e1718'
-                )
-            self.for_team_frame.configure(bg_color="#0e1718")
+            #self.for_team_frame.tk_setPalette(
+            #    background='#0e1718', 
+            #    bg_color='#0e1718', 
+            #    fg_color='#0e1718',
+            #    activeBackground='#0e1718', 
+            #    activeForeground='#0e1718', 
+            #    foreground='#0e1718'
+            #    )
+            
+            #self.for_team_frame.configure(bg_color="#0e1718")
             
             # Create global scores buttons, one for up and one for down
             score_button_frame = ctk.CTkFrame(self.for_team_frame, bg_color='#142324', fg_color='#142324')
@@ -1109,32 +1108,109 @@ class Window(ctk.CTk):
         self.manual_team_select_2.set("None")
         self.manual_team_select_2.pack(pady=10, side=tk.BOTTOM, anchor=tk.S, padx=10)
         #self.manual_team_select_2.bind("<<ComboboxSelected>>", lambda event, nr=0: self.on_team_select(event, nr))
+        
+        if self.teams_playing.count(None) == 0:
+        
+            ######################################################
+            #Time Display
+            
+            # Create a new frame
+            time_frame = ctk.CTkFrame(manual_frame, fg_color='#142324', corner_radius=5)
+            time_frame.pack(anchor=tk.SE, side=tk.RIGHT, padx=10, pady=10, expand=True)
+            
+            # Create a new frame for the first row
+            time_frame1 = ctk.CTkFrame(time_frame, fg_color='#142324', corner_radius=5)
+            time_frame1.pack(anchor=tk.S, side=tk.TOP, padx=10, pady=10, expand=True, fill=tk.X)
+
+            time_current_match, time_next_match = self.get_time_for_current_match(True)
+
+            self.time_label = ctk.CTkLabel(time_frame1, text=f"Current Match Start: ", font=("Helvetica", self.team_button_font_size * 1.5))
+            self.time_label.pack(side=tk.LEFT, pady=5, padx=10)
+
+            self.current_time_label = ctk.CTkLabel(time_frame1, text=f"{time_current_match}", font=("Helvetica", self.team_button_font_size * 1.5, "bold"))
+            self.current_time_label.pack(side=tk.RIGHT, pady=5, fill=tk.X, padx=10)
+
+            # Create a new frame for the second row
+            time_frame2 = ctk.CTkFrame(time_frame, fg_color='#142324', corner_radius=5)
+            time_frame2.pack(anchor=tk.S, side=tk.BOTTOM, padx=10, pady=10, expand=True, fill=tk.X)
+
+            self.time_label2 = ctk.CTkLabel(time_frame2, text=f"Next Match Start: ", font=("Helvetica", self.team_button_font_size * 1.5))
+            self.time_label2.pack(side=tk.LEFT, pady=5, padx=10, anchor=tk.S)
+
+            self.next_time_label = ctk.CTkLabel(time_frame2, text=f"{time_next_match}", font=("Helvetica", self.team_button_font_size * 1.5, "bold"))
+            self.next_time_label.pack(side=tk.RIGHT, pady=5, padx=10, anchor=tk.SE)
+            
+            ######################################################
 
 
         self.create_matches_labels(manual_frame)
 
 
-        if self.teams_playing.count(None) == 0 and self.teams_playing != []:
-            #self.custom_print(self.teams_playing)
-            #self.custom_print(self.read_teamNames())
-            self.manual_team_select_2.configure(state=tk.NORMAL)
-            self.manual_team_select_1.configure(state=tk.NORMAL)
-            self.manual_team_select_1.set(self.read_teamNames()[self.teams_playing[1]])
-            self.manual_team_select_2.set(self.read_teamNames()[self.teams_playing[0]])
-            
-        if self.teams_playing.count(None) == 2:
-            self.manual_team_select_1.configure(tk.DISABLED)
-            self.manual_team_select_1.set("None")
+        none_count = self.teams_playing.count(None)
+        team_names = self.read_teamNames()
 
+        if none_count == 0 and self.teams_playing:
+            self.configure_team_select(self.manual_team_select_2, tk.NORMAL, team_names[self.teams_playing[0]])
+            self.configure_team_select(self.manual_team_select_1, tk.NORMAL, team_names[self.teams_playing[1]])
+        elif none_count == 2:
+            self.configure_team_select(self.manual_team_select_1, tk.DISABLED, "None")
+        elif none_count == 1:
+            self.configure_team_select(self.manual_team_select_1, tk.NORMAL, "None")
+            self.configure_team_select(self.manual_team_select_2, tk.NORMAL, team_names[self.teams_playing[0]])    
+
+    
+    def configure_team_select(self, team_select, state, team_name):
+        team_select.configure(state=state)
+        team_select.set(team_name)
         
-        #self.custom_print("self.teams_playing", self.teams_playing)
-        if self.teams_playing.count(None) == 1:
-            #self.custom_print(self.teams_playing)
-            self.manual_team_select_1.configure(state=tk.NORMAL)
-            self.manual_team_select_1.set("None")
-            self.manual_team_select_2.set(self.read_teamNames()[self.teams_playing[0]])        
 
+    def get_time_for_current_match(self, next_match=False):
+        #get the number of entrys in the matchData table
+        self.cursor.execute("SELECT COUNT(*) FROM matchData")
+        match_count = self.cursor.fetchone()[0]
+        
+        if self.active_mode.get() == 1:
+            # Get the starttime from settings
+            starttime_str = str(self.start_time.get())
+            starttime = datetime.datetime.strptime(starttime_str, '%H:%M')
 
+            # get the number of the active match
+            active_match = self.get_active_match(self.teams_playing[0], self.teams_playing[1]) - 1
+
+            # get the time interval from settings
+            timeinterval = int(self.time_interval.get().replace("m", ""))
+
+            # calculate the time for the current match
+            current_match_time = starttime + datetime.timedelta(minutes=timeinterval * active_match)
+
+            if next_match and active_match <= match_count:
+                return current_match_time.strftime('%H:%M'), (current_match_time + datetime.timedelta(minutes=timeinterval)).strftime('%H:%M')
+            # return the time in 00:00 format
+            return current_match_time.strftime('%H:%M')      
+        
+        elif self.active_mode.get() == 2:
+            # Get the starttime from settings
+            starttime_str = str(self.start_time.get())
+            starttime = datetime.datetime.strptime(starttime_str, '%H:%M')
+
+            # get the number of the active match
+            active_match = self.get_active_match(self.teams_playing[0], self.teams_playing[1]) - 1
+
+            # get the time interval from settings
+            timeinterval = int(self.time_interval.get().replace("m", ""))
+            
+            # get time pause final matches
+            pause_between_final_matches = int(self.time_pause_before_FM.get().replace("m", ""))
+
+            # calculate the time for the current match
+            current_match_time = starttime + datetime.timedelta(minutes=(timeinterval * active_match) + (timeinterval * match_count) + pause_between_final_matches)
+
+            if next_match:
+                return current_match_time.strftime('%H:%M'), (current_match_time + datetime.timedelta(minutes=timeinterval)).strftime('%H:%M')
+            # return the time in 00:00 format
+            return current_match_time.strftime('%H:%M')
+        
+    
     def on_team_select(self, event, nr):
         #self.custom_print("on_team_select")
         #self.custom_print(event)
@@ -1258,10 +1334,14 @@ class Window(ctk.CTk):
     
     
     def create_matches_labels(self, frame):
+        
         matches = self.calculate_matches()
+        
         spiel_select_frame = ctk.CTkFrame(frame, fg_color='#142324', corner_radius=5)
         spiel_select_frame.pack(pady=10, padx=10, anchor=tk.SW, side=tk.LEFT)
+        
         width = self.screenwidth / 9
+        
         spiel_select = ctk.CTkComboBox(spiel_select_frame, font=("Helvetica", self.team_button_font_size * 1.2), width=width, values=[""], command=lambda event: self.on_match_select(event, matches))
         spiel_select.pack(pady=10, side=tk.TOP, anchor=tk.N, padx=10)
 
@@ -1570,6 +1650,9 @@ class Window(ctk.CTk):
                 self.reload_spiel_button_command()
                 self.show_frame(self.SPIEL_frame)
                 
+                self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
+                self.updated_data.update({"Games": get_data_for_website(2)})
+                
 
                 # Print statements
                 print("current_match_index:", current_match_index)
@@ -1595,6 +1678,7 @@ class Window(ctk.CTk):
             #self.save_games_played_in_db(self.active_match)
             
             self.updated_data.update({"Games": get_data_for_website(2)})
+
 
     def global_scored_a_point(self, teamID, team2ID, direction="UP"):
         # Get the current score
@@ -2025,6 +2109,7 @@ class Window(ctk.CTk):
             return False
         return True
 
+
     def on_start_time_change(self, event):
         if self.start_time.get() == "":
             return
@@ -2164,43 +2249,43 @@ class Window(ctk.CTk):
     def calculate_matches(self):
         self.match_count = 0  # Reset matchCount to 0
 
-        if self.active_mode.get() == 1 or True:
-            initial_data = {
-                "Teams": self.read_teamNames()
-            }
+    #if self.active_mode.get() == 1 or True:
+        initial_data = {
+            "Teams": self.read_teamNames()
+        }
 
-            initial_data["Teams"].pop(0)
+        initial_data["Teams"].pop(0)
 
-            teams = initial_data["Teams"][:]  # Create a copy of the teams array
-            
-            teams.sort()
-            
-            #print("calculate_matches: teams", teams)
-
-            # If the number of teams is odd, add a "dummy" team
-            #if len(teams) % 2 != 0:
-            #    print("calculate_matches: uneven number of teams, appending dummy team")
-            #    teams.append("dummy")
-
-            midpoint = (len(teams) + 1) // 2
-            group1 = teams[:midpoint]
-            group2 = teams[midpoint:]
-
-            matches1 = self.calculate_matches_for_group(group1, "Gruppe 1")
-            matches2 = self.calculate_matches_for_group(group2, "Gruppe 2")
-
-            matches = self.interleave_matches(matches1, matches2)
-
-            self.match_count = 0  # Reset matchCount to 0
-
-            self.matches = list(map(lambda match: self.add_match_number(match), matches))
-            
-            #self.custom_print("self.matches", self.matches)
-            
-            self.save_matches_to_db()
-            
-            self.updated_data.update({"Matches": get_data_for_website(4)})
+        teams = initial_data["Teams"][:]  # Create a copy of the teams array
         
+        teams.sort()
+        
+        #print("calculate_matches: teams", teams)
+
+        # If the number of teams is odd, add a "dummy" team
+        #if len(teams) % 2 != 0:
+        #    print("calculate_matches: uneven number of teams, appending dummy team")
+        #    teams.append("dummy")
+
+        midpoint = (len(teams) + 1) // 2
+        group1 = teams[:midpoint]
+        group2 = teams[midpoint:]
+
+        matches1 = self.calculate_matches_for_group(group1, "Gruppe 1")
+        matches2 = self.calculate_matches_for_group(group2, "Gruppe 2")
+
+        matches = self.interleave_matches(matches1, matches2)
+
+        self.match_count = 0  # Reset matchCount to 0
+
+        self.matches = list(map(lambda match: self.add_match_number(match), matches))
+        
+        #self.custom_print("self.matches", self.matches)
+        
+        self.save_matches_to_db()
+        
+        self.updated_data.update({"Matches": get_data_for_website(4)})
+    
         return self.matches
 
 
