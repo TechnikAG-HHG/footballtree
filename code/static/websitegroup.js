@@ -211,7 +211,24 @@ function sortRowsByPoints(table) {
         var bPCell = b.querySelector("[class*='pCell']");
         var aP = aPCell ? parseInt(aPCell.textContent) : 0;
         var bP = bPCell ? parseInt(bPCell.textContent) : 0;
-        return bP - aP;
+
+        // Extract the data from .tcell
+        var aTCell = a.querySelector(".tcell");
+        var bTCell = b.querySelector(".tcell");
+        var aData = aTCell ? aTCell.textContent.trim() : "";
+        var bData = bTCell ? bTCell.textContent.trim() : "";
+
+        // Parse the data to get the scores
+        var aScore = aData ? parseInt(aData.split(" : ")[0]) : 0;
+        var bScore = bData ? parseInt(bData.split(" : ")[0]) : 0;
+
+        // Sort by points first
+        if (aP !== bP) {
+            return bP - aP;
+        }
+
+        // If points are the same, sort by goal difference
+        return (bScore - aScore) - (aScore - bScore);
     });
 
     while (tbody.firstChild) {
@@ -236,4 +253,4 @@ document.getElementById("returnButton").addEventListener("click", function () {
 generateTables();
 
 // call updateData() every 5 seconds
-setInterval(updateData, 2000);
+setInterval(updateData, 5000);

@@ -25,6 +25,14 @@
 
         <div id="tablesContainer"></div>
 
+        <footer>
+            <ul id="footer-list">
+                <li>Sp = Spiele</li>
+                <li>T = Tore</li>
+                <li>P = Punkte</li>
+            </ul>
+        </footer>
+
         <script>
             var data = {{ initial_data|tojson|safe }};
             console.log('Initial data:', data);

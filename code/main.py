@@ -222,7 +222,6 @@ class Window(ctk.CTk):
         self.time_interval = tk.StringVar(value="10m")
         self.time_intervalFM = tk.StringVar(value="10m")
         self.time_pause_before_FM = tk.StringVar(value="0m") 
-        self.final_time_interval = tk.StringVar(value="10m")
 
         
         #self.round_time = settings[1]
@@ -2047,17 +2046,12 @@ class Window(ctk.CTk):
         
         
         # pause time before final matches
-        time_pause_before_FM_label = ctk.CTkLabel(option_frame, text="Time Pause for Final Matches", font=("Helvetica", 19))
+        time_pause_before_FM_label = ctk.CTkLabel(option_frame, text="Time Pause Final Matches", font=("Helvetica", 19))
         time_pause_before_FM_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
         
         time_pause_before_FM_entry = ctk.CTkEntry(option_frame, textvariable=self.time_pause_before_FM, font=("Helvetica", 17))
         time_pause_before_FM_entry.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
         time_pause_before_FM_entry.bind("<KeyRelease>", lambda event: self.on_time_pause_before_FM_change(event))
-        
-        final_time_interval_label = ctk.CTkLabel(option_frame, text="Final Time Interval", font=("Helvetica", 19))
-        final_time_interval_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
-        final_time_interval_entry = ctk.CTkEntry(option_frame, textvariable=self.final_time_interval, font=("Helvetica", 17))
-        final_time_interval_entry.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
         
         
     def on_volume_change(self, event):
@@ -2184,23 +2178,6 @@ class Window(ctk.CTk):
         self.connection.commit()
         
         self.updated_data.update({"pauseBeforeFM": self.time_pause_before_FM.get().replace("m", "")})
-    
-    
-    def on_final_time_interval_change(self, event):
-        if self.final_time_interval.get() == "":
-            return
-        if self.final_time_interval.get()[-1] not in "0123456789m" or not "m" in self.final_time_interval.get() or len(self.final_time_interval.get()) < 1:
-            return
-        saveFinalTimeIntervalInDB = """
-        UPDATE settingsData
-        SET finalTimeInterval = ?
-        WHERE id = 1
-        """
-        print("on_final_time_interval_change", self.final_time_interval.get())
-        self.cursor.execute(saveFinalTimeIntervalInDB, (self.final_time_interval.get(),))
-        self.connection.commit()
-        
-        self.updated_data.update({"finalTimeInterval": self.final_time_interval.get().replace("m", "")})
    
             
 ##############################################################################################
@@ -2808,7 +2785,6 @@ def get_initial_data(template_name):
         "timeInterval": tkapp.time_interval.get().replace("m", ""),
         "timeIntervalFM": tkapp.time_intervalFM.get().replace("m", ""),
         "pauseBeforeFM": tkapp.time_pause_before_FM.get().replace("m", ""),
-        "finalTimeInterval": tkapp.final_time_interval.get().replace("m", ""),
         "startTime": get_data_for_website(7),
         "LastUpdate": 0
     }

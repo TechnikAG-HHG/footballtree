@@ -73,6 +73,19 @@ function generateTableGroup(matches) {
         var cellSecondTeam = row.insertCell(4);
         cellSecondTeam.textContent = match[1];
 
+        if (data["activeMatchNumber"] > i || data["activeMatchNumber"] < 0) {
+            if (match[2] > match[3]) {
+                cellFirstTeam.className = "style-winner";
+                cellSecondTeam.className = "style-loser";
+            } else if (match[2] < match[3]) {
+                cellSecondTeam.className = "style-winner";
+                cellFirstTeam.className = "style-loser";
+            } else {
+                cellFirstTeam.className = "style-draw";
+                cellSecondTeam.className = "style-draw";
+            }
+        }
+
         var cellT = row.insertCell(5);
         cellT.textContent = match[2] + " : " + match[3];
 
@@ -236,6 +249,20 @@ function finalMatchTable() {
             var cellSecondTeam = row.insertCell(3);
             cellSecondTeam.textContent = match[1];
 
+            if (Math.abs(data["activeMatchNumber"]) - 1 > i) {
+                console.log("activeMatchNumber", data["activeMatchNumber"]);
+                if (match[2][0] > match[2][1]) {
+                    cellFirstTeam.className = "style-winner";
+                    cellSecondTeam.className = "style-loser";
+                } else if (match[2][0] < match[2][1]) {
+                    cellSecondTeam.className = "style-winner";
+                    cellFirstTeam.className = "style-loser";
+                } else {
+                    cellFirstTeam.className = "style-draw";
+                    cellSecondTeam.className = "style-draw";
+                }
+            }
+
             var cellT = row.insertCell(4);
             cellT.textContent = match[2][0] + " : " + match[2][1];
 
@@ -300,4 +327,4 @@ startTime.setHours(data["startTime"][0], data["startTime"][1], 0, 0);
 generateTableGroup(data["Matches"]);
 finalMatchTable();
 // call updateData() every 5 seconds
-setInterval(updateData, 2000);
+setInterval(updateData, 5000);

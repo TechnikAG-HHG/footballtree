@@ -121,3 +121,15 @@ td {
     box-shadow: 0.7vw 0.7vw 0.7vw 0.2vw rgba(0, 0, 0, 0.501),
         2vw 2vw 1vw 0.2vw rgba(0, 0, 0, 0.299);
 }
+
+.style-winner {
+    color: gold;
+}
+
+.style-loser {
+    color: #ff4d4d;
+}
+
+.style-draw {
+    color: #c7c7c7;
+}
