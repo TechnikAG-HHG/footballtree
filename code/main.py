@@ -9,6 +9,7 @@ import time
 from flask import Flask, send_file, request, abort, render_template, make_response, session, redirect, jsonify
 import sqlite3
 import vlc
+import datetime
 
 app = Flask(__name__)
 #app.secret_key = "Felix.com"
@@ -909,16 +910,12 @@ class Window(ctk.CTk):
     def read_teamIds(self):
         teamIds = []
         
-        if self.active_mode.get() == 1 or True:
+        self.cursor.execute("SELECT id FROM teamData")
         
-            self.cursor.execute("SELECT id FROM teamData")
-            
-            for id in self.cursor.fetchall():
-                teamIds.append(id[0])
-            teamIds.sort()
-        elif self.active_mode.get() == 2:
-            teamIds = [1, 2, 3, 4]
-        
+        for id in self.cursor.fetchall():
+            teamIds.append(id[0])
+        teamIds.sort()
+
         return teamIds
 
 
@@ -1112,6 +1109,39 @@ class Window(ctk.CTk):
         self.manual_team_select_2.set("None")
         self.manual_team_select_2.pack(pady=10, side=tk.BOTTOM, anchor=tk.S, padx=10)
         #self.manual_team_select_2.bind("<<ComboboxSelected>>", lambda event, nr=0: self.on_team_select(event, nr))
+        
+        if self.teams_playing.count(None) == 0:
+        
+            ######################################################
+            #Time Display
+            
+            # Create a new frame
+            time_frame = ctk.CTkFrame(manual_frame, fg_color='#142324', corner_radius=5)
+            time_frame.pack(anchor=tk.SE, side=tk.RIGHT, padx=10, pady=10, expand=True)
+            
+            # Create a new frame for the first row
+            time_frame1 = ctk.CTkFrame(time_frame, fg_color='#142324', corner_radius=5)
+            time_frame1.pack(anchor=tk.S, side=tk.TOP, padx=10, pady=10, expand=True, fill=tk.X)
+
+            time_current_match, time_next_match = self.get_time_for_current_match(True)
+
+            self.time_label = ctk.CTkLabel(time_frame1, text=f"Current Match Start: ", font=("Helvetica", self.team_button_font_size * 1.5))
+            self.time_label.pack(side=tk.LEFT, pady=5, padx=10)
+
+            self.current_time_label = ctk.CTkLabel(time_frame1, text=f"{time_current_match}", font=("Helvetica", self.team_button_font_size * 1.5, "bold"))
+            self.current_time_label.pack(side=tk.RIGHT, pady=5, fill=tk.X, padx=10)
+
+            # Create a new frame for the second row
+            time_frame2 = ctk.CTkFrame(time_frame, fg_color='#142324', corner_radius=5)
+            time_frame2.pack(anchor=tk.S, side=tk.BOTTOM, padx=10, pady=10, expand=True, fill=tk.X)
+
+            self.time_label2 = ctk.CTkLabel(time_frame2, text=f"Next Match Start: ", font=("Helvetica", self.team_button_font_size * 1.5))
+            self.time_label2.pack(side=tk.LEFT, pady=5, padx=10, anchor=tk.S)
+
+            self.next_time_label = ctk.CTkLabel(time_frame2, text=f"{time_next_match}", font=("Helvetica", self.team_button_font_size * 1.5, "bold"))
+            self.next_time_label.pack(side=tk.RIGHT, pady=5, padx=10, anchor=tk.SE)
+            
+            ######################################################
 
 
         self.create_matches_labels(manual_frame)
@@ -1133,8 +1163,55 @@ class Window(ctk.CTk):
     def configure_team_select(self, team_select, state, team_name):
         team_select.configure(state=state)
         team_select.set(team_name)
+        
 
+    def get_time_for_current_match(self, next_match=False):
+        #get the number of entrys in the matchData table
+        self.cursor.execute("SELECT COUNT(*) FROM matchData")
+        match_count = self.cursor.fetchone()[0]
+        
+        if self.active_mode.get() == 1:
+            # Get the starttime from settings
+            starttime_str = str(self.start_time.get())
+            starttime = datetime.datetime.strptime(starttime_str, '%H:%M')
 
+            # get the number of the active match
+            active_match = self.get_active_match(self.teams_playing[0], self.teams_playing[1]) - 1
+
+            # get the time interval from settings
+            timeinterval = int(self.time_interval.get().replace("m", ""))
+
+            # calculate the time for the current match
+            current_match_time = starttime + datetime.timedelta(minutes=timeinterval * active_match)
+
+            if next_match and active_match <= match_count:
+                return current_match_time.strftime('%H:%M'), (current_match_time + datetime.timedelta(minutes=timeinterval)).strftime('%H:%M')
+            # return the time in 00:00 format
+            return current_match_time.strftime('%H:%M')      
+        
+        elif self.active_mode.get() == 2:
+            # Get the starttime from settings
+            starttime_str = str(self.start_time.get())
+            starttime = datetime.datetime.strptime(starttime_str, '%H:%M')
+
+            # get the number of the active match
+            active_match = self.get_active_match(self.teams_playing[0], self.teams_playing[1]) - 1
+
+            # get the time interval from settings
+            timeinterval = int(self.time_interval.get().replace("m", ""))
+            
+            # get time pause final matches
+            pause_between_final_matches = int(self.time_pause_before_FM.get().replace("m", ""))
+
+            # calculate the time for the current match
+            current_match_time = starttime + datetime.timedelta(minutes=(timeinterval * active_match) + (timeinterval * match_count) + pause_between_final_matches)
+
+            if next_match:
+                return current_match_time.strftime('%H:%M'), (current_match_time + datetime.timedelta(minutes=timeinterval)).strftime('%H:%M')
+            # return the time in 00:00 format
+            return current_match_time.strftime('%H:%M')
+        
+    
     def on_team_select(self, event, nr):
         #self.custom_print("on_team_select")
         #self.custom_print(event)
@@ -1603,6 +1680,7 @@ class Window(ctk.CTk):
             
             self.updated_data.update({"Games": get_data_for_website(2)})
 
+
     def global_scored_a_point(self, teamID, team2ID, direction="UP"):
         # Get the current score
         self.custom_print("global_scored_a_point", "teamID", teamID, "team2ID", team2ID, "direction", direction)
@@ -2037,6 +2115,7 @@ class Window(ctk.CTk):
             return False
         return True
 
+
     def on_start_time_change(self, event):
         if self.start_time.get() == "":
             return
@@ -2105,6 +2184,7 @@ class Window(ctk.CTk):
         self.connection.commit()
         
         self.updated_data.update({"pauseBeforeFM": self.time_pause_before_FM.get().replace("m", "")})
+    
     
     def on_final_time_interval_change(self, event):
         if self.final_time_interval.get() == "":
