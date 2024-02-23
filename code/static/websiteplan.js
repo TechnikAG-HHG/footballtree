@@ -8,6 +8,9 @@ startTime.setHours(0, 0, 0, 0);
 function generateTableGroup(matches) {
     var tablesContainer = document.getElementById("tablesContainer");
 
+    document.title = data["websiteTitle"];
+    document.getElementById("websiteTitle").textContent = data["websiteTitle"];
+
     // If the table already exists, clear its contents
     var table = tablesContainer.querySelector(".tableGroup");
     if (table) {
@@ -294,6 +297,9 @@ function updateData() {
 
     startTime.setHours(data["startTime"][0], data["startTime"][1], 0, 0);
     timeInterval = data["timeInterval"];
+
+    document.title = data["websiteTitle"];
+    document.getElementById("websiteTitle").textContent = data["websiteTitle"];
 
     setTimeout(function () {
         generateTableGroup(data["Matches"]);

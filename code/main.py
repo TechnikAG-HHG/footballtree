@@ -198,7 +198,8 @@ class Window(ctk.CTk):
             startTime TEXT DEFAULT "",
             timeInterval TEXT DEFAULT "",
             timeIntervalFM TEXT DEFAULT "",
-            pauseBeforeFM TEXT DEFAULT ""
+            pauseBeforeFM TEXT DEFAULT "",
+            websiteTitle TEXT DEFAULT ""
         )
         """
         self.cursor.execute(settingsDataTableCreationQuery)
@@ -212,9 +213,11 @@ class Window(ctk.CTk):
         
     
     def load_settings(self):
+        # get the settings from the database
         self.cursor.execute("SELECT * FROM settingsData")
         settings = self.cursor.fetchone()
         
+        # create the variables for the settings
         self.volume = tk.IntVar(value=100)
         self.active_mode = tk.IntVar(value=1)
         self.debug_mode = tk.IntVar(value=0)
@@ -222,12 +225,9 @@ class Window(ctk.CTk):
         self.time_interval = tk.StringVar(value="10m")
         self.time_intervalFM = tk.StringVar(value="10m")
         self.time_pause_before_FM = tk.StringVar(value="0m") 
-
+        self.website_title = tk.StringVar(value="HHG-Fußballturnier")
         
-        #self.round_time = settings[1]
-        #self.break_time = settings[2]
-        #self.is_match_aktive = settings[3]
-        #self.is_break = settings[4]
+        # load the settings from the database into the variables
         if settings[5] is not None and settings[5] != "":
             self.volume.set(value=settings[5])
             
@@ -250,6 +250,9 @@ class Window(ctk.CTk):
             
         if settings[11] is not None and settings[11] != "" and settings[11] != 0:
             self.time_pause_before_FM.set(value=settings[11])
+            
+        if settings[12] is not None and settings[12] != "" and settings[12] != 0:
+            self.website_title.set(value=settings[12])
         
     
 ##############################################################################################
@@ -2058,6 +2061,15 @@ class Window(ctk.CTk):
         time_pause_before_FM_entry.bind("<KeyRelease>", lambda event: self.on_time_pause_before_FM_change(event))
         
         
+        # website title
+        website_title_label = ctk.CTkLabel(option_frame, text="Website Title", font=("Helvetica", 19))
+        website_title_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        
+        website_title_entry = ctk.CTkEntry(option_frame, textvariable=self.website_title, font=("Helvetica", 17))
+        website_title_entry.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        website_title_entry.bind("<KeyRelease>", lambda event: self.on_website_title_change(event))
+        
+        
     def on_volume_change(self, event):
         saveVolumeInDB = """
         UPDATE settingsData
@@ -2182,6 +2194,21 @@ class Window(ctk.CTk):
         self.connection.commit()
         
         self.updated_data.update({"pauseBeforeFM": self.time_pause_before_FM.get().replace("m", "")})
+        
+        
+    def on_website_title_change(self, event):
+        if self.website_title.get() == "":
+            return
+        saveWebsiteTitleInDB = """
+        UPDATE settingsData
+        SET websiteTitle = ?
+        WHERE id = 1
+        """
+        print("on_website_title_change", self.website_title.get())
+        self.cursor.execute(saveWebsiteTitleInDB, (self.website_title.get(),))
+        self.connection.commit()
+        
+        self.updated_data.update({"websiteTitle": self.website_title.get()})
    
             
 ##############################################################################################
@@ -2790,6 +2817,7 @@ def get_initial_data(template_name):
         "timeIntervalFM": tkapp.time_intervalFM.get().replace("m", ""),
         "pauseBeforeFM": tkapp.time_pause_before_FM.get().replace("m", ""),
         "startTime": get_data_for_website(7),
+        "websiteTitle": tkapp.website_title.get(),
         "LastUpdate": 0
     }
     return make_response(render_template(template_name, initial_data=initial_data))

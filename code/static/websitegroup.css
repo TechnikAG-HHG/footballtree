@@ -17,16 +17,19 @@ body {
 .header {
     flex-direction: row;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
 }
 
-.header h1 {
+.header h1#websiteTitle {
     color: white;
     font-size: 5vw;
     text-align: center;
     align-self: center;
     margin: 0;
-    padding-left: 20vw;
+    margin-left: auto;
+    margin-right: auto;
+    position: absolute;
+    width: 100%;
 }
 
 #returnButton {
@@ -49,6 +52,7 @@ body {
     box-shadow: 0 0.5vw 1vw 0 rgba(0, 0, 0, 0.24),
         0 1vw 3vw 0 rgba(0, 0, 0, 0.19);
     margin-left: 3vw;
+    z-index: 99;
 }
 
 #returnButton:hover {
