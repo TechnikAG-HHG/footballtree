@@ -1207,7 +1207,7 @@ class Window(ctk.CTk):
             # get time pause final matches
             pause_between_final_matches = int(self.time_pause_before_FM.get().replace("m", ""))
             
-            print(f"active_match: {active_match}, time_interval_final_matches: {time_interval_final_matches}, timeinterval: {timeinterval}, match_count: {match_count}, pause_between_final_matches: {pause_between_final_matches}")
+            #print(f"active_match: {active_match}, time_interval_final_matches: {time_interval_final_matches}, timeinterval: {timeinterval}, match_count: {match_count}, pause_between_final_matches: {pause_between_final_matches}")
 
             # calculate the time for the current match
             current_match_time = starttime + datetime.timedelta(minutes=(time_interval_final_matches * active_match) + (timeinterval * match_count) + pause_between_final_matches)
