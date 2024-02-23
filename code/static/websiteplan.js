@@ -313,4 +313,4 @@ startTime.setHours(data["startTime"][0], data["startTime"][1], 0, 0);
 generateTableGroup(data["Matches"]);
 finalMatchTable();
 // call updateData() every 5 seconds
-setInterval(updateData, 2000);
+setInterval(updateData, 5000);

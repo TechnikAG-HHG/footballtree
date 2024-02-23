@@ -253,4 +253,4 @@ document.getElementById("returnButton").addEventListener("click", function () {
 generateTables();
 
 // call updateData() every 5 seconds
-setInterval(updateData, 2000);
+setInterval(updateData, 5000);

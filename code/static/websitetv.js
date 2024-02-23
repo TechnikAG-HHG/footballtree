@@ -44,4 +44,4 @@ function updateData() {
 }
 
 getTeamData();
-setInterval(updateData, 2000);
+setInterval(updateData, 5000);
