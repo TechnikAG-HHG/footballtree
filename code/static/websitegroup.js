@@ -2,6 +2,9 @@ function generateTables() {
     var tablesContainer = document.getElementById("tablesContainer");
     tablesContainer.innerHTML = "";
 
+    document.title = data["websiteTitle"];
+    document.getElementById("websiteTitle").textContent = data["websiteTitle"];
+
     var tableCount = 2;
     var teamCount = data.Teams.length;
     if (teamCount % 2 != 0) {
@@ -116,6 +119,9 @@ function updateData() {
             }, 500);
         })
         .catch((error) => console.error("Error fetching data:", error));
+
+    document.title = data["websiteTitle"];
+    document.getElementById("websiteTitle").textContent = data["websiteTitle"];
 }
 
 function updateTables(data) {
@@ -228,7 +234,7 @@ function sortRowsByPoints(table) {
         }
 
         // If points are the same, sort by goal difference
-        return (bScore - aScore) - (aScore - bScore);
+        return bScore - aScore - (aScore - bScore);
     });
 
     while (tbody.firstChild) {

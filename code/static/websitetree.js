@@ -8,6 +8,9 @@ function drawTree() {
 
     console.log("drawTree() called");
 
+    document.title = data["websiteTitle"];
+    document.getElementById("websiteTitle").textContent = data["websiteTitle"];
+
     // create the final box in the middle
     var boxfinal = document.createElement("div");
     // Set class for styling
@@ -340,6 +343,9 @@ function updateData() {
             }
         })
         .catch((error) => console.error("Error fetching data:", error));
+
+    document.title = data["websiteTitle"];
+    document.getElementById("websiteTitle").textContent = data["websiteTitle"];
 
     setTimeout(function () {
         writeTeamData();
