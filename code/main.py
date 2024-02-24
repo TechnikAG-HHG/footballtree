@@ -1744,7 +1744,8 @@ class Window(ctk.CTk):
                 self.teams_playing = [self.endteam2[0], self.endteam4[0]]
                 self.active_match = 1 
                 self.save_active_match_in_final_phase(self.endteam2[0], self.endteam4[0])
-            elif selected_match == self.get_spiel_um_platz_3(self.endteam1, self.endteam3, self.endteam2, self.endteam4) and self.spiel_um_platz_3 != []:
+            elif selected_match.startswith("Spiel um Platz 3: ") and self.spiel_um_platz_3 != []:
+                self.get_spiel_um_platz_3(self.endteam1, self.endteam3, self.endteam2, self.endteam4)
                 if self.spiel_um_platz_3[0][0] != None and self.spiel_um_platz_3[1][0] != None:
                     self.teams_playing = [self.spiel_um_platz_3[0][0], self.spiel_um_platz_3[1][0]]
                     self.active_match = 2
@@ -1754,7 +1755,8 @@ class Window(ctk.CTk):
                     self.active_match = 2
                     self.save_active_match_in_final_phase(None, None)
                 
-            elif selected_match == self.get_final_match(self.endteam1, self.endteam3, self.endteam2, self.endteam4):
+            elif selected_match.startswith("Finale: ") and self.final_match_teams != []:
+                self.get_final_match(self.endteam1, self.endteam3, self.endteam2, self.endteam4)
                 if self.final_match_teams == []:
                     self.teams_playing = [None, None]
                     self.active_match = 3
