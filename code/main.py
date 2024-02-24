@@ -1299,8 +1299,6 @@ class Window(ctk.CTk):
         
     def player_scored_a_point(self, teamID, player_id, player_index, direction="UP"):
         # Get the current score
-        #self.custom_print(self.read_player_stats(teamID, True, player_id)) 
-        #print("teamID", teamID, "player_id", player_id, "player_index", player_index, "direction", direction)   
         current_goals = self.read_player_stats(teamID, True, False, player_id)[0][2]
         
         # Update the score
@@ -1308,33 +1306,23 @@ class Window(ctk.CTk):
             current_goals += 1
         else:
             current_goals -= 1
-        
-        start_time = time.time()
+
         if current_goals < 0:
             current_goals = 0
             return
         
         # Update the score label
         self.spiel_buttons[teamID][player_index][3].configure(text=f"Tore {current_goals}")
-        #self.custom_print("Write", "teamID", teamID, "player_index", player_id)
+        self.update_idletasks()
         
-        updateGoals = """
-        UPDATE playerData
-        SET goals = ?
-        WHERE teamId = ? AND id = ?
-        """
-        self.cursor.execute(updateGoals, (current_goals, teamID, player_id))
+        # Update the database
+        self.cursor.execute(
+            "UPDATE playerData SET goals = ? WHERE teamId = ? AND id = ?",
+            (current_goals, teamID, player_id)
+        )
         
         # Commit the changes to the database
         self.connection.commit()
-
-        # Record the end time
-        end_time = time.time()
-
-        # Calculate the elapsed time in milliseconds
-        elapsed_time_ms = (end_time - start_time) * 1000
-        
-        ###self.updated_data.update({"SPIEL": {team: self.read_team_names_player(team)}})
     
     
     def create_matches_labels(self, frame):
@@ -1688,6 +1676,7 @@ class Window(ctk.CTk):
         # Get the current score
         self.custom_print("global_scored_a_point", "teamID", teamID, "team2ID", team2ID, "direction", direction)
         current_score = self.read_goals_for_match_from_db(teamID, team2ID)
+        old_goals = current_score
         
         # Update the score
         if direction == "UP" and current_score != "None":
@@ -1703,7 +1692,7 @@ class Window(ctk.CTk):
             
         # Write the score into the database
         
-        if self.write_score_for_team_into_db(teamID, team2ID, direction):
+        if self.write_score_for_team_into_db(teamID, team2ID, old_goals, direction):
             # Update the score label
             self.spiel_buttons[teamID]["global"][3].set(str(current_score))
             self.updated_data.update({"Goals": get_data_for_website(1)})
@@ -1719,28 +1708,16 @@ class Window(ctk.CTk):
         
         mp3Path = self.cursor.fetchone()[0]
         
-        if mp3Path == "":
-            return ""
-        
-        return mp3Path
+        return mp3Path or ""
        
         
-    def write_score_for_team_into_db(self, teamID, team2ID, direction="UP"):
-        
-        
-        goals = self.read_goals_for_match_from_db(teamID, team2ID)
-        previous_goals = goals
+    def write_score_for_team_into_db(self, teamID, team2ID, goals, direction="UP"):
         
         if goals == "None":
             return False
-        
-        if direction == "UP":
-            goals += 1
-        else:
-            goals -= 1
-            
-        self.custom_print("write_score_for_team_into_db", "teamID", teamID, "team2ID", team2ID, "direction", direction, "goals", goals, "previous_goals", previous_goals)
-        
+
+        goals += 1 if direction == "UP" else -1
+
         self.save_goals_for_match_in_db(teamID, team2ID, goals)
         
         if self.active_mode.get() == 1:
@@ -1783,135 +1760,63 @@ class Window(ctk.CTk):
         
         self.connection.commit()
         
-
     def save_goals_for_match_in_db(self, teamID, team2ID, goals):
+        table_name = 'matchData' if self.active_mode.get() == 1 else 'finalMatchesData'
+
+        get_team1_or_team2 = f"""
+        SELECT 
+            CASE 
+                WHEN team1Id = ? THEN 'team1Goals'
+                WHEN team2Id = ? THEN 'team2Goals'
+                ELSE 'Not Found'
+            END AS TeamIdColumn
+        FROM {table_name}
+        WHERE (team1Id = ? AND team2ID = ?) OR (team1Id = ? AND team2ID = ?);
+        """
+        self.cursor.execute(get_team1_or_team2, (teamID, teamID, teamID, team2ID, team2ID, teamID))
         
-        if self.active_mode.get() == 1:
-            
-            #self.custom_print("accsed matchData in save_goals_for_match_in_db")
+        self.team1_or_team2 = self.cursor.fetchone()[0]
         
-            get_team1_or_team2 = """
-            SELECT 
-                CASE 
-                    WHEN team1Id = ? THEN 'team1Goals'
-                    WHEN team2Id = ? THEN 'team2Goals'
-                    ELSE 'Not Found'
-                END AS TeamIdColumn
-            FROM matchData
-            WHERE (team1Id = ? AND team2Id = ?) OR (team1Id = ? AND team2Id = ?);
-            """
-            self.cursor.execute(get_team1_or_team2, (teamID, teamID, teamID, team2ID, team2ID, teamID))
-            
-            self.team1_or_team2 = self.cursor.fetchone()[0]
-            
-            #self.custom_print("self.team1_or_team2", self.team1_or_team2)
-            
-            
-            update_goals_for_match = """
-            UPDATE matchData
-            SET {column} = ?
-            WHERE (team1Id = ? AND team2Id = ?) OR (team1Id = ? AND team2Id = ?);
-            """
-            self.cursor.execute(update_goals_for_match.format(column=self.team1_or_team2), (goals, teamID, team2ID, team2ID, teamID))
-            
-        elif self.active_mode.get() == 2:
-            get_team1_or_team2 = """
-            SELECT 
-                CASE 
-                    WHEN team1Id = ? THEN 'team1Goals'
-                    WHEN team2Id = ? THEN 'team2Goals'
-                    ELSE 'Not Found'
-                END AS TeamIdColumn
-            FROM finalMatchesData
-            WHERE (team1Id = ? OR team2Id = ?) AND (team1Id = ? OR team2Id = ?);
-            """
-            self.cursor.execute(get_team1_or_team2, (teamID, teamID, teamID, teamID, team2ID, team2ID))
-            
-            self.team1_or_team2 = self.cursor.fetchone()[0]
-            
-            self.custom_print("save_goals_for_match_in_db", "self.team1_or_team2", self.team1_or_team2, "teamID", teamID, "team2ID", team2ID, "goals", goals, "self.active_match", self.active_match + 1, "self.active_mode.get()", self.active_mode.get())
-            
-            
-            update_goals_for_match = """
-            UPDATE finalMatchesData
-            SET {column} = ?
-            WHERE (team1Id = ? OR team2Id = ?) AND (team1Id = ? OR team2Id = ?);
-            """
-            self.cursor.execute(update_goals_for_match.format(column=self.team1_or_team2), (goals, teamID, teamID, team2ID, team2ID))
+        update_goals_for_match = f"""
+        UPDATE {table_name}
+        SET {self.team1_or_team2} = ?
+        WHERE (team1Id = ? AND team2ID = ?) OR (team1Id = ? AND team2ID = ?);
+        """
+        self.cursor.execute(update_goals_for_match, (goals, teamID, team2ID, team2ID, teamID))
         
         self.connection.commit()
         
         
     def read_goals_for_match_from_db(self, teamID, team2ID):
-        
-        #self.custom_print("read_goals_for_match_from_db", "teamID", teamID, "team2ID", team2ID)
-        
-        if self.active_mode.get() == 1:
-        
-            get_team1_or_team2 = """
-            SELECT 
-                CASE 
-                    WHEN team1Id = ? THEN 'team1Goals'
-                    WHEN team2Id = ? THEN 'team2Goals'
-                    ELSE 'Not Found'
-                END AS TeamIdColumn
-            FROM matchData
-            WHERE (team1Id = ? AND team2Id = ?) OR (team1Id = ? AND team2Id = ?);
-            """
-            self.cursor.execute(get_team1_or_team2, (teamID, teamID, teamID, team2ID, team2ID, teamID))
-            
-            onefetched = self.cursor.fetchone() 
-            
-            if onefetched == None:
-                return "None"
-            
-            #self.custom_print(onefetched)
-            
-            self.team1_or_team2 = onefetched[0]
-            #self.custom_print("self.team1_or_team2", self.team1_or_team2)
-            
-            
-            get_goals_for_match = """
-            SELECT {column} FROM matchData
-            WHERE (team1Id = ? AND team2Id = ?) OR (team1Id = ? AND team2Id = ?);
-            """
-            self.cursor.execute(get_goals_for_match.format(column=self.team1_or_team2), (teamID, team2ID, team2ID, teamID))
-            
-            goals = self.cursor.fetchone()[0]
-            #self.custom_print("goals", goals)
-        elif self.active_mode.get() == 2:
-            self.custom_print("read_goals_for_match_from_db", "teamID", teamID, "team2ID", team2ID)
-            get_team1_or_team2 = """
-            SELECT 
-                CASE 
-                    WHEN team1Id = ? THEN 'team1Goals'
-                    WHEN team2Id = ? THEN 'team2Goals'
-                    ELSE 'Not Found'
-                END AS TeamIdColumn
-            FROM finalMatchesData
-            WHERE (team1Id = ? OR team2Id = ?) AND (team1Id = ? OR team2Id = ?);
-            """
-            self.cursor.execute(get_team1_or_team2, (teamID, teamID, teamID, teamID, team2ID, team2ID))
-            
-            onefetched = self.cursor.fetchone()
-            
-            if onefetched == None:
-                self.custom_print("onefetched == None")
-                return "None"
-            
-            self.custom_print("onefetched", onefetched)
-            
-            self.team1_or_team2 = onefetched[0]
+        table_name = 'matchData' if self.active_mode.get() == 1 else 'finalMatchesData'
 
-            get_goals_for_match = """
-            SELECT {column} FROM finalMatchesData
-            WHERE (team1Id = ? OR team2Id = ?) AND (team1Id = ? OR team2Id = ?);
-            """
-            self.cursor.execute(get_goals_for_match.format(column=self.team1_or_team2), (teamID, teamID, team2ID, team2ID))
-            
-            goals = self.cursor.fetchone()[0]
-            self.custom_print("read_goals_for_match_from_db", "self.team1_or_team2", self.team1_or_team2, "teamID", teamID, "team2ID", team2ID, "goals", goals, "self.active_match", self.active_match + 1, "self.active_mode.get()", self.active_mode.get())
+        get_team1_or_team2 = f"""
+        SELECT 
+            CASE 
+                WHEN team1Id = ? THEN 'team1Goals'
+                WHEN team2Id = ? THEN 'team2Goals'
+                ELSE 'Not Found'
+            END AS TeamIdColumn
+        FROM {table_name}
+        WHERE (team1Id = ? AND team2Id = ?) OR (team1Id = ? AND team2Id = ?);
+        """
+        self.cursor.execute(get_team1_or_team2, (teamID, teamID, teamID, team2ID, team2ID, teamID))
         
+        onefetched = self.cursor.fetchone() 
+        
+        if onefetched is None:
+            return "None"
+        
+        self.team1_or_team2 = onefetched[0]
+        
+        get_goals_for_match = f"""
+        SELECT {self.team1_or_team2} FROM {table_name}
+        WHERE (team1Id = ? AND team2Id = ?) OR (team1Id = ? AND team2Id = ?);
+        """
+        self.cursor.execute(get_goals_for_match, (teamID, team2ID, team2ID, teamID))
+        
+        goals = self.cursor.fetchone()[0]
+
         return goals
         
     
