@@ -252,7 +252,10 @@ function finalMatchTable() {
             var cellSecondTeam = row.insertCell(3);
             cellSecondTeam.textContent = match[1];
 
-            if (Math.abs(data["activeMatchNumber"]) - 1 > i) {
+            if (
+                Math.abs(data["activeMatchNumber"]) - 1 > i &&
+                data["finalMatches"] != null
+            ) {
                 console.log("activeMatchNumber", data["activeMatchNumber"]);
                 if (match[2][0] > match[2][1]) {
                     cellFirstTeam.className = "style-winner";
