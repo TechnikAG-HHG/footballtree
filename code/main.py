@@ -10,6 +10,8 @@ from flask import Flask, send_file, request, abort, render_template, make_respon
 import sqlite3
 import vlc
 import datetime
+import database_commands.database_commands as db_com
+
 
 app = Flask(__name__)
 #app.secret_key = "Felix.com"
@@ -156,7 +158,7 @@ class Window(ctk.CTk):
         playerDataTableCreationQuery = """
         CREATE TABLE IF NOT EXISTS playerData (
             id INTEGER PRIMARY KEY,
-            playerName TEXT,
+            playerName TEXT UNIQUE,
             playerNumber INTEGER,
             teamId INTEGER REFERENCES teamData(id) DEFAULT 0,
             goals INTEGER DEFAULT 0
@@ -338,24 +340,24 @@ class Window(ctk.CTk):
     def save_team_names_in_db(self):
         old_mp3_list = []
         name_entries = self.name_entries
-        
-        get_team_ids = "SELECT id FROM teamData"
-        old_team_ids = self.cursor.execute(get_team_ids).fetchall()
 
-        #self.custom_print("old_team_ids", old_team_ids)
+        get_team_ids = "SELECT id FROM teamData"
+        old_team_ids = [row[0] for row in self.cursor.execute(get_team_ids).fetchall()]
+
         self.cursor.execute("SELECT mp3Path FROM teamData")
         entries = self.cursor.fetchall()
         
+        existing_teams = []
+
         for i in enumerate(old_team_ids):
             old_mp3_list.append("")
-            
-        #self.custom_print("entries", entries)
+
         for i, entry in enumerate(entries):
             old_mp3_list[i] = entry
-            
-        # Get existing teams from the database
-        self.cursor.execute("DROP TABLE teamData")      
-        
+
+        # Drop the table
+        self.cursor.execute("DROP TABLE teamData")
+
         teamDataTableCreationQuery = """
         CREATE TABLE IF NOT EXISTS teamData (
             id INTEGER PRIMARY KEY,
@@ -368,45 +370,47 @@ class Window(ctk.CTk):
             groupNumber INTEGER
         )
         """
-        
+
         self.cursor.execute(teamDataTableCreationQuery)
-        self.connection.commit()
-        
+
         total_entries = len(name_entries)
         midpoint = total_entries // 2
-        
+
+        new_team_data = []
         for i, entry in enumerate(name_entries):
             entry_text = entry.get().strip()
-            
+
             group_number = 1 if (i < midpoint) or (total_entries % 2 != 0 and i == midpoint) else 2
-            
-            #self.custom_print("entry_text", entry_text)
+
             if entry_text:
                 # Update existing team
-                try:
-                    insert_query = "INSERT INTO teamData (teamName, groupNumber) VALUES (?, ?)"
-                    self.cursor.execute(insert_query, (entry_text, group_number))
-                except sqlite3.IntegrityError:
+                if entry_text not in existing_teams:
+                    new_team_data.append((entry_text, group_number))
+                    existing_teams.append(entry_text)
+                else:
                     for i in range(1, 100):
-                        if f"{entry_text} {i}" not in self.read_teamNames():
+                        if f"{entry_text} {i}" not in existing_teams:
                             entry_text = f"{entry_text} {i}"
                             break
-                    insert_query = "INSERT INTO teamData (teamName, groupNumber) VALUES (?, ?)"
-                    self.cursor.execute(insert_query, (entry_text, group_number))
-                    
-        #get all ids from teamData
+                    new_team_data.append((entry_text, group_number))
+                    existing_teams.append(entry_text)
+
+        # Insert new data
+        insert_query = "INSERT INTO teamData (teamName, groupNumber) VALUES (?, ?)"
+        self.cursor.executemany(insert_query, new_team_data)
+
+        # Get all ids from teamData
         self.cursor.execute("SELECT id FROM teamData")
         team_ids = [row[0] for row in self.cursor.fetchall()]
+
         for team_id in team_ids:
             mp3_entry = self.mp3_list.get(team_id-1, "")
-            #self.custom_print("mp3_entry", mp3_entry.strip())
             if mp3_entry.strip() == "" and old_mp3_list is not None and team_id - 1 < len(old_mp3_list) and old_mp3_list[team_id - 1] is not None:
                 self.mp3_list[team_id-1] = old_mp3_list[team_id-1][0]
 
         set_mp3_paths = "UPDATE teamData SET mp3Path = ? WHERE id = ?"
         self.cursor.executemany(set_mp3_paths, [(mp3_path, team_id + 1) for team_id, mp3_path in self.mp3_list.items()])
-        
-        #self.updated_data.update({"Teams": team_names})
+
         self.connection.commit()
         
         self.calculate_matches()
@@ -826,54 +830,34 @@ class Window(ctk.CTk):
         self.write_names_into_entry_fields_players(teamID, "Player", self.frameplayer)
           
             
-    def read_player_stats(self, teamID, readGoals=False, playerID=-1):
+    def read_player_stats(self, teamID, readGoals=False, readID=False, playerID=-1):
         output = []
 
-        if readGoals and playerID == -1:
-            getData = """
-            SELECT playerName, playerNumber, goals FROM playerData
-            WHERE teamId = ?
-            ORDER BY id ASC
-            """
-            self.cursor.execute(getData, (teamID,))
+        if readID and playerID != -1:
+            raise ValueError("readID and playerID cannot be True at the same time")
 
-            for row in self.cursor.fetchall():
-                output.append(row)
+        # Determine the columns to select based on readGoals and readID
+        columns = "playerName, playerNumber, goals" if readGoals else "playerName, playerNumber"
+        columns =  columns + ", id" if readID else columns
+        
+        print("columns", columns)
 
-        elif readGoals and playerID != -1:
-            #self.custom_print("readGoals", readGoals, "playerID", playerID, "teamID", teamID)
-            getData = """
-            SELECT playerName, playerNumber, goals FROM playerData
-            WHERE teamId = ? AND id = ?
-            ORDER BY id ASC
-            """
-            self.cursor.execute(getData, (teamID, playerID))
+        # Determine the condition based on playerID
+        condition = "AND id = ?" if playerID != -1 else ""
 
-            for row in self.cursor.fetchall():
-                output.append(row)
-                
-        elif not readGoals and playerID != -1:
-            getData = """
-            SELECT playerName, playerNumber FROM playerData
-            WHERE teamId = ? AND id = ?
-            ORDER BY id ASC
-            """
-            self.cursor.execute(getData, (teamID, playerID))
-            
-            for row in self.cursor.fetchall():
-                output.append(row)
-            
-        else:
-            getData = """
-            SELECT playerName, playerNumber FROM playerData
-            WHERE teamId = ?
-            ORDER BY id ASC
-            """
-            self.cursor.execute(getData, (teamID,))
-            
-            for row in self.cursor.fetchall():
-                output.append(row)
-                
+        # Construct the SQL query
+        getData = f"""
+        SELECT {columns} FROM playerData
+        WHERE teamId = ? {condition}
+        ORDER BY id ASC
+        """
+
+        # Execute the query with the appropriate parameters
+        params = (teamID, playerID) if playerID != -1 else (teamID,)
+        self.cursor.execute(getData, params)
+
+        # Fetch all rows and append to output
+        output = [row for row in self.cursor.fetchall()]
 
         return output
             
@@ -1057,10 +1041,12 @@ class Window(ctk.CTk):
             down_frame.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.SW)
             
 
-            for i, (player_name, player_number, goals) in enumerate(self.read_player_stats(team_id, True)):       
+            for i, (player_name, player_number, goals, player_id) in enumerate(self.read_player_stats(team_id, True, True)):  
+                print("player_name", player_name, "player_number", player_number, "goals", goals, "player_id", player_id)
                 #self.custom_print(type(player_name), player_name)
                 player_index = i 
-                player_id = self.get_player_id_from_player_name(player_name)
+                #player_id = self.get_player_id_from_player_name(player_name)
+                print("player_id", self.get_player_id_from_player_name(player_name))
                 if i < 8:
                     self.group_frame = ctk.CTkFrame(up_frame, fg_color='#142324', corner_radius=10)
                     self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
@@ -1126,7 +1112,7 @@ class Window(ctk.CTk):
         
             ######################################################
             #Time Display
-            print(f"Time Display, here are the teams: {self.teams_playing} and the active_match: {self.active_match}")
+            #print(f"Time Display, here are the teams: {self.teams_playing} and the active_match: {self.active_match}")
             # Create a new frame
             time_frame = ctk.CTkFrame(manual_frame, fg_color='#142324', corner_radius=5)
             time_frame.pack(anchor=tk.SE, side=tk.RIGHT, padx=10, pady=10, expand=True)
@@ -1314,7 +1300,8 @@ class Window(ctk.CTk):
     def player_scored_a_point(self, teamID, player_id, player_index, direction="UP"):
         # Get the current score
         #self.custom_print(self.read_player_stats(teamID, True, player_id)) 
-        current_goals = self.read_player_stats(teamID, True, player_id)[0][2]
+        #print("teamID", teamID, "player_id", player_id, "player_index", player_index, "direction", direction)   
+        current_goals = self.read_player_stats(teamID, True, False, player_id)[0][2]
         
         # Update the score
         if direction == "UP":
@@ -1365,7 +1352,7 @@ class Window(ctk.CTk):
         if self.active_mode.get() == 1:
             values_list = self.get_values_list_mode1(matches)
             spiel_select.configure(values=values_list)
-            print("active_match in create_matches_labels", self.active_match)
+            #print("active_match in create_matches_labels", self.active_match)
             if self.active_match >= 0:
                 spiel_select.set(values_list[self.active_match])
         elif self.active_mode.get() == 2:
@@ -1589,7 +1576,7 @@ class Window(ctk.CTk):
                 self.teams_playing = [None, None]
                 
             self.active_match = match_index
-            print("self.active_match###################################", self.active_match)
+            #print("self.active_match###################################", self.active_match)
             #self.custom_print("self.active_matchon_match_select", self.active_match)
             
             self.save_games_played_in_db(match_index)
@@ -2290,7 +2277,7 @@ class Window(ctk.CTk):
     def calculate_matches(self):
         self.match_count = 0  # Reset matchCount to 0
 
-    #if self.active_mode.get() == 1 or True:
+        #if self.active_mode.get() == 1 or True:
         initial_data = {
             "Teams": self.read_teamNames()
         }
@@ -2314,7 +2301,7 @@ class Window(ctk.CTk):
 
         matches1 = self.calculate_matches_for_group(group1, "Gruppe 1")
         matches2 = self.calculate_matches_for_group(group2, "Gruppe 2")
-
+        
         matches = self.interleave_matches(matches1, matches2)
 
         self.match_count = 0  # Reset matchCount to 0
@@ -2380,115 +2367,58 @@ class Window(ctk.CTk):
 
 
     def save_matches_to_db(self):
-        
         get_existing_matches = """
         SELECT team1Id, team2Id, groupNumber, matchId, team1Goals, team2Goals, matchTime FROM matchData
         """
-        
         self.cursor.execute(get_existing_matches)
         existing_matches = {tuple(row[:4]) for row in self.cursor.fetchall()}
-        
-        added_matches = []
-        
-        #self.custom_print("existing_matches", existing_matches, "self.matches", self.matches)
 
+        added_matches = []
+
+        # Fetch all team IDs at once
+        select_teams = """
+        SELECT id, teamName FROM teamData
+        ORDER BY id ASC
+        """
+        self.cursor.execute(select_teams)
+        teams = {row[1]: row[0] for row in self.cursor.fetchall()}
+
+        match_tuples = []
         for match in self.matches:
             team1 = match["teams"][0]
             team2 = match["teams"][1]
             group = match["group"]
             number = match["number"]
 
-            selectTeam1 = """
-            SELECT id FROM teamData
-            WHERE teamName = ?
-            ORDER BY id ASC
-            """
-            self.cursor.execute(selectTeam1, (team1,))
-            try:
-                team1ID = self.cursor.fetchone()[0]
-            except:
-                continue
-            
-            #print("team1ID", team1ID, "team1", team1, "team2", team2, "group", group, "number", number)
-            
-            if team2 == "dummy":
-                continue
+            team1ID = teams.get(team1)
+            team2ID = teams.get(team2)
 
-            selectTeam2 = """
-            SELECT id FROM teamData
-            WHERE teamName = ?
-            ORDER BY id ASC
-            """
-            self.cursor.execute(selectTeam2, (team2,))
-            try:
-                team2ID = self.cursor.fetchone()[0]
-            except:
+            if team1ID is None or team2ID is None or team2 == "dummy":
                 continue
 
             match_tuple = (int(team1ID), int(team2ID), int(str(group).replace('Gruppe ','')), int(str(number).replace('Spiel ','')))
-            match_tuple_reverse = (int(team2ID), int(team1ID), int(str(group).replace('Gruppe ','')), int(str(number).replace('Spiel ','')))
-            #match_tuple2 = (int(team1ID), int(team2ID), int(str(group).replace('Gruppe ','')))
+            match_tuples.append(match_tuple)
 
-            added_matches.append(match_tuple)
-            #self.custom_print("match_tuple", match_tuple, "existing_matches", existing_matches)
+        # Use executemany() for bulk insert
+        insert_match_query = """
+            INSERT OR IGNORE INTO matchData (team1Id, team2Id, groupNumber, matchId)
+            VALUES (?, ?, ?, ?)
+        """
+        self.cursor.executemany(insert_match_query, match_tuples)
 
-            # Use either match_tuple or match_tuple_reverse to check for an existing match
-            existing_match_data = None
+        # Use executemany() for bulk update
+        update_match_query = """
+            UPDATE matchData
+            SET team1Id = ?, team2Id = ?, groupNumber = ?
+            WHERE matchId = ?
+        """
+        self.cursor.executemany(update_match_query, match_tuples)
 
-            if match_tuple in existing_matches:
-                get_existing_match_data = """
-                SELECT * FROM matchData
-                WHERE team1Id = ? AND team2Id = ? AND groupNumber = ? AND matchId = ?
-                """
-                self.cursor.execute(get_existing_match_data, match_tuple)
-                existing_match_data = self.cursor.fetchone()
-            elif match_tuple_reverse in existing_matches:
-                get_existing_match_data = """
-                SELECT * FROM matchData
-                WHERE team1Id = ? AND team2Id = ? AND groupNumber = ? AND matchId = ?
-                """
-                self.cursor.execute(get_existing_match_data, match_tuple_reverse)
-                existing_match_data = self.cursor.fetchone()
+        # Commit the transaction
+        self.connection.commit()
 
-            # Copy the existing match data into the new match data
-            match_data = existing_match_data
-            #self.custom_print("accsed matchData in save_matches_to_db")
-
-            insert_match_query = """
-                INSERT OR IGNORE INTO matchData (team1Id, team2Id, groupNumber, matchId)
-                VALUES (?, ?, ?, ?)
-            """
-
-            update_match_query = """
-                UPDATE matchData
-                SET team1Id = ?, team2Id = ?, groupNumber = ?
-                WHERE matchId = ?
-            """
-
-            # Execute INSERT OR IGNORE
-            try:
-                #self.custom_print("accsed matchData in save_matches_to_db to insert or ignore + match_tuple", match_tuple, "existing_matches", existing_matches)
-                self.cursor.execute(insert_match_query, match_tuple)
-                self.connection.commit()  # Make sure to commit changes
-
-                ## Get the last inserted row id
-                #inserted_match_id = self.cursor.lastrowid
-
-                # Execute UPDATE
-                try:
-                    self.cursor.execute(update_match_query, match_tuple)
-                    self.connection.commit()  # Make sure to commit changes
-                except Exception as e:
-                    self.custom_print(f"Error during UPDATE: {e}")
-
-            except Exception as e:
-                self.custom_print(f"Error during INSERT OR IGNORE: {e}")
-        
-        teams_to_delete = []
-        
-        for existing_match in existing_matches:
-            if existing_match not in added_matches:
-                teams_to_delete.append(existing_match)
+        # Find matches to delete
+        teams_to_delete = [match for match in existing_matches if match not in match_tuples]
                 
                 
         #self.custom_print("teams_to_delete", teams_to_delete)
