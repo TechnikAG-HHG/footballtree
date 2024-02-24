@@ -10,7 +10,7 @@ from flask import Flask, send_file, request, abort, render_template, make_respon
 import sqlite3
 import vlc
 import datetime
-import database_commands.database_commands as db_com
+#import database_commands.database_commands as db_com
 
 
 app = Flask(__name__)
@@ -1520,39 +1520,24 @@ class Window(ctk.CTk):
         return values_list, self.active_match
     
     
-    def get_teams_for_final_matches(self):
-        #get the best two teams from the database(with most points)
-        getTeams = """
+    def get_top_two_teams(self, group_number):
+        query = """
         SELECT id, teamName FROM teamData
-        WHERE groupNumber = 1
-        ORDER BY points DESC
+        WHERE groupNumber = ?
+        ORDER BY points DESC, id ASC
         LIMIT 2
         """
-        self.cursor.execute(getTeams)
-        
-        #get the two best teams
-        teams1 = self.cursor.fetchall()
-        #self.custom_print("teams1", teams1)
-        
-        getTeams2 = """
-        SELECT id, teamName FROM teamData
-        WHERE groupNumber = 2
-        ORDER BY points DESC
-        LIMIT 2 
-        """
-        self.cursor.execute(getTeams2)
-        
-        #get the two best teams
-        teams2 = self.cursor.fetchall()
-        
-        values_list = []
-        
-        if teams1 != [] and teams2 != []:
-        
-            self.endteam1 = teams1[0]
-            self.endteam2 = teams1[1]
-            self.endteam3 = teams2[0]
-            self.endteam4 = teams2[1]
+        self.cursor.execute(query, (group_number,))
+        return self.cursor.fetchall()
+
+    def get_teams_for_final_matches(self):
+        teams1 = self.get_top_two_teams(1)
+        teams2 = self.get_top_two_teams(2)
+
+        if teams1 and teams2:
+            self.endteam1, self.endteam2 = teams1
+            self.endteam3, self.endteam4 = teams2
+            
         
 
     def get_spiel_um_platz_3(self, team1, team2, team3, team4):
@@ -1869,6 +1854,7 @@ class Window(ctk.CTk):
         self.cursor.execute(updateGoals, (goalsReceived, team2ID))
         
         self.connection.commit()
+       
         
     def save_goals_for_match_in_db(self, teamID, team2ID, goals):
         table_name = 'matchData' if self.active_mode.get() == 1 else 'finalMatchesData'
