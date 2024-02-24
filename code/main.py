@@ -21,7 +21,6 @@ lock = threading.Lock()
 debug_mode = True
 
 class Window(ctk.CTk):
-    
     def custom_print(self, *args, **kwargs):
         #print(self.debug_mode.get())
         if self.debug_mode.get() == 1:
