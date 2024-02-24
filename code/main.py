@@ -312,7 +312,7 @@ class Window(ctk.CTk):
     
     
     def save_mp3_path(self, new_file_dialog, team_id):
-        file_path = filedialog.askopenfilename(initialdir="/", title="Select mp3 file", filetypes=(("mp3 files", "*.mp3"), ("all files", "*.*")))
+        file_path = filedialog.askopenfilename(title="Select mp3 file", filetypes=(("mp3 files", "*.mp3"), ("all files", "*.*")))
         
         if file_path:
             self.mp3_list[team_id] = file_path
