@@ -1611,11 +1611,13 @@ class Window(ctk.CTk):
         getGoles1 = """
         SELECT team1Goals, team2Goals FROM finalMatchesData
         WHERE matchId = 1
+        ORDER BY matchId ASC
         """
         
         getGoles2 = """
         SELECT team1Goals, team2Goals FROM finalMatchesData
         WHERE matchId = 2
+        ORDER BY matchId ASC
         """
         self.cursor.execute(getGoles1)
         goles1 = self.cursor.fetchone()
@@ -1650,11 +1652,13 @@ class Window(ctk.CTk):
         getGoles1 = """
         SELECT team1Goals, team2Goals FROM finalMatchesData
         WHERE matchId = 1
+        ORDER BY matchId DESC
         """
         
         getGoles2 = """
         SELECT team1Goals, team2Goals FROM finalMatchesData
         WHERE matchId = 2
+        ORDER BY matchId DESC
         """
         
         self.final_match_teams = []
