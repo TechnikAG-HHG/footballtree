@@ -93,7 +93,7 @@ function generateTableGroup(matches) {
         cellT.textContent = match[2] + " : " + match[3];
 
         finalMatchesTime = new Date(
-            startTime.getTime() + (i + 1) * timeInterval * 60000
+            startTime.getTime() + (i + 2) * timeInterval * 60000
         );
 
         i++;
