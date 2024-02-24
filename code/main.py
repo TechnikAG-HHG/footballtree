@@ -1930,47 +1930,62 @@ class Window(ctk.CTk):
         
         
         # start time for matches
-        start_time_label = ctk.CTkLabel(option_frame, text="Start Time", font=("Helvetica", 19))
-        start_time_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        start_time_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        start_time_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, padx=5)
         
-        start_time_entry = ctk.CTkEntry(option_frame, textvariable=self.start_time, font=("Helvetica", 17))
-        start_time_entry.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        start_time_label = ctk.CTkLabel(start_time_frame, text="Start Time", font=("Helvetica", 19))
+        start_time_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        
+        start_time_entry = ctk.CTkEntry(start_time_frame, textvariable=self.start_time, font=("Helvetica", 17))
+        start_time_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
         start_time_entry.bind("<KeyRelease>", lambda event: self.on_start_time_change(event))
         
         
         # time interval for matches
-        time_interval_label = ctk.CTkLabel(option_frame, text="Time Interval", font=("Helvetica", 19))
-        time_interval_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        time_interval_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        time_interval_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, padx=5)
         
-        time_interval_entry = ctk.CTkEntry(option_frame, textvariable=self.time_interval, font=("Helvetica", 17))
-        time_interval_entry.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        time_interval_label = ctk.CTkLabel(time_interval_frame, text="Time Interval", font=("Helvetica", 19))
+        time_interval_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        
+        time_interval_entry = ctk.CTkEntry(time_interval_frame, textvariable=self.time_interval, font=("Helvetica", 17))
+        time_interval_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
         time_interval_entry.bind("<KeyRelease>", lambda event: self.on_time_interval_change(event))
         
         
         # time interval for final matches
-        time_intervalFM_label = ctk.CTkLabel(option_frame, text="Time Interval Final Matches", font=("Helvetica", 19))
-        time_intervalFM_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        time_intervalFM_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        time_intervalFM_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, padx=5)
         
-        time_intervalFM_entry = ctk.CTkEntry(option_frame, textvariable=self.time_intervalFM, font=("Helvetica", 17))
-        time_intervalFM_entry.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        time_intervalFM_label = ctk.CTkLabel(time_intervalFM_frame, text="Time Interval Final Matches", font=("Helvetica", 19))
+        time_intervalFM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        
+        time_intervalFM_entry = ctk.CTkEntry(time_intervalFM_frame, textvariable=self.time_intervalFM, font=("Helvetica", 17))
+        time_intervalFM_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
         time_intervalFM_entry.bind("<KeyRelease>", lambda event: self.on_time_intervalFM_change(event))
         
         
         # pause time before final matches
-        time_pause_before_FM_label = ctk.CTkLabel(option_frame, text="Time Pause Final Matches", font=("Helvetica", 19))
-        time_pause_before_FM_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        time_pause_before_FM_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        time_pause_before_FM_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, padx=5)
         
-        time_pause_before_FM_entry = ctk.CTkEntry(option_frame, textvariable=self.time_pause_before_FM, font=("Helvetica", 17))
-        time_pause_before_FM_entry.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        time_pause_before_FM_label = ctk.CTkLabel(time_pause_before_FM_frame, text="Time Pause Final Matches", font=("Helvetica", 19))
+        time_pause_before_FM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        
+        time_pause_before_FM_entry = ctk.CTkEntry(time_pause_before_FM_frame, textvariable=self.time_pause_before_FM, font=("Helvetica", 17))
+        time_pause_before_FM_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
         time_pause_before_FM_entry.bind("<KeyRelease>", lambda event: self.on_time_pause_before_FM_change(event))
         
         
         # website title
-        website_title_label = ctk.CTkLabel(option_frame, text="Website Title", font=("Helvetica", 19))
-        website_title_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        website_title_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        website_title_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, padx=5)
         
-        website_title_entry = ctk.CTkEntry(option_frame, textvariable=self.website_title, font=("Helvetica", 17))
-        website_title_entry.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        website_title_label = ctk.CTkLabel(website_title_frame, text="Website Title", font=("Helvetica", 19))
+        website_title_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        
+        website_title_entry = ctk.CTkEntry(website_title_frame, textvariable=self.website_title, font=("Helvetica", 17), width=250)
+        website_title_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
         website_title_entry.bind("<KeyRelease>", lambda event: self.on_website_title_change(event))
         
         
