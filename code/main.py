@@ -10,6 +10,8 @@ from flask import Flask, send_file, request, abort, render_template, make_respon
 import sqlite3
 import vlc
 import datetime
+import os
+import glob
 #import database_commands.database_commands as db_com
 
 
@@ -342,6 +344,7 @@ class Window(ctk.CTk):
         
         
     def save_team_names_in_db(self):
+        self.create_backup_of_db()
         old_mp3_list = []
         name_entries = self.name_entries
 
@@ -358,7 +361,8 @@ class Window(ctk.CTk):
 
         for i, entry in enumerate(entries):
             old_mp3_list[i] = entry
-
+        
+        
         # Drop the table
         self.cursor.execute("DROP TABLE teamData")
 
@@ -420,6 +424,7 @@ class Window(ctk.CTk):
         self.calculate_matches()
         self.reload_spiel_button_command()
         self.get_teams_for_final_matches()
+        self.reset_player_stats()
         
     
     def write_names_into_entry_fields(self):
@@ -478,7 +483,28 @@ class Window(ctk.CTk):
 
         reload_button = ctk.CTkButton(team_button_frame, text="Reload", command=self.reload_button_command, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
         reload_button.pack(pady=8, padx=10)
-        
+            
+
+    def create_backup_of_db(self):
+        backup_dir = "data/backups/"
+        os.makedirs(backup_dir, exist_ok=True)  # Ensure the directory exists
+
+        # Get list of existing backups
+        existing_backups = glob.glob(backup_dir + "*.db")
+
+        # If there are more than 5 backups, delete the oldest one
+        if len(existing_backups) > 10:
+            oldest_backup = min(existing_backups, key=os.path.getctime)
+            os.remove(oldest_backup)
+
+        # Create new backup with a unique name
+        timestamp = time.strftime("%Y%m%d-%H%M%S")
+        backup_path = backup_dir + "backup_" + timestamp + ".db"
+        with sqlite3.connect(backup_path) as backup_conn:
+            self.connection.backup(backup_conn)
+        self.custom_print("Backup created")
+
+        return backup_path
 
 ##############################################################################################
 ##############################################################################################
@@ -937,6 +963,10 @@ class Window(ctk.CTk):
         return player_id
 
 
+    def reset_player_stats(self):
+        self.cursor.execute("UPDATE playerData SET goals = 0")
+
+
 ##############################################################################################
 ##############################################################################################
 ##############################################################################################
@@ -1197,8 +1227,10 @@ class Window(ctk.CTk):
                     
                 elif abs(round(delay_time)) % 30 == 0 and self.delay_time_save_for_blinking == 1:
                     self.delay_time_save_for_blinking = 0
-                    
-                    self.blink_label(self.delay_time_label, "#142324", "orange", 6)
+                    try:
+                        self.blink_label(self.delay_time_label, "#142324", "orange", 6)
+                    except:
+                        return
                     
                 else:
                     self.delay_time_save_for_blinking = 1
@@ -1533,6 +1565,7 @@ class Window(ctk.CTk):
         self.cursor.execute(query, (group_number,))
         return self.cursor.fetchall()
 
+
     def get_teams_for_final_matches(self):
         teams1 = self.get_top_two_teams(1)
         teams2 = self.get_top_two_teams(2)
@@ -1540,8 +1573,7 @@ class Window(ctk.CTk):
         if teams1 and teams2:
             self.endteam1, self.endteam2 = teams1
             self.endteam3, self.endteam4 = teams2
-            
-        
+             
 
     def get_spiel_um_platz_3(self, team1, team2, team3, team4):
         #get the best two teams from the database(with most points)
@@ -2477,6 +2509,14 @@ class Window(ctk.CTk):
         """
         self.cursor.execute(delete_teams)
             
+        self.connection.commit()
+        
+        # Reset other values to default after saving
+        reset_values_query = """
+            UPDATE matchData
+            SET team1Goals = 0, team2Goals = 0, matchTime = ''
+        """
+        self.cursor.execute(reset_values_query)
         self.connection.commit()
         
 
