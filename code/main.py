@@ -10,6 +10,9 @@ from flask import Flask, send_file, request, abort, render_template, make_respon
 import sqlite3
 import vlc
 import datetime
+import os
+import glob
+import ast
 #import database_commands.database_commands as db_com
 
 
@@ -212,7 +215,9 @@ class Window(ctk.CTk):
             timeInterval TEXT DEFAULT "",
             timeIntervalFM TEXT DEFAULT "",
             pauseBeforeFM TEXT DEFAULT "",
-            websiteTitle TEXT DEFAULT ""
+            websiteTitle TEXT DEFAULT "",
+            teams_playing INTEGER DEFAULT 0,
+            activeMatch INTEGER DEFAULT 0
         )
         """
         self.settingscursor.execute(settingsDataTableCreationQuery)
@@ -267,6 +272,15 @@ class Window(ctk.CTk):
         if settings[12] is not None and settings[12] != "" and settings[12] != 0:
             self.website_title.set(value=settings[12])
         
+        if settings[13] is not None and settings[13] != "" and settings[13] != 0:
+
+            self.teams_playing = ast.literal_eval(settings[13])
+            print("self.teams_playing", self.teams_playing[0])
+            print("settings[13]", settings[13])
+            print("Type of self.teams_playing", type(self.teams_playing))
+        
+        if settings[14] is not None and settings[14] != "" and settings[14] != 0:
+            self.active_match = settings[14]
     
 ##############################################################################################
 ##############################################################################################
@@ -342,6 +356,7 @@ class Window(ctk.CTk):
         
         
     def save_team_names_in_db(self):
+        self.create_backup_of_db()
         old_mp3_list = []
         name_entries = self.name_entries
 
@@ -358,7 +373,8 @@ class Window(ctk.CTk):
 
         for i, entry in enumerate(entries):
             old_mp3_list[i] = entry
-
+        
+        
         # Drop the table
         self.cursor.execute("DROP TABLE teamData")
 
@@ -420,6 +436,7 @@ class Window(ctk.CTk):
         self.calculate_matches()
         self.reload_spiel_button_command()
         self.get_teams_for_final_matches()
+        self.reset_player_stats()
         
     
     def write_names_into_entry_fields(self):
@@ -478,7 +495,28 @@ class Window(ctk.CTk):
 
         reload_button = ctk.CTkButton(team_button_frame, text="Reload", command=self.reload_button_command, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
         reload_button.pack(pady=8, padx=10)
-        
+            
+
+    def create_backup_of_db(self):
+        backup_dir = "data/backups/"
+        os.makedirs(backup_dir, exist_ok=True)  # Ensure the directory exists
+
+        # Get list of existing backups
+        existing_backups = glob.glob(backup_dir + "*.db")
+
+        # If there are more than 5 backups, delete the oldest one
+        if len(existing_backups) > 10:
+            oldest_backup = min(existing_backups, key=os.path.getctime)
+            os.remove(oldest_backup)
+
+        # Create new backup with a unique name
+        timestamp = time.strftime("%Y%m%d-%H%M%S")
+        backup_path = backup_dir + "backup_" + timestamp + ".db"
+        with sqlite3.connect(backup_path) as backup_conn:
+            self.connection.backup(backup_conn)
+        self.custom_print("Backup created")
+
+        return backup_path
 
 ##############################################################################################
 ##############################################################################################
@@ -844,7 +882,7 @@ class Window(ctk.CTk):
         columns = "playerName, playerNumber, goals" if readGoals else "playerName, playerNumber"
         columns =  columns + ", id" if readID else columns
         
-        print("columns", columns)
+        #print("columns", columns)
 
         # Determine the condition based on playerID
         condition = "AND id = ?" if playerID != -1 else ""
@@ -935,6 +973,10 @@ class Window(ctk.CTk):
         player_id = self.cursor.fetchone()[0]
         
         return player_id
+
+
+    def reset_player_stats(self):
+        self.cursor.execute("UPDATE playerData SET goals = 0")
 
 
 ##############################################################################################
@@ -1161,6 +1203,8 @@ class Window(ctk.CTk):
             
             ######################################################
 
+        self.save_teams_playing_and_active_match()
+        
         self.create_matches_labels(manual_frame)
 
 
@@ -1193,12 +1237,16 @@ class Window(ctk.CTk):
                     self.delay_time_label.configure(font=("Helvetica", self.team_button_font_size * 1.6, "bold"), text_color="red", fg_color="orange")
                     
                     #self.after(1000, self.change_back_label_color, self.delay_time_label, "#142324")
-                    self.blink_label(self.delay_time_label, "#142324", "orange", 6)
+                    if not self.blink_label(self.delay_time_label, "#142324", "orange", 6):
+                        print("Ended blinking because of save_delay_time")
+                        return
                     
                 elif abs(round(delay_time)) % 30 == 0 and self.delay_time_save_for_blinking == 1:
                     self.delay_time_save_for_blinking = 0
-                    
-                    self.blink_label(self.delay_time_label, "#142324", "orange", 6)
+                    if not self.blink_label(self.delay_time_label, "#142324", "orange", 6):
+                        print("Ended blinking because of delay_time_save_for_blinking")
+                        return
+
                     
                 else:
                     self.delay_time_save_for_blinking = 1
@@ -1240,10 +1288,18 @@ class Window(ctk.CTk):
 
     def blink_label(self, label, original_color, blink_color="orange", blink_times=5):
         if blink_times > 0:
-            label.configure(fg_color=blink_color if blink_times % 2 == 0 else original_color)
+            try:
+                label.configure(fg_color=blink_color if blink_times % 2 == 0 else original_color)
+            except:
+                return False
             self.after(1000, self.blink_label, label, original_color, blink_color, blink_times-1)
+            return True
         else:
-            label.configure(fg_color=original_color)
+            try:
+                label.configure(fg_color=original_color)
+            except:
+                return False
+            return True
             
             
     def change_back_label_color(self, label, label_color):
@@ -1402,7 +1458,7 @@ class Window(ctk.CTk):
         
         if show_frame:
             self.show_frame(self.SPIEL_frame)
-
+        self.watch_dog_process_can_be_active = True
         self.create_SPIEL_elements()
 
         
@@ -1452,11 +1508,18 @@ class Window(ctk.CTk):
             #print("active_match in create_matches_labels", self.active_match)
             if self.active_match >= 0:
                 spiel_select.set(values_list[self.active_match])
+            else:
+                self.on_match_select(values_list[0], matches)
+                return
+            
         elif self.active_mode.get() == 2:
             values_list, active_match = self.get_values_list_mode2()
             spiel_select.configure(values=values_list)
             if active_match >= 0:
                 spiel_select.set(values_list[active_match])
+            else:
+                self.on_match_select(values_list[0], matches)
+                return
 
             
         next_match_button = ctk.CTkButton(spiel_select_frame, text="Next Match", command=lambda : self.next_previous_match_button(spiel_select, matches), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
@@ -1528,13 +1591,14 @@ class Window(ctk.CTk):
     
     def get_top_two_teams(self, group_number):
         query = """
-        SELECT id, teamName FROM teamData
+        SELECT id, teamName, goals, goalsReceived, (goals - goalsReceived) as goalDifference FROM teamData
         WHERE groupNumber = ?
-        ORDER BY points DESC, id ASC
+        ORDER BY points DESC, goalDifference DESC, id ASC
         LIMIT 2
         """
         self.cursor.execute(query, (group_number,))
         return self.cursor.fetchall()
+
 
     def get_teams_for_final_matches(self):
         teams1 = self.get_top_two_teams(1)
@@ -1543,19 +1607,20 @@ class Window(ctk.CTk):
         if teams1 and teams2:
             self.endteam1, self.endteam2 = teams1
             self.endteam3, self.endteam4 = teams2
-            
-        
+             
 
     def get_spiel_um_platz_3(self, team1, team2, team3, team4):
         #get the best two teams from the database(with most points)
         getGoles1 = """
         SELECT team1Goals, team2Goals FROM finalMatchesData
         WHERE matchId = 1
+        ORDER BY matchId ASC
         """
         
         getGoles2 = """
         SELECT team1Goals, team2Goals FROM finalMatchesData
         WHERE matchId = 2
+        ORDER BY matchId ASC
         """
         self.cursor.execute(getGoles1)
         goles1 = self.cursor.fetchone()
@@ -1590,11 +1655,13 @@ class Window(ctk.CTk):
         getGoles1 = """
         SELECT team1Goals, team2Goals FROM finalMatchesData
         WHERE matchId = 1
+        ORDER BY matchId DESC
         """
         
         getGoles2 = """
         SELECT team1Goals, team2Goals FROM finalMatchesData
         WHERE matchId = 2
+        ORDER BY matchId DESC
         """
         
         self.final_match_teams = []
@@ -1684,7 +1751,8 @@ class Window(ctk.CTk):
                 self.teams_playing = [self.endteam2[0], self.endteam4[0]]
                 self.active_match = 1 
                 self.save_active_match_in_final_phase(self.endteam2[0], self.endteam4[0])
-            elif selected_match == self.get_spiel_um_platz_3(self.endteam1, self.endteam3, self.endteam2, self.endteam4) and self.spiel_um_platz_3 != []:
+            elif selected_match.startswith("Spiel um Platz 3: ") and self.spiel_um_platz_3 != []:
+                self.get_spiel_um_platz_3(self.endteam1, self.endteam3, self.endteam2, self.endteam4)
                 if self.spiel_um_platz_3[0][0] != None and self.spiel_um_platz_3[1][0] != None:
                     self.teams_playing = [self.spiel_um_platz_3[0][0], self.spiel_um_platz_3[1][0]]
                     self.active_match = 2
@@ -1694,7 +1762,8 @@ class Window(ctk.CTk):
                     self.active_match = 2
                     self.save_active_match_in_final_phase(None, None)
                 
-            elif selected_match == self.get_final_match(self.endteam1, self.endteam3, self.endteam2, self.endteam4):
+            elif selected_match.startswith("Finale: ") and self.final_match_teams != []:
+                self.get_final_match(self.endteam1, self.endteam3, self.endteam2, self.endteam4)
                 if self.final_match_teams == []:
                     self.teams_playing = [None, None]
                     self.active_match = 3
@@ -1712,7 +1781,6 @@ class Window(ctk.CTk):
             
             #self.save_games_played_in_db(self.active_match)
             
-            self.updated_data.update({"Games": get_data_for_website(2)})
             self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
         
         self.reload_spiel_button_command()
@@ -1726,6 +1794,8 @@ class Window(ctk.CTk):
                 # Get the current match index
                 current_match_index = [match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1] for match in matches].index(spiel_select.get()) + 1
 
+                self.save_games_played_in_db(current_match_index)
+                
                 # Calculate the new match index
                 new_match_index = current_match_index + 1 if next_match else current_match_index - 1
 
@@ -1962,7 +2032,7 @@ class Window(ctk.CTk):
             SELECT matchId FROM matchData
             WHERE (team1Id = ? OR team2Id = ?) AND matchId < ?
             """
-            self.cursor.execute(getPlayed, (teamID, teamID, match_index + 2))
+            self.cursor.execute(getPlayed, (teamID, teamID, match_index + 1))
             
             played = self.cursor.fetchall()
             
@@ -1977,9 +2047,22 @@ class Window(ctk.CTk):
             """
             
             self.cursor.execute(updatePlayed, (played, teamID))
-            
+        
         self.connection.commit()
-
+        self.updated_data.update({"Games": get_data_for_website(2)})
+        
+        
+    def save_teams_playing_and_active_match(self):
+        if self.teams_playing[0] != None and self.teams_playing[1] != None:
+            updateTeamsPlaying = """
+            UPDATE settingsData
+            SET teams_playing = ?, activeMatch = ?
+            WHERE id = 1
+            """
+            self.settingscursor.execute(updateTeamsPlaying, (str(self.teams_playing), self.active_match))
+            self.settingsconnection.commit()
+    
+    
     ###########################################################################################################
     ###########################################################################################################
     ###########################################################################################################
@@ -2482,6 +2565,14 @@ class Window(ctk.CTk):
             
         self.connection.commit()
         
+        # Reset other values to default after saving
+        reset_values_query = """
+            UPDATE matchData
+            SET team1Goals = 0, team2Goals = 0, matchTime = ''
+        """
+        self.cursor.execute(reset_values_query)
+        self.connection.commit()
+        
 
     def reset_points_for_all_teams_in_db(self):
         resetPoints = """
@@ -2699,14 +2790,16 @@ def get_data_for_website(which_data=-1):
         return all_matches
     
     if which_data == 5:
-        
-        a_m = tkapp.active_match
-        
-        if tkapp.active_mode.get() == 2:
-            a_m += 1
-            a_m *= -1
-        
-        return a_m
+        try:
+            a_m = tkapp.active_match
+            
+            if tkapp.active_mode.get() == 2:
+                a_m += 1
+                a_m *= -1
+            
+            return a_m
+        except:
+            return 0
     
     if which_data == 6 and tkapp.active_mode.get() == 2:
           
