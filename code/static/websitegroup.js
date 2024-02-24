@@ -219,14 +219,20 @@ function sortRowsByPoints(table) {
         var bP = bPCell ? parseInt(bPCell.textContent) : 0;
 
         // Extract the data from .tcell
-        var aTCell = a.querySelector(".tcell");
-        var bTCell = b.querySelector(".tcell");
+        var aTCell = a.querySelector("[class*='tCell']");
+        var bTCell = b.querySelector("[class*='tCell']");
         var aData = aTCell ? aTCell.textContent.trim() : "";
         var bData = bTCell ? bTCell.textContent.trim() : "";
 
         // Parse the data to get the scores
-        var aScore = aData ? parseInt(aData.split(" : ")[0]) : 0;
-        var bScore = bData ? parseInt(bData.split(" : ")[0]) : 0;
+        var aScore1 = aData ? parseInt(aData.split(" : ")[0]) : 0;
+        var aScore2 = aData ? parseInt(aData.split(" : ")[1]) : 0;
+
+        var bScore1 = bData ? parseInt(bData.split(" : ")[0]) : 0;
+        var bScore2 = bData ? parseInt(bData.split(" : ")[1]) : 0;
+
+        var aScore = aScore1 - aScore2;
+        var bScore = bScore1 - bScore2;
 
         // Sort by points first
         if (aP !== bP) {
