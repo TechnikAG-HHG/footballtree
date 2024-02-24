@@ -1889,18 +1889,20 @@ class Window(ctk.CTk):
         
         # Create elements for the Contact frame
         option_frame = ctk.CTkFrame(self.settings_frame, bg_color='#0e1718', fg_color='#0e1718')
-        option_frame.pack(pady=10, anchor=tk.NW, side=tk.LEFT, padx=10)
+        option_frame.pack(pady=7, anchor=tk.NW, side=tk.LEFT, padx=15)
         
+        all_option_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        all_option_frame.pack(pady=0, anchor=tk.NW, side=tk.TOP, padx=0)
         
         # volume slider
-        volume_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        volume_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, padx=5)
+        volume_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        volume_frame.pack(pady=10, anchor=tk.CENTER, side=tk.TOP, padx=5)
         
-        volume_label = ctk.CTkLabel(volume_frame, text="Volume", font=("Helvetica", 19))
-        volume_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        volume_label = ctk.CTkLabel(volume_frame, text="Volume", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        volume_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.CENTER)
         
-        volume_value_label = ctk.CTkLabel(volume_frame, textvariable=self.volume, font=("Helvetica", 17))
-        volume_value_label.pack(side=tk.RIGHT, pady=0, padx=0, anchor=tk.NW)
+        volume_value_label = ctk.CTkLabel(volume_frame, textvariable=self.volume, font=("Helvetica", self.team_button_font_size*1.3))
+        volume_value_label.pack(side=tk.RIGHT, pady=0, padx=0, anchor=tk.NE)
         
         volume_slider = ctk.CTkSlider(
             volume_frame, 
@@ -1909,91 +1911,94 @@ class Window(ctk.CTk):
             to=100, 
             variable=self.volume, 
             command=lambda event: self.on_volume_change(event), 
-            width=200, 
+            width=self.team_button_width*1.6, 
             height=30)
         volume_slider.pack(pady=0, padx=5, side=tk.LEFT, anchor=tk.NW)
         
         
         # phase switcher
-        phase_switcher_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        phase_switcher_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, padx=5)
+        all_switcher_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        all_switcher_frame.pack(pady=0, anchor=tk.CENTER, side=tk.TOP, padx=0)
         
-        option_label = ctk.CTkLabel(phase_switcher_frame, text="Phase Switcher", font=("Helvetica", 19))
+        phase_switcher_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
+        phase_switcher_frame.pack(pady=7, anchor=tk.NW, side=tk.TOP, padx=5)
+        
+        option_label = ctk.CTkLabel(phase_switcher_frame, text="Phase Switcher", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         option_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
-        radio_button_1 = ctk.CTkRadioButton(phase_switcher_frame, text="Group Phase", variable=self.active_mode, value=1, font=("Helvetica", 17), command=self.on_radio_button_change)
+        radio_button_1 = ctk.CTkRadioButton(phase_switcher_frame, text="Group Phase", variable=self.active_mode, value=1, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_radio_button_change)
         radio_button_1.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
-        radio_button_2 = ctk.CTkRadioButton(phase_switcher_frame, text="Final Phase", variable=self.active_mode, value=2, font=("Helvetica", 17), command=self.on_radio_button_change)
+        radio_button_2 = ctk.CTkRadioButton(phase_switcher_frame, text="Final Phase", variable=self.active_mode, value=2, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_radio_button_change)
         radio_button_2.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
         
         
         # debug mode switcher
-        debug_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        debug_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
         debug_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, padx=5)
         
-        debug_label = ctk.CTkLabel(debug_frame, text="Debug Mode", font=("Helvetica", 19))
+        debug_label = ctk.CTkLabel(debug_frame, text="Debug Mode", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         debug_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
-        radio_button_3 = ctk.CTkRadioButton(debug_frame, text="Debug", variable=self.debug_mode, value=1, font=("Helvetica", 17), command=self.on_radio_debug_button_change)
+        radio_button_3 = ctk.CTkRadioButton(debug_frame, text="Debug", variable=self.debug_mode, value=1, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_radio_debug_button_change)
         radio_button_3.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
-        radio_button_4 = ctk.CTkRadioButton(debug_frame, text="Debug Off", variable=self.debug_mode, value=0, font=("Helvetica", 17), command=self.on_radio_debug_button_change)
+        radio_button_4 = ctk.CTkRadioButton(debug_frame, text="Debug Off", variable=self.debug_mode, value=0, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_radio_debug_button_change)
         radio_button_4.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
         
         
         # start time for matches
-        start_time_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        start_time_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, padx=5)
+        start_time_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        start_time_frame.pack(pady=7, anchor=tk.CENTER, side=tk.TOP, padx=5)
         
-        start_time_label = ctk.CTkLabel(start_time_frame, text="Start Time", font=("Helvetica", 19))
-        start_time_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        start_time_label = ctk.CTkLabel(start_time_frame, text="Start Time", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        start_time_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.CENTER)
         
-        start_time_entry = ctk.CTkEntry(start_time_frame, textvariable=self.start_time, font=("Helvetica", 17))
+        start_time_entry = ctk.CTkEntry(start_time_frame, textvariable=self.start_time, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
         start_time_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
         start_time_entry.bind("<KeyRelease>", lambda event: self.on_start_time_change(event))
         
         
         # time interval for matches
-        time_interval_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        time_interval_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, padx=5)
+        time_interval_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        time_interval_frame.pack(pady=7, anchor=tk.CENTER, side=tk.TOP, padx=5)
         
-        time_interval_label = ctk.CTkLabel(time_interval_frame, text="Time Interval", font=("Helvetica", 19))
-        time_interval_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        time_interval_label = ctk.CTkLabel(time_interval_frame, text="Time Interval", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        time_interval_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.CENTER)
         
-        time_interval_entry = ctk.CTkEntry(time_interval_frame, textvariable=self.time_interval, font=("Helvetica", 17))
+        time_interval_entry = ctk.CTkEntry(time_interval_frame, textvariable=self.time_interval, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
         time_interval_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
         time_interval_entry.bind("<KeyRelease>", lambda event: self.on_time_interval_change(event))
         
         
         # time interval for final matches
-        time_intervalFM_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        time_intervalFM_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, padx=5)
+        time_intervalFM_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        time_intervalFM_frame.pack(pady=7, anchor=tk.CENTER, side=tk.TOP, padx=5)
         
-        time_intervalFM_label = ctk.CTkLabel(time_intervalFM_frame, text="Time Interval Final Matches", font=("Helvetica", 19))
-        time_intervalFM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        time_intervalFM_label = ctk.CTkLabel(time_intervalFM_frame, text="Time Interval Final Matches", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        time_intervalFM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.CENTER)
         
-        time_intervalFM_entry = ctk.CTkEntry(time_intervalFM_frame, textvariable=self.time_intervalFM, font=("Helvetica", 17))
+        time_intervalFM_entry = ctk.CTkEntry(time_intervalFM_frame, textvariable=self.time_intervalFM, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
         time_intervalFM_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
         time_intervalFM_entry.bind("<KeyRelease>", lambda event: self.on_time_intervalFM_change(event))
         
         
         # pause time before final matches
-        time_pause_before_FM_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        time_pause_before_FM_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, padx=5)
+        time_pause_before_FM_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        time_pause_before_FM_frame.pack(pady=10, anchor=tk.CENTER, side=tk.TOP, padx=5)
         
-        time_pause_before_FM_label = ctk.CTkLabel(time_pause_before_FM_frame, text="Time Pause Final Matches", font=("Helvetica", 19))
-        time_pause_before_FM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        time_pause_before_FM_label = ctk.CTkLabel(time_pause_before_FM_frame, text="Time Pause Final Matches", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        time_pause_before_FM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.CENTER)
         
-        time_pause_before_FM_entry = ctk.CTkEntry(time_pause_before_FM_frame, textvariable=self.time_pause_before_FM, font=("Helvetica", 17))
+        time_pause_before_FM_entry = ctk.CTkEntry(time_pause_before_FM_frame, textvariable=self.time_pause_before_FM, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
         time_pause_before_FM_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
         time_pause_before_FM_entry.bind("<KeyRelease>", lambda event: self.on_time_pause_before_FM_change(event))
         
         
         # website title
-        website_title_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        website_title_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, padx=5)
+        website_title_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        website_title_frame.pack(pady=7, anchor=tk.CENTER, side=tk.TOP, padx=5)
         
-        website_title_label = ctk.CTkLabel(website_title_frame, text="Website Title", font=("Helvetica", 19))
-        website_title_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        website_title_label = ctk.CTkLabel(website_title_frame, text="Website Title", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        website_title_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.CENTER)
         
-        website_title_entry = ctk.CTkEntry(website_title_frame, textvariable=self.website_title, font=("Helvetica", 17), width=250)
+        website_title_entry = ctk.CTkEntry(website_title_frame, textvariable=self.website_title, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
         website_title_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
         website_title_entry.bind("<KeyRelease>", lambda event: self.on_website_title_change(event))
         
