@@ -1223,17 +1223,14 @@ class Window(ctk.CTk):
                     self.delay_time_label.configure(font=("Helvetica", self.team_button_font_size * 1.6, "bold"), text_color="red", fg_color="orange")
                     
                     #self.after(1000, self.change_back_label_color, self.delay_time_label, "#142324")
-                    try:
-                        self.blink_label(self.delay_time_label, "#142324", "orange", 6)
-                    except:
+                    if not self.blink_label(self.delay_time_label, "#142324", "orange", 6):
                         return
                     
                 elif abs(round(delay_time)) % 30 == 0 and self.delay_time_save_for_blinking == 1:
                     self.delay_time_save_for_blinking = 0
-                    try:
-                        self.blink_label(self.delay_time_label, "#142324", "orange", 6)
-                    except:
+                    if not self.blink_label(self.delay_time_label, "#142324", "orange", 6):
                         return
+
                     
                 else:
                     self.delay_time_save_for_blinking = 1
@@ -1275,10 +1272,15 @@ class Window(ctk.CTk):
 
     def blink_label(self, label, original_color, blink_color="orange", blink_times=5):
         if blink_times > 0:
-            label.configure(fg_color=blink_color if blink_times % 2 == 0 else original_color)
+            try:
+                label.configure(fg_color=blink_color if blink_times % 2 == 0 else original_color)
+            except:
+                return False
             self.after(1000, self.blink_label, label, original_color, blink_color, blink_times-1)
+            return True
         else:
             label.configure(fg_color=original_color)
+            return True
             
             
     def change_back_label_color(self, label, label_color):
@@ -1744,7 +1746,6 @@ class Window(ctk.CTk):
             
             #self.save_games_played_in_db(self.active_match)
             
-            self.updated_data.update({"Games": get_data_for_website(2)})
             self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
         
         self.reload_spiel_button_command()
@@ -1758,6 +1759,8 @@ class Window(ctk.CTk):
                 # Get the current match index
                 current_match_index = [match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1] for match in matches].index(spiel_select.get()) + 1
 
+                self.save_games_played_in_db(current_match_index)
+                
                 # Calculate the new match index
                 new_match_index = current_match_index + 1 if next_match else current_match_index - 1
 
@@ -1994,7 +1997,7 @@ class Window(ctk.CTk):
             SELECT matchId FROM matchData
             WHERE (team1Id = ? OR team2Id = ?) AND matchId < ?
             """
-            self.cursor.execute(getPlayed, (teamID, teamID, match_index + 2))
+            self.cursor.execute(getPlayed, (teamID, teamID, match_index + 1))
             
             played = self.cursor.fetchall()
             
@@ -2009,8 +2012,10 @@ class Window(ctk.CTk):
             """
             
             self.cursor.execute(updatePlayed, (played, teamID))
-            
+        
         self.connection.commit()
+        self.updated_data.update({"Games": get_data_for_website(2)})
+        
 
     ###########################################################################################################
     ###########################################################################################################
