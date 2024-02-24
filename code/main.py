@@ -1224,11 +1224,13 @@ class Window(ctk.CTk):
                     
                     #self.after(1000, self.change_back_label_color, self.delay_time_label, "#142324")
                     if not self.blink_label(self.delay_time_label, "#142324", "orange", 6):
+                        print("Ended blinking because of save_delay_time")
                         return
                     
                 elif abs(round(delay_time)) % 30 == 0 and self.delay_time_save_for_blinking == 1:
                     self.delay_time_save_for_blinking = 0
                     if not self.blink_label(self.delay_time_label, "#142324", "orange", 6):
+                        print("Ended blinking because of delay_time_save_for_blinking")
                         return
 
                     
@@ -1279,7 +1281,10 @@ class Window(ctk.CTk):
             self.after(1000, self.blink_label, label, original_color, blink_color, blink_times-1)
             return True
         else:
-            label.configure(fg_color=original_color)
+            try:
+                label.configure(fg_color=original_color)
+            except:
+                return False
             return True
             
             
@@ -1436,7 +1441,7 @@ class Window(ctk.CTk):
         
         if show_frame:
             self.show_frame(self.SPIEL_frame)
-
+        self.watch_dog_process_can_be_active = True
         self.create_SPIEL_elements()
 
         
@@ -1486,11 +1491,18 @@ class Window(ctk.CTk):
             #print("active_match in create_matches_labels", self.active_match)
             if self.active_match >= 0:
                 spiel_select.set(values_list[self.active_match])
+            else:
+                self.on_match_select(values_list[0], matches)
+                return
+            
         elif self.active_mode.get() == 2:
             values_list, active_match = self.get_values_list_mode2()
             spiel_select.configure(values=values_list)
             if active_match >= 0:
                 spiel_select.set(values_list[active_match])
+            else:
+                self.on_match_select(values_list[0], matches)
+                return
 
             
         next_match_button = ctk.CTkButton(spiel_select_frame, text="Next Match", command=lambda : self.next_previous_match_button(spiel_select, matches), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
@@ -2744,14 +2756,16 @@ def get_data_for_website(which_data=-1):
         return all_matches
     
     if which_data == 5:
-        
-        a_m = tkapp.active_match
-        
-        if tkapp.active_mode.get() == 2:
-            a_m += 1
-            a_m *= -1
-        
-        return a_m
+        try:
+            a_m = tkapp.active_match
+            
+            if tkapp.active_mode.get() == 2:
+                a_m += 1
+                a_m *= -1
+            
+            return a_m
+        except:
+            return 0
     
     if which_data == 6 and tkapp.active_mode.get() == 2:
           
