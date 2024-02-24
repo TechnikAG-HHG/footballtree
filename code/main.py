@@ -12,6 +12,7 @@ import vlc
 import datetime
 import os
 import glob
+import ast
 #import database_commands.database_commands as db_com
 
 
@@ -214,7 +215,9 @@ class Window(ctk.CTk):
             timeInterval TEXT DEFAULT "",
             timeIntervalFM TEXT DEFAULT "",
             pauseBeforeFM TEXT DEFAULT "",
-            websiteTitle TEXT DEFAULT ""
+            websiteTitle TEXT DEFAULT "",
+            teams_playing INTEGER DEFAULT 0,
+            activeMatch INTEGER DEFAULT 0
         )
         """
         self.settingscursor.execute(settingsDataTableCreationQuery)
@@ -269,6 +272,15 @@ class Window(ctk.CTk):
         if settings[12] is not None and settings[12] != "" and settings[12] != 0:
             self.website_title.set(value=settings[12])
         
+        if settings[13] is not None and settings[13] != "" and settings[13] != 0:
+
+            self.teams_playing = ast.literal_eval(settings[13])
+            print("self.teams_playing", self.teams_playing[0])
+            print("settings[13]", settings[13])
+            print("Type of self.teams_playing", type(self.teams_playing))
+        
+        if settings[14] is not None and settings[14] != "" and settings[14] != 0:
+            self.active_match = settings[14]
     
 ##############################################################################################
 ##############################################################################################
@@ -1191,6 +1203,8 @@ class Window(ctk.CTk):
             
             ######################################################
 
+        self.save_teams_playing_and_active_match()
+        
         self.create_matches_labels(manual_frame)
 
 
@@ -2028,7 +2042,18 @@ class Window(ctk.CTk):
         self.connection.commit()
         self.updated_data.update({"Games": get_data_for_website(2)})
         
-
+        
+    def save_teams_playing_and_active_match(self):
+        if self.teams_playing[0] != None and self.teams_playing[1] != None:
+            updateTeamsPlaying = """
+            UPDATE settingsData
+            SET teams_playing = ?, activeMatch = ?
+            WHERE id = 1
+            """
+            self.settingscursor.execute(updateTeamsPlaying, (str(self.teams_playing), self.active_match))
+            self.settingsconnection.commit()
+    
+    
     ###########################################################################################################
     ###########################################################################################################
     ###########################################################################################################
