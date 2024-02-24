@@ -125,7 +125,6 @@ class Window(ctk.CTk):
         
         #self.custom_print("finished init")
         
-        
         if start_server:
             server_thread = threading.Thread(target=self.start_server)
             server_thread.start()
@@ -1487,10 +1486,14 @@ class Window(ctk.CTk):
     def get_values_list_mode2(self):
         values_list = []
         self.get_teams_for_final_matches()
-        values_list.append(f"Spiel 1 Halb: {self.endteam1[1]} vs {self.endteam3[1]}")
-        values_list.append(f"Spiel 2 Halb: {self.endteam2[1]} vs {self.endteam4[1]}")
-        values_list.append(self.get_spiel_um_platz_3(self.endteam1, self.endteam3, self.endteam2, self.endteam4))
-        values_list.append(self.get_final_match(self.endteam1, self.endteam3, self.endteam2, self.endteam4))
+        endteam1 = getattr(self, 'endteam1', [None, None])
+        endteam2 = getattr(self, 'endteam2', [None, None])
+        endteam3 = getattr(self, 'endteam3', [None, None])
+        endteam4 = getattr(self, 'endteam4', [None, None])
+        values_list.append(f"Spiel 1 Halb: {endteam1[1]} vs {endteam3[1]}")
+        values_list.append(f"Spiel 2 Halb: {endteam2[1]} vs {endteam4[1]}")
+        values_list.append(self.get_spiel_um_platz_3(endteam1, endteam3, endteam2, endteam4))
+        values_list.append(self.get_final_match(endteam1, endteam3, endteam2, endteam4))
         
         active_match = self.active_match
         if self.spiel_um_platz_3 != None and self.final_match_teams != None and self.spiel_um_platz_3 != [] and self.final_match_teams != []:
@@ -1869,6 +1872,7 @@ class Window(ctk.CTk):
         self.cursor.execute(updateGoals, (goalsReceived, team2ID))
         
         self.connection.commit()
+   
         
     def save_goals_for_match_in_db(self, teamID, team2ID, goals):
         table_name = 'matchData' if self.active_mode.get() == 1 else 'finalMatchesData'
@@ -2723,22 +2727,22 @@ def get_data_for_website(which_data=-1):
         if tkapp.endteam1 and tkapp.endteam3:
             final_goles.append([ich_kann_nicht_mehr(tkapp.endteam1[0], tkapp.endteam3[0]), ich_kann_nicht_mehr(tkapp.endteam3[0], tkapp.endteam1[0])])
         else:
-            final_goles.append([None, None])
+            final_goles.append([0, 0])
             
         if tkapp.endteam2 and tkapp.endteam4:
             final_goles.append([ich_kann_nicht_mehr(tkapp.endteam2[0], tkapp.endteam4[0]), ich_kann_nicht_mehr(tkapp.endteam4[0], tkapp.endteam2[0])])
         else:
-            final_goles.append([None, None])
+            final_goles.append([0, 0])
             
         if tkapp.spiel_um_platz_3:
             final_goles.append([ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[0][0], tkapp.spiel_um_platz_3[1][0]), ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[1][0], tkapp.spiel_um_platz_3[0][0])])
         else:
-            final_goles.append([None, None])
+            final_goles.append([0, 0])
             
         if tkapp.final_match_teams:
             final_goles.append([ich_kann_nicht_mehr(tkapp.final_match_teams[0][0], tkapp.final_match_teams[1][0]), ich_kann_nicht_mehr(tkapp.final_match_teams[1][0], tkapp.final_match_teams[0][0])])
         else:
-            final_goles.append([None, None])
+            final_goles.append([0, 0])
 
         v = [
             [tkapp.endteam1[1] if tkapp.endteam1 else None, tkapp.endteam3[1] if tkapp.endteam3 else None, final_goles[0]], 
@@ -2746,6 +2750,7 @@ def get_data_for_website(which_data=-1):
             [tkapp.spiel_um_platz_3[0][1] if tkapp.spiel_um_platz_3 else None, tkapp.spiel_um_platz_3[1][1] if tkapp.spiel_um_platz_3 else None, final_goles[2]], 
             [tkapp.final_match_teams[0][1] if tkapp.final_match_teams else None, tkapp.final_match_teams[1][1] if tkapp.final_match_teams else None, final_goles[3]]
         ]
+        print("v", v)
         return v
     
     if which_data == 7:
@@ -2771,9 +2776,12 @@ def ich_kann_nicht_mehr(teamID, team2ID):
     """
     cursor.execute(get_team1_or_team2, (teamID, teamID, teamID, teamID, team2ID, team2ID))
     
+    print("ich_kann_nicht_mehr: teamID", teamID, "team2ID", team2ID)
+    
     onefetched = cursor.fetchone()
     
     if onefetched is None:
+        print("ich_kann_nicht_mehr: onefetched is None")
         return None
             
     team1_or_team2 = onefetched[0]
