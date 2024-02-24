@@ -1223,7 +1223,10 @@ class Window(ctk.CTk):
                     self.delay_time_label.configure(font=("Helvetica", self.team_button_font_size * 1.6, "bold"), text_color="red", fg_color="orange")
                     
                     #self.after(1000, self.change_back_label_color, self.delay_time_label, "#142324")
-                    self.blink_label(self.delay_time_label, "#142324", "orange", 6)
+                    try:
+                        self.blink_label(self.delay_time_label, "#142324", "orange", 6)
+                    except:
+                        return
                     
                 elif abs(round(delay_time)) % 30 == 0 and self.delay_time_save_for_blinking == 1:
                     self.delay_time_save_for_blinking = 0
