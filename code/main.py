@@ -1167,7 +1167,7 @@ class Window(ctk.CTk):
             time_frame1 = ctk.CTkFrame(time_frame, fg_color='#142324', corner_radius=5)
             time_frame1.pack(anchor=tk.S, side=tk.TOP, padx=10, pady=3, expand=True, fill=tk.X)
 
-            time_current_match, time_next_match = self.get_time_for_current_match(True)
+            time_current_match, time_next_match, _ = self.get_time_for_current_match(True)
 
             time_label = ctk.CTkLabel(time_frame1, text=f"Current Match Start: ", font=("Helvetica", self.team_button_font_size * 1.5))
             time_label.pack(side=tk.LEFT, pady=2, padx=10)
@@ -1311,14 +1311,15 @@ class Window(ctk.CTk):
         current_time = datetime.datetime.now()
 
         # Get the start time for the next match
-        _, next_match_start_time_str = self.get_time_for_current_match(True)
+        _, next_match_start_time_str, day_change = self.get_time_for_current_match(True)
+        print("day_change", day_change)
         next_match_start_time = datetime.datetime.strptime(next_match_start_time_str, '%H:%M')
 
         # Make sure both times are on the same date
         next_match_start_time = next_match_start_time.replace(year=current_time.year, month=current_time.month, day=current_time.day)
 
         # If the match is on the next day, add one day to next_match_start_time
-        if next_match_start_time < current_time:
+        if day_change:
             next_match_start_time += datetime.timedelta(days=1)
 
         # Calculate the delay in seconds
@@ -1347,8 +1348,14 @@ class Window(ctk.CTk):
             # calculate the time for the current match
             current_match_time = starttime + datetime.timedelta(minutes=timeinterval * active_match)
 
+            next_match_start_time = current_match_time + datetime.timedelta(minutes=timeinterval)
+
+            #print("next_match_start_time", next_match_start_time, "current_match_time", current_match_time, "next_match_start_time.day", next_match_start_time.day, "current_match_time.day", current_match_time.day)
+
             if next_match and active_match <= match_count:
-                return current_match_time.strftime('%H:%M'), (current_match_time + datetime.timedelta(minutes=timeinterval)).strftime('%H:%M')
+                if next_match_start_time.day != starttime.day:
+                    return current_match_time.strftime('%H:%M'), next_match_start_time.strftime('%H:%M'), True
+                return current_match_time.strftime('%H:%M'), (current_match_time + datetime.timedelta(minutes=timeinterval)).strftime('%H:%M'), False
             # return the time in 00:00 format
             return current_match_time.strftime('%H:%M')      
         
@@ -1374,7 +1381,10 @@ class Window(ctk.CTk):
             current_match_time = starttime + datetime.timedelta(minutes=(time_interval_final_matches * active_match) + (timeinterval * match_count) + pause_between_final_matches)
 
             if next_match:
-                return current_match_time.strftime('%H:%M'), (current_match_time + datetime.timedelta(minutes=timeinterval)).strftime('%H:%M')
+                next_match_start_time = current_match_time + datetime.timedelta(minutes=timeinterval)                
+                if next_match_start_time.day != starttime.day:
+                    return current_match_time.strftime('%H:%M'), next_match_start_time.strftime('%H:%M'), True
+                return current_match_time.strftime('%H:%M'), next_match_start_time.strftime('%H:%M'), False
             # return the time in 00:00 format
             return current_match_time.strftime('%H:%M')
         
