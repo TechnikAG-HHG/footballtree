@@ -1,15 +1,15 @@
-phrase_count = {}
+import tkinter as tk
+import time
 
-while True:
-    user_input = input("Enter a phrase (type 'final' to finish): ")
+def update_label():
+    current_time = time.strftime("%H:%M:%S")
+    label.config(text=current_time)
+    label.after(1000, update_label)  # Update label every 1 second
 
-    if user_input.lower() == 'final':
-        break
+root = tk.Tk()
+label = tk.Label(root, font=("Arial", 24))
+label.pack()
 
-    if user_input in phrase_count:
-        phrase_count[user_input] += 1
-    else:
-        phrase_count[user_input] = 1
+update_label()  # Start updating the label
 
-for phrase, count in phrase_count.items():
-    print(f'You wrote "{phrase}" {count} times.')
+root.mainloop()
