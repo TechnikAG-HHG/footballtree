@@ -1511,6 +1511,13 @@ class Window(ctk.CTk):
         
         spiel_select = ctk.CTkComboBox(spiel_select_frame, font=("Helvetica", self.team_button_font_size * 1.2), width=width, values=[""], command=lambda event: self.on_match_select(event, matches))
         spiel_select.pack(pady=10, side=tk.TOP, anchor=tk.N, padx=10)
+        
+        self.cursor.execute("SELECT COUNT(*) FROM matchData")
+        match_count = self.cursor.fetchone()[0]
+        
+        if self.active_match >= match_count:
+            self.active_match = -1
+            self.teams_playing = [None, None]
 
         if self.active_mode.get() == 1:
             values_list = self.get_values_list_mode1(matches)
