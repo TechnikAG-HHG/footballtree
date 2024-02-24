@@ -870,7 +870,7 @@ class Window(ctk.CTk):
         columns = "playerName, playerNumber, goals" if readGoals else "playerName, playerNumber"
         columns =  columns + ", id" if readID else columns
         
-        print("columns", columns)
+        #print("columns", columns)
 
         # Determine the condition based on playerID
         condition = "AND id = ?" if playerID != -1 else ""
