@@ -411,7 +411,7 @@ class Window(ctk.CTk):
         
         self.calculate_matches()
         self.reload_spiel_button_command()
-        self.get_teams_for_end_matches()
+        self.get_teams_for_final_matches()
         
     
     def write_names_into_entry_fields(self):
@@ -455,7 +455,7 @@ class Window(ctk.CTk):
         button_height = self.screenheight / 27
         button_font_size = self.screenwidth / 120
         
-        self.get_teams_for_end_matches()
+        self.get_teams_for_final_matches()
         
         team_button_frame = ctk.CTkFrame(self.Team_frame, bg_color='#142324', fg_color='#142324')
         team_button_frame.pack(anchor=tk.NE, side=tk.TOP, pady=10, padx=10)
@@ -973,7 +973,7 @@ class Window(ctk.CTk):
         # Assuming self.spiel_buttons is initialized as an empty dictionary
         self.spiel_buttons = {}
         
-        self.get_teams_for_end_matches()
+        self.get_teams_for_final_matches()
 
         self.custom_print("self.teams_playing", self.teams_playing)
         
@@ -1404,7 +1404,7 @@ class Window(ctk.CTk):
 
     def get_values_list_mode2(self):
         values_list = []
-        self.get_teams_for_end_matches()
+        self.get_teams_for_final_matches()
         values_list.append(f"Spiel 1 Halb: {self.endteam1[1]} vs {self.endteam3[1]}")
         values_list.append(f"Spiel 2 Halb: {self.endteam2[1]} vs {self.endteam4[1]}")
         values_list.append(self.get_spiel_um_platz_3(self.endteam1, self.endteam3, self.endteam2, self.endteam4))
@@ -1429,13 +1429,16 @@ class Window(ctk.CTk):
             goles_spiele.append([self.read_goals_for_match_from_db(self.endteam2[0], self.endteam4[0]), self.read_goals_for_match_from_db(self.endteam4[0], self.endteam2[0])])
             goles_spiele.append([self.read_goals_for_match_from_db(self.spiel_um_platz_3[0][0], self.spiel_um_platz_3[1][0]), self.read_goals_for_match_from_db(self.spiel_um_platz_3[1][0], self.spiel_um_platz_3[0][0])])
             goles_spiele.append([self.read_goals_for_match_from_db(self.final_match_teams[0][0], self.final_match_teams[1][0]), self.read_goals_for_match_from_db(self.final_match_teams[1][0], self.final_match_teams[0][0])])
-        
-            self.updated_data.update({"finalMatches": [[self.endteam1[1], self.endteam3[1], goles_spiele[0]], [self.endteam2[1], self.endteam4[1], goles_spiele[1]], [self.spiel_um_platz_3[0][1], self.spiel_um_platz_3[1][1], goles_spiele[2]], [self.final_match_teams[0][1], self.final_match_teams[1][1], goles_spiele[3]]]})
-            
+
+            if self.active_mode.get() == 2:
+                self.updated_data.update({"finalMatches": [[self.endteam1[1], self.endteam3[1], goles_spiele[0]], [self.endteam2[1], self.endteam4[1], goles_spiele[1]], [self.spiel_um_platz_3[0][1], self.spiel_um_platz_3[1][1], goles_spiele[2]], [self.final_match_teams[0][1], self.final_match_teams[1][1], goles_spiele[3]]]})
+            else:
+                #only send nones in the same structure
+                self.updated_data.update({"finalMatches": [[None, None, [None, None]], [None, None, [None, None]], [None, None, [None, None]], [None, None, [None, None]]]})
         return values_list, self.active_match
     
     
-    def get_teams_for_end_matches(self):
+    def get_teams_for_final_matches(self):
         #get the best two teams from the database(with most points)
         getTeams = """
         SELECT id, teamName FROM teamData
