@@ -1312,7 +1312,7 @@ class Window(ctk.CTk):
 
         # Get the start time for the next match
         _, next_match_start_time_str, day_change = self.get_time_for_current_match(True)
-        print("day_change", day_change)
+        # print("day_change", day_change)
         next_match_start_time = datetime.datetime.strptime(next_match_start_time_str, '%H:%M')
 
         # Make sure both times are on the same date
@@ -2226,6 +2226,12 @@ class Window(ctk.CTk):
             del stored_data["finalMatches"]
         if self.updated_data.get("finalMatches") != None:
             del self.updated_data["finalMatches"]
+            
+        if selected_value == 2:
+            self.cursor.execute("SELECT COUNT(*) FROM matchData")
+            match_count = self.cursor.fetchone()[0]
+            self.save_games_played_in_db(match_count)
+            
         self.reload_spiel_button_command()
         
         
