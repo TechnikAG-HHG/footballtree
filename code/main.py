@@ -1516,6 +1516,7 @@ class Window(ctk.CTk):
             values_list, active_match = self.get_values_list_mode2()
             spiel_select.configure(values=values_list)
             if active_match >= 0:
+                print("values_list", values_list, "active_match", active_match)
                 spiel_select.set(values_list[active_match])
             else:
                 self.on_match_select(values_list[0], matches)
@@ -1828,9 +1829,12 @@ class Window(ctk.CTk):
                 print("Selected match not found in the list.")
         elif self.active_mode.get() == 2:
             if next_match:
-                self.active_match += 1
+                if self.active_match < 3:
+                    self.active_match += 1
             else:
-                self.active_match -= 1
+                if self.active_match > 0:
+                    self.active_match -= 1
+                
             self.reload_spiel_button_command()
             self.show_frame(self.SPIEL_frame)
             
@@ -2802,7 +2806,6 @@ def get_data_for_website(which_data=-1):
             return 0
     
     if which_data == 6 and tkapp.active_mode.get() == 2:
-          
         final_goles = []
         
         if tkapp.endteam1 and tkapp.endteam3:
@@ -2832,6 +2835,7 @@ def get_data_for_website(which_data=-1):
             [tkapp.final_match_teams[0][1] if tkapp.final_match_teams else None, tkapp.final_match_teams[1][1] if tkapp.final_match_teams else None, final_goles[3]]
         ]
         print("v", v)
+        
         return v
     
     if which_data == 7:
