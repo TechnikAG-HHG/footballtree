@@ -1588,9 +1588,9 @@ class Window(ctk.CTk):
     
     def get_top_two_teams(self, group_number):
         query = """
-        SELECT id, teamName FROM teamData
+        SELECT id, teamName, goals, goalsReceived, (goals - goalsReceived) as goalDifference FROM teamData
         WHERE groupNumber = ?
-        ORDER BY points DESC, id ASC
+        ORDER BY points DESC, goalDifference DESC, id ASC
         LIMIT 2
         """
         self.cursor.execute(query, (group_number,))
