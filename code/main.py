@@ -1526,7 +1526,6 @@ class Window(ctk.CTk):
             values_list, active_match = self.get_values_list_mode2()
             spiel_select.configure(values=values_list)
             if active_match >= 0:
-                print("values_list", values_list, "active_match", active_match)
                 spiel_select.set(values_list[active_match])
             else:
                 self.on_match_select(values_list[0], matches)
