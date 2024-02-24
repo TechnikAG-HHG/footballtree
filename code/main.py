@@ -1892,14 +1892,18 @@ class Window(ctk.CTk):
         option_frame.pack(pady=10, anchor=tk.NW, side=tk.LEFT, padx=10)
         
         
-        volume_label = ctk.CTkLabel(option_frame, text="Volume", font=("Helvetica", 19))
-        volume_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        # volume slider
+        volume_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        volume_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, padx=5)
         
-        volume_value_label = ctk.CTkLabel(option_frame, textvariable=self.volume, font=("Helvetica", 17))
-        volume_value_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        volume_label = ctk.CTkLabel(volume_frame, text="Volume", font=("Helvetica", 19))
+        volume_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        
+        volume_value_label = ctk.CTkLabel(volume_frame, textvariable=self.volume, font=("Helvetica", 17))
+        volume_value_label.pack(side=tk.RIGHT, pady=0, padx=0, anchor=tk.NW)
         
         volume_slider = ctk.CTkSlider(
-            option_frame, 
+            volume_frame, 
             orientation=tk.HORIZONTAL, 
             from_=0, 
             to=100, 
@@ -1907,26 +1911,31 @@ class Window(ctk.CTk):
             command=lambda event: self.on_volume_change(event), 
             width=200, 
             height=30)
-        volume_slider.pack(pady=10, padx=10, side=tk.TOP, anchor=tk.NW)
-        
-        option_label = ctk.CTkLabel(option_frame, text="Spiel Modi", font=("Helvetica", 19))
-        option_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
+        volume_slider.pack(pady=0, padx=5, side=tk.LEFT, anchor=tk.NW)
         
         
-        radio_button_1 = ctk.CTkRadioButton(option_frame, text="Gruppenphase", variable=self.active_mode, value=1, font=("Helvetica", 17), command=self.on_radio_button_change)
-        radio_button_1.pack(side=tk.TOP, pady=2, padx = 5, anchor=tk.NW)
-
-        radio_button_2 = ctk.CTkRadioButton(option_frame, text="Final Phase", variable=self.active_mode, value=2, font=("Helvetica", 17), command=self.on_radio_button_change)
-        radio_button_2.pack(side=tk.TOP, pady=2, padx = 5, anchor=tk.NW)
+        # phase switcher
+        phase_switcher_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        phase_switcher_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, padx=5)
         
-        debug_label = ctk.CTkLabel(option_frame, text="Debug Mode", font=("Helvetica", 19))
-        debug_label.pack(side=tk.TOP, pady=5, padx=5, anchor=tk.NW)
-
-        radio_button_3 = ctk.CTkRadioButton(option_frame, text="Debug", variable=self.debug_mode, value=1, font=("Helvetica", 17), command=self.on_radio_debug_button_change)
-        radio_button_3.pack(side=tk.TOP, pady=5, padx = 5, anchor=tk.NW)
+        option_label = ctk.CTkLabel(phase_switcher_frame, text="Phase Switcher", font=("Helvetica", 19))
+        option_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        radio_button_1 = ctk.CTkRadioButton(phase_switcher_frame, text="Group Phase", variable=self.active_mode, value=1, font=("Helvetica", 17), command=self.on_radio_button_change)
+        radio_button_1.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
+        radio_button_2 = ctk.CTkRadioButton(phase_switcher_frame, text="Final Phase", variable=self.active_mode, value=2, font=("Helvetica", 17), command=self.on_radio_button_change)
+        radio_button_2.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
         
-        radio_button_4 = ctk.CTkRadioButton(option_frame, text="Debug Off", variable=self.debug_mode, value=0, font=("Helvetica", 17), command=self.on_radio_debug_button_change)
-        radio_button_4.pack(side=tk.TOP, pady=5, padx = 5, anchor=tk.NW)
+        
+        # debug mode switcher
+        debug_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        debug_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, padx=5)
+        
+        debug_label = ctk.CTkLabel(debug_frame, text="Debug Mode", font=("Helvetica", 19))
+        debug_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        radio_button_3 = ctk.CTkRadioButton(debug_frame, text="Debug", variable=self.debug_mode, value=1, font=("Helvetica", 17), command=self.on_radio_debug_button_change)
+        radio_button_3.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
+        radio_button_4 = ctk.CTkRadioButton(debug_frame, text="Debug Off", variable=self.debug_mode, value=0, font=("Helvetica", 17), command=self.on_radio_debug_button_change)
+        radio_button_4.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
         
         
         # start time for matches
