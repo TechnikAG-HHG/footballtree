@@ -64,6 +64,7 @@ class Window(ctk.CTk):
         self.spiel_um_platz_3 = []
         self.matches = []
         
+        self.delay_time_label = None
         self.settingsconnection = None
         self.settingscursor = None
 
@@ -1122,24 +1123,31 @@ class Window(ctk.CTk):
 
             time_current_match, time_next_match = self.get_time_for_current_match(True)
 
-            self.time_label = ctk.CTkLabel(time_frame1, text=f"Current Match Start: ", font=("Helvetica", self.team_button_font_size * 1.5))
-            self.time_label.pack(side=tk.LEFT, pady=5, padx=10)
+            time_label = ctk.CTkLabel(time_frame1, text=f"Current Match Start: ", font=("Helvetica", self.team_button_font_size * 1.5))
+            time_label.pack(side=tk.LEFT, pady=5, padx=10)
 
-            self.current_time_label = ctk.CTkLabel(time_frame1, text=f"{time_current_match}", font=("Helvetica", self.team_button_font_size * 1.5, "bold"))
-            self.current_time_label.pack(side=tk.RIGHT, pady=5, fill=tk.X, padx=10)
+            current_time_label = ctk.CTkLabel(time_frame1, text=f"{time_current_match}", font=("Helvetica", self.team_button_font_size * 1.5, "bold"))
+            current_time_label.pack(side=tk.RIGHT, pady=5, fill=tk.X, padx=10)
 
             # Create a new frame for the second row
             time_frame2 = ctk.CTkFrame(time_frame, fg_color='#142324', corner_radius=5)
             time_frame2.pack(anchor=tk.S, side=tk.BOTTOM, padx=10, pady=10, expand=True, fill=tk.X)
 
-            self.time_label2 = ctk.CTkLabel(time_frame2, text=f"Next Match Start: ", font=("Helvetica", self.team_button_font_size * 1.5))
-            self.time_label2.pack(side=tk.LEFT, pady=5, padx=10, anchor=tk.S)
+            time_label2 = ctk.CTkLabel(time_frame2, text=f"Next Match Start: ", font=("Helvetica", self.team_button_font_size * 1.5))
+            time_label2.pack(side=tk.LEFT, pady=5, padx=10, anchor=tk.S)
 
-            self.next_time_label = ctk.CTkLabel(time_frame2, text=f"{time_next_match}", font=("Helvetica", self.team_button_font_size * 1.5, "bold"))
-            self.next_time_label.pack(side=tk.RIGHT, pady=5, padx=10, anchor=tk.SE)
+            next_time_label = ctk.CTkLabel(time_frame2, text=f"{time_next_match}", font=("Helvetica", self.team_button_font_size * 1.5, "bold"))
+            next_time_label.pack(side=tk.RIGHT, pady=5, padx=10, anchor=tk.SE)
+            
+            self.delay_label = ctk.CTkLabel(time_frame2, text=f"Delay: ", font=("Helvetica", self.team_button_font_size * 1.5))
+            self.delay_label.pack(side=tk.RIGHT, pady=5, padx=10, anchor=tk.SE)
+            
+            self.delay_time_label = ctk.CTkLabel(time_frame2, text=f"0", font=("Helvetica", self.team_button_font_size * 1.5, "bold"))
+            self.delay_time_label.pack(side=tk.RIGHT, pady=5, padx=10, anchor=tk.SE)
+            
+            self.watch_dog_process()
             
             ######################################################
-
 
         self.create_matches_labels(manual_frame)
 
@@ -1160,7 +1168,65 @@ class Window(ctk.CTk):
     def configure_team_select(self, team_select, state, team_name):
         team_select.configure(state=state)
         team_select.set(team_name)
-        
+    
+    
+    def watch_dog_process(self):
+        # this process is for updating the self.delay_time_label every second and if the delay is over 0, 
+        # it will decrease the delay by 1 and make the self.delay_time_label red and if it is not over 0, 
+        # it will make the self.delay_time_label default again 
+
+        # Get the current delay time
+        if self.teams_playing.count(None) == 0:
+            
+            delay_time = self.calculate_delay()
+
+            # If the delay time is over 0
+            if delay_time < 0:
+                # Decrease the delay time by 1
+                delay_time -= 1
+
+                # Format the delay time as 'Min:Sec'
+                delay_min, delay_sec = divmod(delay_time, 60)
+                delay_time_str = f"{int(delay_min):02d}:{int(delay_sec):02d}"
+
+                # Update the delay time label text
+                self.delay_time_label.configure(text=delay_time_str)
+
+                # Change the delay time label color to red
+                self.delay_time_label.configure(fg_color="red")
+            else:
+                delay_time -= 1
+
+                # Format the delay time as 'Min:Sec'
+                delay_min, delay_sec = divmod(delay_time, 60)
+                delay_time_str = f"{int(delay_min):02d}:{int(delay_sec):02d}"
+
+                # Update the delay time label text
+                self.delay_time_label.configure(text=delay_time_str)
+                # If the delay time is not over 0, change the delay time label color to default (black)
+                self.delay_time_label.configure(fg_color="black")
+
+            # Call this function again after 1 second (1000 milliseconds)
+            self.delay_time_label.after(1000, self.watch_dog_process)
+
+
+    def calculate_delay(self):
+        # Get the current time
+        current_time = datetime.datetime.now()
+
+        # Get the start time for the next match
+        _, next_match_start_time_str = self.get_time_for_current_match(True)
+        next_match_start_time = datetime.datetime.strptime(next_match_start_time_str, '%H:%M')
+
+        # Make sure both times are on the same date
+        next_match_start_time = next_match_start_time.replace(year=current_time.year, month=current_time.month, day=current_time.day)
+
+        # Calculate the delay in seconds
+        delay = (next_match_start_time - current_time).total_seconds()
+
+        # If the delay is negative, that means the next match has already started, so we set the delay to 0
+        return delay
+
 
     def get_time_for_current_match(self, next_match=False):
         #get the number of entrys in the matchData table
@@ -2017,17 +2083,20 @@ class Window(ctk.CTk):
         
         
     def is_valid_time(self, time_str):
-        time_parts = time_str.split(":")
-        if len(time_parts) != 2:
+        if ":" in time_str:
+            time_parts = time_str.split(":")
+            if len(time_parts) != 2:
+                return False
+            hour, minute = time_parts
+            if not hour.isdigit() or not minute.isdigit():
+                return False
+            if not (0 <= int(hour) <= 23 and 0 <= int(minute) <= 59):
+                return False
+            if len(minute) != 2:
+                return False
+            return True
+        else:
             return False
-        hour, minute = time_parts
-        if not hour.isdigit() or not minute.isdigit():
-            return False
-        if not (0 <= int(hour) <= 23 and 0 <= int(minute) <= 59):
-            return False
-        if len(minute) != 2:
-            return False
-        return True
 
 
     def on_start_time_change(self, event):
