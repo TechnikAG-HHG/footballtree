@@ -1261,10 +1261,13 @@ class Window(ctk.CTk):
         # Make sure both times are on the same date
         next_match_start_time = next_match_start_time.replace(year=current_time.year, month=current_time.month, day=current_time.day)
 
+        # If the match is on the next day, add one day to next_match_start_time
+        if next_match_start_time < current_time:
+            next_match_start_time += datetime.timedelta(days=1)
+
         # Calculate the delay in seconds
         delay = (next_match_start_time - current_time).total_seconds()
 
-        # If the delay is negative, that means the next match has already started, so we set the delay to 0
         #print("delay in calculate_delay", delay)
         return delay
 
