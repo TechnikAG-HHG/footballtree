@@ -6,3 +6,4 @@ data/data.db
 .vscode/settings.json
 *.pyc
 *.db-journal
+*.log
