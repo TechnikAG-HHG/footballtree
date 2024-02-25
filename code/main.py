@@ -222,7 +222,8 @@ class Window(ctk.CTk):
             pauseBeforeFM TEXT DEFAULT "",
             websiteTitle TEXT DEFAULT "",
             teams_playing INTEGER DEFAULT 0,
-            activeMatch INTEGER DEFAULT 0
+            activeMatch INTEGER DEFAULT 0,
+            pauseMode BOOLEAN DEFAULT 0
         )
         """
         self.settingscursor.execute(settingsDataTableCreationQuery)
@@ -241,7 +242,7 @@ class Window(ctk.CTk):
         settings = self.settingscursor.fetchone()
         
         # create the variables for the settings
-        self.volume = tk.IntVar(value=100)
+        self.volume = tk.IntVar(value=50)
         self.active_mode = tk.IntVar(value=1)
         self.debug_mode = tk.IntVar(value=0)
         self.start_time = tk.StringVar(value="08:00")
@@ -249,6 +250,7 @@ class Window(ctk.CTk):
         self.time_intervalFM = tk.StringVar(value="10m")
         self.time_pause_before_FM = tk.StringVar(value="0m") 
         self.website_title = tk.StringVar(value="HHG-Fußballturnier")
+        self.pause_mode = tk.BooleanVar(value=False)
         
         # load the settings from the database into the variables
         if settings[5] is not None and settings[5] != "" and settings[5] != 0:
@@ -286,6 +288,9 @@ class Window(ctk.CTk):
         
         if settings[14] is not None and settings[14] != "" and settings[14] != 0:
             self.active_match = settings[14]
+            
+        if settings[15] is not None and settings[15] != "" and settings[15] != 0:
+            self.pause_mode.set(value=settings[15])
 
         if self.debug_mode.get() == 1:
             self.console_handler.setLevel(logging.DEBUG)
@@ -1231,6 +1236,7 @@ class Window(ctk.CTk):
 
         none_count = self.teams_playing.count(None)
         team_names = self.read_teamNames()
+        
 
         if none_count == 0 and self.teams_playing:
             self.configure_team_select(self.manual_team_select_2, tk.NORMAL, team_names[self.teams_playing[0]])
@@ -2119,18 +2125,18 @@ class Window(ctk.CTk):
         option_frame = ctk.CTkFrame(self.settings_frame, bg_color='#0e1718', fg_color='#0e1718')
         option_frame.pack(pady=7, anchor=tk.NW, side=tk.LEFT, padx=15)
         
-        all_option_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        all_option_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718', width=self.screenwidth/3)
         all_option_frame.pack(pady=0, anchor=tk.NW, side=tk.TOP, padx=0)
         
         # volume slider
         volume_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        volume_frame.pack(pady=10, anchor=tk.CENTER, side=tk.TOP, padx=5)
+        volume_frame.pack(pady=10, anchor=tk.N, side=tk.TOP, padx=0)
         
         volume_label = ctk.CTkLabel(volume_frame, text="Volume", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
-        volume_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.CENTER)
+        volume_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
         
         volume_value_label = ctk.CTkLabel(volume_frame, textvariable=self.volume, font=("Helvetica", self.team_button_font_size*1.3))
-        volume_value_label.pack(side=tk.RIGHT, pady=0, padx=0, anchor=tk.NE)
+        volume_value_label.pack(side=tk.RIGHT, pady=0, padx=0, anchor=tk.NE, expand=True)
         
         volume_slider = ctk.CTkSlider(
             volume_frame, 
@@ -2139,14 +2145,15 @@ class Window(ctk.CTk):
             to=100, 
             variable=self.volume, 
             command=lambda event: self.on_volume_change(event), 
-            width=self.team_button_width*1.6, 
             height=30)
-        volume_slider.pack(pady=0, padx=5, side=tk.LEFT, anchor=tk.NW)
+        volume_slider.pack(pady=0, padx=5, side=tk.LEFT, anchor=tk.NW, expand=True, fill=tk.X)
         
+        utility_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        utility_frame.pack(pady=0, anchor=tk.N, side=tk.TOP, padx=5, expand=True, fill=tk.X)
         
         # phase switcher
-        all_switcher_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        all_switcher_frame.pack(pady=0, anchor=tk.CENTER, side=tk.TOP, padx=0)
+        all_switcher_frame = ctk.CTkFrame(utility_frame, bg_color='#0e1718', fg_color='#0e1718')
+        all_switcher_frame.pack(pady=0, side=tk.TOP, padx=0, anchor=tk.N, expand=False)
         
         phase_switcher_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
         phase_switcher_frame.pack(pady=7, anchor=tk.NW, side=tk.TOP, padx=5)
@@ -2158,10 +2165,15 @@ class Window(ctk.CTk):
         radio_button_2 = ctk.CTkRadioButton(phase_switcher_frame, text="Final Phase", variable=self.active_mode, value=2, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_radio_button_change)
         radio_button_2.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
         
+        self.pause_switcher_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
+        self.pause_switcher_frame.pack(pady=7, anchor=tk.NW, side=tk.TOP, padx=5)
+        
+        self.pause_switch = ctk.CTkSwitch(self.pause_switcher_frame, text="Pause", variable=self.pause_mode, command=self.on_pause_switch_change, font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        self.pause_switch.pack(side=tk.TOP, pady=2, padx=0, anchor=tk.N)
         
         # debug mode switcher
         debug_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
-        debug_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, padx=5)
+        debug_frame.pack(pady=5, anchor=tk.NW, side=tk.TOP, padx=5)
         
         debug_label = ctk.CTkLabel(debug_frame, text="Debug Mode", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         debug_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
@@ -2173,46 +2185,46 @@ class Window(ctk.CTk):
         
         # start time for matches
         start_time_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        start_time_frame.pack(pady=7, anchor=tk.CENTER, side=tk.TOP, padx=5)
+        start_time_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
         
         start_time_label = ctk.CTkLabel(start_time_frame, text="Start Time", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
-        start_time_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.CENTER)
+        start_time_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
         
-        start_time_entry = ctk.CTkEntry(start_time_frame, textvariable=self.start_time, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
-        start_time_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        start_time_entry = ctk.CTkEntry(start_time_frame, textvariable=self.start_time, font=("Helvetica", self.team_button_font_size*1.3))
+        start_time_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
         start_time_entry.bind("<KeyRelease>", lambda event: self.on_start_time_change(event))
         
         
         # time interval for matches
         time_interval_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        time_interval_frame.pack(pady=7, anchor=tk.CENTER, side=tk.TOP, padx=5)
+        time_interval_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
         
         time_interval_label = ctk.CTkLabel(time_interval_frame, text="Time Interval", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
-        time_interval_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.CENTER)
+        time_interval_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
         
-        time_interval_entry = ctk.CTkEntry(time_interval_frame, textvariable=self.time_interval, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
-        time_interval_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        time_interval_entry = ctk.CTkEntry(time_interval_frame, textvariable=self.time_interval, font=("Helvetica", self.team_button_font_size*1.3))
+        time_interval_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
         time_interval_entry.bind("<KeyRelease>", lambda event: self.on_time_interval_change(event))
         
         
         # time interval for final matches
         time_intervalFM_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        time_intervalFM_frame.pack(pady=7, anchor=tk.CENTER, side=tk.TOP, padx=5)
+        time_intervalFM_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
         
         time_intervalFM_label = ctk.CTkLabel(time_intervalFM_frame, text="Time Interval Final Matches", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
-        time_intervalFM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.CENTER)
+        time_intervalFM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
         
-        time_intervalFM_entry = ctk.CTkEntry(time_intervalFM_frame, textvariable=self.time_intervalFM, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
-        time_intervalFM_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        time_intervalFM_entry = ctk.CTkEntry(time_intervalFM_frame, textvariable=self.time_intervalFM, font=("Helvetica", self.team_button_font_size*1.3))
+        time_intervalFM_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
         time_intervalFM_entry.bind("<KeyRelease>", lambda event: self.on_time_intervalFM_change(event))
         
         
         # pause time before final matches
         time_pause_before_FM_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        time_pause_before_FM_frame.pack(pady=7, anchor=tk.CENTER, side=tk.TOP, padx=5)
+        time_pause_before_FM_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0)
         
         time_pause_before_FM_label = ctk.CTkLabel(time_pause_before_FM_frame, text="Time Pause Final Matches", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
-        time_pause_before_FM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.CENTER)
+        time_pause_before_FM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
         
         time_pause_before_FM_entry = ctk.CTkEntry(time_pause_before_FM_frame, textvariable=self.time_pause_before_FM, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
         time_pause_before_FM_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
@@ -2221,10 +2233,10 @@ class Window(ctk.CTk):
         
         # website title
         website_title_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        website_title_frame.pack(pady=7, anchor=tk.CENTER, side=tk.TOP, padx=5)
+        website_title_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0)
         
         website_title_label = ctk.CTkLabel(website_title_frame, text="Website Title", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
-        website_title_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.CENTER)
+        website_title_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
         
         website_title_entry = ctk.CTkEntry(website_title_frame, textvariable=self.website_title, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
         website_title_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
@@ -2384,7 +2396,19 @@ class Window(ctk.CTk):
         self.settingsconnection.commit()
         
         self.updated_data.update({"websiteTitle": self.website_title.get()})
-   
+
+
+    def on_pause_switch_change(self):
+        selected_value = self.pause_mode.get()
+        saveModeInDB = """
+        UPDATE settingsData
+        SET pauseMode = ?
+        WHERE id = 1
+        """
+        self.settingscursor.execute(saveModeInDB, (selected_value,))
+        self.settingsconnection.commit()
+        
+        self.updated_data.update({"pauseMode": selected_value})
             
 ##############################################################################################
 ##############################################################################################
@@ -2618,7 +2642,6 @@ class Window(ctk.CTk):
         self.connection.commit()
 
         
-
     def reset_points_for_all_teams_in_db(self):
         resetPoints = """
         UPDATE teamData
@@ -2883,6 +2906,7 @@ def get_data_for_website(which_data=-1):
         start_time = tkapp.start_time.get()
         a, b = start_time.split(":")
         return [int(a), int(b)]
+    
 
 
 def ich_kann_nicht_mehr(teamID, team2ID):
@@ -2942,7 +2966,8 @@ def get_initial_data(template_name):
         "pauseBeforeFM": tkapp.time_pause_before_FM.get().replace("m", ""),
         "startTime": get_data_for_website(7),
         "websiteTitle": tkapp.website_title.get(),
-        "LastUpdate": 0
+        "LastUpdate": 0,
+        "pauseMode": tkapp.pause_mode.get(),
     }
     return make_response(render_template(template_name, initial_data=initial_data))
 
