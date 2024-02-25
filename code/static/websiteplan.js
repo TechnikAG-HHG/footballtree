@@ -108,25 +108,51 @@ function generateTableGroup(matches) {
 
 function generatePauseTime(time) {
     if (time == 0 || time == null) {
+        let pauseTimeDiv = document.getElementById("pauseTime");
         let pauseTimeElement = document.getElementById("pauseTime");
+        let pauseTimeText = document.getElementById("pauseTimeText");
+
         if (pauseTimeElement) {
+            pauseTimeDiv.remove();
             pauseTimeElement.remove();
+            pauseTimeText.remove();
         }
         return;
     }
 
     let tablesContainer = document.getElementById("tablesContainer");
 
-    let pauseTimeElement = document.getElementById("pauseTime");
+    let pauseTimeText = document.getElementById("pauseTimeText");
+    let pauseTimeElement = document.getElementById("pauseTimeProgress");
 
-    if (pauseTimeElement) {
-        pauseTimeElement.textContent = `Pause ${time} Minuten`;
+    if (pauseTimeText) {
+        pauseTimeText.textContent = `Pause ${time} Minuten`;
     } else {
-        pauseTimeElement = document.createElement("div");
-        pauseTimeElement.id = "pauseTime";
-        pauseTimeElement.textContent = `Pause ${time} Minuten`;
+        let pauseTimeDiv = document.createElement("div");
+        pauseTimeDiv.className = "pauseTime";
 
-        tablesContainer.appendChild(pauseTimeElement);
+        pauseTimeElement = document.createElement("progress");
+        pauseTimeElement.id = "pauseTimeProgress";
+        pauseTimeElement.max = time * 60;
+        pauseTimeElement.value = 100;
+
+        pauseTimeText = document.createElement("p");
+        pauseTimeText.textContent = `Pause ${time} Minuten`;
+        pauseTimeText.id = "pauseTimeText";
+
+        let pauseTimeStart = document.createElement("p");
+        pauseTimeStart.textContent = "Start";
+        pauseTimeStart.id = "pauseTimeStart";
+
+        let pauseTimeEnd = document.createElement("p");
+        pauseTimeEnd.textContent = "Ende";
+        pauseTimeEnd.id = "pauseTimeEnd";
+
+        pauseTimeDiv.appendChild(pauseTimeStart);
+        pauseTimeDiv.appendChild(pauseTimeText);
+        pauseTimeDiv.appendChild(pauseTimeEnd);
+        pauseTimeDiv.appendChild(pauseTimeElement);
+        tablesContainer.appendChild(pauseTimeDiv);
     }
 
     finalMatchesTime = new Date(

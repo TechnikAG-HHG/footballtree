@@ -108,22 +108,69 @@ td {
     overflow: hidden;
 }
 
-#pauseTime {
-    width: 100%;
-    margin-top: 3vh;
-    font-size: 2vw;
-    font-weight: bold;
-    padding-top: 2vh;
-    padding-bottom: 2vh;
-    color: white;
-    font-family: "Roboto", sans-serif;
+.pauseTime {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: center;
     align-items: center;
-    border-radius: 0.3vw;
-    border: 0.3vw solid #49ba67;
+    border: 0.25vw solid #49ba67;
+    border-radius: 0.5vw;
+    margin-top: 3vh;
+    width: 100%;
     box-shadow: 0.7vw 0.7vw 0.7vw 0.2vw rgba(0, 0, 0, 0.501),
         2vw 2vw 1vw 0.2vw rgba(0, 0, 0, 0.299);
+}
+
+#pauseTimeText {
+    font-size: 2vw;
+    margin: 0;
+    padding: 0;
+    color: white;
+    position: absolute;
+    font-weight: bold;
+}
+
+#pauseTimeProgress {
+    width: 100%;
+    height: 10vh;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: #1a1a1a;
+    border-radius: 0.5vw;
+}
+
+#pauseTimeProgress::-webkit-progress-value {
+    background-color: black;
+    border-radius: 0.5vw;
+}
+
+#pauseTimeProgress::-webkit-progress-bar {
+    background-color: #1a1a1a;
+    border-radius: 0.5vw;
+}
+
+#pauseTimeProgress::-moz-progress-chunk {
+    background-color: #1a1a1a;
+    border-radius: 0.5vw;
+}
+
+#pauseTimeStart {
+    position: absolute;
+    color: white;
+    font-size: 2vw;
+    margin: 0;
+    padding: 0;
+    margin-left: 4vw;
+    left: 0;
+}
+
+#pauseTimeEnd {
+    position: absolute;
+    color: white;
+    font-size: 2vw;
+    margin: 0;
+    padding: 0;
+    margin-right: 4vw;
+    right: 0;
 }
 
 .style-winner {
