@@ -26,6 +26,7 @@ lock = threading.Lock()
 debug_mode = True
 
 class Window(ctk.CTk):
+    
     def create_navigation_bar(self):
         navigation_frame = ctk.CTkFrame(self, fg_color='#142324', corner_radius=0)
         navigation_frame.pack(side=tk.LEFT, fill=tk.Y, pady=10)
@@ -816,6 +817,7 @@ class Window(ctk.CTk):
         self.selected_team_in_player = ""
         self.variable_dict[varcountname] = 0
     
+    
     def select_team(self, teamID, team_button_list, index, teamName=""):
         self.canvas.yview_moveto(0.0)
         team_button = team_button_list[index]
@@ -1476,8 +1478,8 @@ class Window(ctk.CTk):
         
         width = self.screenwidth / 9
         
-        spiel_select = ctk.CTkComboBox(spiel_select_frame, font=("Helvetica", self.team_button_font_size * 1.2), width=width, values=[""], command=lambda event: self.on_match_select(event, matches))
-        spiel_select.pack(pady=10, side=tk.TOP, anchor=tk.N, padx=10)
+        self.spiel_select = ctk.CTkComboBox(spiel_select_frame, font=("Helvetica", self.team_button_font_size * 1.2), width=width, values=[""], command=lambda event: self.on_match_select(event, matches))
+        self.spiel_select.pack(pady=10, side=tk.TOP, anchor=tk.N, padx=10)
         
         self.cursor.execute("SELECT COUNT(*) FROM matchData")
         match_count = self.cursor.fetchone()[0]
@@ -1488,10 +1490,10 @@ class Window(ctk.CTk):
 
         if self.active_mode.get() == 1:
             values_list = self.get_values_list_mode1(matches)
-            spiel_select.configure(values=values_list)
+            self.spiel_select.configure(values=values_list)
             #logging.debug("active_match in create_matches_labels", self.active_match)
             if self.active_match >= 0:
-                spiel_select.set(values_list[self.active_match])
+                self.spiel_select.set(values_list[self.active_match])
             elif values_list != []:
                 self.on_match_select(values_list[0], matches)
                 return
@@ -1501,17 +1503,17 @@ class Window(ctk.CTk):
             
         elif self.active_mode.get() == 2:
             values_list, active_match = self.get_values_list_mode2()
-            spiel_select.configure(values=values_list)
+            self.spiel_select.configure(values=values_list)
             if active_match >= 0:
-                spiel_select.set(values_list[active_match])
+                self.spiel_select.set(values_list[active_match])
             else:
                 self.on_match_select(values_list[0], matches)
                 return
 
             
-        next_match_button = ctk.CTkButton(spiel_select_frame, text="Next Match", command=lambda : self.next_previous_match_button(spiel_select, matches), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
+        next_match_button = ctk.CTkButton(spiel_select_frame, text="Next Match", command=lambda : self.next_previous_match_button(self.spiel_select, matches), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
         next_match_button.pack(pady=10, padx=10, side=tk.RIGHT, anchor=tk.SE)
-        previous_match_button = ctk.CTkButton(spiel_select_frame, text="Previous Match", command=lambda : self.next_previous_match_button(spiel_select, matches, False), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
+        previous_match_button = ctk.CTkButton(spiel_select_frame, text="Previous Match", command=lambda : self.next_previous_match_button(self.spiel_select, matches, False), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
         previous_match_button.pack(pady=10, padx=10, side=tk.LEFT, anchor=tk.SW)
 
     
@@ -1698,12 +1700,12 @@ class Window(ctk.CTk):
         self.connection.commit()
         
     
-    def on_match_select(self, event, matches):
+    def on_match_select(self, event, matches=[]):
         selected_match = event
         logging.debug(f"on_match_select selected_match: {selected_match}, matches: {matches}")
         #logging.debug(selected_match)
         #logging.debug(matches)
-        if self.active_mode.get() == 1:
+        if self.active_mode.get() == 1 and matches != []:
             match_index = [match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1] for match in matches].index(selected_match)
             #logging.debug("match_index", match_index)
             # Get the teams playing in the selected match and if there are none, set teams_playing to None
@@ -1819,9 +1821,13 @@ class Window(ctk.CTk):
             else:
                 if self.active_match > 0:
                     self.active_match -= 1
-                
+            
             self.reload_spiel_button_command()
-            self.show_frame(self.SPIEL_frame)
+                
+            self.on_match_select(self.spiel_select.get())
+                
+            #self.reload_spiel_button_command()
+            #self.show_frame(self.SPIEL_frame)
             
             self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
             
@@ -2350,9 +2356,9 @@ class Window(ctk.CTk):
         
         self.updated_data.update({"pauseMode": selected_value})
             
-##############################################################################################
-##############################################################################################
-##############################################################################################
+    ##############################################################################################
+    ##############################################################################################
+    ##############################################################################################
 
     def show_frame(self, frame):
         # Hide all frames and pack the selected frame
@@ -2388,9 +2394,9 @@ class Window(ctk.CTk):
         self.watch_dog_process_can_be_active = False
 
 
-##############################################################################################
-##############################################################################################
-##############################################################################################
+    ##############################################################################################
+    ##############################################################################################
+    ##############################################################################################
 
     def delete_updated_data(self):
         #logging.debug("delete")
@@ -2411,10 +2417,10 @@ class Window(ctk.CTk):
         #logging.debug("play_mp3", file_path, "volume", volume.get(), "self.volume", self.volume.get(), "player", player,"media", media)
    
         
-##############################################################################################
-#############################Calculate########################################################
-##############################################################################################
-##############################################################################################
+    ##############################################################################################
+    #############################Calculate########################################################
+    ##############################################################################################
+    ##############################################################################################
 
     def calculate_matches(self):
         self.match_count = 0  # Reset matchCount to 0
