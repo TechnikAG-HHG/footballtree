@@ -449,6 +449,15 @@ class Window(ctk.CTk):
         self.get_teams_for_final_matches()
         self.reset_player_stats()
         
+                
+        # Reset other values to default after saving
+        reset_values_query = """
+            UPDATE matchData
+            SET team1Goals = 0, team2Goals = 0, matchTime = ''
+        """
+        self.cursor.execute(reset_values_query)
+        self.connection.commit()
+        
     
     def write_names_into_entry_fields(self):
         selectTeams = """
@@ -2607,14 +2616,7 @@ class Window(ctk.CTk):
         self.cursor.execute(delete_teams)
             
         self.connection.commit()
-        
-        # Reset other values to default after saving
-        reset_values_query = """
-            UPDATE matchData
-            SET team1Goals = 0, team2Goals = 0, matchTime = ''
-        """
-        self.cursor.execute(reset_values_query)
-        self.connection.commit()
+
         
 
     def reset_points_for_all_teams_in_db(self):
