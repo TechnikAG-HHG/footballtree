@@ -1663,12 +1663,12 @@ class Window(ctk.CTk):
         
         if goles1 != None and goles2 != None:
 
-            if goles1[0] <= goles1[1]:
+            if goles1[1] <= goles1[0]:
                 self.spiel_um_platz_3.append(team2)
             else:
                 self.spiel_um_platz_3.append(team1)
                 
-            if goles2[0] <= goles2[1]:
+            if goles2[1] <= goles2[0]:
                 self.spiel_um_platz_3.append(team4)
             else:
                 self.spiel_um_platz_3.append(team3)
@@ -1686,13 +1686,13 @@ class Window(ctk.CTk):
         getGoles1 = """
         SELECT team1Goals, team2Goals FROM finalMatchesData
         WHERE matchId = 1
-        ORDER BY matchId DESC
+        ORDER BY matchId ASC
         """
         
         getGoles2 = """
         SELECT team1Goals, team2Goals FROM finalMatchesData
         WHERE matchId = 2
-        ORDER BY matchId DESC
+        ORDER BY matchId ASC
         """
         
         self.final_match_teams = []
