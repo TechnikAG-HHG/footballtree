@@ -1902,6 +1902,8 @@ class Window(ctk.CTk):
             self.spiel_buttons[teamID]["global"][3].set(str(current_score))
             self.updated_data.update({"Goals": get_data_for_website(1)})
             self.updated_data.update({"Matches": get_data_for_website(4)})
+            if self.active_mode.get() == 2:
+                self.updated_data.update({"finalMatches": get_data_for_website(6)})
     
     
     def read_mp3_path_from_db_for_team(self, teamID):
@@ -2903,7 +2905,7 @@ def ich_kann_nicht_mehr(teamID, team2ID):
     
     if onefetched is None:
         logging.debug("ich_kann_nicht_mehr: onefetched is None")
-        return None
+        return 0
             
     team1_or_team2 = onefetched[0]
 
