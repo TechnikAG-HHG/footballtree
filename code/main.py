@@ -13,6 +13,8 @@ import datetime
 import os
 import glob
 import ast
+import logging
+import sys
 #import database_commands.database_commands as db_com
 
 
@@ -24,13 +26,6 @@ lock = threading.Lock()
 debug_mode = True
 
 class Window(ctk.CTk):
-    def custom_print(self, *args, **kwargs):
-        #print(self.debug_mode.get())
-        if self.debug_mode.get() == 1:
-            #print("custom_print", *args, **kwargs)
-            print(*args, **kwargs)
-    
-    
     def create_navigation_bar(self):
         navigation_frame = ctk.CTkFrame(self, fg_color='#142324', corner_radius=0)
         navigation_frame.pack(side=tk.LEFT, fill=tk.Y, pady=10)
@@ -79,6 +74,21 @@ class Window(ctk.CTk):
         self.screenheight = self.winfo_screenheight()
         self.screenwidth = self.winfo_screenwidth()
         
+        # setup logging
+        logging.basicConfig(filename="log.log", level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
+
+        # Create a StreamHandler to log to the console
+        self.console_handler = logging.StreamHandler(sys.stdout)
+        self.console_handler.setLevel(logging.ERROR)
+        self.console_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+        self.console_handler.setFormatter(self.console_formatter)
+
+        # Add the StreamHandler to the logger
+        logging.getLogger().addHandler(self.console_handler)
+
+        logging.debug("Started logging")
+        
+        
         # Set window title
         self.title("Football Tournament Manager")
         self.after(0, lambda:self.state('zoomed'))
@@ -102,11 +112,6 @@ class Window(ctk.CTk):
         self.media_player_instance = vlc.Instance()
         self.media_player_instance.log_unset()
         
-        #menu = tk.Menu(self)
-        #self.configure(menu=menu)
-        #filemenu = tk.Menu(menu)
-        #menu.add_cascade(label="Manager", menu=filemenu)
-        #filemenu.add_command(label="Exit", command=self.quit)
 
         # Create and pack the navigation bar
         self.create_navigation_bar()
@@ -126,7 +131,7 @@ class Window(ctk.CTk):
         # Display the default frame
         self.show_frame(self.Team_frame)
         
-        #self.custom_print("finished init")
+        #logging.debug("finished init")
         
         if start_server:
             server_thread = threading.Thread(target=self.start_server)
@@ -250,11 +255,11 @@ class Window(ctk.CTk):
             self.volume.set(value=settings[5])
             
         if settings[6] is not None and settings[6] != "" and settings[6] != 0:
-            self.custom_print("settings[6]", settings[6])
+            logging.debug(f"settings[6]: {settings[6]}")
             self.active_mode.set(value=settings[6])
         
         if settings[7] is not None and settings[7] != "" and settings[7] != 0:
-            self.custom_print("settings[7]", settings[7])
+            logging.debug(f"settings[7]: {settings[7]}")
             self.debug_mode.set(value=settings[7])
         
         if settings[8] is not None and settings[8] != "" and settings[8] != 0:
@@ -275,12 +280,17 @@ class Window(ctk.CTk):
         if settings[13] is not None and settings[13] != "" and settings[13] != 0:
 
             self.teams_playing = ast.literal_eval(settings[13])
-            print("self.teams_playing", self.teams_playing[0])
-            print("settings[13]", settings[13])
-            print("Type of self.teams_playing", type(self.teams_playing))
+            logging.debug(f"self.teams_playing: {self.teams_playing[0]}")
+            logging.debug(f"settings[13]: {settings[13]}")
+            logging.debug(f"Type of self.teams_playing: {type(self.teams_playing)}")
         
         if settings[14] is not None and settings[14] != "" and settings[14] != 0:
             self.active_match = settings[14]
+
+        if self.debug_mode.get() == 1:
+            self.console_handler.setLevel(logging.DEBUG)
+        elif self.debug_mode.get() == 0:
+            self.console_handler.setLevel(logging.ERROR)
     
     
 ##############################################################################################
@@ -291,7 +301,7 @@ class Window(ctk.CTk):
         team_element_width = self.screenwidth / 10
         team_element_height = self.screenheight / 30
         team_element_font_size = self.screenwidth / 150
-        #self.custom_print(entry_text)
+        #logging.debug(entry_text)
         count = len(self.name_entries) + 1
         team_id = count - 1
 
@@ -332,7 +342,7 @@ class Window(ctk.CTk):
             self.mp3_list[team_id] = file_path
             new_file_dialog.configure(text=os.path.basename(file_path))
 
-        #self.custom_print(file_path)
+        #logging.debug(file_path)
         #self.cursor.execute("UPDATE teamData SET mp3Path = ? WHERE id = ?", (file_path, team_id))
         #self.connection.commit()
        
@@ -435,7 +445,7 @@ class Window(ctk.CTk):
         self.connection.commit()
         
         self.calculate_matches()
-        self.reload_spiel_button_command()
+        # self.reload_spiel_button_command()
         self.get_teams_for_final_matches()
         self.reset_player_stats()
         
@@ -452,10 +462,10 @@ class Window(ctk.CTk):
         if allfetched == []:
             self.add_name_entry()
         
-        #self.custom_print("allfetched", allfetched)
+        #logging.debug("allfetched", allfetched)
         for teamName, mp3_path in allfetched:
-            #self.custom_print("teamName", teamName)
-            #self.custom_print("mp3_path", mp3_path)
+            #logging.debug("teamName", teamName)
+            #logging.debug("mp3_path", mp3_path)
             self.add_name_entry(teamName, mp3_path)
            
 
@@ -515,7 +525,7 @@ class Window(ctk.CTk):
         backup_path = backup_dir + "backup_" + timestamp + ".db"
         with sqlite3.connect(backup_path) as backup_conn:
             self.connection.backup(backup_conn)
-        self.custom_print("Backup created")
+        logging.debug("Backup created")
 
         return backup_path
 
@@ -571,7 +581,7 @@ class Window(ctk.CTk):
         team_IDs = self.read_teamIds()
         teamNames = self.read_teamNames()
         teamNames.pop(0)
-        #self.custom_print("teamNames", teamNames, "team_IDs", team_IDs, "in create_player_elements")
+        #logging.debug("teamNames", teamNames, "team_IDs", team_IDs, "in create_player_elements")
         
         self.player_top_frame = ctk.CTkFrame(self.test_frame, width=1, height=1, fg_color="#0e1718")
 
@@ -587,13 +597,13 @@ class Window(ctk.CTk):
             try:
                 teamName = teamNames[int(teamID-1)]
             except:
-                self.custom_print("teamID", teamID)
-                self.custom_print("teamNames", teamNames)
-                self.custom_print("team_IDs", team_IDs)
-                self.custom_print("i", i)
+                logging.debug("teamID", teamID)
+                logging.debug("teamNames", teamNames)
+                logging.debug("team_IDs", team_IDs)
+                logging.debug("i", i)
 
             if i < 8:
-                #self.custom_print("created button in upper frame")
+                #logging.debug("created button in upper frame")
                 team_button = ctk.CTkButton(
                     self.player_top_frame,
                     text=teamName,
@@ -711,8 +721,8 @@ class Window(ctk.CTk):
         new_entry2 = ctk.CTkEntry(Frame, font=("Helvetica", label_font_size), height=entry_height, width=entry_width)
         
         new_entry3 = ctk.CTkEntry(Frame, font=("Helvetica", label_font_size), height=entry_height, width=entry_width)
-        #self.custom_print("entry_text", entry_text)
-        #self.custom_print("new_entry")
+        #logging.debug("entry_text", entry_text)
+        #logging.debug("new_entry")
 
         # Write entry_text to the entry field if it is not empty
         if entry_text:
@@ -766,7 +776,7 @@ class Window(ctk.CTk):
         team_IDs = self.read_teamIds()
         teamNames = self.read_teamNames()
         teamNames.pop(0)
-        #self.custom_print("teamNames", teamNames, "team_IDs", team_IDs)
+        #logging.debug("teamNames", teamNames, "team_IDs", team_IDs)
         
         for i, teamID in enumerate(team_IDs):
             teamName = teamNames[int(teamID-1)]
@@ -864,10 +874,10 @@ class Window(ctk.CTk):
         self.variable_dict[varentrie3name] = []
         self.variable_dict[varlabelname] = []
         
-        #print("teamName", teamName)
+        #logging.debug("teamName", teamName)
         
         self.cool_current_team_label.configure(text=str(teamName))
-        #print("teamName", teamName)
+        #logging.debug("teamName", teamName)
         
         self.cool_current_team_label.configure(text=str(teamName))
         
@@ -884,7 +894,7 @@ class Window(ctk.CTk):
         columns = "playerName, playerNumber, goals" if readGoals else "playerName, playerNumber"
         columns =  columns + ", id" if readID else columns
         
-        #print("columns", columns)
+        #logging.debug("columns", columns)
 
         # Determine the condition based on playerID
         condition = "AND id = ?" if playerID != -1 else ""
@@ -924,7 +934,7 @@ class Window(ctk.CTk):
                     self.cursor.execute(selectTeam, (team,))
                     result = self.cursor.fetchone()
                     if result is not None:
-                        #self.custom_print(result)
+                        #logging.debug(result)
                         teamNames.append(result[0])
         
         else:
@@ -936,7 +946,7 @@ class Window(ctk.CTk):
         
             for team in self.cursor.fetchall():
                 teamNames.append(team[0])
-            #self.custom_print("teamNames", teamNames)
+            #logging.debug("teamNames", teamNames)
         #elif self.active_mode.get() == 2:
         #    teamNames.append(self.endteam1[1])
         #    teamNames.append(self.endteam2[1])
@@ -1007,21 +1017,21 @@ class Window(ctk.CTk):
         
         self.get_teams_for_final_matches()
 
-        self.custom_print("self.teams_playing", self.teams_playing)
+        logging.debug(f"self.teams_playing: {self.teams_playing}")
         
         for i, _ in enumerate(self.teams_playing):
             
-            self.custom_print("kakarcsh",self.teams_playing)
+            logging.debug(f"self.teams_playing: {self.teams_playing}")
             
             team_names = self.read_teamNames()
             if self.teams_playing[i] is not None:
-                self.custom_print("i" , i, "teamnames", team_names)
-                #self.custom_print(self.teams_playing[i])
+                logging.debug(f"i: {i}, teamnames {team_names}")
+                #logging.debug(self.teams_playing[i])
                 #try:
                 team_name = team_names[self.teams_playing[i]]
                 #except IndexError:
                 #    self.teams_playing = [None, None]
-                #    self.custom_print("IndexError in create_SPIEL_elements")
+                #    logging.debug("IndexError in create_SPIEL_elements")
                 #    self.create_SPIEL_elements()
                 #    return
                 
@@ -1038,7 +1048,7 @@ class Window(ctk.CTk):
                 team2_id = self.teams_playing[0]
 
             
-            #self.custom_print(team)
+            #logging.debug(team)
             
             # Initialize the dictionary for the current team
             self.spiel_buttons[team_id] = {}
@@ -1065,7 +1075,7 @@ class Window(ctk.CTk):
             score_button_up.pack(pady=2, anchor=tk.N, side=tk.TOP, expand=True, fill=tk.X)
             
             score_label_var = tk.StringVar()
-            #self.custom_print("team_id", team_id, "team2_id", team2_id)
+            #logging.debug("team_id", team_id, "team2_id", team2_id)
             score_label_var.set(self.read_goals_for_match_from_db(team_id, team2_id))
             
             score_label = ctk.CTkLabel(score_button_frame, text="None", textvariable=score_label_var, font=("Helvetica", self.team_button_font_size * 1.7, "bold"))
@@ -1090,11 +1100,11 @@ class Window(ctk.CTk):
             
 
             for i, (player_name, player_number, goals, player_id) in enumerate(self.read_player_stats(team_id, True, True)):  
-                #print("player_name", player_name, "player_number", player_number, "goals", goals, "player_id", player_id)
-                #self.custom_print(type(player_name), player_name)
+                #logging.debug("player_name", player_name, "player_number", player_number, "goals", goals, "player_id", player_id)
+                #logging.debug(type(player_name), player_name)
                 player_index = i 
                 #player_id = self.get_player_id_from_player_name(player_name)
-                #print("player_id", self.get_player_id_from_player_name(player_name))
+                #logging.debug("player_id", self.get_player_id_from_player_name(player_name))
                 if i < 8:
                     self.group_frame = ctk.CTkFrame(up_frame, fg_color='#142324', corner_radius=10)
                     self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
@@ -1123,7 +1133,7 @@ class Window(ctk.CTk):
                 playerbutton2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
                 
                 
-                #self.custom_print("team", team, "i", i)
+                #logging.debug("team", team, "i", i)
 
                 # Save the group_frame, playertext1, and playerbutton in each for loop with the team name as key
                 self.spiel_buttons[team_id][i] = (self.group_frame, playertext1, playertext2, playertext3, playerbutton1, playerbutton2)  # Use append for a list
@@ -1132,7 +1142,7 @@ class Window(ctk.CTk):
 
         teams_list = self.read_teamNames()
         teams_list.pop(0)
-        #self.custom_print("teams_list", teams_list)
+        #logging.debug("teams_list", teams_list)
 
         self.manual_team_select_1 = ctk.CTkComboBox(
             manual_manual_frame, 
@@ -1160,7 +1170,7 @@ class Window(ctk.CTk):
         
             ######################################################
             #Time Display
-            #print(f"Time Display, here are the teams: {self.teams_playing} and the active_match: {self.active_match}")
+            #logging.debug(f"Time Display, here are the teams: {self.teams_playing} and the active_match: {self.active_match}")
             # Create a new frame
             time_frame = ctk.CTkFrame(manual_frame, fg_color='#142324', corner_radius=5)
             time_frame.pack(anchor=tk.SE, side=tk.RIGHT, padx=10, pady=10, expand=True)
@@ -1169,7 +1179,7 @@ class Window(ctk.CTk):
             time_frame1 = ctk.CTkFrame(time_frame, fg_color='#142324', corner_radius=5)
             time_frame1.pack(anchor=tk.S, side=tk.TOP, padx=10, pady=3, expand=True, fill=tk.X)
 
-            time_current_match, time_next_match = self.get_time_for_current_match(True)
+            time_current_match, time_next_match, _ = self.get_time_for_current_match(True)
 
             time_label = ctk.CTkLabel(time_frame1, text=f"Current Match Start: ", font=("Helvetica", self.team_button_font_size * 1.5))
             time_label.pack(side=tk.LEFT, pady=2, padx=10)
@@ -1240,20 +1250,20 @@ class Window(ctk.CTk):
                     
                     #self.after(1000, self.change_back_label_color, self.delay_time_label, "#142324")
                     if not self.blink_label(self.delay_time_label, "#142324", "orange", 6):
-                        print("Ended blinking because of save_delay_time")
+                        logging.info("Ended blinking because of save_delay_time")
                         return
                     
                 elif abs(round(delay_time)) % 30 == 0 and self.delay_time_save_for_blinking == 1:
                     self.delay_time_save_for_blinking = 0
                     if not self.blink_label(self.delay_time_label, "#142324", "orange", 6):
-                        print("Ended blinking because of delay_time_save_for_blinking")
+                        logging.info("Ended blinking because of delay_time_save_for_blinking")
                         return
 
                     
                 else:
                     self.delay_time_save_for_blinking = 1
                     
-                #print("delay_time", delay_time, "abs(delay_time) % 30", abs(round(delay_time)) % 30)
+                #logging.debug("delay_time", delay_time, "abs(delay_time) % 30", abs(round(delay_time)) % 30)
                     
             else:
                 if self.save_delay_time != 1 or self.save_delay_time == 2:
@@ -1313,17 +1323,21 @@ class Window(ctk.CTk):
         current_time = datetime.datetime.now()
 
         # Get the start time for the next match
-        _, next_match_start_time_str = self.get_time_for_current_match(True)
+        _, next_match_start_time_str, day_change = self.get_time_for_current_match(True)
+        # logging.debug("day_change", day_change)
         next_match_start_time = datetime.datetime.strptime(next_match_start_time_str, '%H:%M')
 
         # Make sure both times are on the same date
         next_match_start_time = next_match_start_time.replace(year=current_time.year, month=current_time.month, day=current_time.day)
 
+        # If the match is on the next day, add one day to next_match_start_time
+        if day_change:
+            next_match_start_time += datetime.timedelta(days=1)
+
         # Calculate the delay in seconds
         delay = (next_match_start_time - current_time).total_seconds()
 
-        # If the delay is negative, that means the next match has already started, so we set the delay to 0
-        #print("delay in calculate_delay", delay)
+        #logging.debug("delay in calculate_delay", delay)
         return delay
 
 
@@ -1346,8 +1360,14 @@ class Window(ctk.CTk):
             # calculate the time for the current match
             current_match_time = starttime + datetime.timedelta(minutes=timeinterval * active_match)
 
+            next_match_start_time = current_match_time + datetime.timedelta(minutes=timeinterval)
+
+            #logging.debug("next_match_start_time", next_match_start_time, "current_match_time", current_match_time, "next_match_start_time.day", next_match_start_time.day, "current_match_time.day", current_match_time.day)
+
             if next_match and active_match <= match_count:
-                return current_match_time.strftime('%H:%M'), (current_match_time + datetime.timedelta(minutes=timeinterval)).strftime('%H:%M')
+                if next_match_start_time.day != starttime.day:
+                    return current_match_time.strftime('%H:%M'), next_match_start_time.strftime('%H:%M'), True
+                return current_match_time.strftime('%H:%M'), (current_match_time + datetime.timedelta(minutes=timeinterval)).strftime('%H:%M'), False
             # return the time in 00:00 format
             return current_match_time.strftime('%H:%M')      
         
@@ -1367,20 +1387,23 @@ class Window(ctk.CTk):
             # get time pause final matches
             pause_between_final_matches = int(self.time_pause_before_FM.get().replace("m", ""))
             
-            #print(f"active_match: {active_match}, time_interval_final_matches: {time_interval_final_matches}, timeinterval: {timeinterval}, match_count: {match_count}, pause_between_final_matches: {pause_between_final_matches}")
+            #logging.debug(f"active_match: {active_match}, time_interval_final_matches: {time_interval_final_matches}, timeinterval: {timeinterval}, match_count: {match_count}, pause_between_final_matches: {pause_between_final_matches}")
 
             # calculate the time for the current match
             current_match_time = starttime + datetime.timedelta(minutes=(time_interval_final_matches * active_match) + (timeinterval * match_count) + pause_between_final_matches)
 
             if next_match:
-                return current_match_time.strftime('%H:%M'), (current_match_time + datetime.timedelta(minutes=timeinterval)).strftime('%H:%M')
+                next_match_start_time = current_match_time + datetime.timedelta(minutes=time_interval_final_matches)                
+                if next_match_start_time.day != starttime.day:
+                    return current_match_time.strftime('%H:%M'), next_match_start_time.strftime('%H:%M'), True
+                return current_match_time.strftime('%H:%M'), next_match_start_time.strftime('%H:%M'), False
             # return the time in 00:00 format
             return current_match_time.strftime('%H:%M')
         
     
     def on_team_select(self, event, nr):
-        #self.custom_print("on_team_select")
-        #self.custom_print(event)
+        #logging.debug("on_team_select")
+        #logging.debug(event)
         #selected_team = event.widget.get()
         selected_team = event
         
@@ -1403,7 +1426,7 @@ class Window(ctk.CTk):
             if self.active_mode.get() == 1:
                 self.active_match = self.get_active_match(self.teams_playing[0], self.teams_playing[1]) - 1
         
-        #self.custom_print("self.teams_playing", self.teams_playing)
+        #logging.debug("self.teams_playing", self.teams_playing)
         if self.teams_playing.count(None) == 1:
             self.manual_team_select_1.configure(state=tk.NORMAL)
             self.manual_team_select_1.set("None")
@@ -1500,16 +1523,26 @@ class Window(ctk.CTk):
         
         spiel_select = ctk.CTkComboBox(spiel_select_frame, font=("Helvetica", self.team_button_font_size * 1.2), width=width, values=[""], command=lambda event: self.on_match_select(event, matches))
         spiel_select.pack(pady=10, side=tk.TOP, anchor=tk.N, padx=10)
+        
+        self.cursor.execute("SELECT COUNT(*) FROM matchData")
+        match_count = self.cursor.fetchone()[0]
+        
+        if self.active_match >= match_count:
+            self.active_match = -1
+            self.teams_playing = [None, None]
 
         if self.active_mode.get() == 1:
             values_list = self.get_values_list_mode1(matches)
             spiel_select.configure(values=values_list)
-            #print("active_match in create_matches_labels", self.active_match)
+            #logging.debug("active_match in create_matches_labels", self.active_match)
             if self.active_match >= 0:
                 spiel_select.set(values_list[self.active_match])
-            else:
+            elif values_list != []:
                 self.on_match_select(values_list[0], matches)
                 return
+            else:
+                self.active_match = -1
+                self.teams_playing = [None, None]
             
         elif self.active_mode.get() == 2:
             values_list, active_match = self.get_values_list_mode2()
@@ -1640,9 +1673,8 @@ class Window(ctk.CTk):
             else:
                 self.spiel_um_platz_3.append(team4)
         
-        #self.custom_print everything
-        self.custom_print("self.spiel_um_platz_3", self.spiel_um_platz_3, "team1", team1, "team2", team2, "team3", team3, "team4", team4, "goles1", goles1, "goles2", goles2)
-        
+        #logging.debug everything
+        logging.debug(f"self.spiel_um_platz_3: {self.spiel_um_platz_3}, team1: {team1}, team2: {team2}, team3: {team3}, team4: {team4}, goles1: {goles1}, goles2: {goles2}")
         if self.spiel_um_platz_3 != []:
             return f"Spiel um Platz 3: {self.spiel_um_platz_3[0][1]} vs {self.spiel_um_platz_3[1][1]}"
         else:
@@ -1689,8 +1721,8 @@ class Window(ctk.CTk):
     
            
     def save_active_match_in_final_phase(self, team1id, team2id):
-        
-        self.custom_print("ichkanneinfachnurnochmehr self.custom_printen", "team1id", team1id, "team2id", team2id, "self.active_match", self.active_match)
+
+        logging.debug(f"team1id: {team1id}, team2id: {team2id}, self.active_match: {self.active_match}")
         active_match_id = self.active_match + 1
 
         # Try to insert a new row
@@ -1713,12 +1745,12 @@ class Window(ctk.CTk):
     
     def on_match_select(self, event, matches):
         selected_match = event
-        self.custom_print("on_match_select", "selected_match", selected_match, "matches", matches)
-        #self.custom_print(selected_match)
-        #self.custom_print(matches)
+        logging.debug(f"on_match_select selected_match: {selected_match}, matches: {matches}")
+        #logging.debug(selected_match)
+        #logging.debug(matches)
         if self.active_mode.get() == 1:
             match_index = [match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1] for match in matches].index(selected_match)
-            #self.custom_print("match_index", match_index)
+            #logging.debug("match_index", match_index)
             # Get the teams playing in the selected match and if there are none, set teams_playing to None
             team_names = self.read_teamNames()
             
@@ -1731,8 +1763,8 @@ class Window(ctk.CTk):
                 self.teams_playing = [None, None]
                 
             self.active_match = match_index
-            #print("self.active_match###################################", self.active_match)
-            #self.custom_print("self.active_matchon_match_select", self.active_match)
+            #logging.debug("self.active_match###################################", self.active_match)
+            #logging.debug("self.active_matchon_match_select", self.active_match)
             
             self.save_games_played_in_db(match_index)
             
@@ -1740,8 +1772,8 @@ class Window(ctk.CTk):
             self.updated_data.update({"activeMatchNumber": self.active_match})
             
         elif self.active_mode.get() == 2:
-            #self.custom_print("self.spiel_um_platz_3", self.spiel_um_platz_3)
-            #self.custom_print("self.final_match_teams", self.final_match_teams)
+            #logging.debug("self.spiel_um_platz_3", self.spiel_um_platz_3)
+            #logging.debug("self.final_match_teams", self.final_match_teams)
             if selected_match == "Spiel 1 Halb: " + self.endteam1[1] + " vs " + self.endteam3[1]:
                 self.teams_playing = [self.endteam1[0], self.endteam3[0]]
                 self.active_match = 0
@@ -1776,7 +1808,7 @@ class Window(ctk.CTk):
             else:
                 self.teams_playing = [None, None]
                 self.active_match = -1
-            #self.custom_print("self.active_matchon_match_select", self.active_match)
+            #logging.debug("self.active_matchon_match_select", self.active_match)
             
             #self.save_games_played_in_db(self.active_match)
             
@@ -1816,26 +1848,29 @@ class Window(ctk.CTk):
                 self.updated_data.update({"Games": get_data_for_website(2)})
                 
 
-                # Print statements
-                print("current_match_index:", current_match_index)
-                print("new_match_index:", new_match_index)
-                print("teams_playing:", teams_playing)
+                # logging.debug statements
+                logging.debug(f"current_match_index: {current_match_index}")
+                logging.debug(f"new_match_index: {new_match_index}")
+                logging.debug(f"teams_playing: {teams_playing}")
                 
 
             except ValueError:
                 # Handle the case where the selected match is not found in the list
-                print("Selected match not found in the list.")
+                logging.debug("Selected match not found in the list.")
         elif self.active_mode.get() == 2:
             if next_match:
-                self.active_match += 1
+                if self.active_match < 3:
+                    self.active_match += 1
             else:
-                self.active_match -= 1
+                if self.active_match > 0:
+                    self.active_match -= 1
+                
             self.reload_spiel_button_command()
             self.show_frame(self.SPIEL_frame)
             
             self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
             
-            #self.custom_print("self.active_match", self.active_match)
+            #logging.debug("self.active_match", self.active_match)
             
             #self.save_games_played_in_db(self.active_match)
             
@@ -1844,7 +1879,7 @@ class Window(ctk.CTk):
 
     def global_scored_a_point(self, teamID, team2ID, direction="UP"):
         # Get the current score
-        self.custom_print("global_scored_a_point", "teamID", teamID, "team2ID", team2ID, "direction", direction)
+        logging.debug(f"global_scored_a_point teamID: {teamID}, team2ID: {team2ID}, direction: {direction}")
         current_score = self.read_goals_for_match_from_db(teamID, team2ID)
         old_goals = current_score
         
@@ -1992,7 +2027,7 @@ class Window(ctk.CTk):
         
     
     def read_team_stats(self, team_id, stat):
-        #self.custom_print("read_team_stats", "teams_playing", self.teams_playing, "team_id", team_id, "stat", stat)
+        #logging.debug("read_team_stats", "teams_playing", self.teams_playing, "team_id", team_id, "stat", stat)
         
         if stat == "score":
             
@@ -2025,7 +2060,7 @@ class Window(ctk.CTk):
         
         teams_ids = self.read_teamIds()
         for teamID in teams_ids:
-            #self.custom_print("accsed matchData in save_games_played_in_db")
+            #logging.debug("accsed matchData in save_games_played_in_db")
             
             getPlayed = """
             SELECT matchId FROM matchData
@@ -2035,7 +2070,7 @@ class Window(ctk.CTk):
             
             played = self.cursor.fetchall()
             
-            #self.custom_print("played", played)
+            #logging.debug("played", played)
             
             played = len(played)
             
@@ -2211,6 +2246,12 @@ class Window(ctk.CTk):
             del stored_data["finalMatches"]
         if self.updated_data.get("finalMatches") != None:
             del self.updated_data["finalMatches"]
+            
+        if selected_value == 2:
+            self.cursor.execute("SELECT COUNT(*) FROM matchData")
+            match_count = self.cursor.fetchone()[0]
+            self.save_games_played_in_db(match_count)
+            
         self.reload_spiel_button_command()
         
         
@@ -2223,8 +2264,13 @@ class Window(ctk.CTk):
         """
         self.settingscursor.execute(saveModeInDB, (selected_value,))
         self.settingsconnection.commit()
-
-        self.reload_spiel_button_command()
+        
+        if self.debug_mode.get() == 1:
+            self.console_handler.setLevel(logging.DEBUG)
+        elif self.debug_mode.get() == 0:
+            self.console_handler.setLevel(logging.ERROR)
+            
+        # self.reload_spiel_button_command()
         
         
     def is_valid_time(self, time_str):
@@ -2248,7 +2294,7 @@ class Window(ctk.CTk):
         if self.start_time.get() == "":
             return
         if not self.is_valid_time(str(self.start_time.get())):
-            self.custom_print("Invalid time format. Please enter time in HH:MM format.")
+            logging.warning(f"Invalid time format. Please enter time in HH:MM format.")
             return
 
         saveStartTimeInDB = """
@@ -2256,7 +2302,7 @@ class Window(ctk.CTk):
         SET startTime = ?
         WHERE id = 1
         """
-        self.custom_print("on_start_time_change", self.start_time.get())
+        logging.debug(f"on_start_time_change {self.start_time.get()}")
         self.settingscursor.execute(saveStartTimeInDB, (self.start_time.get(),))
         self.settingsconnection.commit()
 
@@ -2273,7 +2319,7 @@ class Window(ctk.CTk):
         SET timeInterval = ?
         WHERE id = 1
         """
-        print("on_time_interval_change", self.time_interval.get())
+        logging.debug(f"on_time_interval_change {self.time_interval.get()}")
         self.settingscursor.execute(saveTimeIntervalInDB, (self.time_interval.get(),))
         self.settingsconnection.commit()
         
@@ -2290,7 +2336,7 @@ class Window(ctk.CTk):
         SET timeIntervalFM = ?
         WHERE id = 1
         """
-        print("on_time_intervalFM_change", self.time_intervalFM.get())
+        logging.debug(f"on_time_intervalFM_change {self.time_intervalFM.get()}")
         self.settingscursor.execute(saveTimeIntervalFMInDB, (self.time_intervalFM.get(),))
         self.settingsconnection.commit()
         
@@ -2307,7 +2353,7 @@ class Window(ctk.CTk):
         SET pauseBeforeFM = ?
         WHERE id = 1
         """
-        print("on_time_pause_before_FM_change", self.time_pause_before_FM.get())
+        logging.debug(f"on_time_pause_before_FM_change {self.time_pause_before_FM.get()}")
         self.settingscursor.execute(saveTimePauseBeforeFMInDB, (self.time_pause_before_FM.get(),))
         self.settingsconnection.commit()
         
@@ -2322,7 +2368,7 @@ class Window(ctk.CTk):
         SET websiteTitle = ?
         WHERE id = 1
         """
-        print("on_website_title_change", self.website_title.get())
+        logging.debug(f"on_website_title_change {self.website_title.get()}")
         self.settingscursor.execute(saveWebsiteTitleInDB, (self.website_title.get(),))
         self.settingsconnection.commit()
         
@@ -2357,7 +2403,7 @@ class Window(ctk.CTk):
         if self.teams_playing.count(None) == 0:
             self.reload_spiel_button_command()
             
-        #self.custom_print(stored_data)
+        #logging.debug(stored_data)
         self.calculate_matches()
         self.show_frame(self.SPIEL_frame)
         
@@ -2370,14 +2416,9 @@ class Window(ctk.CTk):
 ##############################################################################################
 ##############################################################################################
 ##############################################################################################
-            
-    def test(self):
-        self.custom_print("test")
-        
-        
     def delete_updated_data(self):
-        #self.custom_print("delete")
-        #self.custom_print(self.updated_data)
+        #logging.debug("delete")
+        #logging.debug(self.updated_data)
         self.updated_data = {}
         
         
@@ -2391,7 +2432,7 @@ class Window(ctk.CTk):
         player.set_media(media)
         player.audio_set_volume(int(volume.get()))
         player.play()
-        #self.custom_print("play_mp3", file_path, "volume", volume.get(), "self.volume", self.volume.get(), "player", player,"media", media)
+        #logging.debug("play_mp3", file_path, "volume", volume.get(), "self.volume", self.volume.get(), "player", player,"media", media)
    
         
 ##############################################################################################
@@ -2413,11 +2454,11 @@ class Window(ctk.CTk):
         
         teams.sort()
         
-        #print("calculate_matches: teams", teams)
+        #logging.debug("calculate_matches: teams", teams)
 
         # If the number of teams is odd, add a "dummy" team
         #if len(teams) % 2 != 0:
-        #    print("calculate_matches: uneven number of teams, appending dummy team")
+        #    logging.debug("calculate_matches: uneven number of teams, appending dummy team")
         #    teams.append("dummy")
 
         midpoint = (len(teams) + 1) // 2
@@ -2433,7 +2474,7 @@ class Window(ctk.CTk):
 
         self.matches = list(map(lambda match: self.add_match_number(match), matches))
         
-        #self.custom_print("self.matches", self.matches)
+        #logging.debug("self.matches", self.matches)
         
         self.save_matches_to_db()
         
@@ -2449,7 +2490,7 @@ class Window(ctk.CTk):
         # If the number of teams is odd, add a "dummy" team
         dummy = False
         if n % 2 != 0:
-            #print("calculate_matches_for_group: uneven number of teams, appending dummy team", "teams", teams)
+            #logging.debug("calculate_matches_for_group: uneven number of teams, appending dummy team", "teams", teams)
             teams.append("dummy")
             n += 1
             dummy = True
@@ -2467,7 +2508,7 @@ class Window(ctk.CTk):
 
         matches = list(map(lambda match_index: {"number": "Spiel " + str(match_index[0] + 1), "teams": match_index[1], "group": group_name}, enumerate(matches)))
 
-        #print("calculate_matches_for_group: matches", matches)
+        #logging.debug("calculate_matches_for_group: matches", matches)
         
         return matches
 
@@ -2546,9 +2587,9 @@ class Window(ctk.CTk):
         teams_to_delete = [match for match in existing_matches if match not in match_tuples]
                 
                 
-        #self.custom_print("teams_to_delete", teams_to_delete)
+        #logging.debug("teams_to_delete", teams_to_delete)
         
-        #self.custom_print("accsed matchData in save_matches_to_db")
+        #logging.debug("accsed matchData in save_matches_to_db")
         for team_to_delete in teams_to_delete:
             deleteMatch = """
                 DELETE FROM matchData
@@ -2779,13 +2820,13 @@ def get_data_for_website(which_data=-1):
             team2_name = cursor.fetchone()[0]
             
             all_matches.append((team1_name, team2_name, match[2], match[3], match[4]))
-            # self.custom_print every var
-            #self.custom_print("team1_name", team1_name, "team2_name", team2_name, "match[2]", match[2], "match[3]", match[3])
+            # logging.debug every var
+            #logging.debug("team1_name", team1_name, "team2_name", team2_name, "match[2]", match[2], "match[3]", match[3])
         
         cursor.close()
         connection.close()
         
-        #self.custom_print("all_matches", all_matches)
+        #logging.debug("all_matches", all_matches)
         return all_matches
     
     if which_data == 5:
@@ -2801,7 +2842,6 @@ def get_data_for_website(which_data=-1):
             return 0
     
     if which_data == 6 and tkapp.active_mode.get() == 2:
-          
         final_goles = []
         
         if tkapp.endteam1 and tkapp.endteam3:
@@ -2830,7 +2870,8 @@ def get_data_for_website(which_data=-1):
             [tkapp.spiel_um_platz_3[0][1] if tkapp.spiel_um_platz_3 else None, tkapp.spiel_um_platz_3[1][1] if tkapp.spiel_um_platz_3 else None, final_goles[2]], 
             [tkapp.final_match_teams[0][1] if tkapp.final_match_teams else None, tkapp.final_match_teams[1][1] if tkapp.final_match_teams else None, final_goles[3]]
         ]
-        print("v", v)
+        logging.debug(f"v {v}")
+        
         return v
     
     if which_data == 7:
@@ -2856,12 +2897,12 @@ def ich_kann_nicht_mehr(teamID, team2ID):
     """
     cursor.execute(get_team1_or_team2, (teamID, teamID, teamID, teamID, team2ID, team2ID))
     
-    print("ich_kann_nicht_mehr: teamID", teamID, "team2ID", team2ID)
+    logging.debug(f"ich_kann_nicht_mehr: teamID {teamID}, team2ID {team2ID}")
     
     onefetched = cursor.fetchone()
     
     if onefetched is None:
-        print("ich_kann_nicht_mehr: onefetched is None")
+        logging.debug("ich_kann_nicht_mehr: onefetched is None")
         return None
             
     team1_or_team2 = onefetched[0]
@@ -2882,7 +2923,6 @@ def ich_kann_nicht_mehr(teamID, team2ID):
   
 def get_initial_data(template_name):
     global initial_data
-    tkapp.test()
     
     initial_data = {
         "Teams": get_data_for_website(0),
@@ -2927,16 +2967,16 @@ def update_data():
     timeatstart = time.time()
     
     last_data_update = request.headers.get('Last-Data-Update', 0)
-    #self.custom_print("last_data_update", last_data_update)
+    #logging.debug("last_data_update", last_data_update)
     
     updated_data = tkapp.updated_data
     
     
     if updated_data != {}:
         
-        #self.custom_print("updated_data)  ", updated_data, "last_data_update", last_data_update, "should be updated")
-        #self.custom_print(updated_data.keys())
-        #self.custom_print(updated_data.values())
+        #logging.debug("updated_data)  ", updated_data, "last_data_update", last_data_update, "should be updated")
+        #logging.debug(updated_data.keys())
+        #logging.debug(updated_data.values())
         for key, value in updated_data.items():
             for key2, value2 in stored_data.items():
                 if key in value2.keys():
@@ -2944,22 +2984,22 @@ def update_data():
                     break
             
             stored_data.update({time.time()-3:{key:value}})
-            #self.custom_print("stored_data", stored_data)
+            #logging.debug("stored_data", stored_data)
         
         updated_data.update({"LastUpdate": timeatstart})
         
     for key, value in stored_data.items():
-        #self.custom_print("magucken")
+        #logging.debug("magucken")
         if key >= float(last_data_update):
-            #self.custom_print("key", key, "value", value, "last_data_update", last_data_update, "should be updated")
+            #logging.debug("key", key, "value", value, "last_data_update", last_data_update, "should be updated")
             updated_data.update(value)
             updated_data.update({"LastUpdate": timeatstart})
-            #self.custom_print("updated_data", updated_data)
+            #logging.debug("updated_data", updated_data)
             
     
-    #self.custom_print("stored_data", stored_data, "updated_data", updated_data, "last_data_update", last_data_update)
+    #logging.debug("stored_data", stored_data, "updated_data", updated_data, "last_data_update", last_data_update)
         
-    #self.custom_print("updated_data", updated_data)
+    #logging.debug("updated_data", updated_data)
 
     tkapp.delete_updated_data()
     
