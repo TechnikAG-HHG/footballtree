@@ -1822,9 +1822,11 @@ class Window(ctk.CTk):
                 if self.active_match > 0:
                     self.active_match -= 1
             
-            self.reload_spiel_button_command()
-                
-            self.on_match_select(self.spiel_select.get())
+            # self.reload_spiel_button_command()
+              
+            values_list, active_match = self.get_values_list_mode2()
+            
+            self.on_match_select(values_list[active_match])
                 
             #self.reload_spiel_button_command()
             #self.show_frame(self.SPIEL_frame)
