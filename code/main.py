@@ -1704,12 +1704,12 @@ class Window(ctk.CTk):
         
         if goles1 != None and goles2 != None:
 
-            if goles1[0] > goles1[1]:
+            if goles1[0] >= goles1[1]:
                 self.final_match_teams.append(team1)
             else:
                 self.final_match_teams.append(team2)
                 
-            if goles2[0] > goles2[1]:
+            if goles2[0] >= goles2[1]:
                 self.final_match_teams.append(team3)
             else:
                 self.final_match_teams.append(team4)
