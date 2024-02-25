@@ -834,3 +834,640 @@
 2024-02-25 09:51:11,693 - DEBUG - self.teams_playing: [1, 6]
 2024-02-25 09:51:11,693 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
 2024-02-25 09:51:11,762 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:53:31,756 - DEBUG - Started logging
+2024-02-25 09:53:31,806 - DEBUG - settings[6]: 2
+2024-02-25 09:53:31,806 - DEBUG - self.teams_playing: 1
+2024-02-25 09:53:31,806 - DEBUG - settings[13]: [1, 6]
+2024-02-25 09:53:31,806 - DEBUG - Type of self.teams_playing: <class 'list'>
+2024-02-25 09:53:32,159 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:53:32,160 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:53:32,160 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 09:53:32,276 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:53:32,276 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 09:53:32,452 - DEBUG - self.spiel_um_platz_3: [], team1: (5, 'Team 4', -9, -14, 5), team2: (7, 'Team 6', -2, -2, 0), team3: (1, 'Team', 0, 0, 0), team4: (6, 'Team 5', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:53:32,453 - DEBUG - on_match_select selected_match: Spiel 1 Halb: Team 4 vs Team 6, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 6', 'Team 9'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 9'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 9', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 15', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 17', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 18', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 19', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 20', 'teams': ['Team 8', 'Team 9'], 'group': 'Gruppe 2'}]
+2024-02-25 09:53:32,467 - DEBUG - team1id: 5, team2id: 7, self.active_match: 0
+2024-02-25 09:53:32,751 - DEBUG - self.teams_playing: [5, 7]
+2024-02-25 09:53:32,752 - DEBUG - self.teams_playing: [5, 7]
+2024-02-25 09:53:32,752 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 09:53:32,864 - DEBUG - self.teams_playing: [5, 7]
+2024-02-25 09:53:32,865 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 09:53:33,021 - DEBUG - self.spiel_um_platz_3: [], team1: (5, 'Team 4', -9, -14, 5), team2: (6, 'Team 5', 0, 0, 0), team3: (1, 'Team', 0, 0, 0), team4: (7, 'Team 6', -2, -2, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:53:33,130 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:53:33,130 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:54:08,116 - DEBUG - Backup created
+2024-02-25 09:55:35,922 - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\Users\Felix\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 1463, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Felix\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 872, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Felix\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 870, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Felix\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\app.py", line 855, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Felix\OneDrive - Helmholtz-Gymnasium\Desktop\GitHub\footballtree\code\main.py", line 2946, in home
+    return get_initial_data("websitemain.html")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Felix\OneDrive - Helmholtz-Gymnasium\Desktop\GitHub\footballtree\code\main.py", line 2924, in get_initial_data
+    tkapp.test()
+    ^^^^^^^^^^
+  File "C:\Users\Felix\AppData\Local\Programs\Python\Python312\Lib\tkinter\__init__.py", line 2425, in __getattr__
+    return getattr(self.tk, attr)
+           ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: '_tkinter.tkapp' object has no attribute 'test'
+2024-02-25 09:55:35,944 - INFO - 192.168.178.56 - - [25/Feb/2024 09:55:35] "[35m[1mGET / HTTP/1.1[0m" 500 -
+2024-02-25 09:55:36,079 - INFO - 192.168.178.56 - - [25/Feb/2024 09:55:36] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-02-25 09:56:22,560 - DEBUG - Started logging
+2024-02-25 09:56:22,607 - DEBUG - settings[6]: 2
+2024-02-25 09:56:22,607 - DEBUG - self.teams_playing: 5
+2024-02-25 09:56:22,607 - DEBUG - settings[13]: [5, 7]
+2024-02-25 09:56:22,608 - DEBUG - Type of self.teams_playing: <class 'list'>
+2024-02-25 09:56:22,940 - DEBUG - self.teams_playing: [5, 7]
+2024-02-25 09:56:22,940 - DEBUG - self.teams_playing: [5, 7]
+2024-02-25 09:56:22,941 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 09:56:23,052 - DEBUG - self.teams_playing: [5, 7]
+2024-02-25 09:56:23,052 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 09:56:23,207 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:56:23,207 - DEBUG - on_match_select selected_match: Spiel 1 Halb: Team vs Team 5, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 6', 'Team 9'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 9'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 9', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 15', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 17', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 18', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 19', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 20', 'teams': ['Team 8', 'Team 9'], 'group': 'Gruppe 2'}]
+2024-02-25 09:56:23,207 - DEBUG - team1id: 1, team2id: 6, self.active_match: 0
+2024-02-25 09:56:23,481 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:56:23,481 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:56:23,481 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 09:56:23,593 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:56:23,593 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 09:56:23,744 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:56:23,845 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:56:23,845 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:56:27,233 - DEBUG - ich_kann_nicht_mehr: teamID 1, team2ID 6
+2024-02-25 09:56:27,233 - DEBUG - ich_kann_nicht_mehr: teamID 6, team2ID 1
+2024-02-25 09:56:27,234 - DEBUG - ich_kann_nicht_mehr: teamID 2, team2ID 7
+2024-02-25 09:56:27,234 - DEBUG - ich_kann_nicht_mehr: onefetched is None
+2024-02-25 09:56:27,235 - DEBUG - ich_kann_nicht_mehr: teamID 7, team2ID 2
+2024-02-25 09:56:27,235 - DEBUG - ich_kann_nicht_mehr: onefetched is None
+2024-02-25 09:56:27,235 - DEBUG - v [['Team', 'Team 5', [0, 0]], ['Team 1', 'Team 6', [None, None]], [None, None, [0, 0]], [None, None, [0, 0]]]
+2024-02-25 09:56:27,254 - INFO - 192.168.178.56 - - [25/Feb/2024 09:56:27] "GET / HTTP/1.1" 200 -
+2024-02-25 09:56:27,427 - INFO - 192.168.178.56 - - [25/Feb/2024 09:56:27] "[36mGET /static/websitemain.css HTTP/1.1[0m" 304 -
+2024-02-25 09:56:27,435 - INFO - 192.168.178.56 - - [25/Feb/2024 09:56:27] "[36mGET /static/websitemain.js HTTP/1.1[0m" 304 -
+2024-02-25 09:56:29,413 - DEBUG - ich_kann_nicht_mehr: teamID 1, team2ID 6
+2024-02-25 09:56:29,414 - DEBUG - ich_kann_nicht_mehr: teamID 6, team2ID 1
+2024-02-25 09:56:29,415 - DEBUG - ich_kann_nicht_mehr: teamID 2, team2ID 7
+2024-02-25 09:56:29,415 - DEBUG - ich_kann_nicht_mehr: onefetched is None
+2024-02-25 09:56:29,416 - DEBUG - ich_kann_nicht_mehr: teamID 7, team2ID 2
+2024-02-25 09:56:29,416 - DEBUG - ich_kann_nicht_mehr: onefetched is None
+2024-02-25 09:56:29,416 - DEBUG - v [['Team', 'Team 5', [0, 0]], ['Team 1', 'Team 6', [None, None]], [None, None, [0, 0]], [None, None, [0, 0]]]
+2024-02-25 09:56:29,433 - INFO - 192.168.178.56 - - [25/Feb/2024 09:56:29] "GET /plan HTTP/1.1" 200 -
+2024-02-25 09:56:29,466 - INFO - 192.168.178.56 - - [25/Feb/2024 09:56:29] "[36mGET /static/websiteplan.css HTTP/1.1[0m" 304 -
+2024-02-25 09:56:29,483 - INFO - 192.168.178.56 - - [25/Feb/2024 09:56:29] "[36mGET /static/websiteplan.js HTTP/1.1[0m" 304 -
+2024-02-25 09:56:34,909 - INFO - 192.168.178.56 - - [25/Feb/2024 09:56:34] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:56:35,756 - DEBUG - self.teams_playing: [None, None]
+2024-02-25 09:56:35,757 - DEBUG - self.teams_playing: [None, None]
+2024-02-25 09:56:35,782 - DEBUG - on_match_select selected_match: Spiel 1: Team 1 vs Team 4, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 6', 'Team 9'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 9'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 9', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 15', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 17', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 18', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 19', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 20', 'teams': ['Team 8', 'Team 9'], 'group': 'Gruppe 2'}]
+2024-02-25 09:56:35,818 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:56:35,818 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:56:35,818 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 09:56:35,964 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:56:35,964 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 09:56:39,906 - INFO - 192.168.178.56 - - [25/Feb/2024 09:56:39] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:56:44,493 - INFO - 192.168.178.56 - - [25/Feb/2024 09:56:44] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:56:44,847 - DEBUG - on_start_time_change 0:00
+2024-02-25 09:56:46,291 - WARNING - Invalid time format. Please enter time in HH:MM format.
+2024-02-25 09:56:46,947 - DEBUG - on_start_time_change 1:00
+2024-02-25 09:56:47,045 - DEBUG - on_start_time_change 10:00
+2024-02-25 09:56:49,494 - INFO - 192.168.178.56 - - [25/Feb/2024 09:56:49] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:56:49,632 - DEBUG - on_time_interval_change 1m
+2024-02-25 09:56:49,771 - DEBUG - on_time_interval_change m
+2024-02-25 09:56:49,893 - DEBUG - on_time_interval_change 7m
+2024-02-25 09:56:52,168 - DEBUG - on_time_intervalFM_change 1m
+2024-02-25 09:56:52,289 - DEBUG - on_time_intervalFM_change 15m
+2024-02-25 09:56:54,151 - DEBUG - on_time_pause_before_FM_change m
+2024-02-25 09:56:54,320 - DEBUG - on_time_pause_before_FM_change 2m
+2024-02-25 09:56:54,441 - DEBUG - on_time_pause_before_FM_change 20m
+2024-02-25 09:56:54,494 - INFO - 192.168.178.56 - - [25/Feb/2024 09:56:54] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:56:59,493 - INFO - 192.168.178.56 - - [25/Feb/2024 09:56:59] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:57:04,497 - INFO - 192.168.178.56 - - [25/Feb/2024 09:57:04] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:57:07,611 - DEBUG - on_website_title_change M
+2024-02-25 09:57:07,658 - DEBUG - on_website_title_change M
+2024-02-25 09:57:07,851 - DEBUG - on_website_title_change Mi
+2024-02-25 09:57:08,167 - DEBUG - on_website_title_change Mit
+2024-02-25 09:57:08,332 - DEBUG - on_website_title_change Mitte
+2024-02-25 09:57:08,428 - DEBUG - on_website_title_change Mitte
+2024-02-25 09:57:08,557 - DEBUG - on_website_title_change Mittel
+2024-02-25 09:57:08,700 - DEBUG - on_website_title_change Mittels
+2024-02-25 09:57:08,936 - DEBUG - on_website_title_change Mittelst
+2024-02-25 09:57:09,112 - DEBUG - on_website_title_change Mittelstu
+2024-02-25 09:57:09,304 - DEBUG - on_website_title_change Mittelstufe
+2024-02-25 09:57:09,376 - DEBUG - on_website_title_change Mittelstufe
+2024-02-25 09:57:09,451 - DEBUG - on_website_title_change Mittelstufen
+2024-02-25 09:57:09,495 - INFO - 192.168.178.56 - - [25/Feb/2024 09:57:09] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:57:09,594 - DEBUG - on_website_title_change Mittelstufent
+2024-02-25 09:57:10,054 - DEBUG - on_website_title_change Mittelstufentu
+2024-02-25 09:57:10,200 - DEBUG - on_website_title_change Mittelstufentur
+2024-02-25 09:57:10,320 - DEBUG - on_website_title_change Mittelstufenturn
+2024-02-25 09:57:10,538 - DEBUG - on_website_title_change Mittelstufenturni
+2024-02-25 09:57:10,659 - DEBUG - on_website_title_change Mittelstufenturnier
+2024-02-25 09:57:10,733 - DEBUG - on_website_title_change Mittelstufenturnier
+2024-02-25 09:57:10,823 - DEBUG - on_website_title_change Mittelstufenturnier 
+2024-02-25 09:57:11,022 - DEBUG - on_website_title_change Mittelstufenturnier 2
+2024-02-25 09:57:11,193 - DEBUG - on_website_title_change Mittelstufenturnier 20
+2024-02-25 09:57:11,380 - DEBUG - on_website_title_change Mittelstufenturnier 202
+2024-02-25 09:57:11,555 - DEBUG - on_website_title_change Mittelstufenturnier 2023
+2024-02-25 09:57:12,667 - DEBUG - on_website_title_change Mittelstufenturnier 202
+2024-02-25 09:57:12,765 - DEBUG - on_website_title_change Mittelstufenturnier 2024
+2024-02-25 09:57:14,495 - INFO - 192.168.178.56 - - [25/Feb/2024 09:57:14] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:57:17,308 - INFO - 192.168.178.56 - - [25/Feb/2024 09:57:17] "GET / HTTP/1.1" 200 -
+2024-02-25 09:57:17,332 - INFO - 192.168.178.56 - - [25/Feb/2024 09:57:17] "[36mGET /static/websitemain.css HTTP/1.1[0m" 304 -
+2024-02-25 09:57:17,334 - INFO - 192.168.178.56 - - [25/Feb/2024 09:57:17] "[36mGET /static/websitemain.js HTTP/1.1[0m" 304 -
+2024-02-25 09:57:20,619 - DEBUG - on_website_title_change Mittelstufenturnier 202
+2024-02-25 09:57:20,765 - DEBUG - on_website_title_change Mittelstufenturnier 20
+2024-02-25 09:57:20,910 - DEBUG - on_website_title_change Mittelstufenturnier 2
+2024-02-25 09:57:21,080 - DEBUG - on_website_title_change Mittelstufenturnier 
+2024-02-25 09:57:21,248 - DEBUG - on_website_title_change Mittelstufenturnier
+2024-02-25 09:57:30,418 - INFO - 192.168.178.56 - - [25/Feb/2024 09:57:30] "GET / HTTP/1.1" 200 -
+2024-02-25 09:57:30,436 - INFO - 192.168.178.56 - - [25/Feb/2024 09:57:30] "[36mGET /static/websitemain.css HTTP/1.1[0m" 304 -
+2024-02-25 09:57:30,436 - INFO - 192.168.178.56 - - [25/Feb/2024 09:57:30] "[36mGET /static/websitemain.js HTTP/1.1[0m" 304 -
+2024-02-25 09:58:28,700 - DEBUG - on_website_title_change Mittelstufenturnier 
+2024-02-25 09:58:28,870 - DEBUG - on_website_title_change Mittelstufenturnier 2
+2024-02-25 09:58:28,962 - DEBUG - on_website_title_change Mittelstufenturnier 20
+2024-02-25 09:58:29,114 - DEBUG - on_website_title_change Mittelstufenturnier 202
+2024-02-25 09:58:29,354 - DEBUG - on_website_title_change Mittelstufenturnier 2024
+2024-02-25 09:58:30,069 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:30] "GET /plan HTTP/1.1" 200 -
+2024-02-25 09:58:30,094 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:30] "[36mGET /static/websiteplan.css HTTP/1.1[0m" 304 -
+2024-02-25 09:58:30,095 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:30] "[36mGET /static/websiteplan.js HTTP/1.1[0m" 304 -
+2024-02-25 09:58:31,051 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:31] "GET / HTTP/1.1" 200 -
+2024-02-25 09:58:31,076 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:31] "[36mGET /static/websitemain.css HTTP/1.1[0m" 304 -
+2024-02-25 09:58:31,076 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:31] "[36mGET /static/websitemain.js HTTP/1.1[0m" 304 -
+2024-02-25 09:58:31,539 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:31] "GET /group HTTP/1.1" 200 -
+2024-02-25 09:58:31,570 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:31] "[36mGET /static/websitegroup.css HTTP/1.1[0m" 304 -
+2024-02-25 09:58:31,582 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:31] "[36mGET /static/websitegroup.js HTTP/1.1[0m" 304 -
+2024-02-25 09:58:32,957 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:32] "GET / HTTP/1.1" 200 -
+2024-02-25 09:58:32,980 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:32] "[36mGET /static/websitemain.css HTTP/1.1[0m" 304 -
+2024-02-25 09:58:32,981 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:32] "[36mGET /static/websitemain.js HTTP/1.1[0m" 304 -
+2024-02-25 09:58:33,596 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:33] "GET /tree HTTP/1.1" 200 -
+2024-02-25 09:58:33,632 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:33] "[36mGET /static/websitetree.css HTTP/1.1[0m" 304 -
+2024-02-25 09:58:33,647 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:33] "[36mGET /static/websitetree.js HTTP/1.1[0m" 304 -
+2024-02-25 09:58:38,662 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:38] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:58:38,852 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:38] "[36mGET /static/websitetree.css HTTP/1.1[0m" 304 -
+2024-02-25 09:58:43,663 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:43] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:58:47,483 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:47] "GET / HTTP/1.1" 200 -
+2024-02-25 09:58:47,508 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:47] "[36mGET /static/websitemain.css HTTP/1.1[0m" 304 -
+2024-02-25 09:58:47,510 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:47] "[36mGET /static/websitemain.js HTTP/1.1[0m" 304 -
+2024-02-25 09:58:48,335 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:48] "GET /group HTTP/1.1" 200 -
+2024-02-25 09:58:48,370 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:48] "[36mGET /static/websitegroup.css HTTP/1.1[0m" 304 -
+2024-02-25 09:58:48,372 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:48] "[36mGET /static/websitegroup.js HTTP/1.1[0m" 304 -
+2024-02-25 09:58:52,918 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:52] "GET / HTTP/1.1" 200 -
+2024-02-25 09:58:52,945 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:52] "[36mGET /static/websitemain.css HTTP/1.1[0m" 304 -
+2024-02-25 09:58:52,945 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:52] "[36mGET /static/websitemain.js HTTP/1.1[0m" 304 -
+2024-02-25 09:58:53,558 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:53] "GET /plan HTTP/1.1" 200 -
+2024-02-25 09:58:53,581 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:53] "[36mGET /static/websiteplan.css HTTP/1.1[0m" 304 -
+2024-02-25 09:58:53,582 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:53] "[36mGET /static/websiteplan.js HTTP/1.1[0m" 304 -
+2024-02-25 09:58:58,604 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:58] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:58:59,091 - INFO - 192.168.178.56 - - [25/Feb/2024 09:58:59] "[36mGET /static/websiteplan.css HTTP/1.1[0m" 304 -
+2024-02-25 09:59:03,605 - INFO - 192.168.178.56 - - [25/Feb/2024 09:59:03] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:59:08,606 - INFO - 192.168.178.56 - - [25/Feb/2024 09:59:08] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:59:13,606 - INFO - 192.168.178.56 - - [25/Feb/2024 09:59:13] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:59:18,606 - INFO - 192.168.178.56 - - [25/Feb/2024 09:59:18] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:59:23,605 - INFO - 192.168.178.56 - - [25/Feb/2024 09:59:23] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:59:28,605 - INFO - 192.168.178.56 - - [25/Feb/2024 09:59:28] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:59:33,607 - INFO - 192.168.178.56 - - [25/Feb/2024 09:59:33] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:59:38,607 - INFO - 192.168.178.56 - - [25/Feb/2024 09:59:38] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:59:43,607 - INFO - 192.168.178.56 - - [25/Feb/2024 09:59:43] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:59:48,608 - INFO - 192.168.178.56 - - [25/Feb/2024 09:59:48] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:59:53,607 - INFO - 192.168.178.56 - - [25/Feb/2024 09:59:53] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 09:59:58,919 - INFO - 192.168.178.56 - - [25/Feb/2024 09:59:58] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:00:03,919 - INFO - 192.168.178.56 - - [25/Feb/2024 10:00:03] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:00:08,920 - INFO - 192.168.178.56 - - [25/Feb/2024 10:00:08] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:00:13,920 - INFO - 192.168.178.56 - - [25/Feb/2024 10:00:13] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:00:18,921 - INFO - 192.168.178.56 - - [25/Feb/2024 10:00:18] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:00:23,610 - INFO - 192.168.178.56 - - [25/Feb/2024 10:00:23] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:00:28,611 - INFO - 192.168.178.56 - - [25/Feb/2024 10:00:28] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:00:33,610 - INFO - 192.168.178.56 - - [25/Feb/2024 10:00:33] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:00:38,610 - INFO - 192.168.178.56 - - [25/Feb/2024 10:00:38] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:00:43,611 - INFO - 192.168.178.56 - - [25/Feb/2024 10:00:43] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:00:45,416 - INFO - 192.168.178.56 - - [25/Feb/2024 10:00:45] "GET / HTTP/1.1" 200 -
+2024-02-25 10:00:45,438 - INFO - 192.168.178.56 - - [25/Feb/2024 10:00:45] "[36mGET /static/websitemain.css HTTP/1.1[0m" 304 -
+2024-02-25 10:00:45,439 - INFO - 192.168.178.56 - - [25/Feb/2024 10:00:45] "[36mGET /static/websitemain.js HTTP/1.1[0m" 304 -
+2024-02-25 10:00:47,349 - INFO - 192.168.178.56 - - [25/Feb/2024 10:00:47] "GET /plan HTTP/1.1" 200 -
+2024-02-25 10:00:47,374 - INFO - 192.168.178.56 - - [25/Feb/2024 10:00:47] "[36mGET /static/websiteplan.css HTTP/1.1[0m" 304 -
+2024-02-25 10:00:47,375 - INFO - 192.168.178.56 - - [25/Feb/2024 10:00:47] "[36mGET /static/websiteplan.js HTTP/1.1[0m" 304 -
+2024-02-25 10:00:49,512 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 10:00:49,512 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 10:00:49,513 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:00:49,642 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 10:00:49,643 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:00:52,396 - INFO - 192.168.178.56 - - [25/Feb/2024 10:00:52] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:00:57,396 - INFO - 192.168.178.56 - - [25/Feb/2024 10:00:57] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:00:59,543 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 10:00:59,543 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 10:00:59,543 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:00:59,675 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 10:00:59,676 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:01:02,396 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:02] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:01:07,924 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:07] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:01:12,925 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:12] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:01:17,925 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:17] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:01:22,925 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:22] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:01:27,927 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:27] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:01:32,925 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:32] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:01:37,926 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:37] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:01:41,394 - DEBUG - self.teams_playing: [7, 10]
+2024-02-25 10:01:41,394 - DEBUG - self.teams_playing: [7, 10]
+2024-02-25 10:01:41,394 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:01:41,532 - DEBUG - self.teams_playing: [7, 10]
+2024-02-25 10:01:41,533 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:01:41,733 - DEBUG - current_match_index: 1
+2024-02-25 10:01:41,733 - DEBUG - new_match_index: 2
+2024-02-25 10:01:41,733 - DEBUG - teams_playing: [7, 10]
+2024-02-25 10:01:42,925 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:42] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:01:47,399 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:47] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:01:47,500 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:47] "GET / HTTP/1.1" 200 -
+2024-02-25 10:01:47,526 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:47] "[36mGET /static/websitemain.css HTTP/1.1[0m" 304 -
+2024-02-25 10:01:47,527 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:47] "[36mGET /static/websitemain.js HTTP/1.1[0m" 304 -
+2024-02-25 10:01:48,049 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:48] "GET /group HTTP/1.1" 200 -
+2024-02-25 10:01:48,073 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:48] "[36mGET /static/websitegroup.css HTTP/1.1[0m" 304 -
+2024-02-25 10:01:48,077 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:48] "[36mGET /static/websitegroup.js HTTP/1.1[0m" 304 -
+2024-02-25 10:01:53,102 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:53] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:01:53,621 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:53] "GET / HTTP/1.1" 200 -
+2024-02-25 10:01:53,648 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:53] "[36mGET /static/websitemain.css HTTP/1.1[0m" 304 -
+2024-02-25 10:01:53,649 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:53] "[36mGET /static/websitemain.js HTTP/1.1[0m" 304 -
+2024-02-25 10:01:54,293 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:54] "GET /tree HTTP/1.1" 200 -
+2024-02-25 10:01:54,319 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:54] "[36mGET /static/websitetree.css HTTP/1.1[0m" 304 -
+2024-02-25 10:01:54,319 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:54] "[36mGET /static/websitetree.js HTTP/1.1[0m" 304 -
+2024-02-25 10:01:58,683 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:58] "GET / HTTP/1.1" 200 -
+2024-02-25 10:01:58,707 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:58] "[36mGET /static/websitemain.css HTTP/1.1[0m" 304 -
+2024-02-25 10:01:58,708 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:58] "[36mGET /static/websitemain.js HTTP/1.1[0m" 304 -
+2024-02-25 10:01:59,124 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:59] "GET /plan HTTP/1.1" 200 -
+2024-02-25 10:01:59,148 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:59] "[36mGET /static/websiteplan.css HTTP/1.1[0m" 304 -
+2024-02-25 10:01:59,152 - INFO - 192.168.178.56 - - [25/Feb/2024 10:01:59] "[36mGET /static/websiteplan.js HTTP/1.1[0m" 304 -
+2024-02-25 10:02:04,930 - INFO - 192.168.178.56 - - [25/Feb/2024 10:02:04] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:02:09,928 - INFO - 192.168.178.56 - - [25/Feb/2024 10:02:09] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:02:10,206 - DEBUG - self.teams_playing: [3, 4]
+2024-02-25 10:02:10,206 - DEBUG - self.teams_playing: [3, 4]
+2024-02-25 10:02:10,206 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:02:10,340 - DEBUG - self.teams_playing: [3, 4]
+2024-02-25 10:02:10,340 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:02:10,539 - DEBUG - current_match_index: 2
+2024-02-25 10:02:10,539 - DEBUG - new_match_index: 3
+2024-02-25 10:02:10,540 - DEBUG - teams_playing: [3, 4]
+2024-02-25 10:02:14,929 - INFO - 192.168.178.56 - - [25/Feb/2024 10:02:14] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:02:16,547 - DEBUG - self.teams_playing: [8, 9]
+2024-02-25 10:02:16,547 - DEBUG - self.teams_playing: [8, 9]
+2024-02-25 10:02:16,547 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:02:16,687 - DEBUG - self.teams_playing: [8, 9]
+2024-02-25 10:02:16,688 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:02:16,903 - DEBUG - current_match_index: 3
+2024-02-25 10:02:16,903 - DEBUG - new_match_index: 4
+2024-02-25 10:02:16,903 - DEBUG - teams_playing: [8, 9]
+2024-02-25 10:02:19,937 - INFO - 192.168.178.56 - - [25/Feb/2024 10:02:19] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:02:23,075 - DEBUG - self.teams_playing: [1, 5]
+2024-02-25 10:02:23,075 - DEBUG - self.teams_playing: [1, 5]
+2024-02-25 10:02:23,075 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:02:23,216 - DEBUG - self.teams_playing: [1, 5]
+2024-02-25 10:02:23,216 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:02:23,433 - DEBUG - current_match_index: 4
+2024-02-25 10:02:23,433 - DEBUG - new_match_index: 5
+2024-02-25 10:02:23,433 - DEBUG - teams_playing: [1, 5]
+2024-02-25 10:02:24,930 - INFO - 192.168.178.56 - - [25/Feb/2024 10:02:24] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:02:29,874 - DEBUG - self.teams_playing: [6, 10]
+2024-02-25 10:02:29,874 - DEBUG - self.teams_playing: [6, 10]
+2024-02-25 10:02:29,874 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:02:29,929 - INFO - 192.168.178.56 - - [25/Feb/2024 10:02:29] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:02:30,025 - DEBUG - self.teams_playing: [6, 10]
+2024-02-25 10:02:30,025 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:02:30,239 - DEBUG - current_match_index: 5
+2024-02-25 10:02:30,239 - DEBUG - new_match_index: 6
+2024-02-25 10:02:30,239 - DEBUG - teams_playing: [6, 10]
+2024-02-25 10:02:34,177 - INFO - 192.168.178.56 - - [25/Feb/2024 10:02:34] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:02:37,842 - INFO - 192.168.178.56 - - [25/Feb/2024 10:02:37] "[36mGET /static/websiteplan.css HTTP/1.1[0m" 304 -
+2024-02-25 10:02:39,172 - INFO - 192.168.178.56 - - [25/Feb/2024 10:02:39] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:02:44,172 - INFO - 192.168.178.56 - - [25/Feb/2024 10:02:44] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:02:49,175 - INFO - 192.168.178.56 - - [25/Feb/2024 10:02:49] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:02:50,198 - INFO - 192.168.178.56 - - [25/Feb/2024 10:02:50] "GET /plan HTTP/1.1" 200 -
+2024-02-25 10:02:50,221 - INFO - 192.168.178.56 - - [25/Feb/2024 10:02:50] "[36mGET /static/websiteplan.css HTTP/1.1[0m" 304 -
+2024-02-25 10:02:50,222 - INFO - 192.168.178.56 - - [25/Feb/2024 10:02:50] "[36mGET /static/websiteplan.js HTTP/1.1[0m" 304 -
+2024-02-25 10:02:55,276 - INFO - 192.168.178.56 - - [25/Feb/2024 10:02:55] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:03:00,277 - INFO - 192.168.178.56 - - [25/Feb/2024 10:03:00] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:03:05,276 - INFO - 192.168.178.56 - - [25/Feb/2024 10:03:05] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:03:10,278 - INFO - 192.168.178.56 - - [25/Feb/2024 10:03:10] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:03:15,935 - INFO - 192.168.178.56 - - [25/Feb/2024 10:03:15] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:03:20,933 - INFO - 192.168.178.56 - - [25/Feb/2024 10:03:20] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:03:25,932 - INFO - 192.168.178.56 - - [25/Feb/2024 10:03:25] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:03:30,935 - INFO - 192.168.178.56 - - [25/Feb/2024 10:03:30] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:03:35,933 - INFO - 192.168.178.56 - - [25/Feb/2024 10:03:35] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:03:40,933 - INFO - 192.168.178.56 - - [25/Feb/2024 10:03:40] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:03:45,934 - INFO - 192.168.178.56 - - [25/Feb/2024 10:03:45] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:03:50,934 - INFO - 192.168.178.56 - - [25/Feb/2024 10:03:50] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:03:55,934 - INFO - 192.168.178.56 - - [25/Feb/2024 10:03:55] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:04:00,935 - INFO - 192.168.178.56 - - [25/Feb/2024 10:04:00] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:04:05,935 - INFO - 192.168.178.56 - - [25/Feb/2024 10:04:05] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:04:10,937 - INFO - 192.168.178.56 - - [25/Feb/2024 10:04:10] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:04:15,937 - INFO - 192.168.178.56 - - [25/Feb/2024 10:04:15] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:04:32,046 - INFO - 192.168.178.56 - - [25/Feb/2024 10:04:32] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:04:35,282 - INFO - 192.168.178.56 - - [25/Feb/2024 10:04:35] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:04:38,204 - INFO - 192.168.178.56 - - [25/Feb/2024 10:04:38] "GET / HTTP/1.1" 200 -
+2024-02-25 10:04:38,241 - INFO - 192.168.178.56 - - [25/Feb/2024 10:04:38] "[36mGET /static/websitemain.css HTTP/1.1[0m" 304 -
+2024-02-25 10:04:38,243 - INFO - 192.168.178.56 - - [25/Feb/2024 10:04:38] "[36mGET /static/websitemain.js HTTP/1.1[0m" 304 -
+2024-02-25 10:04:39,018 - INFO - 192.168.178.56 - - [25/Feb/2024 10:04:39] "GET /group HTTP/1.1" 200 -
+2024-02-25 10:04:39,062 - INFO - 192.168.178.56 - - [25/Feb/2024 10:04:39] "[36mGET /static/websitegroup.css HTTP/1.1[0m" 304 -
+2024-02-25 10:04:39,063 - INFO - 192.168.178.56 - - [25/Feb/2024 10:04:39] "[36mGET /static/websitegroup.js HTTP/1.1[0m" 304 -
+2024-02-25 10:04:44,103 - INFO - 192.168.178.56 - - [25/Feb/2024 10:04:44] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:04:49,104 - INFO - 192.168.178.56 - - [25/Feb/2024 10:04:49] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:04:54,938 - INFO - 192.168.178.56 - - [25/Feb/2024 10:04:54] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:04:59,631 - DEBUG - self.teams_playing: [2, 3]
+2024-02-25 10:04:59,631 - DEBUG - self.teams_playing: [2, 3]
+2024-02-25 10:04:59,631 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:04:59,765 - DEBUG - self.teams_playing: [2, 3]
+2024-02-25 10:04:59,765 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:04:59,941 - INFO - 192.168.178.56 - - [25/Feb/2024 10:04:59] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:04:59,973 - DEBUG - current_match_index: 6
+2024-02-25 10:04:59,973 - DEBUG - new_match_index: 7
+2024-02-25 10:04:59,974 - DEBUG - teams_playing: [2, 3]
+2024-02-25 10:05:04,940 - INFO - 192.168.178.56 - - [25/Feb/2024 10:05:04] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:05:08,997 - DEBUG - self.teams_playing: [7, 8]
+2024-02-25 10:05:08,997 - DEBUG - self.teams_playing: [7, 8]
+2024-02-25 10:05:08,997 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:05:09,135 - DEBUG - self.teams_playing: [7, 8]
+2024-02-25 10:05:09,136 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:05:09,333 - DEBUG - current_match_index: 7
+2024-02-25 10:05:09,333 - DEBUG - new_match_index: 8
+2024-02-25 10:05:09,333 - DEBUG - teams_playing: [7, 8]
+2024-02-25 10:05:09,942 - INFO - 192.168.178.56 - - [25/Feb/2024 10:05:09] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:05:14,940 - INFO - 192.168.178.56 - - [25/Feb/2024 10:05:14] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:05:19,940 - INFO - 192.168.178.56 - - [25/Feb/2024 10:05:19] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:05:21,665 - DEBUG - self.teams_playing: [1, 4]
+2024-02-25 10:05:21,665 - DEBUG - self.teams_playing: [1, 4]
+2024-02-25 10:05:21,665 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:05:21,802 - DEBUG - self.teams_playing: [1, 4]
+2024-02-25 10:05:21,803 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:05:21,997 - DEBUG - current_match_index: 8
+2024-02-25 10:05:21,997 - DEBUG - new_match_index: 9
+2024-02-25 10:05:21,997 - DEBUG - teams_playing: [1, 4]
+2024-02-25 10:05:24,940 - INFO - 192.168.178.56 - - [25/Feb/2024 10:05:24] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:05:28,489 - DEBUG - self.teams_playing: [6, 9]
+2024-02-25 10:05:28,490 - DEBUG - self.teams_playing: [6, 9]
+2024-02-25 10:05:28,490 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:05:28,623 - DEBUG - self.teams_playing: [6, 9]
+2024-02-25 10:05:28,623 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:05:28,818 - DEBUG - current_match_index: 9
+2024-02-25 10:05:28,818 - DEBUG - new_match_index: 10
+2024-02-25 10:05:28,818 - DEBUG - teams_playing: [6, 9]
+2024-02-25 10:05:29,942 - INFO - 192.168.178.56 - - [25/Feb/2024 10:05:29] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:05:34,696 - DEBUG - self.teams_playing: [5, 3]
+2024-02-25 10:05:34,696 - DEBUG - self.teams_playing: [5, 3]
+2024-02-25 10:05:34,696 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:05:34,832 - DEBUG - self.teams_playing: [5, 3]
+2024-02-25 10:05:34,832 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:05:34,940 - INFO - 192.168.178.56 - - [25/Feb/2024 10:05:34] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:05:35,052 - DEBUG - current_match_index: 10
+2024-02-25 10:05:35,053 - DEBUG - new_match_index: 11
+2024-02-25 10:05:35,053 - DEBUG - teams_playing: [5, 3]
+2024-02-25 10:05:39,942 - INFO - 192.168.178.56 - - [25/Feb/2024 10:05:39] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:05:41,831 - DEBUG - self.teams_playing: [10, 8]
+2024-02-25 10:05:41,831 - DEBUG - self.teams_playing: [10, 8]
+2024-02-25 10:05:41,831 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:05:41,967 - DEBUG - self.teams_playing: [10, 8]
+2024-02-25 10:05:41,967 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:05:42,202 - DEBUG - current_match_index: 11
+2024-02-25 10:05:42,202 - DEBUG - new_match_index: 12
+2024-02-25 10:05:42,202 - DEBUG - teams_playing: [10, 8]
+2024-02-25 10:05:44,942 - INFO - 192.168.178.56 - - [25/Feb/2024 10:05:44] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:05:49,438 - DEBUG - self.teams_playing: [1, 3]
+2024-02-25 10:05:49,438 - DEBUG - self.teams_playing: [1, 3]
+2024-02-25 10:05:49,438 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:05:49,575 - DEBUG - self.teams_playing: [1, 3]
+2024-02-25 10:05:49,575 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:05:49,781 - DEBUG - current_match_index: 12
+2024-02-25 10:05:49,782 - DEBUG - new_match_index: 13
+2024-02-25 10:05:49,782 - DEBUG - teams_playing: [1, 3]
+2024-02-25 10:05:49,944 - INFO - 192.168.178.56 - - [25/Feb/2024 10:05:49] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:05:58,052 - DEBUG - self.teams_playing: [6, 8]
+2024-02-25 10:05:58,053 - DEBUG - self.teams_playing: [6, 8]
+2024-02-25 10:05:58,053 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:05:58,190 - DEBUG - self.teams_playing: [6, 8]
+2024-02-25 10:05:58,190 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:05:58,384 - DEBUG - current_match_index: 13
+2024-02-25 10:05:58,384 - DEBUG - new_match_index: 14
+2024-02-25 10:05:58,384 - DEBUG - teams_playing: [6, 8]
+2024-02-25 10:06:00,729 - DEBUG - self.teams_playing: [4, 2]
+2024-02-25 10:06:00,729 - DEBUG - self.teams_playing: [4, 2]
+2024-02-25 10:06:00,729 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:06:00,861 - DEBUG - self.teams_playing: [4, 2]
+2024-02-25 10:06:00,861 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:06:01,053 - DEBUG - current_match_index: 14
+2024-02-25 10:06:01,053 - DEBUG - new_match_index: 15
+2024-02-25 10:06:01,053 - DEBUG - teams_playing: [4, 2]
+2024-02-25 10:06:15,944 - INFO - 192.168.178.56 - - [25/Feb/2024 10:06:15] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:07:10,322 - DEBUG - self.teams_playing: [9, 7]
+2024-02-25 10:07:10,322 - DEBUG - self.teams_playing: [9, 7]
+2024-02-25 10:07:10,322 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:07:10,456 - DEBUG - self.teams_playing: [9, 7]
+2024-02-25 10:07:10,457 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:07:10,652 - DEBUG - current_match_index: 15
+2024-02-25 10:07:10,652 - DEBUG - new_match_index: 16
+2024-02-25 10:07:10,652 - DEBUG - teams_playing: [9, 7]
+2024-02-25 10:07:15,949 - INFO - 192.168.178.56 - - [25/Feb/2024 10:07:15] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:07:43,940 - DEBUG - self.teams_playing: [1, 2]
+2024-02-25 10:07:43,940 - DEBUG - self.teams_playing: [1, 2]
+2024-02-25 10:07:43,940 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:07:44,086 - DEBUG - self.teams_playing: [1, 2]
+2024-02-25 10:07:44,087 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:07:44,293 - DEBUG - current_match_index: 16
+2024-02-25 10:07:44,294 - DEBUG - new_match_index: 17
+2024-02-25 10:07:44,294 - DEBUG - teams_playing: [1, 2]
+2024-02-25 10:07:50,805 - DEBUG - self.teams_playing: [6, 7]
+2024-02-25 10:07:50,805 - DEBUG - self.teams_playing: [6, 7]
+2024-02-25 10:07:50,805 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:07:50,937 - DEBUG - self.teams_playing: [6, 7]
+2024-02-25 10:07:50,938 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:07:51,135 - DEBUG - current_match_index: 17
+2024-02-25 10:07:51,135 - DEBUG - new_match_index: 18
+2024-02-25 10:07:51,135 - DEBUG - teams_playing: [6, 7]
+2024-02-25 10:07:52,143 - DEBUG - self.teams_playing: [4, 5]
+2024-02-25 10:07:52,143 - DEBUG - self.teams_playing: [4, 5]
+2024-02-25 10:07:52,143 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:07:52,275 - DEBUG - self.teams_playing: [4, 5]
+2024-02-25 10:07:52,276 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:07:52,473 - DEBUG - current_match_index: 18
+2024-02-25 10:07:52,473 - DEBUG - new_match_index: 19
+2024-02-25 10:07:52,473 - DEBUG - teams_playing: [4, 5]
+2024-02-25 10:07:58,760 - DEBUG - self.teams_playing: [9, 10]
+2024-02-25 10:07:58,760 - DEBUG - self.teams_playing: [9, 10]
+2024-02-25 10:07:58,760 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:07:58,896 - DEBUG - self.teams_playing: [9, 10]
+2024-02-25 10:07:58,897 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:07:59,095 - DEBUG - current_match_index: 19
+2024-02-25 10:07:59,095 - DEBUG - new_match_index: 20
+2024-02-25 10:07:59,095 - DEBUG - teams_playing: [9, 10]
+2024-02-25 10:08:02,469 - DEBUG - self.teams_playing: [9, 10]
+2024-02-25 10:08:02,469 - DEBUG - self.teams_playing: [9, 10]
+2024-02-25 10:08:02,469 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:08:02,610 - DEBUG - self.teams_playing: [9, 10]
+2024-02-25 10:08:02,611 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:08:02,814 - DEBUG - current_match_index: 20
+2024-02-25 10:08:02,815 - DEBUG - new_match_index: 20
+2024-02-25 10:08:02,815 - DEBUG - teams_playing: [9, 10]
+2024-02-25 10:08:08,445 - INFO - 192.168.178.56 - - [25/Feb/2024 10:08:08] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:08:09,115 - INFO - 192.168.178.56 - - [25/Feb/2024 10:08:09] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:08:14,116 - INFO - 192.168.178.56 - - [25/Feb/2024 10:08:14] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:08:15,909 - DEBUG - on_match_select selected_match: Spiel 20: Team 8 vs Team 9, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 6', 'Team 9'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 9'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 9', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 15', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 17', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 18', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 19', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 20', 'teams': ['Team 8', 'Team 9'], 'group': 'Gruppe 2'}]
+2024-02-25 10:08:16,009 - DEBUG - self.teams_playing: [9, 10]
+2024-02-25 10:08:16,009 - DEBUG - self.teams_playing: [9, 10]
+2024-02-25 10:08:16,009 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:08:16,145 - DEBUG - self.teams_playing: [9, 10]
+2024-02-25 10:08:16,145 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:08:19,117 - INFO - 192.168.178.56 - - [25/Feb/2024 10:08:19] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:08:24,117 - INFO - 192.168.178.56 - - [25/Feb/2024 10:08:24] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:08:29,116 - INFO - 192.168.178.56 - - [25/Feb/2024 10:08:29] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:08:34,116 - INFO - 192.168.178.56 - - [25/Feb/2024 10:08:34] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:08:39,119 - INFO - 192.168.178.56 - - [25/Feb/2024 10:08:39] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:08:44,118 - INFO - 192.168.178.56 - - [25/Feb/2024 10:08:44] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:08:49,954 - INFO - 192.168.178.56 - - [25/Feb/2024 10:08:49] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:08:54,956 - INFO - 192.168.178.56 - - [25/Feb/2024 10:08:54] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:08:59,954 - INFO - 192.168.178.56 - - [25/Feb/2024 10:08:59] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:09:01,512 - DEBUG - self.teams_playing: [None, None]
+2024-02-25 10:09:01,513 - DEBUG - self.teams_playing: [None, None]
+2024-02-25 10:09:01,538 - DEBUG - self.spiel_um_platz_3: [], team1: (2, 'Team 1', 13, 8, 5), team2: (7, 'Team 6', 15, 9, 6), team3: (4, 'Team 3', 9, 8, 1), team4: (10, 'Team 9', 13, 9, 4), goles1: (0, 0), goles2: None
+2024-02-25 10:09:01,539 - DEBUG - on_match_select selected_match: Spiel 1 Halb: Team 1 vs Team 6, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 6', 'Team 9'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 9'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 9', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 15', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 17', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 18', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 19', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 20', 'teams': ['Team 8', 'Team 9'], 'group': 'Gruppe 2'}]
+2024-02-25 10:09:01,539 - DEBUG - team1id: 2, team2id: 7, self.active_match: 0
+2024-02-25 10:09:01,576 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:09:01,576 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:09:01,577 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:09:01,706 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:09:01,706 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:09:01,879 - DEBUG - self.spiel_um_platz_3: [], team1: (2, 'Team 1', 13, 8, 5), team2: (7, 'Team 6', 15, 9, 6), team3: (4, 'Team 3', 9, 8, 1), team4: (10, 'Team 9', 13, 9, 4), goles1: (0, 0), goles2: None
+2024-02-25 10:09:04,955 - INFO - 192.168.178.56 - - [25/Feb/2024 10:09:04] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:09:09,955 - INFO - 192.168.178.56 - - [25/Feb/2024 10:09:09] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:09:14,956 - INFO - 192.168.178.56 - - [25/Feb/2024 10:09:14] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:09:19,955 - INFO - 192.168.178.56 - - [25/Feb/2024 10:09:19] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:09:24,956 - INFO - 192.168.178.56 - - [25/Feb/2024 10:09:24] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:09:25,203 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:09:25,203 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:09:25,203 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:09:25,332 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:09:25,332 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:09:25,511 - DEBUG - self.spiel_um_platz_3: [], team1: (2, 'Team 1', 13, 8, 5), team2: (7, 'Team 6', 15, 9, 6), team3: (4, 'Team 3', 9, 8, 1), team4: (10, 'Team 9', 13, 9, 4), goles1: (0, 0), goles2: None
+2024-02-25 10:09:29,957 - INFO - 192.168.178.56 - - [25/Feb/2024 10:09:29] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:09:31,570 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:09:31,570 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:09:31,570 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:09:31,700 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:09:31,700 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:09:31,890 - DEBUG - self.spiel_um_platz_3: [], team1: (2, 'Team 1', 13, 8, 5), team2: (7, 'Team 6', 15, 9, 6), team3: (4, 'Team 3', 9, 8, 1), team4: (10, 'Team 9', 13, 9, 4), goles1: (0, 0), goles2: None
+2024-02-25 10:09:34,956 - INFO - 192.168.178.56 - - [25/Feb/2024 10:09:34] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:09:39,957 - INFO - 192.168.178.56 - - [25/Feb/2024 10:09:39] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:09:44,960 - INFO - 192.168.178.56 - - [25/Feb/2024 10:09:44] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:09:47,613 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:09:47,613 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:09:47,613 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:09:47,785 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:09:47,785 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:09:47,969 - DEBUG - self.spiel_um_platz_3: [], team1: (2, 'Team 1', 13, 8, 5), team2: (7, 'Team 6', 15, 9, 6), team3: (4, 'Team 3', 9, 8, 1), team4: (10, 'Team 9', 13, 9, 4), goles1: (0, 0), goles2: None
+2024-02-25 10:09:54,058 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:09:54,058 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:09:54,058 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:09:54,201 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:09:54,201 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:09:54,385 - DEBUG - self.spiel_um_platz_3: [], team1: (2, 'Team 1', 13, 8, 5), team2: (7, 'Team 6', 15, 9, 6), team3: (4, 'Team 3', 9, 8, 1), team4: (10, 'Team 9', 13, 9, 4), goles1: (0, 0), goles2: None
+2024-02-25 10:09:58,477 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:09:58,477 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:09:58,478 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:09:58,622 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:09:58,622 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:09:58,806 - DEBUG - self.spiel_um_platz_3: [], team1: (2, 'Team 1', 13, 8, 5), team2: (7, 'Team 6', 15, 9, 6), team3: (4, 'Team 3', 9, 8, 1), team4: (10, 'Team 9', 13, 9, 4), goles1: (0, 0), goles2: None
+2024-02-25 10:10:03,529 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:10:03,529 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:10:03,531 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:10:03,666 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:10:03,666 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:10:03,841 - DEBUG - self.spiel_um_platz_3: [], team1: (2, 'Team 1', 13, 8, 5), team2: (7, 'Team 6', 15, 9, 6), team3: (4, 'Team 3', 9, 8, 1), team4: (10, 'Team 9', 13, 9, 4), goles1: (0, 0), goles2: None
+2024-02-25 10:10:05,678 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:10:05,679 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:10:05,679 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:10:05,826 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:10:05,826 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:10:06,035 - DEBUG - self.spiel_um_platz_3: [], team1: (2, 'Team 1', 13, 8, 5), team2: (7, 'Team 6', 15, 9, 6), team3: (4, 'Team 3', 9, 8, 1), team4: (10, 'Team 9', 13, 9, 4), goles1: (0, 0), goles2: None
+2024-02-25 10:10:15,959 - INFO - 192.168.178.56 - - [25/Feb/2024 10:10:15] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:11:15,963 - INFO - 192.168.178.56 - - [25/Feb/2024 10:11:15] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:12:12,102 - DEBUG - Started logging
+2024-02-25 10:12:12,148 - DEBUG - settings[6]: 2
+2024-02-25 10:12:12,149 - DEBUG - self.teams_playing: 2
+2024-02-25 10:12:12,149 - DEBUG - settings[13]: [2, 7]
+2024-02-25 10:12:12,149 - DEBUG - Type of self.teams_playing: <class 'list'>
+2024-02-25 10:12:12,484 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:12:12,484 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:12:12,485 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:12:12,600 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:12:12,601 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:12:12,754 - DEBUG - self.spiel_um_platz_3: [], team1: (2, 'Team 1', 13, 8, 5), team2: (7, 'Team 6', 15, 9, 6), team3: (4, 'Team 3', 9, 8, 1), team4: (10, 'Team 9', 13, 9, 4), goles1: (0, 0), goles2: None
+2024-02-25 10:12:12,850 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 10:12:12,850 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 10:12:15,402 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:12:15,402 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:12:15,402 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:12:15,527 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:12:15,527 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:12:15,694 - DEBUG - self.spiel_um_platz_3: [], team1: (2, 'Team 1', 13, 8, 5), team2: (7, 'Team 6', 15, 9, 6), team3: (4, 'Team 3', 9, 8, 1), team4: (10, 'Team 9', 13, 9, 4), goles1: (0, 0), goles2: None
+2024-02-25 10:12:15,970 - INFO - 192.168.178.56 - - [25/Feb/2024 10:12:15] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:12:19,754 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:12:19,754 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:12:19,754 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:12:19,893 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:12:19,894 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:12:20,061 - DEBUG - self.spiel_um_platz_3: [], team1: (2, 'Team 1', 13, 8, 5), team2: (7, 'Team 6', 15, 9, 6), team3: (4, 'Team 3', 9, 8, 1), team4: (10, 'Team 9', 13, 9, 4), goles1: (0, 0), goles2: None
+2024-02-25 10:13:15,972 - INFO - 192.168.178.56 - - [25/Feb/2024 10:13:15] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:14:15,977 - INFO - 192.168.178.56 - - [25/Feb/2024 10:14:15] "GET /update_data HTTP/1.1" 200 -
+2024-02-25 10:14:37,712 - DEBUG - Started logging
+2024-02-25 10:14:37,763 - DEBUG - settings[6]: 2
+2024-02-25 10:14:37,763 - DEBUG - self.teams_playing: 2
+2024-02-25 10:14:37,763 - DEBUG - settings[13]: [2, 7]
+2024-02-25 10:14:37,764 - DEBUG - Type of self.teams_playing: <class 'list'>
+2024-02-25 10:14:38,130 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:14:38,130 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:14:38,131 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:14:38,243 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:14:38,244 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:14:38,400 - DEBUG - self.spiel_um_platz_3: [], team1: (2, 'Team 1', 13, 8, 5), team2: (7, 'Team 6', 15, 9, 6), team3: (4, 'Team 3', 9, 8, 1), team4: (10, 'Team 9', 13, 9, 4), goles1: (0, 0), goles2: None
+2024-02-25 10:14:38,401 - DEBUG - on_match_select selected_match: Spiel 1 Halb: Team 1 vs Team 6, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 6', 'Team 9'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 9'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 9', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 15', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 17', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 18', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 19', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 20', 'teams': ['Team 8', 'Team 9'], 'group': 'Gruppe 2'}]
+2024-02-25 10:14:38,401 - DEBUG - team1id: 2, team2id: 7, self.active_match: 0
+2024-02-25 10:14:38,676 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:14:38,676 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:14:38,677 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:14:38,785 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:14:38,785 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:14:38,939 - DEBUG - self.spiel_um_platz_3: [], team1: (2, 'Team 1', 13, 8, 5), team2: (7, 'Team 6', 15, 9, 6), team3: (4, 'Team 3', 9, 8, 1), team4: (10, 'Team 9', 13, 9, 4), goles1: (0, 0), goles2: None
+2024-02-25 10:14:39,100 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 10:14:39,100 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 10:14:40,688 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:14:40,688 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:14:40,689 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:14:40,840 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:14:40,840 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:14:41,022 - DEBUG - self.spiel_um_platz_3: [], team1: (2, 'Team 1', 13, 8, 5), team2: (7, 'Team 6', 15, 9, 6), team3: (4, 'Team 3', 9, 8, 1), team4: (10, 'Team 9', 13, 9, 4), goles1: (0, 0), goles2: None
+2024-02-25 10:14:43,916 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:14:43,916 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:14:43,916 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:14:44,044 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:14:44,044 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:14:44,224 - DEBUG - self.spiel_um_platz_3: [], team1: (2, 'Team 1', 13, 8, 5), team2: (7, 'Team 6', 15, 9, 6), team3: (4, 'Team 3', 9, 8, 1), team4: (10, 'Team 9', 13, 9, 4), goles1: (0, 0), goles2: None
+2024-02-25 10:14:46,258 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:14:46,258 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:14:46,258 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:14:46,392 - DEBUG - self.teams_playing: [2, 7]
+2024-02-25 10:14:46,392 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8', 'Team 9']
+2024-02-25 10:14:46,565 - DEBUG - self.spiel_um_platz_3: [], team1: (2, 'Team 1', 13, 8, 5), team2: (7, 'Team 6', 15, 9, 6), team3: (4, 'Team 3', 9, 8, 1), team4: (10, 'Team 9', 13, 9, 4), goles1: (0, 0), goles2: None

@@ -1391,7 +1391,7 @@ class Window(ctk.CTk):
             current_match_time = starttime + datetime.timedelta(minutes=(time_interval_final_matches * active_match) + (timeinterval * match_count) + pause_between_final_matches)
 
             if next_match:
-                next_match_start_time = current_match_time + datetime.timedelta(minutes=timeinterval)                
+                next_match_start_time = current_match_time + datetime.timedelta(minutes=time_interval_final_matches)                
                 if next_match_start_time.day != starttime.day:
                     return current_match_time.strftime('%H:%M'), next_match_start_time.strftime('%H:%M'), True
                 return current_match_time.strftime('%H:%M'), next_match_start_time.strftime('%H:%M'), False
@@ -1877,7 +1877,7 @@ class Window(ctk.CTk):
 
     def global_scored_a_point(self, teamID, team2ID, direction="UP"):
         # Get the current score
-        logging.debug("global_scored_a_point", "teamID", teamID, "team2ID", team2ID, "direction", direction)
+        logging.debug(f"global_scored_a_point teamID: {teamID}, team2ID: {team2ID}, direction: {direction}")
         current_score = self.read_goals_for_match_from_db(teamID, team2ID)
         old_goals = current_score
         
@@ -2921,7 +2921,6 @@ def ich_kann_nicht_mehr(teamID, team2ID):
   
 def get_initial_data(template_name):
     global initial_data
-    tkapp.test()
     
     initial_data = {
         "Teams": get_data_for_website(0),
