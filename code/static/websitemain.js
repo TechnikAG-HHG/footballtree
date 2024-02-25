@@ -19,10 +19,6 @@ function updateData() {
                     data[key] = updatedData[key];
                 }
             }
-            // Wait 500ms before calling updateTables
-            setTimeout(function () {
-                updateTableSize();
-            }, 500);
         })
         .catch((error) => console.error("Error fetching data:", error));
 
@@ -47,3 +43,5 @@ window.addEventListener("load", function () {
     document.title = data["websiteTitle"];
     document.getElementById("websiteTitle").textContent = data["websiteTitle"];
 });
+
+setInterval(updateData, 5000);
