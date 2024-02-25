@@ -692,34 +692,19 @@ class Window(ctk.CTk):
     def add_name_entry_player(self, Frame, Counter, entry_text="", entry_text2="", entry_text3=""):
         if self.selected_team_in_player == "":
             return
-        
-        varcountname = f"count{Frame}"
-        varentrie1name = f"entries{Frame}"
-        varentrie2name = f"entries2{Frame}"
-        varentrie3name = f"entries3{Frame}"
-        varlabelname = f"label{Frame}"
 
-        # Check if the variable already exists in the dictionary
-        if varcountname not in self.variable_dict:
-            self.variable_dict[varcountname] = 0  # Initialize count to 0
+        varnames = [f"{var}{Frame}" for var in ["count", "entries", "entries2", "entries3", "label"]]
 
-        if varentrie1name not in self.variable_dict:
-            self.variable_dict[varentrie1name] = []
-            
-        if varentrie2name not in self.variable_dict:
-            self.variable_dict[varentrie2name] = []
-
-        if varentrie3name not in self.variable_dict:
-            self.variable_dict[varentrie3name] = []
-        
-        if varlabelname not in self.variable_dict:
-            self.variable_dict[varlabelname] = []
+        # Initialize variables in the dictionary
+        for varname in varnames:
+            if varname not in self.variable_dict:
+                self.variable_dict[varname] = 0 if varname.startswith("count") else []
 
         # Now you can access the count using the dynamic variable name
-        count = self.variable_dict[varcountname] + 1
+        count = self.variable_dict[varnames[0]] + 1
 
         # Update the count in the dictionary
-        self.variable_dict[varcountname] = count
+        self.variable_dict[varnames[0]] = count
 
         label_font_size = self.screenwidth / 150
         entry_width = self.screenwidth / 10
@@ -727,38 +712,20 @@ class Window(ctk.CTk):
         # Create a label with "Team 1" and the count
         label_text = f'{Counter} {count}'
         label = ctk.CTkLabel(Frame, text=label_text, font=("Helvetica", label_font_size * 1.2, "bold"))
-        label.grid(row=len(self.variable_dict[varentrie1name]), column=0, padx=10, pady=8, sticky='e')
+        label.grid(row=len(self.variable_dict[varnames[1]]), column=0, padx=10, pady=8, sticky='e')
 
-        # Create a new entry field
-        new_entry = ctk.CTkEntry(Frame, font=("Helvetica", label_font_size), height=entry_height, width=entry_width)
-        
-        new_entry2 = ctk.CTkEntry(Frame, font=("Helvetica", label_font_size), height=entry_height, width=entry_width)
-        
-        new_entry3 = ctk.CTkEntry(Frame, font=("Helvetica", label_font_size), height=entry_height, width=entry_width)
-        #logging.debug("entry_text", entry_text)
-        #logging.debug("new_entry")
+        # Create new entry fields
+        entries = [ctk.CTkEntry(Frame, font=("Helvetica", label_font_size), height=entry_height, width=entry_width) for _ in range(3)]
+        entry_texts = [entry_text, entry_text2, entry_text3]
 
-        # Write entry_text to the entry field if it is not empty
-        if entry_text:
-            new_entry.insert(0, entry_text)
-            
-        if entry_text2:
-            new_entry2.insert(0, entry_text2)
-            
-        if entry_text3:
-            new_entry3.insert(0, entry_text3)
-        else:
-            new_entry3.insert(0, "0")
-        
-        
+        # Write entry_text to the entry fields if they are not empty
+        for entry, text in zip(entries, entry_texts):
+            entry.insert(0, text if text else "0")
+            entry.grid(row=len(self.variable_dict[varnames[1]]), column=entries.index(entry)+1, pady=5, sticky='we', padx=3)
 
-        new_entry.grid(row=len(self.variable_dict[varentrie1name]), column=1, pady=5, sticky='we', padx=3)
-        new_entry2.grid(row=len(self.variable_dict[varentrie1name]), column=2, pady=5, sticky='we', padx=3)
-        new_entry3.grid(row=len(self.variable_dict[varentrie1name]), column=3, pady=5, sticky='we', padx=3)
-        self.variable_dict[varentrie1name].append(new_entry)
-        self.variable_dict[varentrie2name].append(new_entry2)
-        self.variable_dict[varentrie3name].append(new_entry3)
-        self.variable_dict[varlabelname].append(label)
+        # Append new entries and label to the dictionary
+        for i in range(1, 5):
+            self.variable_dict[varnames[i]].append(entries[i-1] if i < 4 else label)
 
     
     def write_names_into_entry_fields_players(self, teamID, Counter, Frame):
@@ -849,52 +816,25 @@ class Window(ctk.CTk):
         self.selected_team_in_player = ""
         self.variable_dict[varcountname] = 0
     
-    
     def select_team(self, teamID, team_button_list, index, teamName=""):
-        
-        #for button in team_button_list:
-        #    button.configure(bg="lightgray")
         self.canvas.yview_moveto(0.0)
-        
         team_button = team_button_list[index]
-        
-        varcountname = f"count{str(self.frameplayer)}"
-        varentrie1name = f"entries{str(self.frameplayer)}"
-        varentrie2name = f"entries2{str(self.frameplayer)}"
-        varentrie3name = f"entries3{str(self.frameplayer)}"
-        varlabelname = f"label{str(self.frameplayer)}"
 
-        # Check if the key exists in the dictionary
-        if self.variable_dict.get(varentrie1name):
-            # Access the value associated with the key
-            if self.variable_dict[varentrie1name] != []:
-                for entry in self.variable_dict[varentrie1name]:
-                    entry.destroy()
+        varnames = [f"{var}{self.frameplayer}" for var in ["entries", "entries2", "entries3", "label"]]
 
-                for label in self.variable_dict[varlabelname]:
-                    label.destroy()
-                
-                for entry in self.variable_dict[varentrie2name]:
-                    entry.destroy()
-                
-                for entry in self.variable_dict[varentrie3name]:
-                    entry.destroy()
-        
+        # Check if the key exists in the dictionary and delete the widgets
+        for varname in varnames:
+            if self.variable_dict.get(varname):
+                for widget in self.variable_dict[varname]:
+                    widget.destroy()
+                self.variable_dict[varname] = []
+
         self.selected_team_in_player = teamID
-        
-        self.variable_dict[varcountname] = 0
-        self.variable_dict[varentrie1name] = []
-        self.variable_dict[varentrie2name] = []
-        self.variable_dict[varentrie3name] = []
-        self.variable_dict[varlabelname] = []
-        
-        #logging.debug("teamName", teamName)
-        
+
+        self.variable_dict[f"count{self.frameplayer}"] = 0
+
         self.cool_current_team_label.configure(text=str(teamName))
-        #logging.debug("teamName", teamName)
-        
-        self.cool_current_team_label.configure(text=str(teamName))
-        
+
         self.write_names_into_entry_fields_players(teamID, "Player", self.frameplayer)
           
             
