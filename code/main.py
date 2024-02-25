@@ -251,7 +251,7 @@ class Window(ctk.CTk):
         self.website_title = tk.StringVar(value="HHG-Fußballturnier")
         
         # load the settings from the database into the variables
-        if settings[5] is not None and settings[5] != "":
+        if settings[5] is not None and settings[5] != "" and settings[5] != 0:
             self.volume.set(value=settings[5])
             
         if settings[6] is not None and settings[6] != "" and settings[6] != 0:
@@ -2209,7 +2209,7 @@ class Window(ctk.CTk):
         
         # pause time before final matches
         time_pause_before_FM_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        time_pause_before_FM_frame.pack(pady=10, anchor=tk.CENTER, side=tk.TOP, padx=5)
+        time_pause_before_FM_frame.pack(pady=7, anchor=tk.CENTER, side=tk.TOP, padx=5)
         
         time_pause_before_FM_label = ctk.CTkLabel(time_pause_before_FM_frame, text="Time Pause Final Matches", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         time_pause_before_FM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.CENTER)
@@ -2237,7 +2237,7 @@ class Window(ctk.CTk):
         SET volume = ?
         WHERE id = 1
         """
-        self.settingscursor.execute(saveVolumeInDB, (event,))
+        self.settingscursor.execute(saveVolumeInDB, (int(event),))
         self.settingsconnection.commit()
        
         
