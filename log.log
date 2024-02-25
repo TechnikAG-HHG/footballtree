@@ -1,0 +1,836 @@
+2024-02-25 09:10:14,546 - INFO - Started logging
+2024-02-25 09:10:41,207 - INFO - Started logging
+2024-02-25 09:10:52,543 - INFO - Started logging
+2024-02-25 09:11:33,681 - INFO - Started logging
+2024-02-25 09:12:28,281 - INFO - Started logging
+2024-02-25 09:13:45,593 - INFO - Started logging
+2024-02-25 09:14:26,184 - INFO - Started logging
+2024-02-25 09:16:02,966 - INFO - Started logging
+2024-02-25 09:16:03,170 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:16:03,171 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:18:01,381 - INFO - Started logging
+2024-02-25 09:18:02,013 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:18:02,014 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:18:47,657 - INFO - Started logging
+2024-02-25 09:18:48,415 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:18:48,416 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:19:55,347 - DEBUG - Started logging
+2024-02-25 09:19:55,998 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:19:55,999 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:20:46,285 - DEBUG - Started logging
+2024-02-25 09:20:46,871 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:20:46,872 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:21:18,669 - DEBUG - Started logging
+2024-02-25 09:21:19,262 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:21:19,263 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:21:58,093 - DEBUG - Started logging
+2024-02-25 09:22:20,374 - DEBUG - Started logging
+2024-02-25 09:22:20,629 - DEBUG - self.teams_playing [2, 5]
+2024-02-25 09:22:20,781 - DEBUG - self.teams_playing [2, 5]
+2024-02-25 09:22:20,956 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:22:20,956 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:22:45,295 - DEBUG - Started logging
+2024-02-25 09:27:26,024 - DEBUG - Started logging
+2024-02-25 09:27:26,263 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:27:26,264 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:27:26,264 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:27:26,283 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:27:26,284 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:27:26,346 - DEBUG - on_match_select selected_match: Spiel 1: Team 1 vs Team 4, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 15', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}]
+2024-02-25 09:27:26,426 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:27:26,426 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:27:26,427 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:27:26,447 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:27:26,448 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:27:26,612 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:27:26,613 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:27:58,726 - DEBUG - Started logging
+2024-02-25 09:27:58,980 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:27:58,981 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:27:58,981 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:27:59,003 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:27:59,003 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:27:59,075 - DEBUG - on_match_select selected_match: Spiel 1: Team 1 vs Team 4, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 15', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}]
+2024-02-25 09:27:59,156 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:27:59,157 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:27:59,157 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:27:59,179 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:27:59,179 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:27:59,374 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:27:59,374 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:35:02,586 - DEBUG - Started logging
+2024-02-25 09:35:02,953 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:35:02,954 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:35:02,954 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:35:02,975 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:35:02,975 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:35:03,038 - DEBUG - on_match_select selected_match: Spiel 1: Team 1 vs Team 4, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 15', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}]
+2024-02-25 09:35:03,116 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:35:03,116 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:35:03,116 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:35:03,135 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:35:03,135 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:35:03,293 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:35:03,295 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:36:15,489 - DEBUG - Started logging
+2024-02-25 09:36:15,536 - DEBUG - settings[7]: 1
+2024-02-25 09:36:15,842 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:15,842 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:15,843 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:15,863 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:15,864 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:15,932 - DEBUG - on_match_select selected_match: Spiel 1: Team 1 vs Team 4, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 15', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}]
+2024-02-25 09:36:16,019 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:16,019 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:16,020 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:16,039 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:16,039 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:16,216 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:36:16,217 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:36:19,541 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:19,541 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:19,542 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:19,567 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:19,567 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:23,243 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:23,243 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:23,243 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:23,269 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:23,269 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:25,000 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:25,000 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:25,001 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:25,023 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:25,023 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:26,054 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:26,054 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:26,055 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:26,077 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:26,077 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:27,741 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:27,742 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:27,742 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:27,766 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:27,767 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:29,937 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:29,938 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:29,938 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:29,960 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:29,960 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:36,933 - DEBUG - Started logging
+2024-02-25 09:36:37,372 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:37,372 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:37,372 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:37,395 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:37,395 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:37,460 - DEBUG - on_match_select selected_match: Spiel 1: Team 1 vs Team 4, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 15', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}]
+2024-02-25 09:36:37,545 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:37,545 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:37,545 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:37,567 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:36:37,567 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:36:37,737 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:36:37,738 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:38:55,505 - DEBUG - Started logging
+2024-02-25 09:38:55,927 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:38:55,927 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:38:55,927 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:38:55,945 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:38:55,946 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:38:56,008 - DEBUG - on_match_select selected_match: Spiel 1: Team 1 vs Team 4, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 15', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}]
+2024-02-25 09:38:56,083 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:38:56,083 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:38:56,083 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:38:56,102 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:38:56,102 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:38:56,278 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:38:56,278 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:39:05,965 - DEBUG - Started logging
+2024-02-25 09:39:06,408 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:39:06,409 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:39:06,409 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:39:06,433 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:39:06,433 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:39:06,509 - DEBUG - on_match_select selected_match: Spiel 1: Team 1 vs Team 4, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 15', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}]
+2024-02-25 09:39:06,600 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:39:06,600 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:39:06,600 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:39:06,624 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:39:06,624 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:39:06,819 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:39:06,821 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:39:25,606 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:39:25,606 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:39:25,607 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:39:25,630 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:39:25,630 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:39:51,138 - DEBUG - Started logging
+2024-02-25 09:39:51,507 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:39:51,507 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:39:51,507 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:39:51,526 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:39:51,526 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:39:51,591 - DEBUG - on_match_select selected_match: Spiel 1: Team 1 vs Team 4, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 15', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}]
+2024-02-25 09:39:51,670 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:39:51,670 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:39:51,670 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:39:51,690 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:39:51,690 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:39:51,858 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:39:51,858 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:40:11,382 - DEBUG - Started logging
+2024-02-25 09:40:11,769 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:40:11,769 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:40:11,769 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:40:11,788 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:40:11,788 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:40:11,857 - DEBUG - on_match_select selected_match: Spiel 1: Team 1 vs Team 4, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 15', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}]
+2024-02-25 09:40:11,935 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:40:11,936 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:40:11,936 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:40:11,955 - DEBUG - self.teams_playing: [2, 5]
+2024-02-25 09:40:11,956 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:40:12,120 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:40:12,121 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:40:15,916 - DEBUG - self.teams_playing: [None, None]
+2024-02-25 09:40:15,916 - DEBUG - self.teams_playing: [None, None]
+2024-02-25 09:40:15,944 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: None, goles2: None
+2024-02-25 09:40:15,945 - DEBUG - on_match_select selected_match: Spiel 1 Halb: Team vs Team 5, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 15', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}]
+2024-02-25 09:40:15,946 - DEBUG - team1id: 1, team2id: 6, self.active_match: 0
+2024-02-25 09:40:15,986 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:40:15,987 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:40:15,987 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:40:16,010 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:40:16,010 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:40:16,078 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:40:28,927 - DEBUG - Started logging
+2024-02-25 09:40:28,976 - DEBUG - settings[6]: 2
+2024-02-25 09:40:29,295 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:40:29,295 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:40:29,296 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:40:29,316 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:40:29,316 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:40:29,384 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:40:29,385 - DEBUG - on_match_select selected_match: Spiel 1 Halb: Team vs Team 5, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 15', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}]
+2024-02-25 09:40:29,386 - DEBUG - team1id: 1, team2id: 6, self.active_match: 0
+2024-02-25 09:40:29,461 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:40:29,461 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:40:29,461 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:40:29,481 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:40:29,481 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:40:29,543 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:40:29,648 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:40:29,650 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:41:02,606 - DEBUG - Started logging
+2024-02-25 09:41:02,649 - DEBUG - settings[6]: 2
+2024-02-25 09:41:02,950 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:41:02,950 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:41:02,950 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:41:02,970 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:41:02,971 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:41:03,034 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:41:03,035 - DEBUG - on_match_select selected_match: Spiel 1 Halb: Team vs Team 5, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 15', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}]
+2024-02-25 09:41:03,036 - DEBUG - team1id: 1, team2id: 6, self.active_match: 0
+2024-02-25 09:41:03,108 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:41:03,108 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:41:03,108 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:41:03,127 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:41:03,128 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:41:03,190 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:41:03,299 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:41:03,300 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:41:10,263 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:41:10,263 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:41:10,263 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:41:10,289 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:41:10,289 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:41:10,358 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:42:21,400 - DEBUG - Started logging
+2024-02-25 09:42:21,450 - DEBUG - settings[6]: 2
+2024-02-25 09:42:21,762 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:42:21,762 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:42:21,762 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:42:21,783 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:42:21,784 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:42:21,856 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:42:21,857 - DEBUG - on_match_select selected_match: Spiel 1 Halb: Team vs Team 5, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 15', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}]
+2024-02-25 09:42:21,858 - DEBUG - team1id: 1, team2id: 6, self.active_match: 0
+2024-02-25 09:42:21,942 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:42:21,943 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:42:21,943 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:42:21,965 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:42:21,965 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:42:22,033 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:42:22,154 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:42:22,155 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:42:27,030 - INFO - debug_mode 1
+2024-02-25 09:42:29,294 - ERROR - debug_mode 0
+2024-02-25 09:42:30,467 - INFO - debug_mode 1
+2024-02-25 09:42:30,863 - ERROR - debug_mode 0
+2024-02-25 09:42:32,046 - INFO - debug_mode 1
+2024-02-25 09:42:32,383 - ERROR - debug_mode 0
+2024-02-25 09:42:33,501 - INFO - debug_mode 1
+2024-02-25 09:42:33,895 - ERROR - debug_mode 0
+2024-02-25 09:42:34,701 - INFO - debug_mode 1
+2024-02-25 09:42:35,758 - ERROR - debug_mode 0
+2024-02-25 09:42:41,233 - INFO - debug_mode 1
+2024-02-25 09:44:01,868 - DEBUG - Started logging
+2024-02-25 09:44:01,914 - DEBUG - settings[6]: 2
+2024-02-25 09:44:01,914 - DEBUG - settings[7]: 1
+2024-02-25 09:44:02,225 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:44:02,226 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:44:02,226 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:44:02,245 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:44:02,246 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:44:02,307 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:44:02,309 - DEBUG - on_match_select selected_match: Spiel 1 Halb: Team vs Team 5, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 15', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}]
+2024-02-25 09:44:02,309 - DEBUG - team1id: 1, team2id: 6, self.active_match: 0
+2024-02-25 09:44:02,383 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:44:02,383 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:44:02,384 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:44:02,401 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:44:02,402 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:44:02,458 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:44:02,563 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:44:02,563 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:45:04,226 - DEBUG - Started logging
+2024-02-25 09:45:04,270 - DEBUG - settings[6]: 2
+2024-02-25 09:45:04,271 - DEBUG - settings[7]: 1
+2024-02-25 09:45:04,579 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:04,579 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:04,580 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:04,598 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:04,598 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:04,660 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:04,661 - DEBUG - on_match_select selected_match: Spiel 1 Halb: Team vs Team 5, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 15', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}]
+2024-02-25 09:45:04,661 - DEBUG - team1id: 1, team2id: 6, self.active_match: 0
+2024-02-25 09:45:04,730 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:04,731 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:04,731 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:04,749 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:04,750 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:04,808 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:04,912 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:45:04,912 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:45:14,986 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:14,987 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:14,987 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:15,008 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:15,008 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:15,070 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:27,116 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:27,116 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:27,117 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:27,139 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:27,139 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:27,210 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:30,846 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:30,846 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:30,846 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:30,868 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:30,868 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:30,928 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:32,599 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:32,600 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:32,600 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:32,623 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:32,624 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:32,691 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:45,038 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:45,038 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:45,039 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:45,062 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:45,062 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:45,128 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:46,059 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:46,059 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:46,060 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:46,082 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:46,083 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:46,148 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:46,848 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:46,849 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:46,849 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:46,871 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:46,872 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:46,936 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:48,186 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:48,186 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:48,186 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:48,208 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:48,208 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:48,273 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:48,914 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:48,914 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:48,915 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:48,938 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:48,939 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:49,018 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:49,579 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:49,580 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:49,580 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:49,602 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:49,603 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:49,668 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:50,419 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:50,420 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:50,420 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:50,443 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:50,443 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:50,506 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:51,223 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:51,223 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:51,224 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:51,248 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:51,248 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:51,312 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:51,719 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:51,719 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:51,719 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:51,742 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:51,742 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:51,808 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:52,148 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:52,149 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:52,149 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:52,171 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:52,171 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:52,239 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:52,580 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:52,580 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:52,580 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:52,605 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:52,605 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:52,670 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:52,986 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:52,986 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:52,986 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:53,010 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:53,010 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:53,074 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:53,349 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:53,350 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:53,350 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:53,374 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:53,374 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:53,442 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:53,705 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:53,705 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:53,706 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:53,726 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:53,728 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:53,792 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:54,061 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:54,061 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:54,062 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:54,084 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:54,084 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:54,150 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:54,417 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:54,417 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:54,417 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:54,438 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:54,439 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:54,505 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:54,738 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:54,739 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:54,739 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:54,761 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:54,761 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:54,826 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:55,072 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:55,073 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:55,073 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:55,094 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:55,095 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:55,160 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:55,268 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:55,268 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:55,268 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:55,291 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:55,292 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:55,355 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:55,466 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:55,466 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:55,466 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:55,489 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:55,490 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:55,556 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:55,661 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:55,661 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:55,662 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:55,685 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:55,685 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:55,749 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:55,863 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:55,863 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:55,863 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:55,886 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:55,886 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:55,958 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:56,081 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:56,081 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:56,082 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:56,103 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:56,104 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:56,170 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:56,276 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:56,276 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:56,277 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:56,300 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:56,300 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:56,366 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:56,473 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:56,473 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:56,473 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:56,494 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:56,495 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:56,563 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:56,670 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:56,670 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:56,671 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:56,692 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:56,692 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:56,759 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:56,875 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:56,875 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:56,876 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:56,897 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:56,898 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:56,965 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:57,069 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:57,070 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:57,070 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:57,093 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:57,093 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:57,159 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:57,271 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:57,271 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:57,271 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:57,295 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:57,296 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:57,363 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:57,474 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:57,474 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:57,475 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:57,497 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:57,498 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:57,565 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:57,737 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:57,737 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:57,737 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:57,759 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:57,759 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:57,823 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:45:57,938 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:57,939 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:57,939 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:57,963 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:45:57,964 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:45:58,034 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:00,611 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:00,612 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:00,612 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:00,636 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:00,636 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:00,703 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:00,811 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:00,811 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:00,812 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:00,833 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:00,834 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:00,897 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:01,008 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:01,008 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:01,009 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:01,033 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:01,033 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:01,101 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:01,206 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:01,207 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:01,207 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:01,229 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:01,229 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:01,295 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:01,406 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:01,407 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:01,407 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:01,429 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:01,430 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:01,496 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:01,600 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:01,600 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:01,600 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:01,622 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:01,623 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:01,690 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:01,795 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:01,796 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:01,796 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:01,816 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:01,817 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:01,882 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:01,988 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:01,988 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:01,988 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:02,011 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:02,012 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:02,076 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:02,183 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:02,184 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:02,184 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:02,205 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:02,206 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:02,272 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:02,387 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:02,387 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:02,387 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:02,410 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:02,411 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:02,474 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:02,589 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:02,589 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:02,589 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:02,613 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:02,613 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:02,680 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:02,788 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:02,788 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:02,789 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:02,810 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:02,811 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:02,875 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:02,983 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:02,983 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:02,984 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:03,007 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:03,007 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:03,073 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:03,182 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:03,182 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:03,182 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:03,204 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:03,204 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:03,273 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:03,381 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:03,382 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:03,382 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:03,406 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:03,406 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:03,473 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:03,589 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:03,589 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:03,589 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:03,611 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:03,612 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:03,680 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:03,803 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:03,804 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:03,804 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:03,825 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:03,826 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:03,893 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:04,017 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:04,017 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:04,017 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:04,043 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:04,043 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:04,113 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:04,218 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:04,219 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:04,219 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:04,244 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:04,244 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:04,314 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:04,421 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:04,421 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:04,421 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:04,443 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:04,443 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:04,512 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:04,722 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:04,722 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:04,722 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:04,747 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:04,747 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:04,841 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:05,014 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:05,015 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:05,016 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:05,055 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:05,056 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:05,134 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:05,256 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:05,256 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:05,256 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:05,280 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:05,281 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:05,349 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:05,459 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:05,459 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:05,460 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:05,482 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:05,482 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:05,550 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:05,652 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:05,653 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:05,653 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:05,677 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:05,677 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:05,749 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:05,857 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:05,857 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:05,858 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:05,886 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:05,887 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:05,963 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:06,067 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:06,067 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:06,067 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:06,092 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:06,092 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:06,163 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:06,261 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:06,261 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:06,261 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:06,282 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:06,282 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:06,373 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:06,492 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:06,492 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:06,492 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:06,516 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:06,517 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:06,584 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:46:06,696 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:06,696 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:06,696 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:06,720 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:46:06,720 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:46:06,785 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:50:17,374 - DEBUG - Started logging
+2024-02-25 09:50:17,422 - DEBUG - settings[6]: 2
+2024-02-25 09:50:17,422 - DEBUG - settings[7]: 1
+2024-02-25 09:50:17,422 - DEBUG - self.teams_playing: 1
+2024-02-25 09:50:17,423 - DEBUG - settings[13]: [1, 6]
+2024-02-25 09:50:17,423 - DEBUG - Type of self.teams_playing: <class 'list'>
+2024-02-25 09:50:17,423 - DEBUG - debug_mode 1
+2024-02-25 09:50:17,765 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:50:17,765 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:50:17,766 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:50:17,787 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:50:17,787 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:50:17,853 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:50:17,854 - DEBUG - on_match_select selected_match: Spiel 1 Halb: Team vs Team 5, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 15', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}]
+2024-02-25 09:50:17,854 - DEBUG - team1id: 1, team2id: 6, self.active_match: 0
+2024-02-25 09:50:17,925 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:50:17,925 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:50:17,925 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:50:17,944 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:50:17,945 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:50:18,005 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:50:18,108 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:50:18,108 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:50:22,876 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:50:22,877 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:50:22,877 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:50:22,898 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:50:22,898 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:50:22,961 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:51:03,716 - DEBUG - Started logging
+2024-02-25 09:51:03,763 - DEBUG - settings[6]: 2
+2024-02-25 09:51:03,763 - DEBUG - settings[7]: 1
+2024-02-25 09:51:03,763 - DEBUG - self.teams_playing: 1
+2024-02-25 09:51:03,763 - DEBUG - settings[13]: [1, 6]
+2024-02-25 09:51:03,765 - DEBUG - Type of self.teams_playing: <class 'list'>
+2024-02-25 09:51:04,088 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:51:04,088 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:51:04,088 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:51:04,107 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:51:04,107 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:51:04,172 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:51:04,173 - DEBUG - on_match_select selected_match: Spiel 1 Halb: Team vs Team 5, matches: [{'number': 'Spiel 1', 'teams': ['Team 1', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 2', 'teams': ['Team 5', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 3', 'teams': ['Team 2', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 4', 'teams': ['Team 6', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 5', 'teams': ['Team', 'Team 4'], 'group': 'Gruppe 1'}, {'number': 'Spiel 6', 'teams': ['Team 5', 'Team 7'], 'group': 'Gruppe 2'}, {'number': 'Spiel 7', 'teams': ['Team 1', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 8', 'teams': ['Team 8', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 9', 'teams': ['Team', 'Team 3'], 'group': 'Gruppe 1'}, {'number': 'Spiel 10', 'teams': ['Team 5', 'Team 6'], 'group': 'Gruppe 2'}, {'number': 'Spiel 11', 'teams': ['Team 4', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 12', 'teams': ['Team 7', 'Team 8'], 'group': 'Gruppe 2'}, {'number': 'Spiel 13', 'teams': ['Team', 'Team 2'], 'group': 'Gruppe 1'}, {'number': 'Spiel 14', 'teams': ['Team 3', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 15', 'teams': ['Team', 'Team 1'], 'group': 'Gruppe 1'}, {'number': 'Spiel 16', 'teams': ['Team 3', 'Team 4'], 'group': 'Gruppe 1'}]
+2024-02-25 09:51:04,174 - DEBUG - team1id: 1, team2id: 6, self.active_match: 0
+2024-02-25 09:51:04,247 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:51:04,247 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:51:04,248 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:51:04,269 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:51:04,270 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:51:04,331 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
+2024-02-25 09:51:04,437 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.178.56:5000
+2024-02-25 09:51:04,437 - INFO - [33mPress CTRL+C to quit[0m
+2024-02-25 09:51:11,671 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:51:11,671 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:51:11,671 - DEBUG - i: 0, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:51:11,693 - DEBUG - self.teams_playing: [1, 6]
+2024-02-25 09:51:11,693 - DEBUG - i: 1, teamnames ['', 'Team', 'Team 1', 'Team 2', 'Team 3', 'Team 4', 'Team 5', 'Team 6', 'Team 7', 'Team 8']
+2024-02-25 09:51:11,762 - DEBUG - self.spiel_um_platz_3: [], team1: (1, 'Team', 0, 0, 0), team2: (6, 'Team 5', 0, 0, 0), team3: (2, 'Team 1', 0, 0, 0), team4: (7, 'Team 6', 0, 0, 0), goles1: (0, 0), goles2: None
