@@ -93,7 +93,7 @@ function generateTableGroup(matches) {
         cellT.textContent = match[2] + " : " + match[3];
 
         finalMatchesTime = new Date(
-            startTime.getTime() + (i + 2) * timeInterval * 60000
+            startTime.getTime() + (i + 1) * timeInterval * 60000
         );
 
         i++;
@@ -107,31 +107,55 @@ function generateTableGroup(matches) {
 }
 
 function generatePauseTime(time) {
-    if (time == 0 || time == null) {
-        let pauseTimeElement = document.getElementById("pauseTime");
-        if (pauseTimeElement) {
-            pauseTimeElement.remove();
+    if (time == 0 || time == null || time == "0") {
+        console.log("No pause time");
+        let pauseTimeDiv = document.getElementById("pauseTime");
+        if (pauseTimeDiv) {
+            pauseTimeDiv.remove();
         }
-        return;
     }
+
+    oldfinalMatchesTime = finalMatchesTime;
+    finalMatchesTime = new Date(finalMatchesTime.getTime() + time * 60000);
 
     let tablesContainer = document.getElementById("tablesContainer");
 
-    let pauseTimeElement = document.getElementById("pauseTime");
+    let pauseTimeText = document.getElementById("pauseTimeText");
+    let pauseTimeElement = document.getElementById("pauseTimeProgress");
+    let pauseTimeStart = document.getElementById("pauseTimeStart");
+    let pauseTimeEnd = document.getElementById("pauseTimeEnd");
 
-    if (pauseTimeElement) {
-        pauseTimeElement.textContent = `Pause ${time} Minuten`;
+    if (pauseTimeText && pauseTimeStart && pauseTimeEnd) {
+        pauseTimeText.textContent = `Pause ${time} Minuten`;
+        pauseTimeStart.textContent = `${formatTime(oldfinalMatchesTime)}`;
+        pauseTimeEnd.textContent = `${formatTime(finalMatchesTime)}`;
     } else {
-        pauseTimeElement = document.createElement("div");
-        pauseTimeElement.id = "pauseTime";
-        pauseTimeElement.textContent = `Pause ${time} Minuten`;
+        let pauseTimeDiv = document.createElement("div");
+        pauseTimeDiv.className = "pauseTime";
 
-        tablesContainer.appendChild(pauseTimeElement);
+        pauseTimeElement = document.createElement("progress");
+        pauseTimeElement.id = "pauseTimeProgress";
+        pauseTimeElement.max = time * 60;
+        pauseTimeElement.value = 0;
+
+        pauseTimeText = document.createElement("p");
+        pauseTimeText.textContent = `Pause ${time} Minuten`;
+        pauseTimeText.id = "pauseTimeText";
+
+        pauseTimeStart = document.createElement("p");
+        pauseTimeStart.textContent = `${formatTime(oldfinalMatchesTime)}`;
+        pauseTimeStart.id = "pauseTimeStart";
+
+        pauseTimeEnd = document.createElement("p");
+        pauseTimeEnd.textContent = `${formatTime(finalMatchesTime)}`;
+        pauseTimeEnd.id = "pauseTimeEnd";
+
+        pauseTimeDiv.appendChild(pauseTimeStart);
+        pauseTimeDiv.appendChild(pauseTimeText);
+        pauseTimeDiv.appendChild(pauseTimeEnd);
+        pauseTimeDiv.appendChild(pauseTimeElement);
+        tablesContainer.appendChild(pauseTimeDiv);
     }
-
-    finalMatchesTime = new Date(
-        finalMatchesTime.getTime() + time * 60000 - timeInterval * 60000
-    );
 }
 
 function finalMatchTable() {
@@ -140,7 +164,8 @@ function finalMatchTable() {
             let requestedtime = parseInt(data["pauseBeforeFM"]);
             generatePauseTime(requestedtime);
         } else {
-            let pauseTimeElement = document.getElementById("pauseTime");
+            let pauseTimeElement =
+                document.getElementsByClassName("pauseTime")[0];
             if (pauseTimeElement) {
                 pauseTimeElement.remove();
             }
