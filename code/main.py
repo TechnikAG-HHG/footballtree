@@ -1663,15 +1663,15 @@ class Window(ctk.CTk):
         
         if goles1 != None and goles2 != None:
 
-            if goles1[0] < goles1[1]:
-                self.spiel_um_platz_3.append(team1)
-            else:
+            if goles1[1] <= goles1[0]:
                 self.spiel_um_platz_3.append(team2)
-                
-            if goles2[0] < goles2[1]:
-                self.spiel_um_platz_3.append(team3)
             else:
+                self.spiel_um_platz_3.append(team1)
+                
+            if goles2[1] <= goles2[0]:
                 self.spiel_um_platz_3.append(team4)
+            else:
+                self.spiel_um_platz_3.append(team3)
         
         #logging.debug everything
         logging.debug(f"self.spiel_um_platz_3: {self.spiel_um_platz_3}, team1: {team1}, team2: {team2}, team3: {team3}, team4: {team4}, goles1: {goles1}, goles2: {goles2}")
@@ -1686,13 +1686,13 @@ class Window(ctk.CTk):
         getGoles1 = """
         SELECT team1Goals, team2Goals FROM finalMatchesData
         WHERE matchId = 1
-        ORDER BY matchId DESC
+        ORDER BY matchId ASC
         """
         
         getGoles2 = """
         SELECT team1Goals, team2Goals FROM finalMatchesData
         WHERE matchId = 2
-        ORDER BY matchId DESC
+        ORDER BY matchId ASC
         """
         
         self.final_match_teams = []
@@ -1704,12 +1704,12 @@ class Window(ctk.CTk):
         
         if goles1 != None and goles2 != None:
 
-            if goles1[0] > goles1[1]:
+            if goles1[0] >= goles1[1]:
                 self.final_match_teams.append(team1)
             else:
                 self.final_match_teams.append(team2)
                 
-            if goles2[0] > goles2[1]:
+            if goles2[0] >= goles2[1]:
                 self.final_match_teams.append(team3)
             else:
                 self.final_match_teams.append(team4)
@@ -2418,6 +2418,7 @@ class Window(ctk.CTk):
 ##############################################################################################
 ##############################################################################################
 ##############################################################################################
+
     def delete_updated_data(self):
         #logging.debug("delete")
         #logging.debug(self.updated_data)
