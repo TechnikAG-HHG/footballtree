@@ -5,6 +5,8 @@ var startTime = new Date(); // Set the start time
 
 startTime.setHours(0, 0, 0, 0);
 
+var intervalActivated = false;
+
 function generateTableGroup(matches) {
     var tablesContainer = document.getElementById("tablesContainer");
 
@@ -158,6 +160,19 @@ function generatePauseTime(time) {
     }
 }
 
+function updatePauseTime() {
+    // update the progress bar with the current time and the finalmatchtime
+    let pauseTimeElement = document.getElementById("pauseTimeProgress");
+    if (pauseTimeElement) {
+        //console.log(finalMatchesTime);
+        let currentTime = new Date();
+        let timeDifference = currentTime - oldfinalMatchesTime;
+        let timeDifferenceInSeconds = timeDifference / 1000;
+        pauseTimeElement.value = timeDifferenceInSeconds;
+        //console.log(timeDifferenceInSeconds);
+    }
+}
+
 function finalMatchTable() {
     if ("finalMatches" in data) {
         if (data["pauseBeforeFM"] != null && data["pauseBeforeFM"] != "0") {
@@ -169,6 +184,14 @@ function finalMatchTable() {
             if (pauseTimeElement) {
                 pauseTimeElement.remove();
             }
+        }
+
+        if (data["pauseMode"] == true && intervalActivated == false) {
+            updatePauseTime();
+            setInterval(updatePauseTime, 100);
+            intervalActivated = true;
+        } else {
+            
         }
 
         var tablesContainer = document.getElementById("tablesContainer");
