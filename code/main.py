@@ -1006,25 +1006,20 @@ class Window(ctk.CTk):
 
         logging.debug(f"self.teams_playing: {self.teams_playing}")
         
+        team_names = self.read_teamNames()
+        
         for i, _ in enumerate(self.teams_playing):
             
-            logging.debug(f"self.teams_playing: {self.teams_playing}")
-            
-            team_names = self.read_teamNames()
             if self.teams_playing[i] is not None:
-                logging.debug(f"i: {i}, teamnames {team_names}")
                 #logging.debug(self.teams_playing[i])
                 try:
                     team_name = team_names[self.teams_playing[i]]
                 except IndexError:
-                #    self.teams_playing = [None, None]
-                #    logging.debug("IndexError in create_SPIEL_elements")
-                #    self.create_SPIEL_elements()
+                    
+                    logging.debug("IndexError in create_SPIEL_elements")
                     
                     self.teams_playing = [None, None]
                     
-                    print("IndexError in create_SPIEL_elements")
-                
                     return
                 
             else:
@@ -1032,8 +1027,6 @@ class Window(ctk.CTk):
                 # For example, you can set team_name to an empty string
                 
                 self.teams_playing = [None, None]
-                
-                print("self.teams_playing[i] is None")
                 
                 break
                 
@@ -2577,6 +2570,7 @@ class Window(ctk.CTk):
         self.settingsconnection.commit()
         
         self.updated_data.update({"pauseMode": selected_value})
+      
             
     ##############################################################################################
     ##############################################################################################
