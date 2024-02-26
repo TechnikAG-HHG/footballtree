@@ -221,6 +221,17 @@ class Window(ctk.CTk):
         self.cursor.execute(playerPerMatchDataTableCreationQuery)
         self.connection.commit()
         
+        playerPerMatchDataFinalTableCreationQuery = """
+        CREATE TABLE IF NOT EXISTS playerPerMatchDataFinal (
+            id INTEGER PRIMARY KEY,
+            matchId INTEGER REFERENCES finalMatchesData(matchId),
+            playerName INTEGER REFERENCES playerData(playerName),
+            playerGoals INTEGER DEFAULT 0
+        )
+        """
+        self.cursor.execute(playerPerMatchDataFinalTableCreationQuery)
+        self.connection.commit()
+        
         settingsDataTableCreationQuery = """
         CREATE TABLE IF NOT EXISTS settingsData (
             id INTEGER PRIMARY KEY,
@@ -1023,7 +1034,7 @@ class Window(ctk.CTk):
                 team2_id = self.teams_playing[0]
 
             
-            self.setup_player_goals_per_match(i)
+            self.setup_player_goals_per_match(team_id)
             
             # Initialize the dictionary for the current team
             self.spiel_buttons[team_id] = {}
@@ -1073,28 +1084,20 @@ class Window(ctk.CTk):
             down_frame = ctk.CTkFrame(frame_frame, bg_color='#0e1718', fg_color='#0e1718')
             down_frame.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.SW)
             
-            read_player_stats = self.read_player_stats(team_id, True, True)
+            joined_data = self.read_player_goals_per_match(team_id)
             
-            print("read_player_stats", read_player_stats)
+            #print("i", i)
+            
+            #print("read_player_stats", read_player_stats)
     
             if self.active_match == -1:
                 continue
             
-            if not read_player_stats:
+            #print("joined_data", joined_data)
+            
+            if not joined_data or joined_data == ([], []):
                 continue
             
-            _player_names, _player_numbers, _goals, _player_ids = zip(*read_player_stats)
-            _player_names, _playerGoalsPerMatch = self.read_player_goals_per_match()
-            
-            print("self.read_player_goals_per_match()", "_player_names", _player_names, "_playerGoalsPerMatch", _playerGoalsPerMatch)
-
-            # Create a dictionary from player_names and playerGoalsPerMatch
-            _player_goals_dict = dict(zip(_player_names, _playerGoalsPerMatch))
-
-            # Create a new list of tuples where each tuple contains player's name, number, goals, id, and goals per match
-            joined_data = [(_name, _number, _goals, _id, _player_goals_dict.get(_name)) if _player_goals_dict.get(_name) is not None else (_name, _number, _goals, _id, []) for _name, _number, _goals, _id in zip(_player_names, _player_numbers, _goals, _player_ids)]
-            
-            print(joined_data)
             
             for i, (player_name, player_number, goals, player_id, player_goals_per_match) in enumerate(joined_data): 
                 #logging.debug("player_name", player_name, "player_number", player_number, "goals", goals, "player_id", player_id)
@@ -1123,10 +1126,10 @@ class Window(ctk.CTk):
                 playertext3 = ctk.CTkLabel(self.group_frame, text=f"Tore {str(player_goals_per_match)}", font=("Helvetica", self.team_button_font_size))
                 playertext3.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
 
-                playerbutton1 = ctk.CTkButton(self.group_frame, text="UP", command=lambda team=team_id, player_id1=player_id, player_index = player_index: self.player_scored_a_point(team, player_id1, player_index,  "UP"), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)  
+                playerbutton1 = ctk.CTkButton(self.group_frame, text="UP", command=lambda team=team_id, player_id1=player_id, player_index = player_index, player_name = player_name: self.player_scored_a_point(team, player_id1, player_index,  "UP", player_name), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)  
                 playerbutton1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
                 
-                playerbutton2 = ctk.CTkButton(self.group_frame, text="DOWN", command=lambda team=team_id, player_id1=player_id, player_index = player_index: self.player_scored_a_point(team, player_id1, player_index, "DOWN"), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)
+                playerbutton2 = ctk.CTkButton(self.group_frame, text="DOWN", command=lambda team=team_id, player_id1=player_id, player_index = player_index, player_name = player_name: self.player_scored_a_point(team, player_id1, player_index, "DOWN", player_name), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)
                 playerbutton2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
                 
                 
@@ -1233,57 +1236,113 @@ class Window(ctk.CTk):
     
     def setup_player_goals_per_match(self, team_id):
         active_match = self.active_match
+        team_id = team_id
         logging.info(f"active_match: {active_match}, self.active_mode: {self.active_mode.get()}, self.teams_playing: {self.teams_playing}")
 
         if active_match == -1:
             logging.exception("active_match is -1 in setup_player_goals_per_match")
             return
 
-        if self.active_mode.get() == 2:
-            active_match = active_match * -1
-
-        # check if the current match is in the playerPerMatchData table and if not, add it
-        self.cursor.execute("SELECT COUNT(*) FROM playerPerMatchData WHERE matchId = ?", (active_match,))
-        match_exists = self.cursor.fetchone()[0]
-
-        if match_exists == 0:
-            self.cursor.execute("INSERT INTO playerPerMatchData (matchId) VALUES (?)", (active_match,))
-            self.connection.commit()
+        if self.active_mode.get() == 1:
+            colum = "playerPerMatchData"
+        else:
+            colum = "playerPerMatchDataFinal"
 
         # get the player names for the current team
-        self.cursor.execute("SELECT playerName FROM playerData WHERE teamId = ?", (team_id,))
+        self.cursor.execute("SELECT playerName FROM playerData WHERE teamId = ? ORDER BY id ASC", (team_id,))
         player_names = set(row[0] for row in self.cursor.fetchall())
 
         # get the player names that exist in the playerPerMatchData table for the current match
-        self.cursor.execute("SELECT playerName FROM playerPerMatchData WHERE matchId = ?", (active_match,))
+        self.cursor.execute(f"SELECT playerName FROM {colum} WHERE matchId = ? ORDER BY id ASC", (active_match,))
         existing_player_names = set(row[0] for row in self.cursor.fetchall())
 
         # find the player names that need to be inserted
         player_names_to_insert = player_names - existing_player_names
-
-        # check if the player is in the playerPerMatchData table and if not, add it
-        for player_name in player_names_to_insert:
-            self.cursor.execute("INSERT INTO playerPerMatchData (playerName, matchId) VALUES (?, ?)", (player_name, active_match))
-        self.connection.commit()
-       
         
-    def read_player_goals_per_match(self):
+        #print("player_names_to_insert", player_names_to_insert)
+
+        # check if the player is in the {colum} table and if not, add it
+        for player_name in player_names_to_insert:
+            self.cursor.execute(f"INSERT INTO {colum} (playerName, matchId) VALUES (?, ?)", (player_name, active_match))
+        self.connection.commit()
+        
+        
+    def read_player_goals_per_match(self, team_id):
         active_match = self.active_match
         
         if active_match == -1:
             logging.exception("active_match is -1 in setup_player_goals_per_match")
             return
 
-        if self.active_mode.get() == 2:
-            active_match = active_match * -1
+        if self.active_mode.get() == 1:
+            colum = "playerPerMatchData"
+        else:
+            colum = "playerPerMatchDataFinal"
+            
+            
+        selectingQuery = f"""
+            SELECT playerData.playerName, playerData.playerNumber, playerData.goals, playerData.id, {colum}.playerGoals 
+            FROM playerData, {colum} 
+            WHERE playerData.playerName = {colum}.playerName 
+            AND {colum}.matchId = ? AND playerData.teamId = ?
+            ORDER BY playerData.id ASC
+        """
         
-        playerData = self.cursor.execute("SELECT playerName, playerGoals FROM playerPerMatchData WHERE matchId = ?", (active_match,)).fetchall()
-        playerNames = [row[0] for row in playerData]
-        playerGoalsPeMatch = [row[1] for row in playerData]
+        playerData = self.cursor.execute(selectingQuery, (active_match, team_id)).fetchall()
         
-        return playerNames, playerGoalsPeMatch
-        
+        return playerData
+   
     
+    def read_player_goals_per_match_per_player(self, player_name):
+        active_match = self.active_match
+        
+        if active_match == -1:
+            logging.exception("active_match is -1 in setup_player_goals_per_match")
+            return
+
+        if self.active_mode.get() == 1:
+            colum = "playerPerMatchData"
+        else:
+            colum = "playerPerMatchDataFinal"
+            
+        selectingQuery = f"""
+            SELECT playerGoals 
+            FROM {colum} 
+            WHERE playerName = ? AND matchId = ?
+        """
+        
+        playerData = self.cursor.execute(selectingQuery, (player_name, active_match)).fetchone()
+        
+        if playerData is None:
+            return 0
+        
+        return playerData[0]
+    
+    
+    def save_fake_goals_for_match_for_player(self, player_name, goals):
+        active_match = self.active_match
+        
+        print("player_name", player_name, "goals", goals)
+        
+        if active_match == -1:
+            logging.exception("active_match is -1 in save_fake_goals_for_match_for_player")
+            return
+
+        if self.active_mode.get() == 1:
+            colum = "playerPerMatchData"
+        else:
+            colum = "playerPerMatchDataFinal"
+            
+        updateQuery = f"""
+            UPDATE {colum} 
+            SET playerGoals = ? 
+            WHERE playerName = ? AND matchId = ?
+        """
+        
+        self.cursor.execute(updateQuery, (goals, player_name, active_match))
+        self.connection.commit()
+        
+        
     def reset_player_per_match_data(self):
         # Drop the table
         self.cursor.execute("DROP TABLE IF EXISTS playerPerMatchData")
@@ -1300,6 +1359,20 @@ class Window(ctk.CTk):
         """
         self.cursor.execute(playerPerMatchDataTableCreationQuery)
         self.connection.commit()   
+        
+        self.cursor.execute("DROP TABLE IF EXISTS playerPerMatchDataFinal")
+        self.connection.commit()
+        
+        playerPerMatchDataFinalTableCreationQuery = """
+        CREATE TABLE IF NOT EXISTS playerPerMatchDataFinal (
+            id INTEGER PRIMARY KEY,
+            matchId INTEGER REFERENCES finalMatchesData(matchId),
+            playerName INTEGER REFERENCES playerData(playerName),
+            playerGoals INTEGER DEFAULT 0
+        )
+        """
+        self.cursor.execute(playerPerMatchDataFinalTableCreationQuery)
+        self.connection.commit()
     
     
     def configure_team_select(self, team_select, state, team_name):
@@ -1553,22 +1626,29 @@ class Window(ctk.CTk):
         self.create_SPIEL_elements()
 
         
-    def player_scored_a_point(self, teamID, player_id, player_index, direction="UP"):
+    def player_scored_a_point(self, teamID, player_id, player_index, direction="UP", player_name=""):
         # Get the current score
+        
+        print("teamID", teamID, "player_id", player_id, "player_index", player_index, "direction", direction)
+        
         current_goals = self.read_player_stats(teamID, True, False, player_id)[0][2]
+        
+        fake_current_goals = self.read_player_goals_per_match_per_player(player_name)
         
         # Update the score
         if direction == "UP":
             current_goals += 1
+            fake_current_goals += 1
         else:
             current_goals -= 1
+            fake_current_goals -= 1
 
         if current_goals < 0:
             current_goals = 0
             return
         
         # Update the score label
-        self.spiel_buttons[teamID][player_index][3].configure(text=f"Tore {current_goals}")
+        self.spiel_buttons[teamID][player_index][3].configure(text=f"Tore {fake_current_goals}")
         self.update_idletasks()
         
         # Update the database
@@ -1576,6 +1656,8 @@ class Window(ctk.CTk):
             "UPDATE playerData SET goals = ? WHERE teamId = ? AND id = ?",
             (current_goals, teamID, player_id)
         )
+        
+        self.save_fake_goals_for_match_for_player(player_name, fake_current_goals)
         
         # Commit the changes to the database
         self.connection.commit()
@@ -1749,7 +1831,7 @@ class Window(ctk.CTk):
         else:
             return "Spiel um Platz 3: None vs None"
         
-    
+        
     def get_final_match(self, team1, team2, team3, team4):
         #get the best two teams from the database(with most points)
         getGoles1 = """
@@ -1787,8 +1869,8 @@ class Window(ctk.CTk):
             return f"Finale: {self.final_match_teams[0][1]} vs {self.final_match_teams[1][1]}"
         else:
             return "Finale: None vs None"
-    
-           
+        
+        
     def save_active_match_in_final_phase(self, team1id, team2id):
 
         logging.debug(f"team1id: {team1id}, team2id: {team2id}, self.active_match: {self.active_match}")
@@ -2311,7 +2393,7 @@ class Window(ctk.CTk):
         """
         self.settingscursor.execute(saveVolumeInDB, (int(event),))
         self.settingsconnection.commit()
-       
+        
         
     def on_radio_button_change(self):
         selected_value = self.active_mode.get()
