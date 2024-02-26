@@ -71,6 +71,9 @@ class Window(ctk.CTk):
         self.save_delay_time = 2
         self.settingsconnection = None
         self.settingscursor = None
+        
+        # helping, saving variables
+        self.reload_requried_on_click_SPIEL = False
 
         self.screenheight = self.winfo_screenheight()
         self.screenwidth = self.winfo_screenwidth()
@@ -299,9 +302,9 @@ class Window(ctk.CTk):
             self.console_handler.setLevel(logging.ERROR)
     
     
-##############################################################################################
-##############################################################################################
-##############################################################################################
+    ##############################################################################################
+    ##############################################################################################
+    ##############################################################################################
 
     def add_name_entry(self, entry_text="", mp3_path=""):
         team_element_width = self.screenwidth / 10
@@ -464,6 +467,8 @@ class Window(ctk.CTk):
         self.cursor.execute(reset_values_query)
         self.connection.commit()
         
+        self.reload_requried_on_click_SPIEL = True
+        
     
     def write_names_into_entry_fields(self):
         selectTeams = """
@@ -545,9 +550,9 @@ class Window(ctk.CTk):
         return backup_path
 
 
-##############################################################################################
-##############################################################################################
-##############################################################################################
+    ##############################################################################################
+    ##############################################################################################
+    ##############################################################################################
 
     def create_player_elements(self):
         # Create elements for the player frame
@@ -947,9 +952,9 @@ class Window(ctk.CTk):
         self.cursor.execute("UPDATE playerData SET goals = 0")
 
 
-##############################################################################################
-##############################################################################################
-##############################################################################################
+    ##############################################################################################
+    ##############################################################################################
+    ##############################################################################################
 
     def create_SPIEL_elements(self):
         
@@ -983,13 +988,13 @@ class Window(ctk.CTk):
             if self.teams_playing[i] is not None:
                 logging.debug(f"i: {i}, teamnames {team_names}")
                 #logging.debug(self.teams_playing[i])
-                #try:
-                team_name = team_names[self.teams_playing[i]]
-                #except IndexError:
+                try:
+                    team_name = team_names[self.teams_playing[i]]
+                except IndexError:
                 #    self.teams_playing = [None, None]
                 #    logging.debug("IndexError in create_SPIEL_elements")
                 #    self.create_SPIEL_elements()
-                #    return
+                    return
                 
             else:
                 # Handle the case when self.teams_playing[i + 1] is None
@@ -2383,8 +2388,9 @@ class Window(ctk.CTk):
 
     def show_SPIEL_frame(self):
         self.watch_dog_process_can_be_active = True
-        if self.teams_playing.count(None) == 0:
+        if self.teams_playing.count(None) == 0 or self.reload_requried_on_click_SPIEL:
             self.reload_spiel_button_command()
+            self.reload_requried_on_click_SPIEL = False
             
         #logging.debug(stored_data)
         self.calculate_matches()
