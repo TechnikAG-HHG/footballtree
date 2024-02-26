@@ -3031,8 +3031,10 @@ def get_data_for_website(which_data=-1):
             a_m = tkapp.active_match
             
             if tkapp.active_mode.get() == 2:
-                a_m += 1
+                a_m += 2
+                print("a_m", a_m)
                 a_m *= -1
+                print("a_m2", a_m)
             
             return a_m
         except:
@@ -3076,7 +3078,6 @@ def get_data_for_website(which_data=-1):
         a, b = start_time.split(":")
         return [int(a), int(b)]
     
-
 
 def ich_kann_nicht_mehr(teamID, team2ID):
       
