@@ -8,6 +8,35 @@ startTime.setHours(0, 0, 0, 0);
 var intervalActivated = false;
 
 function generateTableGroup(matches) {
+    if (
+        data["Matches"] == null ||
+        data["Matches"] == "null" ||
+        data["Matches"] == "" ||
+        data["Matches"] == "[]" ||
+        data["Matches"] === 0
+    ) {
+        let no_matches = document
+            .getElementById("tablesContainer")
+            .querySelector("p");
+
+        console.log("No matches found");
+
+        if (!no_matches) {
+            let tablesContainer = document.getElementById("tablesContainer");
+            no_matches = document.createElement("p");
+            no_matches.textContent = "Keine Spiele gefunden";
+            tablesContainer.appendChild(no_matches);
+        }
+        return;
+    }
+
+    let no_matches = document
+        .getElementById("tablesContainer")
+        .querySelector("p");
+    if (no_matches) {
+        no_matches.remove();
+    }
+
     var tablesContainer = document.getElementById("tablesContainer");
 
     document.title = data["websiteTitle"];
@@ -177,6 +206,17 @@ function updatePauseTime() {
 
 function finalMatchTable() {
     var intervalId = null;
+
+    if (
+        data["Matches"] == null ||
+        data["Matches"] == "null" ||
+        data["Matches"] == "" ||
+        data["Matches"] == "[]" ||
+        data["Matches"] === 0
+    ) {
+        console.log("No matches found");
+        return; // Add return statement here
+    }
 
     if ("finalMatches" in data) {
         if (data["pauseBeforeFM"] != null && data["pauseBeforeFM"] != "0") {
@@ -402,6 +442,9 @@ document.getElementById("returnButton").addEventListener("click", function () {
 startTime.setHours(data["startTime"][0], data["startTime"][1], 0, 0);
 generateTableGroup(data["Matches"]);
 finalMatchTable();
+
+updateData();
+
 // call updateData() every 5 seconds
 setInterval(updateData, 5000);
 setInterval(updatePauseTime, 100);
