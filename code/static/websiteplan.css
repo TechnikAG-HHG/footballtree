@@ -98,6 +98,10 @@ table td {
     text-align: center;
 }
 
+table tbody tr:nth-child(odd) {
+    background-color: #292929;
+}
+
 table td:first-child,
 table td:last-child {
     width: 15%;
