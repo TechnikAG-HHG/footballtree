@@ -74,6 +74,7 @@ class Window(ctk.CTk):
         
         # helping, saving variables
         self.reload_requried_on_click_SPIEL = False
+        self.manual_select_active = False
 
         self.screenheight = self.winfo_screenheight()
         self.screenwidth = self.winfo_screenwidth()
@@ -1019,11 +1020,21 @@ class Window(ctk.CTk):
                 #    self.teams_playing = [None, None]
                 #    logging.debug("IndexError in create_SPIEL_elements")
                 #    self.create_SPIEL_elements()
+                    
+                    self.teams_playing = [None, None]
+                    
+                    print("IndexError in create_SPIEL_elements")
+                
                     return
                 
             else:
                 # Handle the case when self.teams_playing[i + 1] is None
                 # For example, you can set team_name to an empty string
+                
+                self.teams_playing = [None, None]
+                
+                print("self.teams_playing[i] is None")
+                
                 break
                 
             team_id = self.teams_playing[i]
@@ -1086,14 +1097,9 @@ class Window(ctk.CTk):
             
             joined_data = self.read_player_goals_per_match(team_id)
             
-            #print("i", i)
-            
-            #print("read_player_stats", read_player_stats)
     
             if self.active_match == -1:
                 continue
-            
-            #print("joined_data", joined_data)
             
             if not joined_data or joined_data == ([], []):
                 continue
@@ -1149,7 +1155,7 @@ class Window(ctk.CTk):
             values=teams_list, 
             font=("Helvetica", self.team_button_font_size), 
             state=tk.DISABLED, 
-            command=lambda event: self.on_team_select(event, nr=1),
+            command=lambda event: self.on_team_select(event, 1, True),
             )
         self.manual_team_select_1.set("None")
         self.manual_team_select_1.pack(pady=10, side=tk.BOTTOM, anchor=tk.S, padx=10)
@@ -1160,7 +1166,7 @@ class Window(ctk.CTk):
             values=teams_list, 
             font=("Helvetica", self.team_button_font_size), 
             state=tk.NORMAL, 
-            command=lambda event: self.on_team_select(event, nr=0),
+            command=lambda event: self.on_team_select(event, 0, True),
             )
         self.manual_team_select_2.set("None")
         self.manual_team_select_2.pack(pady=10, side=tk.BOTTOM, anchor=tk.S, padx=10)
@@ -1237,10 +1243,10 @@ class Window(ctk.CTk):
     def setup_player_goals_per_match(self, team_id):
         active_match = self.active_match
         team_id = team_id
-        logging.info(f"active_match: {active_match}, self.active_mode: {self.active_mode.get()}, self.teams_playing: {self.teams_playing}")
+        #logging.info(f"active_match: {active_match}, self.active_mode: {self.active_mode.get()}, self.teams_playing: {self.teams_playing}")
 
         if active_match == -1:
-            logging.exception("active_match is -1 in setup_player_goals_per_match")
+            #logging.exception("active_match is -1 in setup_player_goals_per_match")
             return
 
         if self.active_mode.get() == 1:
@@ -1258,8 +1264,6 @@ class Window(ctk.CTk):
 
         # find the player names that need to be inserted
         player_names_to_insert = player_names - existing_player_names
-        
-        #print("player_names_to_insert", player_names_to_insert)
 
         # check if the player is in the {colum} table and if not, add it
         for player_name in player_names_to_insert:
@@ -1271,7 +1275,7 @@ class Window(ctk.CTk):
         active_match = self.active_match
         
         if active_match == -1:
-            logging.exception("active_match is -1 in setup_player_goals_per_match")
+            #logging.exception("active_match is -1 in setup_player_goals_per_match")
             return
 
         if self.active_mode.get() == 1:
@@ -1297,7 +1301,7 @@ class Window(ctk.CTk):
         active_match = self.active_match
         
         if active_match == -1:
-            logging.exception("active_match is -1 in setup_player_goals_per_match")
+            #logging.exception("active_match is -1 in setup_player_goals_per_match")
             return
 
         if self.active_mode.get() == 1:
@@ -1322,10 +1326,8 @@ class Window(ctk.CTk):
     def save_fake_goals_for_match_for_player(self, player_name, goals):
         active_match = self.active_match
         
-        print("player_name", player_name, "goals", goals)
-        
         if active_match == -1:
-            logging.exception("active_match is -1 in save_fake_goals_for_match_for_player")
+            #logging.exception("active_match is -1 in save_fake_goals_for_match_for_player")
             return
 
         if self.active_mode.get() == 1:
@@ -1494,7 +1496,12 @@ class Window(ctk.CTk):
             starttime = datetime.datetime.strptime(starttime_str, '%H:%M')
 
             # get the number of the active match
-            active_match = self.get_active_match(self.teams_playing[0], self.teams_playing[1]) - 1
+            active_match = self.get_active_match(self.teams_playing[0], self.teams_playing[1])
+            
+            if active_match < 0:
+                if next_match:
+                    return "00:00", "00:00", False
+                return "00:00"
 
             # get the time interval from settings
             timeinterval = int(self.time_interval.get().replace("m", ""))
@@ -1543,11 +1550,14 @@ class Window(ctk.CTk):
             return current_match_time.strftime('%H:%M')
         
     
-    def on_team_select(self, event, nr):
+    def on_team_select(self, event, nr, manual_select=False):
         #logging.debug("on_team_select")
         #logging.debug(event)
         #selected_team = event.widget.get()
         selected_team = event
+        
+        if manual_select:
+            self.manual_select_active = True
         
         # Convert the value to the team index
         team_index = self.read_teamNames().index(selected_team)
@@ -1566,7 +1576,7 @@ class Window(ctk.CTk):
             self.manual_team_select_1.set(self.read_teamNames()[self.teams_playing[1]])
             self.manual_team_select_2.set(self.read_teamNames()[self.teams_playing[0]])
             if self.active_mode.get() == 1:
-                self.active_match = self.get_active_match(self.teams_playing[0], self.teams_playing[1]) - 1
+                self.active_match = self.get_active_match(self.teams_playing[0], self.teams_playing[1])
         
         #logging.debug("self.teams_playing", self.teams_playing)
         if self.teams_playing.count(None) == 1:
@@ -1629,8 +1639,6 @@ class Window(ctk.CTk):
     def player_scored_a_point(self, teamID, player_id, player_index, direction="UP", player_name=""):
         # Get the current score
         
-        print("teamID", teamID, "player_id", player_id, "player_index", player_index, "direction", direction)
-        
         current_goals = self.read_player_stats(teamID, True, False, player_id)[0][2]
         
         fake_current_goals = self.read_player_goals_per_match_per_player(player_name)
@@ -1686,14 +1694,20 @@ class Window(ctk.CTk):
             values_list = self.get_values_list_mode1(matches)
             self.spiel_select.configure(values=values_list)
             #logging.debug("active_match in create_matches_labels", self.active_match)
+            self.active_match = self.get_active_match(self.teams_playing[0], self.teams_playing[1])
+                
             if self.active_match >= 0:
                 self.spiel_select.set(values_list[self.active_match])
-            elif values_list != []:
+                self.manual_select_active = False
+            elif (values_list != [] and self.teams_playing.count(None) != 0) or (values_list != [] and self.manual_select_active == False):
                 self.on_match_select(values_list[0], matches)
+                self.manual_select_active = False
                 return
-            else:
+            elif self.manual_select_active == False:
                 self.active_match = -1
                 self.teams_playing = [None, None]
+            else:
+                self.active_match = -1
             
         elif self.active_mode.get() == 2:
             values_list, active_match = self.get_values_list_mode2()
@@ -1727,7 +1741,7 @@ class Window(ctk.CTk):
         self.cursor.execute(getActiveMatch, (team1, team2))
         active_match = self.cursor.fetchone()
         if active_match != None:
-            return active_match[0]
+            return active_match[0] -1
         else:
             return -1
 
@@ -1780,7 +1794,14 @@ class Window(ctk.CTk):
         LIMIT 2
         """
         self.cursor.execute(query, (group_number,))
-        return self.cursor.fetchall()
+        result = self.cursor.fetchall()
+
+        # Check if the result has less than 2 teams
+        while len(result) < 2:
+            # Append a zero tuple
+            result.append((0, 'No Team', 0, 0, 0))
+
+        return result
 
 
     def get_teams_for_final_matches(self):
@@ -2008,6 +2029,11 @@ class Window(ctk.CTk):
             except ValueError:
                 # Handle the case where the selected match is not found in the list
                 logging.debug("Selected match not found in the list.")
+                
+                values_list = self.get_values_list_mode1(matches)
+                
+                self.on_match_select(values_list[0], matches)
+                
         elif self.active_mode.get() == 2:
             if next_match:
                 if self.active_match < 3:
