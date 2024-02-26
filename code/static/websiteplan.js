@@ -53,7 +53,7 @@ function generateTableGroup(matches) {
     matches.forEach((match) => {
         var row = tbody.insertRow();
 
-        if (i == data["activeMatchNumber"]) {
+        if (i == data["activeMatchNumber"] && data["pauseMode"] == false) {
             row.style.backgroundColor = "black";
         }
 
@@ -161,19 +161,23 @@ function generatePauseTime(time) {
 }
 
 function updatePauseTime() {
-    // update the progress bar with the current time and the finalmatchtime
-    let pauseTimeElement = document.getElementById("pauseTimeProgress");
-    if (pauseTimeElement) {
-        //console.log(finalMatchesTime);
-        let currentTime = new Date();
-        let timeDifference = currentTime - oldfinalMatchesTime;
-        let timeDifferenceInSeconds = timeDifference / 1000;
-        pauseTimeElement.value = timeDifferenceInSeconds;
-        //console.log(timeDifferenceInSeconds);
+    if (intervalActivated == true) {
+        // update the progress bar with the current time and the finalmatchtime
+        let pauseTimeElement = document.getElementById("pauseTimeProgress");
+        if (pauseTimeElement) {
+            //console.log(finalMatchesTime);
+            let currentTime = new Date();
+            let timeDifference = currentTime - oldfinalMatchesTime;
+            let timeDifferenceInSeconds = timeDifference / 1000;
+            pauseTimeElement.value = timeDifferenceInSeconds;
+            //console.log(timeDifferenceInSeconds);
+        }
     }
 }
 
 function finalMatchTable() {
+    var intervalId = null;
+
     if ("finalMatches" in data) {
         if (data["pauseBeforeFM"] != null && data["pauseBeforeFM"] != "0") {
             let requestedtime = parseInt(data["pauseBeforeFM"]);
@@ -188,10 +192,20 @@ function finalMatchTable() {
 
         if (data["pauseMode"] == true && intervalActivated == false) {
             updatePauseTime();
-            setInterval(updatePauseTime, 100);
+            console.log("Pause mode is true");
             intervalActivated = true;
-        } else {
-            
+        }
+
+        if (data["pauseMode"] == false) {
+            console.log("Pause mode is false");
+            let pauseTimeElement = document.getElementById("pauseTimeProgress");
+
+            if (pauseTimeElement) {
+                console.log("Remove pause time");
+                pauseTimeElement.value = 0;
+            }
+
+            intervalActivated = false;
         }
 
         var tablesContainer = document.getElementById("tablesContainer");
@@ -259,7 +273,12 @@ function finalMatchTable() {
             var row = tbody.insertRow();
 
             if (data["activeMatchNumber"] < 0) {
-                if (i + 1 == Math.abs(data["activeMatchNumber"])) {
+                if (
+                    i + 1 ==
+                    Math.abs(
+                        data["activeMatchNumber"] && data["pauseMode"] == false
+                    )
+                ) {
                     row.style.backgroundColor = "black";
                 }
             }
@@ -385,3 +404,4 @@ generateTableGroup(data["Matches"]);
 finalMatchTable();
 // call updateData() every 5 seconds
 setInterval(updateData, 5000);
+setInterval(updatePauseTime, 100);
