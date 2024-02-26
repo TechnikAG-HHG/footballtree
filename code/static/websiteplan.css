@@ -89,11 +89,18 @@ table {
     border-spacing: 0;
     box-shadow: 0.7vw 0.7vw 0.7vw 0.2vw rgba(0, 0, 0, 0.501),
         2vw 2vw 1vw 0.2vw rgba(0, 0, 0, 0.299);
+    table-layout: fixed;
+    width: 100%;
 }
 
 table td {
     padding: 0.8vw;
     text-align: center;
+}
+
+table td:first-child,
+table td:last-child {
+    width: 15%;
 }
 
 table thead {
