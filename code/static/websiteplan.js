@@ -47,7 +47,6 @@ function generateTableGroup(matches) {
         tablesContainer.appendChild(table);
     }
 
-    console.log(matches);
     // Add the new matches to the table
     var i = 0;
     matches.forEach((match) => {
@@ -110,7 +109,6 @@ function generateTableGroup(matches) {
 
 function generatePauseTime(time) {
     if (time == 0 || time == null || time == "0") {
-        console.log("No pause time");
         let pauseTimeDiv = document.getElementById("pauseTime");
         if (pauseTimeDiv) {
             pauseTimeDiv.remove();
@@ -176,8 +174,6 @@ function updatePauseTime() {
 }
 
 function finalMatchTable() {
-    var intervalId = null;
-
     if ("finalMatches" in data) {
         if (data["pauseBeforeFM"] != null && data["pauseBeforeFM"] != "0") {
             let requestedtime = parseInt(data["pauseBeforeFM"]);
@@ -192,16 +188,13 @@ function finalMatchTable() {
 
         if (data["pauseMode"] == true && intervalActivated == false) {
             updatePauseTime();
-            console.log("Pause mode is true");
             intervalActivated = true;
         }
 
         if (data["pauseMode"] == false) {
-            console.log("Pause mode is false");
             let pauseTimeElement = document.getElementById("pauseTimeProgress");
 
             if (pauseTimeElement) {
-                console.log("Remove pause time");
                 pauseTimeElement.value = 0;
             }
 
@@ -268,16 +261,14 @@ function finalMatchTable() {
         }
 
         // Add the new matches to the table
-        var i = 0;
+        var i = 1;
         finalMatchesSliced.forEach((match) => {
             var row = tbody.insertRow();
 
-            if (data["activeMatchNumber"] < 0) {
+            if (data["activeMatchNumber"] < -1) {
                 if (
-                    i + 1 ==
-                    Math.abs(
-                        data["activeMatchNumber"] && data["pauseMode"] == false
-                    )
+                    i + 1 == Math.abs(data["activeMatchNumber"]) &&
+                    data["pauseMode"] == false
                 ) {
                     row.style.backgroundColor = "black";
                 }
@@ -304,10 +295,10 @@ function finalMatchTable() {
             cellTime.textContent = formatTime(matchTime);
 
             var cellMatchNumber = row.insertCell(1);
-            var matchNumber = i + 1;
-            if (i == totalMatchNumber - 1) {
+            var matchNumber = i;
+            if (i == totalMatchNumber) {
                 cellMatchNumber.textContent = "Finale";
-            } else if (i == totalMatchNumber - 2) {
+            } else if (i == totalMatchNumber - 1) {
                 cellMatchNumber.textContent = "Spiel um Platz 3";
             } else {
                 cellMatchNumber.textContent = "Halbfinalspiel " + matchNumber;
@@ -323,7 +314,6 @@ function finalMatchTable() {
                 Math.abs(data["activeMatchNumber"]) - 1 > i &&
                 data["finalMatches"] != null
             ) {
-                console.log("activeMatchNumber", data["activeMatchNumber"]);
                 if (match[2][0] > match[2][1]) {
                     cellFirstTeam.className = "style-winner";
                     cellSecondTeam.className = "style-loser";
