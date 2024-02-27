@@ -1090,8 +1090,9 @@ class Window(ctk.CTk):
             
             joined_data = self.read_player_goals_per_match(team_id)
             
+            logging.debug("joined_data " + str(joined_data))
     
-            if self.active_match == -1:
+            if self.active_match == -1 and self.manual_select_active == False:
                 continue
             
             if not joined_data or joined_data == ([], []):
@@ -1568,7 +1569,7 @@ class Window(ctk.CTk):
             self.manual_team_select_1.configure(state=tk.NORMAL)
             self.manual_team_select_1.set(self.read_teamNames()[self.teams_playing[1]])
             self.manual_team_select_2.set(self.read_teamNames()[self.teams_playing[0]])
-            if self.active_mode.get() == 1:
+            if self.active_mode.get() == 1 or self.active_mode.get() == 2:
                 self.active_match = self.get_active_match(self.teams_playing[0], self.teams_playing[1])
         
         #logging.debug("self.teams_playing", self.teams_playing)
@@ -1576,11 +1577,13 @@ class Window(ctk.CTk):
             self.manual_team_select_1.configure(state=tk.NORMAL)
             self.manual_team_select_1.set("None")
             self.manual_team_select_2.set(self.read_teamNames()[self.teams_playing[0]])
+            self.active_match = -1
         
         if self.teams_playing.count(None) == 2:
             self.manual_team_select_1.configure(tk.DISABLED)
             self.manual_team_select_1.set("None")
-        
+            self.manual_team_select_2.set("None")
+            self.active_match = -1
         
         
         self.reload_spiel_button_command()
@@ -1701,15 +1704,24 @@ class Window(ctk.CTk):
                 self.teams_playing = [None, None]
             else:
                 self.active_match = -1
+                print("Manual Select Active")
             
         elif self.active_mode.get() == 2:
             values_list, active_match = self.get_values_list_mode2()
             self.spiel_select.configure(values=values_list)
             if active_match >= 0:
                 self.spiel_select.set(values_list[active_match])
-            else:
+                self.manual_select_active = False
+            elif (values_list != [] and self.teams_playing.count(None) != 0) or (values_list != [] and self.manual_select_active == False):
                 self.on_match_select(values_list[0], matches)
+                self.manual_select_active = False
                 return
+            elif self.manual_select_active == False:
+                active_match = -1
+                self.teams_playing = [None, None]
+            else:
+                active_match = -1
+                logging.info("Manual Select Active")
 
             
         next_match_button = ctk.CTkButton(spiel_select_frame, text="Next Match", command=lambda : self.next_previous_match_button(self.spiel_select, matches), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
@@ -1727,16 +1739,29 @@ class Window(ctk.CTk):
 
     def get_active_match(self, team1, team2):
         #get the active match by looking in the matches databesa and where these teams play together you get the match number
-        getActiveMatch = """
-        SELECT matchId FROM matchData
-        WHERE team1Id = ? AND team2Id = ?
-        """
-        self.cursor.execute(getActiveMatch, (team1, team2))
-        active_match = self.cursor.fetchone()
-        if active_match != None:
-            return active_match[0] -1
-        else:
-            return -1
+        
+        if self.active_mode.get() == 1:
+            getActiveMatch = """
+            SELECT matchId FROM matchData
+            WHERE team1Id = ? AND team2Id = ?
+            """
+            self.cursor.execute(getActiveMatch, (team1, team2))
+            active_match = self.cursor.fetchone()
+            if active_match != None:
+                return active_match[0] -1
+            else:
+                return -1
+        elif self.active_mode.get() == 2:
+            getActiveMatch = """
+            SELECT matchId FROM finalMatchesData
+            WHERE team1Id = ? AND team2Id = ?
+            """
+            self.cursor.execute(getActiveMatch, (team1, team2))
+            active_match = self.cursor.fetchone()
+            if active_match != None:
+                return active_match[0] -1
+            else:
+                return -1
 
 
     def get_values_list_mode2(self):
@@ -3026,9 +3051,7 @@ def get_data_for_website(which_data=-1):
             
             if tkapp.active_mode.get() == 2:
                 a_m += 2
-                print("a_m", a_m)
                 a_m *= -1
-                print("a_m2", a_m)
             
             return a_m
         except:
