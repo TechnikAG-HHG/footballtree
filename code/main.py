@@ -3170,6 +3170,10 @@ def tree_index():
 def plan_index():
     return get_initial_data("websiteplan.html")
 
+@app.route("/best_scorer")
+def best_scorer_index():
+    return get_initial_data("websitebestscorer.html")
+
 @app.route("/tv")
 def tv_index():
     return get_initial_data("websitetv.html")
