@@ -474,6 +474,8 @@ class Window(ctk.CTk):
             self.cursor.execute(finalMatchesDataTableCreationQuery)
         
             self.reload_requried_on_click_SPIEL = True
+            
+            self.updated_data.update({"Teams": get_data_for_website(0)})
         
     
     def write_names_into_entry_fields(self):
@@ -2889,24 +2891,16 @@ def get_data_for_website(which_data=-1):
     if which_data == 0:
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
-        
-        getTeams = """
+
+        get_teams_query = """
         SELECT teamName FROM teamData
         ORDER BY id ASC
         """
-        cursor.execute(getTeams)
-        
-        teamNames = []
-        
-        for team in cursor.fetchall():
-            teamNames.append(team[0])
-        
-        #teamNames.pop(0)
-            
-        cursor.close()
-        connection.close()
-        
-        return teamNames
+        cursor.execute(get_teams_query)
+
+        team_names = [team[0] for team in cursor.fetchall()]
+
+        return team_names
     
     if which_data == 1:     
         
