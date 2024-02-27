@@ -476,6 +476,8 @@ class Window(ctk.CTk):
             self.reload_requried_on_click_SPIEL = True
             
             self.updated_data.update({"Teams": get_data_for_website(0)})
+            self.updated_data.update({"Matches": get_data_for_website(4)})
+            self.updated_data.update({"finalMatches": get_data_for_website(6)})
         
     
     def write_names_into_entry_fields(self):
@@ -3050,12 +3052,18 @@ def get_data_for_website(which_data=-1):
         final_goles = []
         
         if tkapp.endteam1 and tkapp.endteam3:
-            final_goles.append([ich_kann_nicht_mehr(tkapp.endteam1[0], tkapp.endteam3[0]), ich_kann_nicht_mehr(tkapp.endteam3[0], tkapp.endteam1[0])])
+            if tkapp.endteam1[1] != "No Team" and tkapp.endteam3[1] != "No Team":
+                final_goles.append([ich_kann_nicht_mehr(tkapp.endteam1[0], tkapp.endteam3[0]), ich_kann_nicht_mehr(tkapp.endteam3[0], tkapp.endteam1[0])])
+            else:
+                final_goles.append([0, 0])
         else:
             final_goles.append([0, 0])
             
         if tkapp.endteam2 and tkapp.endteam4:
-            final_goles.append([ich_kann_nicht_mehr(tkapp.endteam2[0], tkapp.endteam4[0]), ich_kann_nicht_mehr(tkapp.endteam4[0], tkapp.endteam2[0])])
+            if tkapp.endteam2[1] != "No Team" and tkapp.endteam4[1] != "No Team":
+                final_goles.append([ich_kann_nicht_mehr(tkapp.endteam2[0], tkapp.endteam4[0]), ich_kann_nicht_mehr(tkapp.endteam4[0], tkapp.endteam2[0])])
+            else:
+                final_goles.append([0, 0])
         else:
             final_goles.append([0, 0])
             
@@ -3070,8 +3078,8 @@ def get_data_for_website(which_data=-1):
             final_goles.append([0, 0])
 
         v = [
-            [tkapp.endteam1[1] if tkapp.endteam1 else None, tkapp.endteam3[1] if tkapp.endteam3 else None, final_goles[0]], 
-            [tkapp.endteam2[1] if tkapp.endteam2 else None, tkapp.endteam4[1] if tkapp.endteam4 else None, final_goles[1]], 
+            [tkapp.endteam1[1] if tkapp.endteam1 and tkapp.endteam1[1] != "No Team" else None, tkapp.endteam3[1] if tkapp.endteam3 and tkapp.endteam3[1] != "No Team" else None, final_goles[0]], 
+            [tkapp.endteam2[1] if tkapp.endteam2 and tkapp.endteam2[1] != "No Team" else None, tkapp.endteam4[1] if tkapp.endteam4 and tkapp.endteam4[1] != "No Team" else None, final_goles[1]], 
             [tkapp.spiel_um_platz_3[0][1] if tkapp.spiel_um_platz_3 else None, tkapp.spiel_um_platz_3[1][1] if tkapp.spiel_um_platz_3 else None, final_goles[2]], 
             [tkapp.final_match_teams[0][1] if tkapp.final_match_teams else None, tkapp.final_match_teams[1][1] if tkapp.final_match_teams else None, final_goles[3]]
         ]
