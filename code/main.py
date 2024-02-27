@@ -400,101 +400,80 @@ class Window(ctk.CTk):
         
         
     def save_team_names_in_db(self):
+        with self.connection:
+            self.create_backup_of_db()
+
+            old_mp3_list = [row[0] if row else "" for row in self.cursor.execute("SELECT mp3Path FROM teamData").fetchall()]
+
+            self.cursor.execute("DROP TABLE teamData")
+
+            teamDataTableCreationQuery = """
+            CREATE TABLE IF NOT EXISTS teamData (
+                id INTEGER PRIMARY KEY,
+                teamName TEXT UNIQUE,
+                goals INTEGER DEFAULT 0,
+                goalsReceived INTEGER DEFAULT 0,
+                games INTEGER DEFAULT 0,
+                points INTEGER DEFAULT 0,
+                mp3Path TEXT DEFAULT "",
+                groupNumber INTEGER
+            )
+            """
+            self.cursor.execute(teamDataTableCreationQuery)
+
+            existing_teams = set()
+            new_team_data = []
+            total_entries = len(self.name_entries)
+            midpoint = total_entries // 2
+
+            for i, entry in enumerate(self.name_entries):
+                entry_text = entry.get().strip()
+                group_number = 1 if (i < midpoint) or (total_entries % 2 != 0 and i == midpoint) else 2
+
+                if entry_text:
+                    if entry_text not in existing_teams:
+                        new_team_data.append((entry_text, group_number))
+                        existing_teams.add(entry_text)
+                    else:
+                        for i in range(1, 100):
+                            new_entry_text = f"{entry_text} {i}"
+                            if new_entry_text not in existing_teams:
+                                new_team_data.append((new_entry_text, group_number))
+                                existing_teams.add(new_entry_text)
+                                break
+
+            self.cursor.executemany("INSERT INTO teamData (teamName, groupNumber) VALUES (?, ?)", new_team_data)
+
+            team_ids = [row[0] for row in self.cursor.execute("SELECT id FROM teamData").fetchall()]
+
+            for team_id in team_ids:
+                mp3_entry = self.mp3_list.get(team_id-1, "")
+                if not mp3_entry.strip() and team_id - 1 < len(old_mp3_list) and old_mp3_list[team_id - 1]:
+                    self.mp3_list[team_id-1] = old_mp3_list[team_id-1]
+
+            self.cursor.executemany("UPDATE teamData SET mp3Path = ? WHERE id = ?", [(mp3_path, team_id + 1) for team_id, mp3_path in self.mp3_list.items()])
+
+            self.calculate_matches()
+            self.get_teams_for_final_matches()
+            self.reset_player_stats()
+            self.reset_player_per_match_data()
+
+            self.cursor.execute("UPDATE matchData SET team1Goals = 0, team2Goals = 0, matchTime = ''")
+            self.cursor.execute("DROP TABLE finalMatchesData")
+
+            finalMatchesDataTableCreationQuery = """
+            CREATE TABLE IF NOT EXISTS finalMatchesData (
+                matchId INTEGER PRIMARY KEY,
+                team1Id INTEGER REFERENCES teamData(id),
+                team2Id INTEGER REFERENCES teamData(id),
+                team1Goals INTEGER DEFAULT 0,
+                team2Goals INTEGER DEFAULT 0,
+                matchTime TEXT
+            )
+            """
+            self.cursor.execute(finalMatchesDataTableCreationQuery)
         
-        self.create_backup_of_db()
-        
-        old_mp3_list = []
-        name_entries = self.name_entries
-
-        get_team_ids = "SELECT id FROM teamData"
-        old_team_ids = [row[0] for row in self.cursor.execute(get_team_ids).fetchall()]
-
-        self.cursor.execute("SELECT mp3Path FROM teamData")
-        entries = self.cursor.fetchall()
-        
-        existing_teams = []
-
-        for i in enumerate(old_team_ids):
-            old_mp3_list.append("")
-
-        for i, entry in enumerate(entries):
-            old_mp3_list[i] = entry
-        
-        
-        # Drop the table
-        self.cursor.execute("DROP TABLE teamData")
-
-        teamDataTableCreationQuery = """
-        CREATE TABLE IF NOT EXISTS teamData (
-            id INTEGER PRIMARY KEY,
-            teamName TEXT UNIQUE,
-            goals INTEGER DEFAULT 0,
-            goalsReceived INTEGER DEFAULT 0,
-            games INTEGER DEFAULT 0,
-            points INTEGER DEFAULT 0,
-            mp3Path TEXT DEFAULT "",
-            groupNumber INTEGER
-        )
-        """
-
-        self.cursor.execute(teamDataTableCreationQuery)
-
-        total_entries = len(name_entries)
-        midpoint = total_entries // 2
-
-        new_team_data = []
-        for i, entry in enumerate(name_entries):
-            entry_text = entry.get().strip()
-
-            group_number = 1 if (i < midpoint) or (total_entries % 2 != 0 and i == midpoint) else 2
-
-            if entry_text:
-                # Update existing team
-                if entry_text not in existing_teams:
-                    new_team_data.append((entry_text, group_number))
-                    existing_teams.append(entry_text)
-                else:
-                    for i in range(1, 100):
-                        if f"{entry_text} {i}" not in existing_teams:
-                            entry_text = f"{entry_text} {i}"
-                            break
-                    new_team_data.append((entry_text, group_number))
-                    existing_teams.append(entry_text)
-
-        # Insert new data
-        insert_query = "INSERT INTO teamData (teamName, groupNumber) VALUES (?, ?)"
-        self.cursor.executemany(insert_query, new_team_data)
-
-        # Get all ids from teamData
-        self.cursor.execute("SELECT id FROM teamData")
-        team_ids = [row[0] for row in self.cursor.fetchall()]
-
-        for team_id in team_ids:
-            mp3_entry = self.mp3_list.get(team_id-1, "")
-            if mp3_entry.strip() == "" and old_mp3_list is not None and team_id - 1 < len(old_mp3_list) and old_mp3_list[team_id - 1] is not None:
-                self.mp3_list[team_id-1] = old_mp3_list[team_id-1][0]
-
-        set_mp3_paths = "UPDATE teamData SET mp3Path = ? WHERE id = ?"
-        self.cursor.executemany(set_mp3_paths, [(mp3_path, team_id + 1) for team_id, mp3_path in self.mp3_list.items()])
-
-        self.connection.commit()
-        
-        self.calculate_matches()
-        # self.reload_spiel_button_command()
-        self.get_teams_for_final_matches()
-        self.reset_player_stats()
-        self.reset_player_per_match_data()
-        
-                
-        # Reset other values to default after saving
-        reset_values_query = """
-            UPDATE matchData
-            SET team1Goals = 0, team2Goals = 0, matchTime = ''
-        """
-        self.cursor.execute(reset_values_query)
-        self.connection.commit()
-        
-        self.reload_requried_on_click_SPIEL = True
+            self.reload_requried_on_click_SPIEL = True
         
     
     def write_names_into_entry_fields(self):
@@ -2228,34 +2207,21 @@ class Window(ctk.CTk):
     def read_goals_for_match_from_db(self, teamID, team2ID):
         table_name = 'matchData' if self.active_mode.get() == 1 else 'finalMatchesData'
 
-        get_team1_or_team2 = f"""
+        get_goals_for_match = f"""
         SELECT 
             CASE 
-                WHEN team1Id = ? THEN 'team1Goals'
-                WHEN team2Id = ? THEN 'team2Goals'
+                WHEN team1Id = ? THEN team1Goals
+                WHEN team2Id = ? THEN team2Goals
                 ELSE 'Not Found'
-            END AS TeamIdColumn
+            END AS Goals
         FROM {table_name}
         WHERE (team1Id = ? AND team2Id = ?) OR (team1Id = ? AND team2Id = ?);
         """
-        self.cursor.execute(get_team1_or_team2, (teamID, teamID, teamID, team2ID, team2ID, teamID))
+        self.cursor.execute(get_goals_for_match, (teamID, teamID, teamID, team2ID, team2ID, teamID))
         
-        onefetched = self.cursor.fetchone() 
-        
-        if onefetched is None:
-            return "None"
-        
-        self.team1_or_team2 = onefetched[0]
-        
-        get_goals_for_match = f"""
-        SELECT {self.team1_or_team2} FROM {table_name}
-        WHERE (team1Id = ? AND team2Id = ?) OR (team1Id = ? AND team2Id = ?);
-        """
-        self.cursor.execute(get_goals_for_match, (teamID, team2ID, team2ID, teamID))
-        
-        goals = self.cursor.fetchone()[0]
+        goals = self.cursor.fetchone()
 
-        return goals
+        return goals[0] if goals else None
         
     
     def read_team_stats(self, team_id, stat):
