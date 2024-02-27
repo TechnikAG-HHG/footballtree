@@ -133,14 +133,15 @@ class Window(ctk.CTk):
         self.create_SPIEL_elements()
         self.create_settings_elements()
 
+        if start_server:
+            server_thread = threading.Thread(target=self.start_server)
+            server_thread.start()
+            
         # Display the default frame
         self.show_frame(self.Team_frame)
         
         #logging.debug("finished init")
         
-        if start_server:
-            server_thread = threading.Thread(target=self.start_server)
-            server_thread.start()
     
         
     def start_server(self):
@@ -627,7 +628,7 @@ class Window(ctk.CTk):
         team_IDs = self.read_teamIds()
         teamNames = self.read_teamNames()
         teamNames.pop(0)
-        #logging.debug("teamNames", teamNames, "team_IDs", team_IDs, "in create_player_elements")
+        logging.exception("teamNames" + str(teamNames) + "team_IDs" + str(team_IDs) + "in create_player_elements")
         
         self.player_top_frame = ctk.CTkFrame(self.test_frame, width=1, height=1, fg_color="#0e1718")
 
@@ -643,10 +644,10 @@ class Window(ctk.CTk):
             try:
                 teamName = teamNames[int(teamID-1)]
             except:
-                logging.debug("teamID", teamID)
-                logging.debug("teamNames", teamNames)
-                logging.debug("team_IDs", team_IDs)
-                logging.debug("i", i)
+                logging.exception("teamID: " + str(teamID))
+                logging.exception("teamNames: " + str(teamNames))
+                logging.exception("team_IDs: " + str(team_IDs))
+                logging.exception("i: " + str(i))
 
             if i < 8:
                 #logging.debug("created button in upper frame")
@@ -905,42 +906,38 @@ class Window(ctk.CTk):
             
     def read_teamNames(self, teams_to_read=-1):
         teamNames = [""]
-        
-        #if self.active_mode.get() == 1 or True:
-        
+
         if teams_to_read != -1:
-            for team in teams_to_read:
-                if team != None:
-                    team = int(team) + 1
-                        
-                    selectTeam = """
-                    SELECT teamName FROM teamData
-                    WHERE id = ?
-                    ORDER BY id ASC
-                    """
-                    self.cursor.execute(selectTeam, (team,))
-                    result = self.cursor.fetchone()
-                    if result is not None:
-                        #logging.debug(result)
-                        teamNames.append(result[0])
-        
+            # Convert teams_to_read to a list of integers and increment each by 1
+            teams_to_read = [int(team) + 1 for team in teams_to_read if team is not None]
+
+            # Create a string of question marks for the IN clause
+            placeholders = ', '.join('?' for _ in teams_to_read)
+
+            # Create the SQL query
+            selectTeam = f"""
+            SELECT teamName FROM teamData
+            WHERE id IN ({placeholders})
+            ORDER BY id ASC
+            """
+
+            # Execute the query and fetch all results
+            self.cursor.execute(selectTeam, teams_to_read)
+            results = self.cursor.fetchall()
+
+            # Append the team names to teamNames
+            teamNames.extend(result[0] for result in results)
+
         else:
             selectTeams = """
             SELECT teamName FROM teamData
             ORDER BY id ASC
             """
             self.cursor.execute(selectTeams)
-        
-            for team in self.cursor.fetchall():
-                teamNames.append(team[0])
-            #logging.debug("teamNames", teamNames)
-        #elif self.active_mode.get() == 2:
-        #    teamNames.append(self.endteam1[1])
-        #    teamNames.append(self.endteam2[1])
-        #    teamNames.append(self.endteam3[1])
-        #    teamNames.append(self.endteam4[1])
-            
-        
+
+            # Append the team names to teamNames
+            teamNames.extend(team[0] for team in self.cursor.fetchall())
+
         return teamNames
     
     
@@ -1008,6 +1005,8 @@ class Window(ctk.CTk):
         
         team_names = self.read_teamNames()
         
+        start_time = time.time()
+        
         for i, _ in enumerate(self.teams_playing):
             
             if self.teams_playing[i] is not None:
@@ -1046,17 +1045,6 @@ class Window(ctk.CTk):
             self.for_team_frame = ctk.CTkFrame(self.SPIEL_frame, bg_color='#0e1718', fg_color='#0e1718')
             self.for_team_frame.pack(pady=10, anchor=tk.NW, side=tk.TOP, fill="both", padx=10, expand=True)
             
-            #self.for_team_frame.tk_setPalette(
-            #    background='#0e1718', 
-            #    bg_color='#0e1718', 
-            #    fg_color='#0e1718',
-            #    activeBackground='#0e1718', 
-            #    activeForeground='#0e1718', 
-            #    foreground='#0e1718'
-            #    )
-            
-            #self.for_team_frame.configure(bg_color="#0e1718")
-            
             # Create global scores buttons, one for up and one for down
             score_button_frame = ctk.CTkFrame(self.for_team_frame, bg_color='#142324', fg_color='#142324')
             score_button_frame.pack(pady=10, anchor=tk.E, side=tk.RIGHT, padx=10)
@@ -1088,12 +1076,13 @@ class Window(ctk.CTk):
             down_frame = ctk.CTkFrame(frame_frame, bg_color='#0e1718', fg_color='#0e1718')
             down_frame.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.SW)
             
-            joined_data = self.read_player_goals_per_match(team_id)
             
-            logging.debug("joined_data " + str(joined_data))
-    
             if self.active_match == -1 and self.manual_select_active == False:
                 continue
+            
+            joined_data = self.read_player_goals_per_match(team_id)
+            
+            #logging.debug("joined_data " + str(joined_data))
             
             if not joined_data or joined_data == ([], []):
                 continue
@@ -1140,6 +1129,10 @@ class Window(ctk.CTk):
                 
                 #self.spiel_buttons[team] = (playerbutton)  # Use append for a list
 
+        end_time = time.time()
+
+        print(f"Execution time: {end_time - start_time} seconds")
+        
         teams_list = self.read_teamNames()
         teams_list.pop(0)
         #logging.debug("teams_list", teams_list)
@@ -1166,7 +1159,9 @@ class Window(ctk.CTk):
         self.manual_team_select_2.pack(pady=10, side=tk.BOTTOM, anchor=tk.S, padx=10)
         #self.manual_team_select_2.bind("<<ComboboxSelected>>", lambda event, nr=0: self.on_team_select(event, nr))
         
-        if self.teams_playing.count(None) == 0:
+        none_count = self.teams_playing.count(None)
+        
+        if none_count == 0 and self.teams_playing:
         
             ######################################################
             #Time Display
@@ -1219,11 +1214,6 @@ class Window(ctk.CTk):
         
         self.create_matches_labels(manual_frame)
 
-
-        none_count = self.teams_playing.count(None)
-        team_names = self.read_teamNames()
-        
-
         if none_count == 0 and self.teams_playing:
             self.configure_team_select(self.manual_team_select_2, tk.NORMAL, team_names[self.teams_playing[0]])
             self.configure_team_select(self.manual_team_select_1, tk.NORMAL, team_names[self.teams_playing[1]])
@@ -1237,10 +1227,10 @@ class Window(ctk.CTk):
     def setup_player_goals_per_match(self, team_id):
         active_match = self.active_match
         team_id = team_id
-        #logging.info(f"active_match: {active_match}, self.active_mode: {self.active_mode.get()}, self.teams_playing: {self.teams_playing}")
+        #logging.debug(f"active_match: {active_match}, self.active_mode: {self.active_mode.get()}, self.teams_playing: {self.teams_playing}")
 
         if active_match == -1:
-            #logging.exception("active_match is -1 in setup_player_goals_per_match")
+            #logging.debug("active_match is -1 in setup_player_goals_per_match")
             return
 
         if self.active_mode.get() == 1:
@@ -1586,10 +1576,8 @@ class Window(ctk.CTk):
             self.active_match = -1
         
         
-        self.reload_spiel_button_command()
+        self.reload_spiel_button_command(True)
         
-        self.show_frame(self.SPIEL_frame)
-
         
     def delete_all_in_frame(self, frame):
         if frame.winfo_exists():
@@ -1629,7 +1617,11 @@ class Window(ctk.CTk):
         if show_frame:
             self.show_frame(self.SPIEL_frame)
         self.watch_dog_process_can_be_active = True
+        
+        start_time = time.time()
         self.create_SPIEL_elements()
+        end_time = time.time()
+        print("Time to create_SPIEL_elements:", end_time - start_time)
 
         
     def player_scored_a_point(self, teamID, player_id, player_index, direction="UP", player_name=""):
@@ -1912,7 +1904,7 @@ class Window(ctk.CTk):
         
     def save_active_match_in_final_phase(self, team1id, team2id):
 
-        logging.debug(f"team1id: {team1id}, team2id: {team2id}, self.active_match: {self.active_match}")
+        #logging.debug(f"team1id: {team1id}, team2id: {team2id}, self.active_match: {self.active_match}")
         active_match_id = self.active_match + 1
 
         # Try to insert a new row
@@ -1935,7 +1927,7 @@ class Window(ctk.CTk):
     
     def on_match_select(self, event, matches=[]):
         selected_match = event
-        logging.debug(f"on_match_select selected_match: {selected_match}, matches: {matches}")
+        #logging.debug(f"on_match_select selected_match: {selected_match}, matches: {matches}")
         #logging.debug(selected_match)
         #logging.debug(matches)
         if self.active_mode.get() == 1 and matches != []:
