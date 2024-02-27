@@ -154,7 +154,7 @@ function generatePauseTime(time) {
     let pauseTimeStart = document.getElementById("pauseTimeStart");
     let pauseTimeEnd = document.getElementById("pauseTimeEnd");
 
-    if (pauseTimeText && pauseTimeStart && pauseTimeEnd) {
+    if (pauseTimeElement) {
         pauseTimeText.textContent = `Pause ${time} Minuten`;
         pauseTimeStart.textContent = `${formatTime(oldfinalMatchesTime)}`;
         pauseTimeEnd.textContent = `${formatTime(finalMatchesTime)}`;
@@ -223,6 +223,7 @@ function finalMatchTable() {
                 document.getElementsByClassName("pauseTime")[0];
             if (pauseTimeElement) {
                 pauseTimeElement.remove();
+                console.log("Removed pauseTimeElement");
             }
         }
 
