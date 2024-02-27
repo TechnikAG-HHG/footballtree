@@ -262,7 +262,10 @@ function writeTeamData(matchCount = 2) {
         var matchData = data["finalMatches"];
 
         var finalMatches = data["finalMatches"];
-        if (finalMatches == null) {
+        if (
+            finalMatches == null ||
+            (finalMatches[0][0] == null && finalMatches[0][1] == null)
+        ) {
             var finalMatchesSliced = [];
             while (finalMatchesSliced.length < 4) {
                 finalMatchesSliced.push(["???", "???", ["0", "0"]]);
