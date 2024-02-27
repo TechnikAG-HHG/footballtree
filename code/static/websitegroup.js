@@ -4,7 +4,7 @@ function generateTables() {
 
         if (!no_teams) {
             no_teams = document.createElement("p");
-            no_teams.textContent = "No teams found";
+            no_teams.textContent = "Keine Teams gefunden";
             no_teams.id = "no_teams";
             document.getElementById("tablesContainer").appendChild(no_teams);
 
