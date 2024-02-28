@@ -1261,7 +1261,6 @@ class Window(ctk.CTk):
         existing_player_names = set(str(row[0]) for row in self.cursor.fetchall())
 
         # find the player names that need to be inserted
-        #print("player_names", player_names, "existing_player_names", existing_player_names, "player_names - existing_player_names", player_names - existing_player_names)
         player_names_to_insert = player_names - existing_player_names
 
         # check if the player is in the {colum} table and if not, add it
@@ -1866,7 +1865,7 @@ class Window(ctk.CTk):
 
         if teams1 and teams2:
             self.endteam1, self.endteam2 = teams1
-            self.endteam3, self.endteam4 = teams2
+            self.endteam4, self.endteam3 = teams2
              
 
     def get_spiel_um_platz_3(self, team1, team2, team3, team4):
@@ -2911,7 +2910,7 @@ class Window(ctk.CTk):
                 
         self.updated_data.update({"Points": get_data_for_website(3)})    
        
-                
+
 ##############################################################################################
 ##############################################################################################
 ##############################################################################################
@@ -2976,8 +2975,7 @@ def get_data_for_website(which_data=-1):
         else:
             return tkapp.cache.get("Goals")
         
-    elif which_data == 2:
-        
+    elif which_data == 2:     
         try:
             if tkapp.cache_vars.get("getgames_changed_using_var") == True:
             
@@ -3005,15 +3003,12 @@ def get_data_for_website(which_data=-1):
                 return tkapp.cache.get("Games")
         except:
             return []
-        
-
+    
     elif which_data == 3:
         
         try:
             if tkapp.cache_vars.get("getpoints_changed_using_active_match") != tkapp.active_match or tkapp.active_match == -1:
                 
-                print("getpoints_changed_using_active_match")
-            
                 connection = sqlite3.connect(db_path)
                 cursor = connection.cursor()
                 
@@ -3036,9 +3031,6 @@ def get_data_for_website(which_data=-1):
                     cursor.execute(selectMatches)
                     matches = cursor.fetchall()
                     
-                print("matches", matches)
-                print("team_names", team_names)
-                
 
                 for match in matches:
                     team1Goals = int(match[2])
@@ -3053,8 +3045,6 @@ def get_data_for_website(which_data=-1):
                     elif team1Goals != 0 and team2Goals != 0:
                         teams_with_points[str(match[0])] = teams_with_points.get(str(match[0]), 0) + 1
                         teams_with_points[str(match[1])] = teams_with_points.get(str(match[1]), 0) + 1
-                        
-                print("teams_with_points", teams_with_points)
                 
                 cursor.close()
                 connection.close()
@@ -3065,13 +3055,10 @@ def get_data_for_website(which_data=-1):
                 
                 tkapp.cache["Points"] = points_in_order
                 
-                print("points_in_order", points_in_order)
-
                 return points_in_order
-            
             else:
                 return tkapp.cache.get("Points")
-        except ImportError:
+        except:
             return []
     
     elif which_data == 4:
