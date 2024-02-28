@@ -1647,7 +1647,7 @@ class Window(ctk.CTk):
     def player_scored_a_point(self, teamID, player_id, player_index, direction="UP", player_name=""):
         # Get the current score
         
-        self.cache_vars["getgoals_changed_using_var"] = True
+
         
         current_goals = self.read_player_stats(teamID, True, False, player_id)[0][2]
         
@@ -1679,8 +1679,8 @@ class Window(ctk.CTk):
         
         # Commit the changes to the database
         self.connection.commit()
-    
-    
+        
+
     def create_matches_labels(self, frame):
         
         self.manual_select_active_sure = False
@@ -2116,6 +2116,7 @@ class Window(ctk.CTk):
 
     def global_scored_a_point(self, teamID, team2ID, direction="UP"):
         # Get the current score
+        self.cache_vars["getgoals_changed_using_var"] = True
         logging.debug(f"global_scored_a_point teamID: {teamID}, team2ID: {team2ID}, direction: {direction}")
         current_score = self.read_goals_for_match_from_db(teamID, team2ID)
         old_goals = current_score
@@ -2977,87 +2978,101 @@ def get_data_for_website(which_data=-1):
         
     elif which_data == 2:
         
-        if tkapp.cache_vars.get("getgames_changed_using_var") == True:
-        
-            connection = sqlite3.connect(db_path)
-            cursor = connection.cursor()
-
-            get_games = """
-            SELECT games FROM teamData
-            ORDER BY id ASC
-            """
-            cursor.execute(get_games)
-
-            games = [row[0] for row in cursor.fetchall()]
-
-            cursor.close()
-            connection.close()
+        try:
+            if tkapp.cache_vars.get("getgames_changed_using_var") == True:
             
-            tkapp.cache_vars["getgames_changed_using_var"] = False
-            
-            tkapp.cache["Games"] = games
+                connection = sqlite3.connect(db_path)
+                cursor = connection.cursor()
 
-            return games
-        
-        else:
-            return tkapp.cache.get("Games")
+                get_games = """
+                SELECT games FROM teamData
+                ORDER BY id ASC
+                """
+                cursor.execute(get_games)
+
+                games = [row[0] for row in cursor.fetchall()]
+
+                cursor.close()
+                connection.close()
+                
+                tkapp.cache_vars["getgames_changed_using_var"] = False
+                
+                tkapp.cache["Games"] = games
+
+                return games
+            
+            else:
+                return tkapp.cache.get("Games")
+        except:
+            return []
         
 
     elif which_data == 3:
         
-        if tkapp.cache_vars.get("getpoints_changed_using_active_match") != tkapp.active_match or tkapp.active_match == -1:
-        
-            connection = sqlite3.connect(db_path)
-            cursor = connection.cursor()
+        try:
+            if tkapp.cache_vars.get("getpoints_changed_using_active_match") != tkapp.active_match or tkapp.active_match == -1:
+                
+                print("getpoints_changed_using_active_match")
             
-            team_names = cursor.execute("SELECT teamName FROM teamData ORDER BY id ASC").fetchall()
-            teams_with_points = {str(team[0]): 0 for team in team_names}
-            
-            if tkapp.active_mode.get() == 1:
-                selectMatches = """
-                    SELECT team1Id, team2Id, team1Goals, team2Goals
-                    FROM matchData
-                    WHERE matchId <= ?
-                """
-                cursor.execute(selectMatches, (tkapp.active_match,))
-                matches = cursor.fetchall()
-            else:
-                selectMatches = """
-                    SELECT team1Id, team2Id, team1Goals, team2Goals
-                    FROM matchData
-                """
-                cursor.execute(selectMatches)
-                matches = cursor.fetchall()
-            
-
-            for match in matches:
-                team1Goals = int(match[2])
-                team2Goals = int(match[3])
-
-                if team1Goals > team2Goals:
-                    teams_with_points[str(match[0])] = teams_with_points.get(str(match[0]), 0) + 3
-                            
-                elif team1Goals < team2Goals:
-                    teams_with_points[str(match[1])] = teams_with_points.get(str(match[1]), 0) + 3
-                            
-                elif team1Goals != 0 and team2Goals != 0:
-                    teams_with_points[str(match[0])] = teams_with_points.get(str(match[0]), 0) + 1
-                    teams_with_points[str(match[1])] = teams_with_points.get(str(match[1]), 0) + 1
+                connection = sqlite3.connect(db_path)
+                cursor = connection.cursor()
+                
+                team_names = cursor.execute("SELECT id FROM teamData ORDER BY id ASC").fetchall()
+                teams_with_points = {str(team[0]): 0 for team in team_names}
+                
+                if tkapp.active_mode.get() == 1:
+                    selectMatches = """
+                        SELECT team1Id, team2Id, team1Goals, team2Goals
+                        FROM matchData
+                        WHERE matchId <= ?
+                    """
+                    cursor.execute(selectMatches, (tkapp.active_match,))
+                    matches = cursor.fetchall()
+                else:
+                    selectMatches = """
+                        SELECT team1Id, team2Id, team1Goals, team2Goals
+                        FROM matchData
+                    """
+                    cursor.execute(selectMatches)
+                    matches = cursor.fetchall()
                     
-            cursor.close()
-            connection.close()
-            
-            points_in_order = [teams_with_points[team[0]] for team in team_names]
-            
-            tkapp.cache_vars["getpoints_changed_using_active_match"] = tkapp.active_match
-            
-            tkapp.cache["Points"] = points_in_order
+                print("matches", matches)
+                print("team_names", team_names)
+                
 
-            return points_in_order
-        
-        else:
-            return tkapp.cache.get("Points")
+                for match in matches:
+                    team1Goals = int(match[2])
+                    team2Goals = int(match[3])
+
+                    if team1Goals > team2Goals:
+                        teams_with_points[str(match[0])] = teams_with_points.get(str(match[0]), 0) + 3
+                                
+                    elif team1Goals < team2Goals:
+                        teams_with_points[str(match[1])] = teams_with_points.get(str(match[1]), 0) + 3
+                                
+                    elif team1Goals != 0 and team2Goals != 0:
+                        teams_with_points[str(match[0])] = teams_with_points.get(str(match[0]), 0) + 1
+                        teams_with_points[str(match[1])] = teams_with_points.get(str(match[1]), 0) + 1
+                        
+                print("teams_with_points", teams_with_points)
+                
+                cursor.close()
+                connection.close()
+                
+                points_in_order = [teams_with_points[str(team[0])] for team in team_names]
+                
+                tkapp.cache_vars["getpoints_changed_using_active_match"] = tkapp.active_match
+                
+                tkapp.cache["Points"] = points_in_order
+                
+                print("points_in_order", points_in_order)
+
+                return points_in_order
             
+            else:
+                return tkapp.cache.get("Points")
+        except ImportError:
+            return []
     
     elif which_data == 4:
         try:
