@@ -1076,12 +1076,19 @@ class Window(ctk.CTk):
             
             frame_frame = ctk.CTkFrame(self.for_team_frame, bg_color='#0e1718', fg_color='#0e1718')
             frame_frame.pack(side=tk.TOP, pady=0, anchor=tk.N)
+            
+            if i == 0:
+                self.up_frame1 = ctk.CTkFrame(frame_frame, bg_color='#0e1718', fg_color='#0e1718')
+                self.up_frame1.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.NW)
 
-            self.up_frame = ctk.CTkFrame(frame_frame, bg_color='#0e1718', fg_color='#0e1718')
-            self.up_frame.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.NW)
+                self.down_frame1 = ctk.CTkFrame(frame_frame, bg_color='#0e1718', fg_color='#0e1718')
+                self.down_frame1.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.SW)
+            elif i == 1:
+                self.up_frame2 = ctk.CTkFrame(frame_frame, bg_color='#0e1718', fg_color='#0e1718')
+                self.up_frame2.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.NW)
 
-            self.down_frame = ctk.CTkFrame(frame_frame, bg_color='#0e1718', fg_color='#0e1718')
-            self.down_frame.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.SW)
+                self.down_frame2 = ctk.CTkFrame(frame_frame, bg_color='#0e1718', fg_color='#0e1718')
+                self.down_frame2.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.SW)
             
             
             if self.active_match == -1 and self.manual_select_active == False:
@@ -1094,7 +1101,7 @@ class Window(ctk.CTk):
             if not joined_data or joined_data == ([], []):
                 continue
             
-            self.create_widgets_after_delay(joined_data, 0)
+            self.create_widgets_after_delay(joined_data, 0, i)
 
         
         teams_list = self.read_teamNames()
@@ -1187,29 +1194,37 @@ class Window(ctk.CTk):
             self.configure_team_select(self.manual_team_select_2, tk.NORMAL, team_names[self.teams_playing[0]])    
     
 
-    def create_widgets_after_delay(self, joined_data, index):
+    def create_widgets_after_delay(self, joined_data, index, team_i):
         if index < len(joined_data):
             player_info = joined_data[index]
-            self.create_player_widgets(player_info, index)
+            self.create_player_widgets(player_info, index, team_i)
             # Schedule the next iteration with after
-            self.after(10, self.create_widgets_after_delay, joined_data, index + 1)
+            self.after(10, self.create_widgets_after_delay, joined_data, index + 1, team_i)
         else:
             # All widgets created, now update the layout
             self.update_idletasks()
 
     
-    def create_player_widgets(self, player_info, i):
+    def create_player_widgets(self, player_info, i, team_i):
         player_name, player_number, goals, player_id, player_goals_per_match = player_info
         player_index = i 
         
         #player_id = self.get_player_id_from_player_name(player_name)
         #logging.debug("player_id", self.get_player_id_from_player_name(player_name))
-        if i < 8:
-            self.group_frame = ctk.CTkFrame(self.up_frame, fg_color='#142324', corner_radius=10)
-            self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
+        if team_i == 0:
+            if i < 8:
+                self.group_frame = ctk.CTkFrame(self.up_frame1, fg_color='#142324', corner_radius=10)
+                self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
+            else:
+                self.group_frame = ctk.CTkFrame(self.down_frame1, fg_color='#142324', corner_radius=10)
+                self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
         else:
-            self.group_frame = ctk.CTkFrame(self.down_frame, fg_color='#142324', corner_radius=10)
-            self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
+            if i < 8:
+                self.group_frame = ctk.CTkFrame(self.up_frame2, fg_color='#142324', corner_radius=10)
+                self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
+            else:
+                self.group_frame = ctk.CTkFrame(self.down_frame2, fg_color='#142324', corner_radius=10)
+                self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
         
         #self.group_frame = tk.Frame(self.for_team_frame, background="lightcoral")
         #self.group_frame.pack(side=tk.LEFT, padx=10, pady=10)
