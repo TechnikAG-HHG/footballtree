@@ -2910,8 +2910,7 @@ class Window(ctk.CTk):
                 self.add_points_for_team_in_db(match[1], 1)
                 
         self.updated_data.update({"Points": get_data_for_website(3)})    
-       
-                
+                  
 ##############################################################################################
 ##############################################################################################
 ##############################################################################################
@@ -3241,6 +3240,9 @@ def get_initial_data(template_name):
     }
     return make_response(render_template(template_name, initial_data=initial_data))
 
+##############################################################################################
+########################################### Sites ############################################
+##############################################################################################
 
 @app.route("/")
 def home():
@@ -3258,9 +3260,45 @@ def tree_index():
 def plan_index():
     return get_initial_data("websiteplan.html")
 
+@app.route("/best_scorer")
+def best_scorer_index():
+    return get_initial_data("websitebestscorer.html")
+
 @app.route("/tv")
 def tv_index():
     return get_initial_data("websitetv.html")
+
+##############################################################################################
+########################################### Data #############################################
+##############################################################################################
+
+@app.route('/best_scorer_data')
+def get_best_scorer_data():
+    
+    getBestScorerDataQuery = """
+    SELECT playerData.playerName, playerData.goals, teamData.teamName, ROW_NUMBER() OVER (ORDER BY playerData.goals DESC) AS Rank FROM playerData, teamData
+    WHERE playerData.teamId = teamData.id
+    ORDER BY playerData.goals DESC
+    LIMIT 100
+    """
+    
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    
+    cursor.execute(getBestScorerDataQuery)
+    
+    best_scorer_data = cursor.fetchall()
+    
+    output_json = {}
+    
+    for player_data in best_scorer_data:
+        new_json = {f"{player_data[3]}": {"playerName": player_data[0], "goals": player_data[1], "teamName": player_data[2]}} 
+        output_json.update(new_json)
+    
+    cursor.close()
+    connection.close()
+    
+    return jsonify(players=output_json)
 
 @app.route('/update_data')
 def update_data():   
@@ -3306,6 +3344,10 @@ def update_data():
     #updated_data = {'Players': {"Player1":"Erik Van Doof","Player2":"Felix Schweigmann"}}  # You can modify this data as needed
     return jsonify(updated_data)
 
+
+##############################################################################################
+########################################### Init #############################################
+##############################################################################################
 
 global tkapp
 global server_thread
