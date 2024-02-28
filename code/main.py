@@ -3203,7 +3203,16 @@ def get_best_scorer_data():
     
     best_scorer_data = cursor.fetchall()
     
-    return jsonify(best_scorer_data)
+    output_json = {}
+    
+    for player_data in best_scorer_data:
+        new_json = {f"{player_data[3]}": {"playerName": player_data[0], "goals": player_data[1], "teamName": player_data[2]}} 
+        output_json.update(new_json)
+    
+    cursor.close()
+    connection.close()
+    
+    return jsonify(players=output_json)
 
 @app.route('/update_data')
 def update_data():   
