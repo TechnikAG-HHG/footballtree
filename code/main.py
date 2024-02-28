@@ -2857,7 +2857,7 @@ class Window(ctk.CTk):
         """
         self.cursor.execute(updatePoints, (newpoints, teamID))
         
-        self.connection.commit()    
+        self.connection.commit()
     
         
     def calculate_points(self):
@@ -2904,7 +2904,7 @@ def get_data_for_website(which_data=-1):
 
         return team_names
     
-    if which_data == 1:     
+    elif which_data == 1:     
         
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
@@ -2944,7 +2944,7 @@ def get_data_for_website(which_data=-1):
             
         return Tore
         
-    if which_data == 2:
+    elif which_data == 2:
         
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
@@ -2976,25 +2976,53 @@ def get_data_for_website(which_data=-1):
         
         return games
     
-    if which_data == 3:
+    elif which_data == 3:
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
         
-        get_points = """
-        SELECT points FROM teamData
-        ORDER BY id ASC
-        """
+        team_names = cursor.execute("SELECT teamName FROM teamData ORDER BY id ASC").fetchall()
+        teams_with_points = {str(team[0]): 0 for team in team_names}
         
-        cursor.execute(get_points)
+        if tkapp.active_mode.get() == 1:
+            selectMatches = """
+                SELECT team1Id, team2Id, team1Goals, team2Goals
+                FROM matchData
+                WHERE matchId <= ?
+            """
+            cursor.execute(selectMatches, (tkapp.active_match,))
+            matches = cursor.fetchall()
+        else:
+            selectMatches = """
+                SELECT team1Id, team2Id, team1Goals, team2Goals
+                FROM matchData
+            """
+            cursor.execute(selectMatches)
+            matches = cursor.fetchall()
         
-        points = cursor.fetchall()
-        
+
+        for match in matches:
+            team1Goals = int(match[2])
+            team2Goals = int(match[3])
+
+            if team1Goals > team2Goals:
+                teams_with_points[str(match[0])] = teams_with_points.get(str(match[0]), 0) + 3
+                        
+            elif team1Goals < team2Goals:
+                teams_with_points[str(match[1])] = teams_with_points.get(str(match[1]), 0) + 3
+                        
+            elif team1Goals != 0 and team2Goals != 0:
+                teams_with_points[str(match[0])] = teams_with_points.get(str(match[0]), 0) + 1
+                teams_with_points[str(match[1])] = teams_with_points.get(str(match[1]), 0) + 1
+                
         cursor.close()
         connection.close()
         
-        return points
+        points_in_order = [teams_with_points[team[0]] for team in team_names]
+        
+        return points_in_order
+
     
-    if which_data == 4:
+    elif which_data == 4:
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
         
@@ -3036,7 +3064,7 @@ def get_data_for_website(which_data=-1):
         #logging.debug("all_matches", all_matches)
         return all_matches
     
-    if which_data == 5:
+    elif which_data == 5:
         try:
             a_m = tkapp.active_match
             
@@ -3048,7 +3076,7 @@ def get_data_for_website(which_data=-1):
         except:
             return 0
     
-    if which_data == 6 and tkapp.active_mode.get() == 2:
+    elif which_data == 6 and tkapp.active_mode.get() == 2:
         final_goles = []
         
         if tkapp.endteam1 and tkapp.endteam3:
@@ -3087,7 +3115,7 @@ def get_data_for_website(which_data=-1):
         
         return v
     
-    if which_data == 7:
+    elif which_data == 7:
         start_time = tkapp.start_time.get()
         a, b = start_time.split(":")
         return [int(a), int(b)]
