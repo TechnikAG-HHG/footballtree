@@ -3264,7 +3264,7 @@ def get_best_scorer_data():
     SELECT playerData.playerName, playerData.goals, teamData.teamName, ROW_NUMBER() OVER (ORDER BY playerData.goals DESC) AS Rank FROM playerData, teamData
     WHERE playerData.teamId = teamData.id
     ORDER BY playerData.goals DESC
-    LIMIT 5
+    LIMIT 100
     """
     
     connection = sqlite3.connect(db_path)
