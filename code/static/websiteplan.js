@@ -15,9 +15,7 @@ function generateTableGroup(matches) {
         data["Matches"] == "[]" ||
         data["Matches"] === 0
     ) {
-        let no_matches = document
-            .getElementById("tablesContainer")
-            .querySelector("p");
+        let no_matches = document.getElementById("noMatches");
 
         console.log("No matches found");
 
@@ -25,14 +23,13 @@ function generateTableGroup(matches) {
             let tablesContainer = document.getElementById("tablesContainer");
             no_matches = document.createElement("p");
             no_matches.textContent = "Keine Spiele gefunden";
+            no_matches.id = "noMatches";
             tablesContainer.appendChild(no_matches);
         }
         return;
     }
 
-    let no_matches = document
-        .getElementById("tablesContainer")
-        .querySelector("p");
+    let no_matches = document.getElementById("noMatches");
     if (no_matches) {
         no_matches.remove();
     }
