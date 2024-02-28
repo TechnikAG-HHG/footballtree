@@ -146,3 +146,13 @@ footer {
     margin-left: 2vw;
     margin-right: 2vw;
 }
+
+#no_teams {
+    color: red;
+    font-size: 4vw;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    font-weight: bold;
+    margin-top: 5vh;
+}

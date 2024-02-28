@@ -39,6 +39,12 @@ document.getElementById("treeButton").addEventListener("click", function () {
     redirectTo("/tree");
 });
 
+document
+    .getElementById("bestScorerButton")
+    .addEventListener("click", function () {
+        redirectTo("/best_scorer");
+    });
+
 window.addEventListener("load", function () {
     document.title = data["websiteTitle"];
     document.getElementById("websiteTitle").textContent = data["websiteTitle"];

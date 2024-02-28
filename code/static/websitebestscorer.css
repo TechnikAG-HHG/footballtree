@@ -60,3 +60,61 @@ body {
     box-shadow: 0 0.5vw 1vw 0 rgba(0, 0, 0, 0.24),
         0 1vw 3vw 0 rgba(0, 0, 0, 0.19);
 }
+
+#tablesContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2%;
+    flex-wrap: wrap;
+}
+
+.tableGroup {
+    color: white;
+    width: 100%;
+    font-size: 1.5vw;
+}
+
+.tableFinalMatches {
+    color: white;
+    width: 100%;
+    font-size: 1.5vw;
+    margin-top: 3vh;
+}
+
+table {
+    border-collapse: collapse;
+    border-radius: 0.5vw;
+    border-collapse: separate;
+    border-spacing: 0;
+    box-shadow: 0.7vw 0.7vw 0.7vw 0.2vw rgba(0, 0, 0, 0.501),
+        2vw 2vw 1vw 0.2vw rgba(0, 0, 0, 0.299);
+    table-layout: fixed;
+    width: 100%;
+}
+
+table td {
+    padding: 0.8vw;
+    text-align: center;
+}
+
+table tbody tr:nth-child(odd) {
+    background-color: #292929;
+}
+
+table td:first-child,
+table td:last-child {
+    width: 15%;
+}
+
+table thead {
+    font-size: 2vw;
+    font-weight: bold;
+}
+
+table,
+th,
+td {
+    border: 0.15vw solid #49ba67;
+    overflow: hidden;
+}

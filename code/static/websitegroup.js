@@ -1,4 +1,21 @@
 function generateTables() {
+    if (data["Teams"].length == 0) {
+        let no_teams = document.getElementById("no_teams");
+
+        if (!no_teams) {
+            no_teams = document.createElement("p");
+            no_teams.textContent = "Keine Teams gefunden";
+            no_teams.id = "no_teams";
+            document.getElementById("tablesContainer").appendChild(no_teams);
+
+            let footer = document.getElementsByTagName("footer")[0];
+            if (footer) {
+                footer.remove();
+            }
+        }
+        return;
+    }
+
     var tablesContainer = document.getElementById("tablesContainer");
     tablesContainer.innerHTML = "";
 
@@ -261,8 +278,6 @@ document.getElementById("returnButton").addEventListener("click", function () {
     redirectTo("/");
 });
 
-// generate tables on page load
 generateTables();
-
-// call updateData() every 5 seconds
+updateData();
 setInterval(updateData, 5000);
