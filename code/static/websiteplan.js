@@ -182,6 +182,10 @@ function generatePauseTime(time) {
         pauseTimeDiv.appendChild(pauseTimeElement);
         tablesContainer.appendChild(pauseTimeDiv);
     }
+
+    finalMatchesTime = new Date(
+        finalMatchesTime.getTime() - data["timeIntervalFM"] * 60000
+    );
 }
 
 function updatePauseTime() {
@@ -279,10 +283,10 @@ function finalMatchTable() {
 
             var totalMatchNumber = 4;
         } else {
-            if (finalMatches.length > Math.abs(data["activeMatchNumber"])) {
+            if (finalMatches.length > Math.abs(data["activeMatchNumber"]) - 1) {
                 if (
                     finalMatches.length / 2 <
-                    Math.abs(data["activeMatchNumber"])
+                    Math.abs(data["activeMatchNumber"]) - 1
                 ) {
                     var finalMatchesSliced = finalMatches;
                 } else {
