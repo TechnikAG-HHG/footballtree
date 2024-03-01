@@ -159,8 +159,8 @@ td {
     border-radius: 0.5vw;
 }
 
-#pauseTimeProgress::-moz-progress-chunk {
-    background-color: #1a1a1a;
+#pauseTimeProgress::-moz-progress-bar {
+    background-color: black;
     border-radius: 0.5vw;
 }
 
@@ -204,4 +204,22 @@ p {
     padding: 0;
     font-weight: bold;
     margin-top: 5vh;
+}
+
+@media (max-width: 800px) {
+    .pauseTime,
+    #pauseTimeProgress {
+        height: 4vh;
+    }
+
+    #pauseTimeStart,
+    #pauseTimeEnd,
+    #pauseTimeText {
+        font-size: 1.3vh;
+    }
+
+    table td {
+        font-size: 1.3vh;
+        border: 1.3px solid #49ba67;
+    }
 }

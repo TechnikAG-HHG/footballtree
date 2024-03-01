@@ -15,9 +15,7 @@ function generateTableGroup(matches) {
         data["Matches"] == "[]" ||
         data["Matches"] === 0
     ) {
-        let no_matches = document
-            .getElementById("tablesContainer")
-            .querySelector("p");
+        let no_matches = document.getElementById("noMatches");
 
         console.log("No matches found");
 
@@ -25,14 +23,13 @@ function generateTableGroup(matches) {
             let tablesContainer = document.getElementById("tablesContainer");
             no_matches = document.createElement("p");
             no_matches.textContent = "Keine Spiele gefunden";
+            no_matches.id = "noMatches";
             tablesContainer.appendChild(no_matches);
         }
         return;
     }
 
-    let no_matches = document
-        .getElementById("tablesContainer")
-        .querySelector("p");
+    let no_matches = document.getElementById("noMatches");
     if (no_matches) {
         no_matches.remove();
     }
@@ -185,6 +182,10 @@ function generatePauseTime(time) {
         pauseTimeDiv.appendChild(pauseTimeElement);
         tablesContainer.appendChild(pauseTimeDiv);
     }
+
+    finalMatchesTime = new Date(
+        finalMatchesTime.getTime() - data["timeIntervalFM"] * 60000
+    );
 }
 
 function updatePauseTime() {
@@ -282,10 +283,10 @@ function finalMatchTable() {
 
             var totalMatchNumber = 4;
         } else {
-            if (finalMatches.length > Math.abs(data["activeMatchNumber"])) {
+            if (finalMatches.length > Math.abs(data["activeMatchNumber"]) - 1) {
                 if (
                     finalMatches.length / 2 <
-                    Math.abs(data["activeMatchNumber"])
+                    Math.abs(data["activeMatchNumber"]) - 1
                 ) {
                     var finalMatchesSliced = finalMatches;
                 } else {

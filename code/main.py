@@ -894,7 +894,7 @@ class Window(ctk.CTk):
         WHERE teamId = ? {condition}
         ORDER BY id ASC
         """
-
+        
         # Execute the query with the appropriate parameters
         params = (teamID, playerID) if playerID != -1 else (teamID,)
         self.cursor.execute(getData, params)
@@ -1076,12 +1076,19 @@ class Window(ctk.CTk):
             
             frame_frame = ctk.CTkFrame(self.for_team_frame, bg_color='#0e1718', fg_color='#0e1718')
             frame_frame.pack(side=tk.TOP, pady=0, anchor=tk.N)
+            
+            if i == 0:
+                self.up_frame1 = ctk.CTkFrame(frame_frame, bg_color='#0e1718', fg_color='#0e1718')
+                self.up_frame1.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.NW)
 
-            self.up_frame = ctk.CTkFrame(frame_frame, bg_color='#0e1718', fg_color='#0e1718')
-            self.up_frame.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.NW)
+                self.down_frame1 = ctk.CTkFrame(frame_frame, bg_color='#0e1718', fg_color='#0e1718')
+                self.down_frame1.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.SW)
+            elif i == 1:
+                self.up_frame2 = ctk.CTkFrame(frame_frame, bg_color='#0e1718', fg_color='#0e1718')
+                self.up_frame2.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.NW)
 
-            self.down_frame = ctk.CTkFrame(frame_frame, bg_color='#0e1718', fg_color='#0e1718')
-            self.down_frame.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.SW)
+                self.down_frame2 = ctk.CTkFrame(frame_frame, bg_color='#0e1718', fg_color='#0e1718')
+                self.down_frame2.pack(side=tk.TOP, padx=0, pady=0, anchor=tk.SW)
             
             
             if self.active_match == -1 and self.manual_select_active == False:
@@ -1094,7 +1101,7 @@ class Window(ctk.CTk):
             if not joined_data or joined_data == ([], []):
                 continue
             
-            self.create_widgets_after_delay(joined_data, 0)
+            self.create_widgets_after_delay(joined_data, 0, i)
 
         
         teams_list = self.read_teamNames()
@@ -1187,29 +1194,37 @@ class Window(ctk.CTk):
             self.configure_team_select(self.manual_team_select_2, tk.NORMAL, team_names[self.teams_playing[0]])    
     
 
-    def create_widgets_after_delay(self, joined_data, index):
+    def create_widgets_after_delay(self, joined_data, index, team_i):
         if index < len(joined_data):
             player_info = joined_data[index]
-            self.create_player_widgets(player_info, index)
+            self.create_player_widgets(player_info, index, team_i)
             # Schedule the next iteration with after
-            self.after(10, self.create_widgets_after_delay, joined_data, index + 1)
+            self.after(10, self.create_widgets_after_delay, joined_data, index + 1, team_i)
         else:
             # All widgets created, now update the layout
             self.update_idletasks()
 
     
-    def create_player_widgets(self, player_info, i):
+    def create_player_widgets(self, player_info, i, team_i):
         player_name, player_number, goals, player_id, player_goals_per_match = player_info
         player_index = i 
         
         #player_id = self.get_player_id_from_player_name(player_name)
         #logging.debug("player_id", self.get_player_id_from_player_name(player_name))
-        if i < 8:
-            self.group_frame = ctk.CTkFrame(self.up_frame, fg_color='#142324', corner_radius=10)
-            self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
+        if team_i == 0:
+            if i < 8:
+                self.group_frame = ctk.CTkFrame(self.up_frame1, fg_color='#142324', corner_radius=10)
+                self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
+            else:
+                self.group_frame = ctk.CTkFrame(self.down_frame1, fg_color='#142324', corner_radius=10)
+                self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
         else:
-            self.group_frame = ctk.CTkFrame(self.down_frame, fg_color='#142324', corner_radius=10)
-            self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
+            if i < 8:
+                self.group_frame = ctk.CTkFrame(self.up_frame2, fg_color='#142324', corner_radius=10)
+                self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
+            else:
+                self.group_frame = ctk.CTkFrame(self.down_frame2, fg_color='#142324', corner_radius=10)
+                self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
         
         #self.group_frame = tk.Frame(self.for_team_frame, background="lightcoral")
         #self.group_frame.pack(side=tk.LEFT, padx=10, pady=10)
@@ -1225,17 +1240,17 @@ class Window(ctk.CTk):
         playertext3 = ctk.CTkLabel(self.group_frame, text=f"Tore {str(player_goals_per_match)}", font=("Helvetica", self.team_button_font_size))
         playertext3.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
 
-        playerbutton1 = ctk.CTkButton(self.group_frame, text="UP", command=lambda team=self.team_id, player_id1=player_id, player_index = player_index, player_name = player_name: self.player_scored_a_point(team, player_id1, player_index,  "UP", player_name), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)  
+        playerbutton1 = ctk.CTkButton(self.group_frame, text="UP", command=lambda team=self.teams_playing[team_i], player_id1=player_id, player_index = player_index, player_name = player_name: self.player_scored_a_point(team, player_id1, player_index,  "UP", player_name), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)  
         playerbutton1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
         
-        playerbutton2 = ctk.CTkButton(self.group_frame, text="DOWN", command=lambda team=self.team_id, player_id1=player_id, player_index = player_index, player_name = player_name: self.player_scored_a_point(team, player_id1, player_index, "DOWN", player_name), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)
+        playerbutton2 = ctk.CTkButton(self.group_frame, text="DOWN", command=lambda team=self.teams_playing[team_i], player_id1=player_id, player_index = player_index, player_name = player_name: self.player_scored_a_point(team, player_id1, player_index, "DOWN", player_name), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)
         playerbutton2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
     
     
         #logging.debug("team", team, "i", i)
 
         # Save the group_frame, playertext1, and playerbutton in each for loop with the team name as key
-        self.spiel_buttons[self.team_id][i] = (self.group_frame, playertext1, playertext2, playertext3, playerbutton1, playerbutton2)  # Use append for a list
+        self.spiel_buttons[self.teams_playing[team_i]][i] = (self.group_frame, playertext1, playertext2, playertext3, playerbutton1, playerbutton2)  # Use append for a list
         
         
     def setup_player_goals_per_match(self, team_id):
@@ -1261,7 +1276,6 @@ class Window(ctk.CTk):
         existing_player_names = set(str(row[0]) for row in self.cursor.fetchall())
 
         # find the player names that need to be inserted
-        #print("player_names", player_names, "existing_player_names", existing_player_names, "player_names - existing_player_names", player_names - existing_player_names)
         player_names_to_insert = player_names - existing_player_names
 
         # check if the player is in the {colum} table and if not, add it
@@ -1646,9 +1660,6 @@ class Window(ctk.CTk):
         
     def player_scored_a_point(self, teamID, player_id, player_index, direction="UP", player_name=""):
         # Get the current score
-        
-        self.cache_vars["getgoals_changed_using_var"] = True
-        
         current_goals = self.read_player_stats(teamID, True, False, player_id)[0][2]
         
         fake_current_goals = self.read_player_goals_per_match_per_player(player_name)
@@ -1679,8 +1690,8 @@ class Window(ctk.CTk):
         
         # Commit the changes to the database
         self.connection.commit()
-    
-    
+        
+
     def create_matches_labels(self, frame):
         
         self.manual_select_active_sure = False
@@ -1718,6 +1729,9 @@ class Window(ctk.CTk):
             elif self.manual_select_active == False:
                 self.active_match = -1
                 self.teams_playing = [None, None]
+                
+                if match_count > 0:
+                    self.reload_spiel_button_command()
                 
                 # Create an red label on the frame to show that no match is active
                 no_match_active_label = ctk.CTkLabel(frame, text="No Match Active", font=("Helvetica", self.team_button_font_size * 2, "bold"), fg_color="red")
@@ -1866,7 +1880,7 @@ class Window(ctk.CTk):
 
         if teams1 and teams2:
             self.endteam1, self.endteam2 = teams1
-            self.endteam3, self.endteam4 = teams2
+            self.endteam4, self.endteam3 = teams2
              
 
     def get_spiel_um_platz_3(self, team1, team2, team3, team4):
@@ -2116,6 +2130,7 @@ class Window(ctk.CTk):
 
     def global_scored_a_point(self, teamID, team2ID, direction="UP"):
         # Get the current score
+        self.cache_vars["getgoals_changed_using_var"] = True
         logging.debug(f"global_scored_a_point teamID: {teamID}, team2ID: {team2ID}, direction: {direction}")
         current_score = self.read_goals_for_match_from_db(teamID, team2ID)
         old_goals = current_score
@@ -2465,6 +2480,7 @@ class Window(ctk.CTk):
         
         
     def on_radio_button_change(self):
+        self.cache_vars["getfinalmatches_changed_using_var"] = True
         selected_value = self.active_mode.get()
         saveModeInDB = """
         UPDATE settingsData
@@ -2487,6 +2503,8 @@ class Window(ctk.CTk):
             self.save_games_played_in_db(match_count)
             
         self.reload_spiel_button_command()
+        self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
+        self.updated_data.update({"finalMatches": get_data_for_website(6)})
         
         
     def on_radio_debug_button_change(self):
@@ -2729,8 +2747,6 @@ class Window(ctk.CTk):
         
         self.save_matches_to_db()
         
-        self.updated_data.update({"Matches": get_data_for_website(4)})
-    
         return self.matches
 
 
@@ -2909,7 +2925,8 @@ class Window(ctk.CTk):
                 self.add_points_for_team_in_db(match[1], 1)
                 
         self.updated_data.update({"Points": get_data_for_website(3)})    
-                  
+       
+
 ##############################################################################################
 ##############################################################################################
 ##############################################################################################
@@ -2974,89 +2991,91 @@ def get_data_for_website(which_data=-1):
         else:
             return tkapp.cache.get("Goals")
         
-    elif which_data == 2:
-        
-        if tkapp.cache_vars.get("getgames_changed_using_var") == True:
-        
-            connection = sqlite3.connect(db_path)
-            cursor = connection.cursor()
-
-            get_games = """
-            SELECT games FROM teamData
-            ORDER BY id ASC
-            """
-            cursor.execute(get_games)
-
-            games = [row[0] for row in cursor.fetchall()]
-
-            cursor.close()
-            connection.close()
+    elif which_data == 2:     
+        try:
+            if tkapp.cache_vars.get("getgames_changed_using_var") == True:
             
-            tkapp.cache_vars["getgames_changed_using_var"] = False
+                connection = sqlite3.connect(db_path)
+                cursor = connection.cursor()
+
+                get_games = """
+                SELECT games FROM teamData
+                ORDER BY id ASC
+                """
+                cursor.execute(get_games)
+
+                games = [row[0] for row in cursor.fetchall()]
+
+                cursor.close()
+                connection.close()
+                
+                tkapp.cache_vars["getgames_changed_using_var"] = False
+                
+                tkapp.cache["Games"] = games
+
+                return games
             
-            tkapp.cache["Games"] = games
-
-            return games
-        
-        else:
-            return tkapp.cache.get("Games")
-        
-
+            else:
+                return tkapp.cache.get("Games")
+        except:
+            return []
+    
     elif which_data == 3:
         
-        if tkapp.cache_vars.get("getpoints_changed_using_active_match") != tkapp.active_match or tkapp.active_match == -1:
-        
-            connection = sqlite3.connect(db_path)
-            cursor = connection.cursor()
-            
-            team_names = cursor.execute("SELECT teamName FROM teamData ORDER BY id ASC").fetchall()
-            teams_with_points = {str(team[0]): 0 for team in team_names}
-            
-            if tkapp.active_mode.get() == 1:
-                selectMatches = """
-                    SELECT team1Id, team2Id, team1Goals, team2Goals
-                    FROM matchData
-                    WHERE matchId <= ?
-                """
-                cursor.execute(selectMatches, (tkapp.active_match,))
-                matches = cursor.fetchall()
-            else:
-                selectMatches = """
-                    SELECT team1Id, team2Id, team1Goals, team2Goals
-                    FROM matchData
-                """
-                cursor.execute(selectMatches)
-                matches = cursor.fetchall()
-            
-
-            for match in matches:
-                team1Goals = int(match[2])
-                team2Goals = int(match[3])
-
-                if team1Goals > team2Goals:
-                    teams_with_points[str(match[0])] = teams_with_points.get(str(match[0]), 0) + 3
-                            
-                elif team1Goals < team2Goals:
-                    teams_with_points[str(match[1])] = teams_with_points.get(str(match[1]), 0) + 3
-                            
-                elif team1Goals != 0 and team2Goals != 0:
-                    teams_with_points[str(match[0])] = teams_with_points.get(str(match[0]), 0) + 1
-                    teams_with_points[str(match[1])] = teams_with_points.get(str(match[1]), 0) + 1
+        try:
+            if tkapp.cache_vars.get("getpoints_changed_using_active_match") != tkapp.active_match or tkapp.active_match == -1:
+                
+                connection = sqlite3.connect(db_path)
+                cursor = connection.cursor()
+                
+                team_names = cursor.execute("SELECT id FROM teamData ORDER BY id ASC").fetchall()
+                teams_with_points = {str(team[0]): 0 for team in team_names}
+                
+                if tkapp.active_mode.get() == 1:
+                    selectMatches = """
+                        SELECT team1Id, team2Id, team1Goals, team2Goals
+                        FROM matchData
+                        WHERE matchId <= ?
+                    """
+                    cursor.execute(selectMatches, (tkapp.active_match,))
+                    matches = cursor.fetchall()
+                else:
+                    selectMatches = """
+                        SELECT team1Id, team2Id, team1Goals, team2Goals
+                        FROM matchData
+                    """
+                    cursor.execute(selectMatches)
+                    matches = cursor.fetchall()
                     
-            cursor.close()
-            connection.close()
-            
-            points_in_order = [teams_with_points[team[0]] for team in team_names]
-            
-            tkapp.cache_vars["getpoints_changed_using_active_match"] = tkapp.active_match
-            
-            tkapp.cache["Points"] = points_in_order
 
-            return points_in_order
-        
-        else:
-            return tkapp.cache.get("Points")
-            
+                for match in matches:
+                    team1Goals = int(match[2])
+                    team2Goals = int(match[3])
+
+                    if team1Goals > team2Goals:
+                        teams_with_points[str(match[0])] = teams_with_points.get(str(match[0]), 0) + 3
+                                
+                    elif team1Goals < team2Goals:
+                        teams_with_points[str(match[1])] = teams_with_points.get(str(match[1]), 0) + 3
+                                
+                    elif team1Goals != 0 and team2Goals != 0:
+                        teams_with_points[str(match[0])] = teams_with_points.get(str(match[0]), 0) + 1
+                        teams_with_points[str(match[1])] = teams_with_points.get(str(match[1]), 0) + 1
+                
+                cursor.close()
+                connection.close()
+                
+                points_in_order = [teams_with_points[str(team[0])] for team in team_names]
+                
+                tkapp.cache_vars["getpoints_changed_using_active_match"] = tkapp.active_match
+                
+                tkapp.cache["Points"] = points_in_order
+                
+                return points_in_order
+            else:
+                return tkapp.cache.get("Points")
+        except:
+            return []
     
     elif which_data == 4:
         try:
@@ -3084,10 +3103,11 @@ def get_data_for_website(which_data=-1):
 
                 cursor.close()
                 connection.close()
-
-                tkapp.cache_vars["getmatches_changed_using_var"] = False
                 
-                tkapp.cache["Matches"] = all_matches
+                if all_matches != []:
+                    tkapp.cache_vars["getmatches_changed_using_var"] = False
+                    
+                    tkapp.cache["Matches"] = all_matches
 
                 return all_matches
             
@@ -3249,6 +3269,10 @@ def plan_index():
 def best_scorer_index():
     return get_initial_data("websitebestscorer.html")
 
+@app.route("/tipping")
+def tipping_index():
+    return get_initial_data("websitetipping.html")
+
 @app.route("/tv")
 def tv_index():
     return get_initial_data("websitetv.html")
@@ -3261,7 +3285,8 @@ def tv_index():
 def get_best_scorer_data():
     
     getBestScorerDataQuery = """
-    SELECT playerData.playerName, playerData.goals, teamData.teamName, ROW_NUMBER() OVER (ORDER BY playerData.goals DESC) AS Rank FROM playerData, teamData
+    SELECT playerData.playerName, playerData.goals, teamData.teamName, DENSE_RANK() OVER (ORDER BY playerData.goals DESC) AS Rank 
+    FROM playerData, teamData
     WHERE playerData.teamId = teamData.id
     ORDER BY playerData.goals DESC
     LIMIT 100
@@ -3274,11 +3299,11 @@ def get_best_scorer_data():
     
     best_scorer_data = cursor.fetchall()
     
-    output_json = {}
+    output_json = []
     
     for player_data in best_scorer_data:
         new_json = {f"{player_data[3]}": {"playerName": player_data[0], "goals": player_data[1], "teamName": player_data[2]}} 
-        output_json.update(new_json)
+        output_json.append(new_json)
     
     cursor.close()
     connection.close()
