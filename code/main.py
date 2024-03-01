@@ -2480,6 +2480,7 @@ class Window(ctk.CTk):
         
         
     def on_radio_button_change(self):
+        self.cache_vars["getfinalmatches_changed_using_var"] = True
         selected_value = self.active_mode.get()
         saveModeInDB = """
         UPDATE settingsData
