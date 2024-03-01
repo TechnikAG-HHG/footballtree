@@ -45,6 +45,10 @@ document.getElementById("treeButton").addEventListener("click", function () {
     redirectTo("/tree");
 });
 
+document.getElementById("tippingButton").addEventListener("click", function () {
+    redirectTo("/tipping");
+});
+
 document
     .getElementById("bestScorerButton")
     .addEventListener("click", function () {
