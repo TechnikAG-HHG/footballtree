@@ -268,7 +268,8 @@ class Window(ctk.CTk):
             teams_playing INTEGER DEFAULT 0,
             activeMatch INTEGER DEFAULT 0,
             pauseMode BOOLEAN DEFAULT 0,
-            timeIntervalForOnlyTheFinalMatch TEXT DEFAULT ""
+            timeIntervalForOnlyTheFinalMatch TEXT DEFAULT "",
+            bestScorerActive BOOLEAN DEFAULT 0
         )
         """
         self.settingscursor.execute(settingsDataTableCreationQuery)
@@ -297,6 +298,7 @@ class Window(ctk.CTk):
         self.website_title = tk.StringVar(value="HHG-Fußballturnier")
         self.pause_mode = tk.BooleanVar(value=False)
         self.time_interval_for_only_the_final_match = tk.StringVar(value="10m")
+        self.best_scorer_active = tk.BooleanVar(value=False)
         
         # load the settings from the database into the variables
         if settings[5] is not None and settings[5] != "" and settings[5] != 0:
@@ -340,6 +342,9 @@ class Window(ctk.CTk):
         
         if settings[16] is not None and settings[16] != "" and settings[16] != 0:
             self.time_interval_for_only_the_final_match.set(value=settings[16])
+            
+        if settings[17] is not None and settings[17] != "" and settings[17] != 0:
+            self.best_scorer_active.set(value=settings[17])
 
         if self.debug_mode.get() == 1:
             self.console_handler.setLevel(logging.DEBUG)
@@ -1181,7 +1186,11 @@ class Window(ctk.CTk):
             self.next_time_label_wd = ctk.CTkLabel(time_frame2, text=f"{time_next_match}", font=("Helvetica", self.team_button_font_size * 1.5, "bold"))
             self.next_time_label_wd.pack(side=tk.RIGHT, pady=2, padx=10, anchor=tk.SE)
             
-            self.watch_dog_process()
+            if self.active_match == 3 and self.active_mode.get() == 2:
+                self.next_time_label_wd.configure(text="Disabled", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), text_color="#21a621")
+                self.delay_time_label.configure(text="Disabled", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), text_color="#21a621")
+            else:   
+                self.watch_dog_process()
 
             ######################################################
 
@@ -1552,21 +1561,33 @@ class Window(ctk.CTk):
             starttime_str = str(self.start_time.get())
             starttime = datetime.datetime.strptime(starttime_str, '%H:%M')
 
+            final_match_active = 0
+            
             # get the number of the active match
             active_match = self.active_match
+            
+            active_match += 1
+            
+            if active_match > 3:
+                active_match = 3
+                final_match_active = 1
 
             # get the time interval from settings
             timeinterval = int(self.time_interval.get().replace("m", ""))
             
+            # get the interval for the final matches
             time_interval_final_matches = int(self.time_intervalFM.get().replace("m", ""))
             
             # get time pause final matches
             pause_between_final_matches = int(self.time_pause_before_FM.get().replace("m", ""))
             
+            # calculate the time for the current match
+            time_interval_for_only_the_final_match = int(self.time_interval_for_only_the_final_match.get().replace("m", ""))
+            
             #logging.debug(f"active_match: {active_match}, time_interval_final_matches: {time_interval_final_matches}, timeinterval: {timeinterval}, match_count: {match_count}, pause_between_final_matches: {pause_between_final_matches}")
 
             # calculate the time for the current match
-            current_match_time = starttime + datetime.timedelta(minutes=(time_interval_final_matches * active_match) + (timeinterval * match_count) + pause_between_final_matches)
+            current_match_time = starttime + datetime.timedelta(minutes=(final_match_active * time_interval_for_only_the_final_match) + (time_interval_final_matches * active_match) + (timeinterval * match_count) + pause_between_final_matches)
 
             if next_match:
                 next_match_start_time = current_match_time + datetime.timedelta(minutes=time_interval_final_matches)                
@@ -2402,16 +2423,12 @@ class Window(ctk.CTk):
         self.pause_switch = ctk.CTkSwitch(self.pause_switcher_frame, text="Pause", variable=self.pause_mode, command=self.on_pause_switch_change, font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         self.pause_switch.pack(side=tk.TOP, pady=2, padx=0, anchor=tk.N)
         
-        # debug mode switcher
-        debug_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
-        debug_frame.pack(pady=5, anchor=tk.NW, side=tk.TOP, padx=5)
+
+        best_scorer_active_switch_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
+        best_scorer_active_switch_frame.pack(pady=5, anchor=tk.NW, side=tk.TOP, padx=5)
         
-        debug_label = ctk.CTkLabel(debug_frame, text="Debug Mode", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
-        debug_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
-        radio_button_3 = ctk.CTkRadioButton(debug_frame, text="Debug", variable=self.debug_mode, value=1, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_radio_debug_button_change)
-        radio_button_3.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
-        radio_button_4 = ctk.CTkRadioButton(debug_frame, text="Debug Off", variable=self.debug_mode, value=0, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_radio_debug_button_change)
-        radio_button_4.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
+        best_scorer_active_switch = ctk.CTkSwitch(best_scorer_active_switch_frame, text="Best Scorer Active", variable=self.best_scorer_active, command=self.on_best_scorer_active_switch_change, font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        best_scorer_active_switch.pack(side=tk.TOP, pady=2, padx=0, anchor=tk.N)
         
         
         # start time for matches
@@ -2446,7 +2463,7 @@ class Window(ctk.CTk):
         time_pause_before_FM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
         
         time_pause_before_FM_entry = ctk.CTkEntry(time_pause_before_FM_frame, textvariable=self.time_pause_before_FM, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
-        time_pause_before_FM_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        time_pause_before_FM_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
         time_pause_before_FM_entry.bind("<KeyRelease>", lambda event: self.on_time_pause_before_FM_change(event))
         
         
@@ -2465,7 +2482,7 @@ class Window(ctk.CTk):
         time_intervalFinalMatch_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
         time_intervalFinalMatch_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
         
-        time_intervalFinalMatch_label = ctk.CTkLabel(time_intervalFinalMatch_frame, text="Time Interval For Final Match", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        time_intervalFinalMatch_label = ctk.CTkLabel(time_intervalFinalMatch_frame, text="Time For Final Match", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         time_intervalFinalMatch_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
         
         time_intervalFinalMatch_entry = ctk.CTkEntry(time_intervalFinalMatch_frame, textvariable=self.time_interval_for_only_the_final_match, font=("Helvetica", self.team_button_font_size*1.3))
@@ -2475,14 +2492,26 @@ class Window(ctk.CTk):
         
         # website title
         website_title_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        website_title_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0)
+        website_title_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
         
         website_title_label = ctk.CTkLabel(website_title_frame, text="Website Title", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         website_title_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
         
         website_title_entry = ctk.CTkEntry(website_title_frame, textvariable=self.website_title, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
-        website_title_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        website_title_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
         website_title_entry.bind("<KeyRelease>", lambda event: self.on_website_title_change(event))
+        
+        # debug mode switcher
+        debug_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
+        debug_frame.pack(pady=5, anchor=tk.NW, side=tk.TOP, padx=5)
+        
+        debug_label = ctk.CTkLabel(debug_frame, text="Debug Mode", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        debug_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        
+        radio_button_3 = ctk.CTkRadioButton(debug_frame, text="Debug", variable=self.debug_mode, value=1, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_radio_debug_button_change)
+        radio_button_3.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
+        radio_button_4 = ctk.CTkRadioButton(debug_frame, text="Debug Off", variable=self.debug_mode, value=0, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_radio_debug_button_change)
+        radio_button_4.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
         
         
     def on_volume_change(self, event):
@@ -2655,6 +2684,7 @@ class Window(ctk.CTk):
         
         self.updated_data.update({"pauseMode": selected_value})
         
+        
     def on_time_intervalFinalMatch_change(self, event):
         if self.time_interval_for_only_the_final_match.get() == "":
             return
@@ -2662,7 +2692,7 @@ class Window(ctk.CTk):
             return
         saveTimeIntervalFinalMatchInDB = """
         UPDATE settingsData
-        SET timeIntervalFinalMatch = ?
+        SET timeIntervalForOnlyTheFinalMatch = ?
         WHERE id = 1
         """
         logging.debug(f"on_time_intervalFinalMatch_change {self.time_interval_for_only_the_final_match.get()}")
@@ -2670,6 +2700,18 @@ class Window(ctk.CTk):
         self.settingsconnection.commit()
         
         self.updated_data.update({"timeIntervalFinalMatch": self.time_interval_for_only_the_final_match.get().replace("m", "")})
+        
+    def on_best_scorer_active_switch_change(self):
+        selected_value = self.best_scorer_active.get()
+        saveModeInDB = """
+        UPDATE settingsData
+        SET bestScorerActive = ?
+        WHERE id = 1
+        """
+        self.settingscursor.execute(saveModeInDB, (selected_value,))
+        self.settingsconnection.commit()
+        
+        self.updated_data.update({"bestScorerActive": selected_value})
       
             
     ##############################################################################################
