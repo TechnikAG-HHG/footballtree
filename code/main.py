@@ -2747,8 +2747,6 @@ class Window(ctk.CTk):
         
         self.save_matches_to_db()
         
-        self.updated_data.update({"Matches": get_data_for_website(4)})
-    
         return self.matches
 
 
@@ -3105,10 +3103,11 @@ def get_data_for_website(which_data=-1):
 
                 cursor.close()
                 connection.close()
-
-                tkapp.cache_vars["getmatches_changed_using_var"] = False
                 
-                tkapp.cache["Matches"] = all_matches
+                if all_matches != []:
+                    tkapp.cache_vars["getmatches_changed_using_var"] = False
+                    
+                    tkapp.cache["Matches"] = all_matches
 
                 return all_matches
             
