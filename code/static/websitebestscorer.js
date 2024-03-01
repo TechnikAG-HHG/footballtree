@@ -79,12 +79,14 @@ function generateTable() {
 
     var tableBody = document.createElement("tbody");
 
-    for (var i = 1; i < Object.keys(best_scorer_players).length + 1; i++) {
+    for (var i = 0; i < Object.keys(best_scorer_players).length; i++) {
         let player = best_scorer_players[`${i}`];
+        console.log(player);
+        console.log(player["rank"]);
         var row = document.createElement("tr");
 
         var position = document.createElement("td");
-        position.textContent = i;
+        position.textContent = player["rank"];
         row.appendChild(position);
 
         var name = document.createElement("td");
