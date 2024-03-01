@@ -3275,6 +3275,7 @@ def get_initial_data(template_name):
         "LastUpdate": 0,
         "pauseMode": tkapp.pause_mode.get(),
         "timeIntervalFinalMatch": tkapp.time_interval_for_only_the_final_match.get().replace("m", ""),
+        "bestScorerActive": tkapp.best_scorer_active.get(),##############################################################################################
     }
     return make_response(render_template(template_name, initial_data=initial_data))
 
@@ -3335,7 +3336,12 @@ def get_best_scorer_data():
     output_json = []
     
     for player_data in best_scorer_data:
-        new_json = {f"{player_data[3]}": {"playerName": player_data[0], "goals": player_data[1], "teamName": player_data[2]}} 
+        new_json = {
+            "playerName": player_data[0],
+            "goals": player_data[1],
+            "teamName": player_data[2],
+            "rank": player_data[3]
+        }
         output_json.append(new_json)
     
     cursor.close()
