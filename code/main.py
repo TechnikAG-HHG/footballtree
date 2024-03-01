@@ -267,7 +267,8 @@ class Window(ctk.CTk):
             websiteTitle TEXT DEFAULT "",
             teams_playing INTEGER DEFAULT 0,
             activeMatch INTEGER DEFAULT 0,
-            pauseMode BOOLEAN DEFAULT 0
+            pauseMode BOOLEAN DEFAULT 0,
+            timeIntervalForOnlyTheFinalMatch TEXT DEFAULT ""
         )
         """
         self.settingscursor.execute(settingsDataTableCreationQuery)
@@ -295,6 +296,7 @@ class Window(ctk.CTk):
         self.time_pause_before_FM = tk.StringVar(value="0m") 
         self.website_title = tk.StringVar(value="HHG-Fußballturnier")
         self.pause_mode = tk.BooleanVar(value=False)
+        self.time_interval_for_only_the_final_match = tk.StringVar(value="10m")
         
         # load the settings from the database into the variables
         if settings[5] is not None and settings[5] != "" and settings[5] != 0:
@@ -335,6 +337,9 @@ class Window(ctk.CTk):
             
         if settings[15] is not None and settings[15] != "" and settings[15] != 0:
             self.pause_mode.set(value=settings[15])
+        
+        if settings[16] is not None and settings[16] != "" and settings[16] != 0:
+            self.time_interval_for_only_the_final_match.set(value=settings[16])
 
         if self.debug_mode.get() == 1:
             self.console_handler.setLevel(logging.DEBUG)
@@ -2425,7 +2430,7 @@ class Window(ctk.CTk):
         time_interval_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
         time_interval_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
         
-        time_interval_label = ctk.CTkLabel(time_interval_frame, text="Time Interval", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        time_interval_label = ctk.CTkLabel(time_interval_frame, text="Time Interval For Group Phase", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         time_interval_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
         
         time_interval_entry = ctk.CTkEntry(time_interval_frame, textvariable=self.time_interval, font=("Helvetica", self.team_button_font_size*1.3))
@@ -2433,28 +2438,39 @@ class Window(ctk.CTk):
         time_interval_entry.bind("<KeyRelease>", lambda event: self.on_time_interval_change(event))
         
         
+        # pause time before final matches
+        time_pause_before_FM_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        time_pause_before_FM_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0)
+        
+        time_pause_before_FM_label = ctk.CTkLabel(time_pause_before_FM_frame, text="Time Pause Between Final Matches", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        time_pause_before_FM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
+        
+        time_pause_before_FM_entry = ctk.CTkEntry(time_pause_before_FM_frame, textvariable=self.time_pause_before_FM, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
+        time_pause_before_FM_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        time_pause_before_FM_entry.bind("<KeyRelease>", lambda event: self.on_time_pause_before_FM_change(event))
+        
+        
         # time interval for final matches
         time_intervalFM_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
         time_intervalFM_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
         
-        time_intervalFM_label = ctk.CTkLabel(time_intervalFM_frame, text="Time Interval Final Matches", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        time_intervalFM_label = ctk.CTkLabel(time_intervalFM_frame, text="Time Interval For Final Matches", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         time_intervalFM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
         
         time_intervalFM_entry = ctk.CTkEntry(time_intervalFM_frame, textvariable=self.time_intervalFM, font=("Helvetica", self.team_button_font_size*1.3))
         time_intervalFM_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
         time_intervalFM_entry.bind("<KeyRelease>", lambda event: self.on_time_intervalFM_change(event))
         
+        #time interval for final match
+        time_intervalFinalMatch_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        time_intervalFinalMatch_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
         
-        # pause time before final matches
-        time_pause_before_FM_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        time_pause_before_FM_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0)
+        time_intervalFinalMatch_label = ctk.CTkLabel(time_intervalFinalMatch_frame, text="Time Interval For Final Match", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        time_intervalFinalMatch_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
         
-        time_pause_before_FM_label = ctk.CTkLabel(time_pause_before_FM_frame, text="Time Pause Final Matches", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
-        time_pause_before_FM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
-        
-        time_pause_before_FM_entry = ctk.CTkEntry(time_pause_before_FM_frame, textvariable=self.time_pause_before_FM, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
-        time_pause_before_FM_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
-        time_pause_before_FM_entry.bind("<KeyRelease>", lambda event: self.on_time_pause_before_FM_change(event))
+        time_intervalFinalMatch_entry = ctk.CTkEntry(time_intervalFinalMatch_frame, textvariable=self.time_interval_for_only_the_final_match, font=("Helvetica", self.team_button_font_size*1.3))
+        time_intervalFinalMatch_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
+        time_intervalFinalMatch_entry.bind("<KeyRelease>", lambda event: self.on_time_intervalFinalMatch_change(event))
         
         
         # website title
@@ -2638,6 +2654,22 @@ class Window(ctk.CTk):
         self.settingsconnection.commit()
         
         self.updated_data.update({"pauseMode": selected_value})
+        
+    def on_time_intervalFinalMatch_change(self, event):
+        if self.time_interval_for_only_the_final_match.get() == "":
+            return
+        if self.time_interval_for_only_the_final_match.get()[-1] not in "0123456789m" or not "m" in self.time_interval_for_only_the_final_match.get() or len(self.time_interval_for_only_the_final_match.get()) < 1:
+            return
+        saveTimeIntervalFinalMatchInDB = """
+        UPDATE settingsData
+        SET timeIntervalFinalMatch = ?
+        WHERE id = 1
+        """
+        logging.debug(f"on_time_intervalFinalMatch_change {self.time_interval_for_only_the_final_match.get()}")
+        self.settingscursor.execute(saveTimeIntervalFinalMatchInDB, (self.time_interval_for_only_the_final_match.get(),))
+        self.settingsconnection.commit()
+        
+        self.updated_data.update({"timeIntervalFinalMatch": self.time_interval_for_only_the_final_match.get().replace("m", "")})
       
             
     ##############################################################################################
@@ -3242,6 +3274,7 @@ def get_initial_data(template_name):
         "websiteTitle": tkapp.website_title.get(),
         "LastUpdate": 0,
         "pauseMode": tkapp.pause_mode.get(),
+        "timeIntervalFinalMatch": tkapp.time_interval_for_only_the_final_match.get().replace("m", ""),
     }
     return make_response(render_template(template_name, initial_data=initial_data))
 
