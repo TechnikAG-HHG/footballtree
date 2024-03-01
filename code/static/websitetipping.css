@@ -1,0 +1,62 @@
+html,
+body {
+    width: 100%;
+    margin: 0; /* Add this line */
+    padding: 0; /* Add this line */
+    font-family: "Roboto", sans-serif;
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: #1a1a1a;
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: column;
+}
+
+.header {
+    flex-direction: row;
+    display: flex;
+    align-items: center;
+}
+
+.header h1#websiteTitle {
+    color: white;
+    font-size: 5vw;
+    text-align: center;
+    align-self: center;
+    margin: 0;
+    margin-left: auto;
+    margin-right: auto;
+    position: absolute;
+    width: 100%;
+}
+
+#returnButton {
+    background-color: #49ba67;
+    border: none;
+    border-radius: 0.5vw;
+    color: white;
+    padding: 1vw;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 2vw;
+    margin: 0.5vw;
+    cursor: pointer;
+    align-self: center;
+    margin-bottom: 2vw;
+    margin-top: 2vw;
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    box-shadow: 0 0.5vw 1vw 0 rgba(0, 0, 0, 0.24),
+        0 1vw 3vw 0 rgba(0, 0, 0, 0.19);
+    margin-left: 3vw;
+    z-index: 99;
+}
+
+#returnButton:hover {
+    background-color: #3d8e4f;
+    box-shadow: 0 0.5vw 1vw 0 rgba(0, 0, 0, 0.24),
+        0 1vw 3vw 0 rgba(0, 0, 0, 0.19);
+}

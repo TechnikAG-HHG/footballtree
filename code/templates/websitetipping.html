@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>Loading...</title>
+
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="{{ url_for('static', filename='websitetipping.css') }}"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <div class="header">
+            <button id="returnButton">Zur&uuml;ck</button>
+
+            <h1 id="websiteTitle">Loading...</h1>
+        </div>
+
+        <script>
+            // Your existing script for initializing data
+            var data = {{ initial_data|tojson|safe }};
+            console.log('Initial data:', data);
+        </script>
+        <script src="{{url_for('static', filename='websitetipping.js')}}"></script>
+    </body>
+</html>
