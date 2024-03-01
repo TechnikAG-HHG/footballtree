@@ -25,6 +25,10 @@ async function updateData() {
     document.title = data["websiteTitle"];
     document.getElementById("websiteTitle").textContent = data["websiteTitle"];
 
+    if (data["bestScorerActive"] != true) {
+        redirectTo("/");
+    }
+
     await fetch("/best_scorer_data", {
         headers: headers,
     })
