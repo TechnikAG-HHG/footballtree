@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
+import tkinter.messagebox
 import customtkinter as ctk
 import threading
 import requests
@@ -1226,14 +1227,14 @@ class Window(ctk.CTk):
         #player_id = self.get_player_id_from_player_name(player_name)
         #logging.debug("player_id", self.get_player_id_from_player_name(player_name))
         if team_i == 0:
-            if i < 8:
+            if i < 7:
                 self.group_frame = ctk.CTkFrame(self.up_frame1, fg_color='#142324', corner_radius=10)
                 self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
             else:
                 self.group_frame = ctk.CTkFrame(self.down_frame1, fg_color='#142324', corner_radius=10)
                 self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
         else:
-            if i < 8:
+            if i < 7:
                 self.group_frame = ctk.CTkFrame(self.up_frame2, fg_color='#142324', corner_radius=10)
                 self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
             else:
@@ -1412,7 +1413,7 @@ class Window(ctk.CTk):
     def watch_dog_process(self):
         if self.teams_playing.count(None) == 0 and self.watch_dog_process_can_be_active:
             delay_time = self.calculate_delay()
-            if self.manual_select_active_sure == False:
+            if self.manual_select_active_sure == False and self.manual_select_active == False:
                 if delay_time < 0:
                     if self.save_delay_time != 0 or self.save_delay_time == 2:
                         self.save_delay_time = 0
@@ -1479,7 +1480,7 @@ class Window(ctk.CTk):
 
 
     def blink_label(self, label, original_color, blink_color="orange", blink_times=5):
-        if blink_times > 0:
+        if blink_times > 0 and self.manual_select_active_sure == False and self.manual_select_active == False:
             try:
                 label.configure(fg_color=blink_color if blink_times % 2 == 0 else original_color)
             except:
@@ -2095,6 +2096,19 @@ class Window(ctk.CTk):
                 
                 # Calculate the new match index
                 new_match_index = current_match_index + 1 if next_match else current_match_index - 1
+                
+                if new_match_index > len(matches):
+                    result = tkinter.messagebox.askyesno("End of Matches", "You have reached the end of the matches. Do you want activate the pause and the final matches?")
+                    if result:
+                        self.active_mode.set(2)
+                        self.on_radio_button_change()
+                        self.pause_mode.set(1)
+                        self.on_pause_switch_change()
+                        self.update_idletasks()
+                        self.update()
+                        return
+                    else:
+                        return
 
                 # Ensure the new index is within bounds
                 new_match_index = max(1, min(new_match_index, len(matches)))
@@ -2157,6 +2171,8 @@ class Window(ctk.CTk):
     def global_scored_a_point(self, teamID, team2ID, direction="UP"):
         # Get the current score
         self.cache_vars["getgoals_changed_using_var"] = True
+        self.cache_vars["getmatches_changed_using_var"] = True
+        self.cache_vars["getfinalmatches_changed_using_var"] = True
         logging.debug(f"global_scored_a_point teamID: {teamID}, team2ID: {team2ID}, direction: {direction}")
         current_score = self.read_goals_for_match_from_db(teamID, team2ID)
         old_goals = current_score
@@ -2700,6 +2716,7 @@ class Window(ctk.CTk):
         self.settingsconnection.commit()
         
         self.updated_data.update({"timeIntervalFinalMatch": self.time_interval_for_only_the_final_match.get().replace("m", "")})
+   
         
     def on_best_scorer_active_switch_change(self):
         selected_value = self.best_scorer_active.get()
