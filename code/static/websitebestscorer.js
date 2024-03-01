@@ -106,50 +106,73 @@ function generateTable() {
 }
 
 function drawWinnerPodest() {
+    let podest = document.getElementById("podest");
+    if (podest) {
+        podest.remove();
+    }
+
     // draw a podest for the first 3 players with svg
     var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.id = "podest";
-    svg.setAttribute("width", "500");
-    svg.setAttribute("height", "500");
-
-    svg.setAttribute("viewBox", "0 0 500 500");
+    svg.setAttribute("width", "100%");
+    svg.setAttribute("height", "100%");
 
     var first = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    first.setAttribute("x", "200");
-    first.setAttribute("y", "0");
-    first.setAttribute("width", "100");
-    first.setAttribute("height", "500");
+    first.setAttribute("x", "33%");
+    first.setAttribute("y", "40");
+    first.setAttribute("width", "33%");
+    first.setAttribute("height", "150");
     first.setAttribute("fill", "gold");
     svg.appendChild(first);
 
     var second = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    second.setAttribute("x", "100");
-    second.setAttribute("y", "100");
-    second.setAttribute("width", "100");
-    second.setAttribute("height", "400");
+    second.setAttribute("x", "0");
+    second.setAttribute("y", "90");
+    second.setAttribute("width", "33%");
+    second.setAttribute("height", "100");
     second.setAttribute("fill", "silver");
     svg.appendChild(second);
 
     var third = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    third.setAttribute("x", "300");
-    third.setAttribute("y", "200");
-    third.setAttribute("width", "100");
-    third.setAttribute("height", "300");
-    third.setAttribute("fill", "brown");
+    third.setAttribute("x", "66%");
+    third.setAttribute("y", "140");
+    third.setAttribute("width", "33%");
+    third.setAttribute("height", "50");
+    third.setAttribute("fill", "#A97142");
     svg.appendChild(third);
+
+    var firstText = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "text"
+    );
+    firstText.setAttribute("x", "49.5%");
+    firstText.setAttribute("y", "35"); // adjust this value to position the text correctly
+    firstText.textContent = "First";
+    firstText.classList.add("svgText");
+    svg.appendChild(firstText);
+
+    var secondText = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "text"
+    );
+    secondText.setAttribute("x", "16.5%");
+    secondText.setAttribute("y", "85"); // adjust this value to position the text correctly
+    secondText.textContent = "Second";
+    secondText.classList.add("svgText");
+    svg.appendChild(secondText);
+
+    var thirdText = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "text"
+    );
+    thirdText.setAttribute("x", "82.5%");
+    thirdText.setAttribute("y", "135"); // adjust this value to position the text correctly
+    thirdText.textContent = "Third";
+    thirdText.classList.add("svgText");
+    svg.appendChild(thirdText);
 
     var podestContainer = document.getElementById("podestContainer");
     podestContainer.appendChild(svg);
-
-    var firstPlayer = document.createElement("p");
-    firstPlayer.textContent = best_scorer_players["1"]["playerName"];
-    podestContainer.appendChild(firstPlayer);
-    var secondPlayer = document.createElement("p");
-    secondPlayer.textContent = best_scorer_players["2"]["playerName"];
-    podestContainer.appendChild(secondPlayer);
-    var thirdPlayer = document.createElement("p");
-    thirdPlayer.textContent = best_scorer_players["3"]["playerName"];
-    podestContainer.appendChild(thirdPlayer);
 }
 
 document.getElementById("returnButton").addEventListener("click", function () {

@@ -114,11 +114,20 @@ td {
 }
 
 #podestContainer {
-    width: 500px;
-    height: 500px;
+    width: 70vw;
+    height: 50vh;
+    margin: 0 auto;
 }
 
 svg#podest {
     width: 100%;
     height: 100%;
+}
+
+.svgText {
+    font-size: 1.5vw;
+    font-weight: bold;
+    fill: white;
+    font-family: "Roboto", sans-serif;
+    text-anchor: middle;
 }
