@@ -1733,6 +1733,9 @@ class Window(ctk.CTk):
                 self.active_match = -1
                 self.teams_playing = [None, None]
                 
+                if match_count > 0:
+                    self.reload_spiel_button_command()
+                
                 # Create an red label on the frame to show that no match is active
                 no_match_active_label = ctk.CTkLabel(frame, text="No Match Active", font=("Helvetica", self.team_button_font_size * 2, "bold"), fg_color="red")
                 no_match_active_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
@@ -2503,6 +2506,8 @@ class Window(ctk.CTk):
             self.save_games_played_in_db(match_count)
             
         self.reload_spiel_button_command()
+        self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
+        self.updated_data.update({"finalMatches": get_data_for_website(6)})
         
         
     def on_radio_debug_button_change(self):
