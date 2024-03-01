@@ -112,3 +112,16 @@ td {
     font-size: 1.5vw;
     margin-top: 3vh;
 }
+
+#podestContainer {
+    width: 500px;
+    height: 500px;
+}
+
+svg#podest {
+    width: 100px;
+    height: 30px;
+}
+rect {
+    transform: scale(30, 10);
+}

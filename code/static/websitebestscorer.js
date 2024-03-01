@@ -36,7 +36,7 @@ async function updateData() {
         .catch((error) => console.error("Error fetching best scorer:", error));
 
     setTimeout(function () {
-        generateTable();
+        drawWinnerPodest();
     }, 0);
 }
 
@@ -103,6 +103,47 @@ function generateTable() {
     }
 
     table.appendChild(tableBody);
+}
+
+function drawWinnerPodest() {
+    // draw a podest for the first 3 players with svg
+    var svg = document.createElement("svg");
+    svg.id = "podest";
+    svg.setAttribute("width", "100%");
+    svg.setAttribute("height", "100%");
+    var first = document.createElement("rect");
+    first.setAttribute("x", "0");
+    first.setAttribute("y", "0");
+    first.setAttribute("width", "33%");
+    first.setAttribute("height", "100%");
+    first.setAttribute("fill", "gold");
+    svg.appendChild(first);
+    var second = document.createElement("rect");
+    second.setAttribute("x", "33%");
+    second.setAttribute("y", "0");
+    second.setAttribute("width", "33%");
+    second.setAttribute("height", "100%");
+    second.setAttribute("fill", "silver");
+    svg.appendChild(second);
+    var third = document.createElement("rect");
+    third.setAttribute("x", "66%");
+    third.setAttribute("y", "0");
+    third.setAttribute("width", "33%");
+    third.setAttribute("height", "100%");
+    third.setAttribute("fill", "brown");
+    svg.appendChild(third);
+    var podestContainer = document.getElementById("podestContainer");
+    podestContainer.appendChild(svg);
+
+    var firstPlayer = document.createElement("p");
+    firstPlayer.textContent = best_scorer_players["1"]["playerName"];
+    podestContainer.appendChild(firstPlayer);
+    var secondPlayer = document.createElement("p");
+    secondPlayer.textContent = best_scorer_players["2"]["playerName"];
+    podestContainer.appendChild(secondPlayer);
+    var thirdPlayer = document.createElement("p");
+    thirdPlayer.textContent = best_scorer_players["3"]["playerName"];
+    podestContainer.appendChild(thirdPlayer);
 }
 
 document.getElementById("returnButton").addEventListener("click", function () {
