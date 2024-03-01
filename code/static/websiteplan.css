@@ -205,3 +205,21 @@ p {
     font-weight: bold;
     margin-top: 5vh;
 }
+
+@media (max-width: 800px) {
+    .pauseTime,
+    #pauseTimeProgress {
+        height: 4vh;
+    }
+
+    #pauseTimeStart,
+    #pauseTimeEnd,
+    #pauseTimeText {
+        font-size: 1.3vh;
+    }
+
+    table td {
+        font-size: 1.3vh;
+        border: 1.3px solid #49ba67;
+    }
+}
