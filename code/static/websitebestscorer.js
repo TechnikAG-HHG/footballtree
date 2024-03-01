@@ -107,31 +107,37 @@ function generateTable() {
 
 function drawWinnerPodest() {
     // draw a podest for the first 3 players with svg
-    var svg = document.createElement("svg");
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.id = "podest";
-    svg.setAttribute("width", "100");
-    svg.setAttribute("height", "100");
-    var first = document.createElement("rect");
-    first.setAttribute("x", "50");
-    first.setAttribute("y", "50");
-    first.setAttribute("width", "33");
-    first.setAttribute("height", "100");
+    svg.setAttribute("width", "500");
+    svg.setAttribute("height", "500");
+
+    svg.setAttribute("viewBox", "0 0 500 500");
+
+    var first = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    first.setAttribute("x", "200");
+    first.setAttribute("y", "0");
+    first.setAttribute("width", "100");
+    first.setAttribute("height", "500");
     first.setAttribute("fill", "gold");
     svg.appendChild(first);
-    var second = document.createElement("rect");
-    second.setAttribute("x", "33");
-    second.setAttribute("y", "0");
-    second.setAttribute("width", "33");
-    second.setAttribute("height", "100");
+
+    var second = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    second.setAttribute("x", "100");
+    second.setAttribute("y", "100");
+    second.setAttribute("width", "100");
+    second.setAttribute("height", "400");
     second.setAttribute("fill", "silver");
     svg.appendChild(second);
-    var third = document.createElement("rect");
-    third.setAttribute("x", "66");
-    third.setAttribute("y", "0");
-    third.setAttribute("width", "33");
-    third.setAttribute("height", "100");
+
+    var third = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    third.setAttribute("x", "300");
+    third.setAttribute("y", "200");
+    third.setAttribute("width", "100");
+    third.setAttribute("height", "300");
     third.setAttribute("fill", "brown");
     svg.appendChild(third);
+
     var podestContainer = document.getElementById("podestContainer");
     podestContainer.appendChild(svg);
 
