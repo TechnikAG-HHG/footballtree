@@ -71,6 +71,10 @@ a {
     color: #3d8e4f;
 }
 
+#bestScorerButton {
+    background-color: rgb(237, 202, 6);
+}
+
 /* Media query for larger screens */
 @media screen and (max-width: 1000px) {
     h1 {

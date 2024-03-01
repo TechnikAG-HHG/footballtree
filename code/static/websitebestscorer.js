@@ -101,7 +101,7 @@ function generateTable() {
             document.getElementsByClassName("firstText")[0].textContent =
                 player["playerName"];
             pos1counter++;
-            name.style.color = "gold";
+            name.style.color = "rgb(237, 202, 6)";
             name.style.fontWeight = "bold";
         } else if (player["rank"] == 2) {
             document.getElementsByClassName("secondText")[0].textContent =
@@ -162,7 +162,7 @@ function drawWinnerPodest() {
     first.setAttribute("y", "40");
     first.setAttribute("width", "33%");
     first.setAttribute("height", "150");
-    first.setAttribute("fill", "gold");
+    first.setAttribute("fill", "rgb(237, 202, 6)");
     svg.appendChild(first);
 
     var second = document.createElementNS("http://www.w3.org/2000/svg", "rect");
