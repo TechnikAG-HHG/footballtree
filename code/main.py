@@ -3268,6 +3268,10 @@ def plan_index():
 def best_scorer_index():
     return get_initial_data("websitebestscorer.html")
 
+@app.route("/tipping")
+def tipping_index():
+    return get_initial_data("websitetipping.html")
+
 @app.route("/tv")
 def tv_index():
     return get_initial_data("websitetv.html")
