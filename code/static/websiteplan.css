@@ -159,8 +159,8 @@ td {
     border-radius: 0.5vw;
 }
 
-#pauseTimeProgress::-moz-progress-chunk {
-    background-color: #1a1a1a;
+#pauseTimeProgress::-moz-progress-bar {
+    background-color: black;
     border-radius: 0.5vw;
 }
 
