@@ -1,9 +1,11 @@
+var tippingData = {};
+
 async function updateData() {
     // Include the last data version in the request headers
     var headers = new Headers();
     headers.append("Last-Data-Update", data["LastUpdate"]);
 
-    await fetch("/update_data", {
+    fetch("/update_data", {
         headers: headers,
     })
         .then((response) => response.json())
@@ -19,8 +21,24 @@ async function updateData() {
         })
         .catch((error) => console.error("Error fetching data:", error));
 
+    await fetch("/tipping_data", {
+        method: "GET",
+    })
+        .then((response) => response.json())
+        .then((updatedtippingData) => {
+            console.log("Updated tipping data:", updatedtippingData);
+            tippingData = updatedtippingData;
+        })
+        .catch((error) => console.error("Error fetching tipping data:", error));
+
     document.title = data["websiteTitle"];
     document.getElementById("websiteTitle").textContent = data["websiteTitle"];
+
+    console.log("Tipping data:", tippingData);
+
+    if (currentlyTyping == false && tippingData["name"] != null) {
+        document.getElementById("name-input").value = tippingData["name"];
+    }
 
     await generateDropdownData();
 }
@@ -142,6 +160,9 @@ function voteForMatch(match) {
             goals1.value = 0;
         }
     });
+    if (tippingData["tips"][matchNumber] != null) {
+        goals1.value = tippingData["tips"][matchNumber]["team1Goals"];
+    }
     entryDiv.appendChild(goals1);
 
     let goals2 = document.createElement("input");
@@ -154,12 +175,50 @@ function voteForMatch(match) {
             goals2.value = 0;
         }
     });
+    if (tippingData["tips"][matchNumber] != null) {
+        goals2.value = tippingData["tips"][matchNumber]["team2Goals"];
+    }
     entryDiv.appendChild(goals2);
+
+    let submitButton = document.createElement("button");
+    submitButton.textContent = "Abstimmen";
+    submitButton.addEventListener("click", handleSubmit);
+    entryDiv.appendChild(submitButton);
 
     voteContainer.appendChild(entryDiv);
 
     let container = document.getElementsByClassName("content")[0];
     container.appendChild(voteContainer);
+}
+
+function handleSubmit(event) {
+    event.preventDefault();
+    var goals1 = document.getElementById("goals1").value;
+    var goals2 = document.getElementById("goals2").value;
+    var match = document.getElementById("game-select").value;
+
+    console.log("Submitting tipping data for match", match);
+    console.log("Goals", goals1, goals2);
+
+    fetch("/send_tipping_data", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            matchId: match.split(".")[0] - 1,
+            team1Goals: goals1,
+            team2Goals: goals2,
+        }),
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log("Success:", data);
+            updateData();
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
 }
 
 function redirectTo(path) {
@@ -173,6 +232,40 @@ document.getElementById("returnButton").addEventListener("click", function () {
 document.getElementById("game-select").addEventListener("change", function () {
     var selectedMatch = document.getElementById("game-select").value;
     voteForMatch(selectedMatch);
+});
+
+var typingTimer;
+var doneTypingInterval = 500;
+
+var currentlyTyping = false;
+
+document.getElementById("name-input").addEventListener("input", function () {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(function () {
+        var name = document.getElementById("name-input").value;
+        fetch("/send_user_name", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                userName: name,
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("Success:", data);
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+        currentlyTyping = false;
+    }, doneTypingInterval);
+});
+
+document.getElementById("name-input").addEventListener("keydown", function () {
+    clearTimeout(typingTimer);
+    currentlyTyping = true;
 });
 
 updateData();
