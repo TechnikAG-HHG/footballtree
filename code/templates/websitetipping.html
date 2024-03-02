@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>Loading...</title>
+
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="{{ url_for('static', filename='websitetipping.css') }}"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <div class="header">
+            <button id="returnButton">Zur&uuml;ck</button>
+
+            <h1 id="websiteTitle">Loading...</h1>
+        </div>
+
+        <div class="content">
+            <div id="name-content">
+                <input
+                    type="text"
+                    id="name-input"
+                    placeholder="Vor- und Nachname"
+                />
+                <p id="name-info">
+                    Bei der Auswertung werden nur richtige und vollständige
+                    Namen ber&uuml;cksichtigt. Dein Name ist nicht
+                    &ouml;ffentlich einsehbar, wird aber bei einem Gewinn
+                    ausgerufen.
+                </p>
+            </div>
+            <div id="tipping-content">
+                <label for="game-select" id="label-game-select"
+                    >Wähle ein Spiel zum Wetten aus:</label
+                >
+                <select id="game-select">
+                    <option value="0">Loading...</option>
+                </select>
+            </div>
+        </div>
+
+        <script>
+            // Your existing script for initializing data
+            var data = {{ initial_data|tojson|safe }};
+            console.log('Initial data:', data);
+        </script>
+        <script src="{{url_for('static', filename='websitetipping.js')}}"></script>
+    </body>
+</html>
