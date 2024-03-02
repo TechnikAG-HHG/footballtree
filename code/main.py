@@ -3511,22 +3511,23 @@ def send_user_name():
     
     user_name = request.json['userName']
     
-    insertIntoDB = """
-    INSERT INTO userData (googleId, userName)
-    VALUES (?, ?)
-    """
-    
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     
-    cursor.execute(insertIntoDB, (google_id, user_name))
+    cursor.execute("SELECT * FROM userData WHERE googleId = ?", (google_id,))
+    result = cursor.fetchone()
+    
+    if result:
+        cursor.execute("UPDATE userData SET userName = ? WHERE googleId = ?", (user_name, google_id))
+    else:
+        cursor.execute("INSERT INTO userData (googleId, userName) VALUES (?, ?)", (google_id, user_name))
     
     connection.commit()
     
     cursor.close()
     connection.close()
     
-    return jsonify(message="Data successfully inserted")
+    return jsonify(message="Data successfully updated or inserted")
 
     
 ##############################################################################################
