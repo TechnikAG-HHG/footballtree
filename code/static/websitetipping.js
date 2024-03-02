@@ -99,7 +99,7 @@ function generateDropdownData() {
         matchData = data["finalMatches"][i];
 
         if (i == 0 || i == 1) {
-            group = "Halbfinale";
+            group = `${i + 1}. Halbfinale`;
         } else if (i == 2) {
             group = "Spiel um Platz 3";
         } else if (i == 3) {
@@ -108,9 +108,7 @@ function generateDropdownData() {
             group = "Nicht definiert";
         }
 
-        option.textContent = `${i + 1}. ${group}: ${matchData[0]} vs ${
-            matchData[1]
-        }`;
+        option.textContent = `${group}: ${matchData[0]} vs ${matchData[1]}`;
         dropdown.appendChild(option);
 
         // If this option is the previously selected one, select it
@@ -123,6 +121,22 @@ function generateDropdownData() {
 function voteForMatch(match) {
     var matchNumber = match.split(".")[0] - 1;
     var matchData = data["Matches"][matchNumber];
+
+    if (match.split(".")[1]) {
+        if (match.split(".")[1].startsWith(" Halbfinale")) {
+            matchNumber = parseInt(match.split(".")[0]) * -1 - 1;
+            console.log("Voting for match", matchNumber);
+            matchData = data["finalMatches"][Math.abs(matchNumber) - 2];
+        }
+    } else if (match.split(":")[0] == "Spiel um Platz 3") {
+        matchNumber = -4;
+        matchData = data["finalMatches"][2];
+    } else if (match.split(":")[0] == "Finale") {
+        matchNumber = -5;
+        matchData = data["finalMatches"][3];
+    }
+
+    console.log("Voting for match", matchNumber, matchData);
 
     let voteContainer = document.getElementById("vote-container");
     if (voteContainer != null) {
