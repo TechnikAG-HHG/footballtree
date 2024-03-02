@@ -3470,7 +3470,8 @@ def tipping_data_index():
     
     if fetch_all == []:
         return jsonify(name=name, tips=None)
-    tips = fetch_all
+    
+    tips = [{"matchId": row[0], "team1Goals": row[1], "team2Goals": row[2]} for row in fetch_all]
     
     cursor.close()
     connection.close()
