@@ -1,12 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
+import tkinter.messagebox
 import customtkinter as ctk
 import threading
 import requests
 import os
 import time
-from flask import Flask, send_file, request, abort, render_template, make_response, session, redirect, jsonify
+from flask import Flask, send_file, request, abort, render_template, make_response, session, redirect, jsonify, send_from_directory
 import sqlite3
 import vlc
 import datetime
@@ -267,7 +268,9 @@ class Window(ctk.CTk):
             websiteTitle TEXT DEFAULT "",
             teams_playing INTEGER DEFAULT 0,
             activeMatch INTEGER DEFAULT 0,
-            pauseMode BOOLEAN DEFAULT 0
+            pauseMode BOOLEAN DEFAULT 0,
+            timeIntervalForOnlyTheFinalMatch TEXT DEFAULT "",
+            bestScorerActive BOOLEAN DEFAULT 0
         )
         """
         self.settingscursor.execute(settingsDataTableCreationQuery)
@@ -295,6 +298,8 @@ class Window(ctk.CTk):
         self.time_pause_before_FM = tk.StringVar(value="0m") 
         self.website_title = tk.StringVar(value="HHG-Fußballturnier")
         self.pause_mode = tk.BooleanVar(value=False)
+        self.time_interval_for_only_the_final_match = tk.StringVar(value="10m")
+        self.best_scorer_active = tk.BooleanVar(value=False)
         
         # load the settings from the database into the variables
         if settings[5] is not None and settings[5] != "" and settings[5] != 0:
@@ -335,6 +340,12 @@ class Window(ctk.CTk):
             
         if settings[15] is not None and settings[15] != "" and settings[15] != 0:
             self.pause_mode.set(value=settings[15])
+        
+        if settings[16] is not None and settings[16] != "" and settings[16] != 0:
+            self.time_interval_for_only_the_final_match.set(value=settings[16])
+            
+        if settings[17] is not None and settings[17] != "" and settings[17] != 0:
+            self.best_scorer_active.set(value=settings[17])
 
         if self.debug_mode.get() == 1:
             self.console_handler.setLevel(logging.DEBUG)
@@ -1176,7 +1187,11 @@ class Window(ctk.CTk):
             self.next_time_label_wd = ctk.CTkLabel(time_frame2, text=f"{time_next_match}", font=("Helvetica", self.team_button_font_size * 1.5, "bold"))
             self.next_time_label_wd.pack(side=tk.RIGHT, pady=2, padx=10, anchor=tk.SE)
             
-            self.watch_dog_process()
+            if self.active_match == 3 and self.active_mode.get() == 2:
+                self.next_time_label_wd.configure(text="Disabled", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), text_color="#21a621")
+                self.delay_time_label.configure(text="Disabled", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), text_color="#21a621")
+            else:   
+                self.watch_dog_process()
 
             ######################################################
 
@@ -1212,14 +1227,14 @@ class Window(ctk.CTk):
         #player_id = self.get_player_id_from_player_name(player_name)
         #logging.debug("player_id", self.get_player_id_from_player_name(player_name))
         if team_i == 0:
-            if i < 8:
+            if i < 7:
                 self.group_frame = ctk.CTkFrame(self.up_frame1, fg_color='#142324', corner_radius=10)
                 self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
             else:
                 self.group_frame = ctk.CTkFrame(self.down_frame1, fg_color='#142324', corner_radius=10)
                 self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
         else:
-            if i < 8:
+            if i < 7:
                 self.group_frame = ctk.CTkFrame(self.up_frame2, fg_color='#142324', corner_radius=10)
                 self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
             else:
@@ -1398,7 +1413,7 @@ class Window(ctk.CTk):
     def watch_dog_process(self):
         if self.teams_playing.count(None) == 0 and self.watch_dog_process_can_be_active:
             delay_time = self.calculate_delay()
-            if self.manual_select_active_sure == False:
+            if self.manual_select_active_sure == False and self.manual_select_active == False:
                 if delay_time < 0:
                     if self.save_delay_time != 0 or self.save_delay_time == 2:
                         self.save_delay_time = 0
@@ -1465,7 +1480,7 @@ class Window(ctk.CTk):
 
 
     def blink_label(self, label, original_color, blink_color="orange", blink_times=5):
-        if blink_times > 0:
+        if blink_times > 0 and self.manual_select_active_sure == False and self.manual_select_active == False:
             try:
                 label.configure(fg_color=blink_color if blink_times % 2 == 0 else original_color)
             except:
@@ -1547,21 +1562,33 @@ class Window(ctk.CTk):
             starttime_str = str(self.start_time.get())
             starttime = datetime.datetime.strptime(starttime_str, '%H:%M')
 
+            final_match_active = 0
+            
             # get the number of the active match
             active_match = self.active_match
+            
+            active_match += 1
+            
+            if active_match > 3:
+                active_match = 3
+                final_match_active = 1
 
             # get the time interval from settings
             timeinterval = int(self.time_interval.get().replace("m", ""))
             
+            # get the interval for the final matches
             time_interval_final_matches = int(self.time_intervalFM.get().replace("m", ""))
             
             # get time pause final matches
             pause_between_final_matches = int(self.time_pause_before_FM.get().replace("m", ""))
             
+            # calculate the time for the current match
+            time_interval_for_only_the_final_match = int(self.time_interval_for_only_the_final_match.get().replace("m", ""))
+            
             #logging.debug(f"active_match: {active_match}, time_interval_final_matches: {time_interval_final_matches}, timeinterval: {timeinterval}, match_count: {match_count}, pause_between_final_matches: {pause_between_final_matches}")
 
             # calculate the time for the current match
-            current_match_time = starttime + datetime.timedelta(minutes=(time_interval_final_matches * active_match) + (timeinterval * match_count) + pause_between_final_matches)
+            current_match_time = starttime + datetime.timedelta(minutes=(final_match_active * time_interval_for_only_the_final_match) + (time_interval_final_matches * active_match) + (timeinterval * match_count) + pause_between_final_matches)
 
             if next_match:
                 next_match_start_time = current_match_time + datetime.timedelta(minutes=time_interval_final_matches)                
@@ -2069,6 +2096,19 @@ class Window(ctk.CTk):
                 
                 # Calculate the new match index
                 new_match_index = current_match_index + 1 if next_match else current_match_index - 1
+                
+                if new_match_index > len(matches):
+                    result = tkinter.messagebox.askyesno("End of Matches", "You have reached the end of the matches. Do you want activate the pause and the final matches?")
+                    if result:
+                        self.pause_mode.set(1)
+                        self.on_pause_switch_change()
+                        self.active_mode.set(2)
+                        self.on_radio_button_change()
+                        self.update_idletasks()
+                        self.update()
+                        return
+                    else:
+                        return
 
                 # Ensure the new index is within bounds
                 new_match_index = max(1, min(new_match_index, len(matches)))
@@ -2093,7 +2133,6 @@ class Window(ctk.CTk):
                 logging.debug(f"new_match_index: {new_match_index}")
                 logging.debug(f"teams_playing: {teams_playing}")
                 
-
             except ValueError:
                 # Handle the case where the selected match is not found in the list
                 logging.debug("Selected match not found in the list.")
@@ -2131,6 +2170,8 @@ class Window(ctk.CTk):
     def global_scored_a_point(self, teamID, team2ID, direction="UP"):
         # Get the current score
         self.cache_vars["getgoals_changed_using_var"] = True
+        self.cache_vars["getmatches_changed_using_var"] = True
+        self.cache_vars["getfinalmatches_changed_using_var"] = True
         logging.debug(f"global_scored_a_point teamID: {teamID}, team2ID: {team2ID}, direction: {direction}")
         current_score = self.read_goals_for_match_from_db(teamID, team2ID)
         old_goals = current_score
@@ -2397,16 +2438,12 @@ class Window(ctk.CTk):
         self.pause_switch = ctk.CTkSwitch(self.pause_switcher_frame, text="Pause", variable=self.pause_mode, command=self.on_pause_switch_change, font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         self.pause_switch.pack(side=tk.TOP, pady=2, padx=0, anchor=tk.N)
         
-        # debug mode switcher
-        debug_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
-        debug_frame.pack(pady=5, anchor=tk.NW, side=tk.TOP, padx=5)
+
+        best_scorer_active_switch_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
+        best_scorer_active_switch_frame.pack(pady=5, anchor=tk.NW, side=tk.TOP, padx=5)
         
-        debug_label = ctk.CTkLabel(debug_frame, text="Debug Mode", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
-        debug_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
-        radio_button_3 = ctk.CTkRadioButton(debug_frame, text="Debug", variable=self.debug_mode, value=1, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_radio_debug_button_change)
-        radio_button_3.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
-        radio_button_4 = ctk.CTkRadioButton(debug_frame, text="Debug Off", variable=self.debug_mode, value=0, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_radio_debug_button_change)
-        radio_button_4.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
+        best_scorer_active_switch = ctk.CTkSwitch(best_scorer_active_switch_frame, text="Best Scorer Active", variable=self.best_scorer_active, command=self.on_best_scorer_active_switch_change, font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        best_scorer_active_switch.pack(side=tk.TOP, pady=2, padx=0, anchor=tk.N)
         
         
         # start time for matches
@@ -2425,7 +2462,7 @@ class Window(ctk.CTk):
         time_interval_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
         time_interval_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
         
-        time_interval_label = ctk.CTkLabel(time_interval_frame, text="Time Interval", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        time_interval_label = ctk.CTkLabel(time_interval_frame, text="Time Interval For Group Phase", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         time_interval_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
         
         time_interval_entry = ctk.CTkEntry(time_interval_frame, textvariable=self.time_interval, font=("Helvetica", self.team_button_font_size*1.3))
@@ -2433,40 +2470,63 @@ class Window(ctk.CTk):
         time_interval_entry.bind("<KeyRelease>", lambda event: self.on_time_interval_change(event))
         
         
+        # pause time before final matches
+        time_pause_before_FM_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        time_pause_before_FM_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0)
+        
+        time_pause_before_FM_label = ctk.CTkLabel(time_pause_before_FM_frame, text="Time Pause Between Final Matches", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        time_pause_before_FM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
+        
+        time_pause_before_FM_entry = ctk.CTkEntry(time_pause_before_FM_frame, textvariable=self.time_pause_before_FM, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
+        time_pause_before_FM_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
+        time_pause_before_FM_entry.bind("<KeyRelease>", lambda event: self.on_time_pause_before_FM_change(event))
+        
+        
         # time interval for final matches
         time_intervalFM_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
         time_intervalFM_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
         
-        time_intervalFM_label = ctk.CTkLabel(time_intervalFM_frame, text="Time Interval Final Matches", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        time_intervalFM_label = ctk.CTkLabel(time_intervalFM_frame, text="Time Interval For Final Matches", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         time_intervalFM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
         
         time_intervalFM_entry = ctk.CTkEntry(time_intervalFM_frame, textvariable=self.time_intervalFM, font=("Helvetica", self.team_button_font_size*1.3))
         time_intervalFM_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
         time_intervalFM_entry.bind("<KeyRelease>", lambda event: self.on_time_intervalFM_change(event))
         
+        #time interval for final match
+        time_intervalFinalMatch_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        time_intervalFinalMatch_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
         
-        # pause time before final matches
-        time_pause_before_FM_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        time_pause_before_FM_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0)
+        time_intervalFinalMatch_label = ctk.CTkLabel(time_intervalFinalMatch_frame, text="Time For Final Match", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        time_intervalFinalMatch_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
         
-        time_pause_before_FM_label = ctk.CTkLabel(time_pause_before_FM_frame, text="Time Pause Final Matches", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
-        time_pause_before_FM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
-        
-        time_pause_before_FM_entry = ctk.CTkEntry(time_pause_before_FM_frame, textvariable=self.time_pause_before_FM, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
-        time_pause_before_FM_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
-        time_pause_before_FM_entry.bind("<KeyRelease>", lambda event: self.on_time_pause_before_FM_change(event))
+        time_intervalFinalMatch_entry = ctk.CTkEntry(time_intervalFinalMatch_frame, textvariable=self.time_interval_for_only_the_final_match, font=("Helvetica", self.team_button_font_size*1.3))
+        time_intervalFinalMatch_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
+        time_intervalFinalMatch_entry.bind("<KeyRelease>", lambda event: self.on_time_intervalFinalMatch_change(event))
         
         
         # website title
         website_title_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        website_title_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0)
+        website_title_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
         
         website_title_label = ctk.CTkLabel(website_title_frame, text="Website Title", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         website_title_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
         
         website_title_entry = ctk.CTkEntry(website_title_frame, textvariable=self.website_title, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
-        website_title_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        website_title_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
         website_title_entry.bind("<KeyRelease>", lambda event: self.on_website_title_change(event))
+        
+        # debug mode switcher
+        debug_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
+        debug_frame.pack(pady=5, anchor=tk.NW, side=tk.TOP, padx=5)
+        
+        debug_label = ctk.CTkLabel(debug_frame, text="Debug Mode", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        debug_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+        
+        radio_button_3 = ctk.CTkRadioButton(debug_frame, text="Debug", variable=self.debug_mode, value=1, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_radio_debug_button_change)
+        radio_button_3.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
+        radio_button_4 = ctk.CTkRadioButton(debug_frame, text="Debug Off", variable=self.debug_mode, value=0, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_radio_debug_button_change)
+        radio_button_4.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
         
         
     def on_volume_change(self, event):
@@ -2638,6 +2698,36 @@ class Window(ctk.CTk):
         self.settingsconnection.commit()
         
         self.updated_data.update({"pauseMode": selected_value})
+        
+        
+    def on_time_intervalFinalMatch_change(self, event):
+        if self.time_interval_for_only_the_final_match.get() == "":
+            return
+        if self.time_interval_for_only_the_final_match.get()[-1] not in "0123456789m" or not "m" in self.time_interval_for_only_the_final_match.get() or len(self.time_interval_for_only_the_final_match.get()) < 1:
+            return
+        saveTimeIntervalFinalMatchInDB = """
+        UPDATE settingsData
+        SET timeIntervalForOnlyTheFinalMatch = ?
+        WHERE id = 1
+        """
+        logging.debug(f"on_time_intervalFinalMatch_change {self.time_interval_for_only_the_final_match.get()}")
+        self.settingscursor.execute(saveTimeIntervalFinalMatchInDB, (self.time_interval_for_only_the_final_match.get(),))
+        self.settingsconnection.commit()
+        
+        self.updated_data.update({"timeIntervalFinalMatch": self.time_interval_for_only_the_final_match.get().replace("m", "")})
+   
+        
+    def on_best_scorer_active_switch_change(self):
+        selected_value = self.best_scorer_active.get()
+        saveModeInDB = """
+        UPDATE settingsData
+        SET bestScorerActive = ?
+        WHERE id = 1
+        """
+        self.settingscursor.execute(saveModeInDB, (selected_value,))
+        self.settingsconnection.commit()
+        
+        self.updated_data.update({"bestScorerActive": selected_value})
       
             
     ##############################################################################################
@@ -3130,6 +3220,9 @@ def get_data_for_website(which_data=-1):
     
     elif which_data == 6 and tkapp.active_mode.get() == 2:
         
+        if tkapp.pause_mode.get() == 1:
+            return None
+    
         if tkapp.cache_vars.get("getfinalmatches_changed_using_var") == True:
             
             final_goles = []
@@ -3224,7 +3317,7 @@ def ich_kann_nicht_mehr(teamID, team2ID):
     return goals
         
   
-def get_initial_data(template_name):
+def get_initial_data(template_name, base_url=None):
     global initial_data
     
     initial_data = {
@@ -3242,8 +3335,10 @@ def get_initial_data(template_name):
         "websiteTitle": tkapp.website_title.get(),
         "LastUpdate": 0,
         "pauseMode": tkapp.pause_mode.get(),
+        "timeIntervalFinalMatch": tkapp.time_interval_for_only_the_final_match.get().replace("m", ""),
+        "bestScorerActive": tkapp.best_scorer_active.get(),
     }
-    return make_response(render_template(template_name, initial_data=initial_data))
+    return make_response(render_template(template_name, initial_data=initial_data, base_url=base_url))
 
 ##############################################################################################
 ########################################### Sites ############################################
@@ -3267,7 +3362,10 @@ def plan_index():
 
 @app.route("/best_scorer")
 def best_scorer_index():
-    return get_initial_data("websitebestscorer.html")
+    if tkapp.best_scorer_active.get() == 1:
+        return get_initial_data("websitebestscorer.html")
+    else:
+        abort(404) 
 
 @app.route("/tipping")
 def tipping_index():
@@ -3275,7 +3373,12 @@ def tipping_index():
 
 @app.route("/tv")
 def tv_index():
-    return get_initial_data("websitetv.html")
+    base_url = request.base_url
+    return get_initial_data("websitetv.html", base_url)
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 ##############################################################################################
 ########################################### Data #############################################
@@ -3283,32 +3386,40 @@ def tv_index():
 
 @app.route('/best_scorer_data')
 def get_best_scorer_data():
+    if tkapp.best_scorer_active.get() == 1:
     
-    getBestScorerDataQuery = """
-    SELECT playerData.playerName, playerData.goals, teamData.teamName, DENSE_RANK() OVER (ORDER BY playerData.goals DESC) AS Rank 
-    FROM playerData, teamData
-    WHERE playerData.teamId = teamData.id
-    ORDER BY playerData.goals DESC
-    LIMIT 100
-    """
-    
-    connection = sqlite3.connect(db_path)
-    cursor = connection.cursor()
-    
-    cursor.execute(getBestScorerDataQuery)
-    
-    best_scorer_data = cursor.fetchall()
-    
-    output_json = []
-    
-    for player_data in best_scorer_data:
-        new_json = {f"{player_data[3]}": {"playerName": player_data[0], "goals": player_data[1], "teamName": player_data[2]}} 
-        output_json.append(new_json)
-    
-    cursor.close()
-    connection.close()
-    
-    return jsonify(players=output_json)
+        getBestScorerDataQuery = """
+        SELECT playerData.playerName, playerData.goals, teamData.teamName, DENSE_RANK() OVER (ORDER BY playerData.goals DESC) AS Rank 
+        FROM playerData, teamData
+        WHERE playerData.teamId = teamData.id
+        ORDER BY playerData.goals DESC
+        LIMIT 100
+        """
+        
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+        
+        cursor.execute(getBestScorerDataQuery)
+        
+        best_scorer_data = cursor.fetchall()
+        
+        output_json = []
+        
+        for player_data in best_scorer_data:
+            new_json = {
+                "playerName": player_data[0],
+                "goals": player_data[1],
+                "teamName": player_data[2],
+                "rank": player_data[3]
+            }
+            output_json.append(new_json)
+        
+        cursor.close()
+        connection.close()
+        
+        return jsonify(players=output_json)
+    else:
+        abort(404)
 
 @app.route('/update_data')
 def update_data():   
@@ -3354,6 +3465,35 @@ def update_data():
     #updated_data = {'Players': {"Player1":"Erik Van Doof","Player2":"Felix Schweigmann"}}  # You can modify this data as needed
     return jsonify(updated_data)
 
+
+##############################################################################################
+########################################## Favicon ###########################################
+##############################################################################################
+
+@app.route('/favicon.ico')
+def favicon():
+    print("favicon")
+    return send_from_directory(os.path.join(app.root_path, '../favicon'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+@app.route('/apple-touch-icon.png')
+def apple_touch_icon():
+    return send_from_directory(os.path.join(app.root_path, '../favicon'), 'apple-touch-icon.png', mimetype='image/png')
+
+@app.route('/favicon-32x32.png')
+def favicon_32():
+    return send_from_directory(os.path.join(app.root_path, '../favicon'), 'favicon-32x32.png', mimetype='image/png')
+
+@app.route('/favicon-16x16.png')
+def favicon_16():
+    return send_from_directory(os.path.join(app.root_path, '../favicon'), 'favicon-16x16.png', mimetype='image/png')
+
+@app.route('/site.webmanifest')
+def site_webmanifest():
+    return send_from_directory(os.path.join(app.root_path, '../favicon'), 'site.webmanifest')
+
+@app.route('/safari-pinned-tab.svg')
+def safari_pinned_tab():
+    return send_from_directory(os.path.join(app.root_path, '../favicon'), 'safari-pinned-tab.svg', mimetype='image/svg+xml')
 
 ##############################################################################################
 ########################################### Init #############################################

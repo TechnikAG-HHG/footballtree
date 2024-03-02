@@ -3,12 +3,12 @@ function redirectTo(path) {
     window.location.href = path;
 }
 
-function updateData() {
+async function updateData() {
     // Include the last data version in the request headers
     var headers = new Headers();
     headers.append("Last-Data-Update", data["LastUpdate"]);
 
-    fetch("/update_data", {
+    await fetch("/update_data", {
         headers: headers,
     })
         .then((response) => response.json())
@@ -24,6 +24,12 @@ function updateData() {
 
     document.title = data["websiteTitle"];
     document.getElementById("websiteTitle").textContent = data["websiteTitle"];
+
+    if (data["bestScorerActive"] != true) {
+        document.getElementById("bestScorerButton").style.display = "none";
+    } else {
+        document.getElementById("bestScorerButton").style.display = "block";
+    }
 }
 
 // Add click event listeners to the buttons
@@ -39,6 +45,10 @@ document.getElementById("treeButton").addEventListener("click", function () {
     redirectTo("/tree");
 });
 
+document.getElementById("tippingButton").addEventListener("click", function () {
+    redirectTo("/tipping");
+});
+
 document
     .getElementById("bestScorerButton")
     .addEventListener("click", function () {
@@ -50,4 +60,5 @@ window.addEventListener("load", function () {
     document.getElementById("websiteTitle").textContent = data["websiteTitle"];
 });
 
+updateData();
 setInterval(updateData, 5000);

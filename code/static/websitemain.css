@@ -71,6 +71,22 @@ a {
     color: #3d8e4f;
 }
 
+#bestScorerButton {
+    background-color: rgb(237, 202, 6);
+}
+
+#bestScorerButton:hover {
+    background-color: rgb(204, 173, 0);
+}
+
+#tippingButton {
+    background-color: darkcyan;
+}
+
+#tippingButton:hover {
+    background-color: rgb(0, 110, 110);
+}
+
 /* Media query for larger screens */
 @media screen and (max-width: 1000px) {
     h1 {

@@ -26,13 +26,11 @@
 
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-        <title>Loading...</title>
-
+        <title>404 Page Not Found</title>
         <link
             rel="stylesheet"
             type="text/css"
-            href="{{ url_for('static', filename='websitetree.css') }}"
+            href="{{ url_for('static', filename='404.css') }}"
         />
         <link
             href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
@@ -40,29 +38,19 @@
         />
     </head>
     <body>
-        <div class="header">
-            <button id="returnButton">Zur&uuml;ck</button>
-
-            <h1 id="websiteTitle">Loading...</h1>
-        </div>
-
-        <div id="text-container">
-            <ul class="text-labels">
-                <li>Halbfinale</li>
-                <li>Finale</li>
-                <li>Halbfinale</li>
-            </ul>
-        </div>
-
-        <div id="main-container">
-            <!-- Your other content here -->
-        </div>
-
-        <script>
-            var data = {{ initial_data|tojson|safe }};
-            console.log('Initial data:', data);
-        </script>
-
-        <script src="{{url_for('static', filename='websitetree.js')}}"></script>
+        <h1>404 Page Not Found</h1>
+        <p id="not-found">
+            Die Seite existiert nicht, kann es sein, dass deine URL nicht
+            stimmt?
+        </p>
+        <a id="returnButton" href="/">Zur Startseite</a>
+        <p id="advertissimo1">
+            Die Technik-AG sucht dringend neue Mitglieder ab der 7. Klasse!
+        </p>
+        <p id="advertissimo2">
+            Wenn du interesse hast uns beizutreten, dann sprich Herr
+            LIM/DEG/LHM/HRT an oder komm jetzt ganz nach vorne an das Mischpult
+            und melde dich bei uns!
+        </p>
     </body>
 </html>
