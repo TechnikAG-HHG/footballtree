@@ -3504,6 +3504,31 @@ def send_tipping_data():
     
     return jsonify(message="Data successfully inserted")
 
+# send user name to db
+@app.route("/send_user_name", methods=['POST'])
+@login_is_required
+def send_user_name():
+    google_id = session["google_id"]
+    
+    user_name = request.json['userName']
+    
+    insertIntoDB = """
+    INSERT INTO userData (googleId, userName)
+    VALUES (?, ?)
+    """
+    
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    
+    cursor.execute(insertIntoDB, (google_id, user_name))
+    
+    connection.commit()
+    
+    cursor.close()
+    connection.close()
+    
+    return jsonify(message="Data successfully inserted")
+
     
 ##############################################################################################
 ########################################### Sites ############################################
