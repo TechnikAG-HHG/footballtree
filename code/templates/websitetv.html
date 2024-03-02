@@ -11,10 +11,14 @@
         />
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
         <script>
+            var base_url = "{{ base_url }}";
+            base_url = base_url.replace("/tv", "");
+            console.log("Base URL:", base_url);
+
             const websites = [
-                "http://192.168.178.56:5000/plan",
-                "http://192.168.178.56:5000/group",
-                "http://192.168.178.56:5000/tree",
+                `${base_url}/plan`,
+                `${base_url}/group`,
+                `${base_url}/tree`,
             ];
 
             let currentIndex = 0;
