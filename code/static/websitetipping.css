@@ -258,3 +258,24 @@ body {
     font-weight: bold;
     align-self: center;
 }
+
+input.disabled {
+    border: 0.2vw solid #404040 !important;
+    background-color: #333333 !important;
+    color: #7e7e7e !important;
+}
+
+button.disabled {
+    border: 0.2vw solid #404040 !important;
+    background-color: #333333 !important;
+    color: #7e7e7e !important;
+    cursor: default;
+}
+
+button.disabled:hover {
+    cursor: default;
+}
+
+div.disabled {
+    border: 0.2vw solid #404040 !important;
+}

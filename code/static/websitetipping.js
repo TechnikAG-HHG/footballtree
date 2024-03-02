@@ -53,14 +53,22 @@ function generateDropdownData() {
         dropdown.removeChild(dropdown.firstChild);
     }
 
+    var disabledOptions = [];
+    var enabledOptions = [];
+
     for (var i = 0; i < data["Matches"].length; i++) {
         let group;
         var option = document.createElement("option");
         matchData = data["Matches"][i];
 
-        if (i < -1 || i < data["activeFinalMatch"] + 1) {
-            option.classList.add("disabled");
-            option.disabled = true;
+        if (
+            data["activeMatchNumber"] < -1 ||
+            i < data["activeMatchNumber"] + 1
+        ) {
+            option.style.color = "gray";
+            disabledOptions.push(option);
+        } else {
+            enabledOptions.push(option);
         }
 
         if (matchData[4] == 1) {
@@ -74,10 +82,9 @@ function generateDropdownData() {
         option.textContent = `${i + 1}. ${group}: ${matchData[0]} vs ${
             matchData[1]
         }`;
-        dropdown.appendChild(option);
 
-        // If this option is the previously selected one, select it
-        if (option.value === selectedValue) {
+        // Set the selected option if it matches the currently selected value
+        if (option.textContent === selectedValue) {
             option.selected = true;
         }
     }
@@ -109,16 +116,45 @@ function generateDropdownData() {
         }
 
         option.textContent = `${group}: ${matchData[0]} vs ${matchData[1]}`;
-        dropdown.appendChild(option);
 
-        // If this option is the previously selected one, select it
-        if (option.value === selectedValue) {
+        if (Math.abs(data["activeMatchNumber"]) > i + 1) {
+            option.style.color = "gray";
+            disabledOptions.push(option);
+        } else {
+            enabledOptions.push(option);
+        }
+
+        // Set the selected option if it matches the currently selected value
+        if (option.textContent === selectedValue) {
             option.selected = true;
         }
+    }
+
+    // Append the enabled options first
+    enabledOptions.forEach((option) => {
+        dropdown.appendChild(option);
+    });
+
+    // Add a dividing line between disabled and enabled options
+    var divider = document.createElement("option");
+    divider.disabled = true;
+    divider.textContent =
+        "------------ Bereits gespielt oder im Gange ------------";
+    dropdown.appendChild(divider);
+
+    // Append the disabled options last
+    disabledOptions.forEach((option) => {
+        dropdown.appendChild(option);
+    });
+
+    // If the previously selected option is disabled, select the first enabled option
+    if (dropdown.value === selectedValue && dropdown.selectedIndex === -1) {
+        dropdown.selectedIndex = 0;
     }
 }
 
 function voteForMatch(match) {
+    let matchPlayed = false;
     var matchNumber = match.split(".")[0] - 1;
     var matchData = data["Matches"][matchNumber];
 
@@ -136,7 +172,15 @@ function voteForMatch(match) {
         matchData = data["finalMatches"][3];
     }
 
-    console.log("Voting for match", matchNumber, matchData);
+    if (data["activeMatchNumber"] < -1) {
+        if (matchNumber > data["activeMatchNumber"] - 1) {
+            matchPlayed = true;
+            console.log("Match played");
+        }
+    } else if (matchNumber < data["activeMatchNumber"] + 1) {
+        matchPlayed = true;
+        console.log("Match played");
+    }
 
     let voteContainer = document.getElementById("vote-container");
     if (voteContainer != null) {
@@ -146,6 +190,9 @@ function voteForMatch(match) {
     voteContainer = document.createElement("div");
     voteContainer.id = "vote-container";
     voteContainer.classList.add("vote-container");
+    if (matchPlayed) {
+        voteContainer.classList.add("disabled");
+    }
 
     let title = document.createElement("h2");
     title.textContent = "Deine Wette für das Spiel:";
@@ -180,6 +227,11 @@ function voteForMatch(match) {
             goals1.value = tippingData["tips"][matchNumber]["team1Goals"];
         }
     }
+    if (matchPlayed) {
+        goals1.disabled = true;
+        goals1.classList.add("disabled");
+    }
+
     team1Div.appendChild(goals1);
 
     let vs = document.createElement("p");
@@ -211,11 +263,19 @@ function voteForMatch(match) {
             goals2.value = tippingData["tips"][matchNumber]["team2Goals"];
         }
     }
+    if (matchPlayed) {
+        goals2.disabled = true;
+        goals2.classList.add("disabled");
+    }
     team2Div.appendChild(goals2);
 
     let submitButton = document.createElement("button");
     submitButton.textContent = "Wette abschicken";
     submitButton.id = "submit-button";
+    if (matchPlayed) {
+        submitButton.disabled = true;
+        submitButton.classList.add("disabled");
+    }
     submitButton.addEventListener("click", handleSubmit);
     voteContainer.appendChild(submitButton);
 
