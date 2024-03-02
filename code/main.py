@@ -3697,7 +3697,6 @@ def update_data():
 
 @app.route('/favicon.ico')
 def favicon():
-    print("favicon")
     return send_from_directory(os.path.join(app.root_path, '../favicon'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @app.route('/apple-touch-icon.png')
