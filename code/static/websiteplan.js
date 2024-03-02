@@ -376,12 +376,12 @@ function finalMatchTable() {
     }
 }
 
-function updateData() {
+async function updateData() {
     // Include the last data version in the request headers
     var headers = new Headers();
     headers.append("Last-Data-Update", data["LastUpdate"]);
 
-    fetch("/update_data", {
+    await fetch("/update_data", {
         headers: headers,
     })
         .then((response) => response.json())
@@ -406,7 +406,7 @@ function updateData() {
     setTimeout(function () {
         generateTableGroup(data["Matches"]);
         finalMatchTable();
-    }, 500);
+    }, 0);
 }
 
 function formatTime(date) {

@@ -1,10 +1,10 @@
 function drawTree() {
     var teamCount = 2;
     var boxes = teamCount;
-    var boxheight = 120;
+    var boxheight = 30;
     var boxestodraw = 0;
     var textsdrawn = 0;
-    var marginsubbox = 800;
+    var marginsubbox = 200;
 
     console.log("drawTree() called");
 
