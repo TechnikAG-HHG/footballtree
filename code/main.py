@@ -3487,22 +3487,22 @@ def send_tipping_data():
     team1_goals = request.json['team1Goals']
     team2_goals = request.json['team2Goals']
     
-    insertIntoDB = """
-    INSERT INTO tippingData (googleId, matchId, team1Goals, team2Goals)
+    insertOrUpdateDB = """
+    INSERT OR REPLACE INTO tippingData (googleId, matchId, team1Goals, team2Goals)
     VALUES (?, ?, ?, ?)
     """
     
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     
-    cursor.execute(insertIntoDB, (google_id, match_id, team1_goals, team2_goals))
+    cursor.execute(insertOrUpdateDB, (google_id, match_id, team1_goals, team2_goals))
     
     connection.commit()
     
     cursor.close()
     connection.close()
     
-    return jsonify(message="Data successfully inserted")
+    return jsonify(message="Data successfully inserted or updated")
 
 # send user name to db
 @app.route("/send_user_name", methods=['POST'])
