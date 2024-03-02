@@ -95,7 +95,8 @@ class Window(ctk.CTk):
             "getgoals_changed_using_var": True,
             "getteams_changed_using_var": True,
             "getfinalmatches_changed_using_var": True,
-            "getteams_changed_using_var": True
+            "getteams_changed_using_var": True,
+            "getbestscorer_changed_using_var": True,
         }
 
         # Get the screen size
@@ -1715,6 +1716,9 @@ class Window(ctk.CTk):
 
         
     def player_scored_a_point(self, teamID, player_id, player_index, direction="UP", player_name=""):
+        
+        self.cache_vars["getbestscorer_changed_using_var"] = True
+        
         # Get the current score
         current_goals = self.read_player_stats(teamID, True, False, player_id)[0][2]
         
@@ -3581,37 +3585,46 @@ def page_not_found(e):
 @app.route('/best_scorer_data')
 def get_best_scorer_data():
     if tkapp.best_scorer_active.get() == 1:
+        if tkapp.cache_vars.get("getbestscorer_changed_using_var") == True:
     
-        getBestScorerDataQuery = """
-        SELECT playerData.playerName, playerData.goals, teamData.teamName, DENSE_RANK() OVER (ORDER BY playerData.goals DESC) AS Rank 
-        FROM playerData, teamData
-        WHERE playerData.teamId = teamData.id
-        ORDER BY playerData.goals DESC
-        LIMIT 100
-        """
+            getBestScorerDataQuery = """
+            SELECT playerData.playerName, playerData.goals, teamData.teamName, DENSE_RANK() OVER (ORDER BY playerData.goals DESC) AS Rank 
+            FROM playerData, teamData
+            WHERE playerData.teamId = teamData.id
+            ORDER BY playerData.goals DESC
+            LIMIT 100
+            """
+            
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+            
+            cursor.execute(getBestScorerDataQuery)
+            
+            best_scorer_data = cursor.fetchall()
+            
+            output_json = []
+            
+            for player_data in best_scorer_data:
+                new_json = {
+                    "playerName": player_data[0],
+                    "goals": player_data[1],
+                    "teamName": player_data[2],
+                    "rank": player_data[3]
+                }
+                output_json.append(new_json)
+            
+            cursor.close()
+            connection.close()
+            
+            if output_json != []:
+                tkapp.cache_vars["getbestscorer_changed_using_var"] = False
+                
+                tkapp.cache["BestScorer"] = output_json
+            
+            return jsonify(players=output_json)
+        else:
+            return jsonify(players=tkapp.cache.get("BestScorer"))
         
-        connection = sqlite3.connect(db_path)
-        cursor = connection.cursor()
-        
-        cursor.execute(getBestScorerDataQuery)
-        
-        best_scorer_data = cursor.fetchall()
-        
-        output_json = []
-        
-        for player_data in best_scorer_data:
-            new_json = {
-                "playerName": player_data[0],
-                "goals": player_data[1],
-                "teamName": player_data[2],
-                "rank": player_data[3]
-            }
-            output_json.append(new_json)
-        
-        cursor.close()
-        connection.close()
-        
-        return jsonify(players=output_json)
     else:
         abort(404)
 
