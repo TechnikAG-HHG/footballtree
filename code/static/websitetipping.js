@@ -244,7 +244,7 @@ function redirectTo(path) {
 }
 
 document.getElementById("returnButton").addEventListener("click", function () {
-    redirectTo("/logout");
+    redirectTo("/");
 });
 
 document.getElementById("game-select").addEventListener("change", function () {
