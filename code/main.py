@@ -156,8 +156,9 @@ class Window(ctk.CTk):
         self.create_settings_elements()
 
         if start_server:
-            server_thread = threading.Thread(target=self.start_server)
+            server_thread = threading.Thread(target=self.start_server, daemon=True)
             server_thread.start()
+            
             
         # Display the default frame
         self.show_frame(self.Team_frame)
@@ -279,12 +280,35 @@ class Window(ctk.CTk):
         """
         self.settingscursor.execute(settingsDataTableCreationQuery)
         self.settingsconnection.commit()
-
+        
         # Create a first row if there is no row
         self.settingscursor.execute("SELECT * FROM settingsData")
         if self.settingscursor.fetchone() is None:
             insert_query = "INSERT INTO settingsData (id) VALUES (?)"
             self.settingscursor.execute(insert_query, (1,))
+            
+        tippingTableCreationQuery = """
+        CREATE TABLE IF NOT EXISTS tippingData (
+            id INTEGER PRIMARY KEY,
+            matchId INTEGER REFERENCES matchData(matchId),
+            team1Goals INTEGER DEFAULT 0,
+            team2Goals INTEGER DEFAULT 0,
+            googleId TEXT REFERENCES userData(googleId)
+        )
+        """
+        
+        self.cursor.execute(tippingTableCreationQuery)
+        self.connection.commit()
+        
+        userDataTableCreationQuery = """
+        CREATE TABLE IF NOT EXISTS userData (
+            id INTEGER PRIMARY KEY,
+            googleId TEXT,
+            userName TEXT
+        )
+        """
+        self.cursor.execute(userDataTableCreationQuery)
+        self.connection.commit()
         
     
     def load_settings(self):
@@ -3020,7 +3044,6 @@ class Window(ctk.CTk):
                 
         self.updated_data.update({"Points": get_data_for_website(3)})    
        
-
 ##############################################################################################
 ##############################################################################################
 ##############################################################################################
@@ -3364,6 +3387,7 @@ def login_is_required(function):
     @functools.wraps(function)
     def decorator(*args, **kwargs):
         if "google_id" not in session:
+            session["next"] = request.url
             return redirect("/login")
         else:
             return function(*args, **kwargs)
@@ -3400,7 +3424,7 @@ def callback():
 
     session["google_id"] = id_info.get("sub")
     session["name"] = id_info.get("name")
-    return redirect("/tipping")
+    return redirect(session.pop("next", "/"))
  
 @app.route("/logout")
 def logout():
@@ -3415,9 +3439,71 @@ def logout():
 @login_is_required
 def tipping_data_index():
     google_id = session["google_id"]
-    print(google_id)
-    return redirect("/tipping")
+    
+    getNameFromDB = """
+    SELECT userName
+    FROM userData
+    WHERE googleId = ?
+    """
+    
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    
+    cursor.execute(getNameFromDB, (google_id,))
+    
+    fetch_one = cursor.fetchone()
+    
+    if fetch_one is None:
+        return jsonify(name=None, tips=None)
+    name = fetch_one[0]
+    
+    getTipsFromDB = """
+    SELECT matchId, team1Goals, team2Goals
+    FROM tippingData
+    WHERE googleId = ?
+    ORDER BY matchId ASC
+    """
+    
+    cursor.execute(getTipsFromDB, (google_id,))
+    
+    fetch_all = cursor.fetchall()
+    
+    if fetch_all == []:
+        return jsonify(name=name, tips=None)
+    tips = fetch_all
+    
+    cursor.close()
+    connection.close()
+    
+    return jsonify(name=name, tips=tips)
 
+@app.route("/send_tipping_data", methods=['POST'])
+@login_is_required
+def send_tipping_data():
+    google_id = session["google_id"]
+    
+    match_id = request.json['matchId']
+    team1_goals = request.json['team1Goals']
+    team2_goals = request.json['team2Goals']
+    
+    insertIntoDB = """
+    INSERT INTO tippingData (googleId, matchId, team1Goals, team2Goals)
+    VALUES (?, ?, ?, ?)
+    """
+    
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    
+    cursor.execute(insertIntoDB, (google_id, match_id, team1_goals, team2_goals))
+    
+    connection.commit()
+    
+    cursor.close()
+    connection.close()
+    
+    return jsonify(message="Data successfully inserted")
+
+    
 ##############################################################################################
 ########################################### Sites ############################################
 ##############################################################################################
