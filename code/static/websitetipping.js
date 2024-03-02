@@ -89,44 +89,42 @@ function generateDropdownData() {
         }
     }
 
-    if (data["finalMatches"] == null || data["finalMatches"].length == 0) {
-        return;
-    }
+    if (data["finalMatches"] != null && data["finalMatches"].length != 0) {
+        for (var i = 0; i < data["finalMatches"].length; i++) {
+            if (
+                data["finalMatches"][i][0] == null ||
+                data["finalMatches"][i][1] == null
+            ) {
+                continue;
+            }
 
-    for (var i = 0; i < data["finalMatches"].length; i++) {
-        if (
-            data["finalMatches"][i][0] == null ||
-            data["finalMatches"][i][1] == null
-        ) {
-            continue;
-        }
+            let group;
+            var option = document.createElement("option");
+            matchData = data["finalMatches"][i];
 
-        let group;
-        var option = document.createElement("option");
-        matchData = data["finalMatches"][i];
+            if (i == 0 || i == 1) {
+                group = `${i + 1}. Halbfinale`;
+            } else if (i == 2) {
+                group = "Spiel um Platz 3";
+            } else if (i == 3) {
+                group = "Finale";
+            } else {
+                group = "Nicht definiert";
+            }
 
-        if (i == 0 || i == 1) {
-            group = `${i + 1}. Halbfinale`;
-        } else if (i == 2) {
-            group = "Spiel um Platz 3";
-        } else if (i == 3) {
-            group = "Finale";
-        } else {
-            group = "Nicht definiert";
-        }
+            option.textContent = `${group}: ${matchData[0]} vs ${matchData[1]}`;
 
-        option.textContent = `${group}: ${matchData[0]} vs ${matchData[1]}`;
+            if (Math.abs(data["activeMatchNumber"]) > i + 1) {
+                option.style.color = "gray";
+                disabledOptions.push(option);
+            } else {
+                enabledOptions.push(option);
+            }
 
-        if (Math.abs(data["activeMatchNumber"]) > i + 1) {
-            option.style.color = "gray";
-            disabledOptions.push(option);
-        } else {
-            enabledOptions.push(option);
-        }
-
-        // Set the selected option if it matches the currently selected value
-        if (option.textContent === selectedValue) {
-            option.selected = true;
+            // Set the selected option if it matches the currently selected value
+            if (option.textContent === selectedValue) {
+                option.selected = true;
+            }
         }
     }
 
