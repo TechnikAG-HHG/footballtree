@@ -26,7 +26,7 @@ def maintain_connection():
                         '-R',
                         'technikag:80:127.0.0.1:5000',
                         '-i',
-                        '\\new\\mykey',
+                        r'code/new/mykey',
                         '-o',
                         'ServerAliveInterval=600',
                         '-o',

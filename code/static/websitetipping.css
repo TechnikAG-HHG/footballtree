@@ -156,3 +156,105 @@ body {
     padding: 0.5vw 1vw;
     font-size: 1.5vh;
 }
+
+#vote-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1vh;
+    margin-bottom: 3vh;
+    width: 50%;
+    border: 0.2vw solid #49ba67;
+    border-radius: 0.5vw;
+    padding: 1vw;
+    background-color: #1a1a1a;
+    box-shadow: 0.7vw 0.7vw 0.7vw 0.2vw rgba(0, 0, 0, 0.501),
+        2vw 2vw 1vw 0.2vw rgba(0, 0, 0, 0.299);
+}
+
+.teams {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1vh;
+    margin-bottom: 3vh;
+    width: 100%;
+}
+
+.names {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1vh;
+    margin-bottom: 3vh;
+    width: 100%;
+}
+
+.team {
+    font-size: 2.5vh;
+    background-color: #1a1a1a;
+    color: white;
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+#goals1,
+#goals2 {
+    font-size: 2.5vh;
+    color: white;
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    text-align: center;
+    background-color: #1a1a1a;
+    border: 0.2vw solid #49ba67;
+    border-radius: 0.5vw;
+    padding: 0.5vw;
+    width: 60%;
+    outline: none;
+}
+
+#submit-button {
+    background-color: #49ba67;
+    border: none;
+    border-radius: 0.5vw;
+    color: white;
+    padding: 1vw;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 2vw;
+    margin: 0.5vw;
+    cursor: pointer;
+    align-self: center;
+    margin-bottom: 2vw;
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    box-shadow: 0 0.5vw 1vw 0 rgba(0, 0, 0, 0.24),
+        0 1vw 3vw 0 rgba(0, 0, 0, 0.19);
+}
+
+.vote-title {
+    color: white;
+    font-size: 3vw;
+    margin: 0;
+    margin-bottom: 1vw;
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    align-self: center;
+}
+
+.vs {
+    color: white;
+    font-size: 3vw;
+    margin: 0;
+    margin-bottom: 1vw;
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    align-self: center;
+}

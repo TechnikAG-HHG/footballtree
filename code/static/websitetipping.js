@@ -133,22 +133,23 @@ function voteForMatch(match) {
     voteContainer.id = "vote-container";
     voteContainer.classList.add("vote-container");
 
-    let namesDiv = document.createElement("div");
-    namesDiv.classList.add("names");
-    voteContainer.appendChild(namesDiv);
+    let title = document.createElement("h2");
+    title.textContent = "Deine Wette für das Spiel:";
+    title.classList.add("vote-title");
+    voteContainer.appendChild(title);
+
+    let teamsDiv = document.createElement("div");
+    teamsDiv.classList.add("teams");
+    voteContainer.appendChild(teamsDiv);
+
+    let team1Div = document.createElement("div");
+    team1Div.classList.add("names");
+    teamsDiv.appendChild(team1Div);
 
     let team1 = document.createElement("p");
     team1.classList.add("team");
     team1.textContent = matchData[0];
-    namesDiv.appendChild(team1);
-
-    let team2 = document.createElement("p");
-    team2.classList.add("team");
-    team2.textContent = matchData[1];
-    namesDiv.appendChild(team2);
-
-    let entryDiv = document.createElement("div");
-    entryDiv.classList.add("entry");
+    team1Div.appendChild(team1);
 
     let goals1 = document.createElement("input");
     goals1.type = "number";
@@ -160,10 +161,26 @@ function voteForMatch(match) {
             goals1.value = 0;
         }
     });
-    if (tippingData["tips"][matchNumber] != null) {
-        goals1.value = tippingData["tips"][matchNumber]["team1Goals"];
+    if (tippingData["tips"] != null) {
+        if (tippingData["tips"][matchNumber] != null) {
+            goals1.value = tippingData["tips"][matchNumber]["team1Goals"];
+        }
     }
-    entryDiv.appendChild(goals1);
+    team1Div.appendChild(goals1);
+
+    let vs = document.createElement("p");
+    vs.textContent = "vs";
+    vs.classList.add("vs");
+    teamsDiv.appendChild(vs);
+
+    let team2Div = document.createElement("div");
+    team2Div.classList.add("names");
+    teamsDiv.appendChild(team2Div);
+
+    let team2 = document.createElement("p");
+    team2.classList.add("team");
+    team2.textContent = matchData[1];
+    team2Div.appendChild(team2);
 
     let goals2 = document.createElement("input");
     goals2.type = "number";
@@ -175,17 +192,18 @@ function voteForMatch(match) {
             goals2.value = 0;
         }
     });
-    if (tippingData["tips"][matchNumber] != null) {
-        goals2.value = tippingData["tips"][matchNumber]["team2Goals"];
+    if (tippingData["tips"] != null) {
+        if (tippingData["tips"][matchNumber] != null) {
+            goals2.value = tippingData["tips"][matchNumber]["team2Goals"];
+        }
     }
-    entryDiv.appendChild(goals2);
+    team2Div.appendChild(goals2);
 
     let submitButton = document.createElement("button");
-    submitButton.textContent = "Abstimmen";
+    submitButton.textContent = "Wette abschicken";
+    submitButton.id = "submit-button";
     submitButton.addEventListener("click", handleSubmit);
-    entryDiv.appendChild(submitButton);
-
-    voteContainer.appendChild(entryDiv);
+    voteContainer.appendChild(submitButton);
 
     let container = document.getElementsByClassName("content")[0];
     container.appendChild(voteContainer);
