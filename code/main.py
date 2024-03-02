@@ -3494,6 +3494,17 @@ def send_tipping_data():
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     
+    
+    if match_id > 0:
+        if match_id <= tkapp.active_match:
+            return jsonify(message="Match already started or finished")
+    else:
+        if tkapp.active_mode.get() == 2:
+            match_id = (match_id * -1) - 2
+            if match_id <= tkapp.active_match:
+                return jsonify(message="Match already started or finished")
+            
+    
     cursor.execute("SELECT * FROM tippingData WHERE googleId = ? AND matchId = ?", (google_id, match_id))
     result = cursor.fetchone()
     
