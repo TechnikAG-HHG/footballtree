@@ -7,7 +7,7 @@ import threading
 import requests
 import os
 import time
-from flask import Flask, send_file, request, abort, render_template, make_response, session, redirect, jsonify
+from flask import Flask, send_file, request, abort, render_template, make_response, session, redirect, jsonify, send_from_directory
 import sqlite3
 import vlc
 import datetime
@@ -2100,10 +2100,10 @@ class Window(ctk.CTk):
                 if new_match_index > len(matches):
                     result = tkinter.messagebox.askyesno("End of Matches", "You have reached the end of the matches. Do you want activate the pause and the final matches?")
                     if result:
-                        self.active_mode.set(2)
-                        self.on_radio_button_change()
                         self.pause_mode.set(1)
                         self.on_pause_switch_change()
+                        self.active_mode.set(2)
+                        self.on_radio_button_change()
                         self.update_idletasks()
                         self.update()
                         return
@@ -2133,7 +2133,6 @@ class Window(ctk.CTk):
                 logging.debug(f"new_match_index: {new_match_index}")
                 logging.debug(f"teams_playing: {teams_playing}")
                 
-
             except ValueError:
                 # Handle the case where the selected match is not found in the list
                 logging.debug("Selected match not found in the list.")
@@ -3221,6 +3220,9 @@ def get_data_for_website(which_data=-1):
     
     elif which_data == 6 and tkapp.active_mode.get() == 2:
         
+        if tkapp.pause_mode.get() == 1:
+            return None
+    
         if tkapp.cache_vars.get("getfinalmatches_changed_using_var") == True:
             
             final_goles = []
@@ -3334,7 +3336,7 @@ def get_initial_data(template_name, base_url=None):
         "LastUpdate": 0,
         "pauseMode": tkapp.pause_mode.get(),
         "timeIntervalFinalMatch": tkapp.time_interval_for_only_the_final_match.get().replace("m", ""),
-        "bestScorerActive": tkapp.best_scorer_active.get(),##############################################################################################
+        "bestScorerActive": tkapp.best_scorer_active.get(),
     }
     return make_response(render_template(template_name, initial_data=initial_data, base_url=base_url))
 
@@ -3463,6 +3465,35 @@ def update_data():
     #updated_data = {'Players': {"Player1":"Erik Van Doof","Player2":"Felix Schweigmann"}}  # You can modify this data as needed
     return jsonify(updated_data)
 
+
+##############################################################################################
+########################################## Favicon ###########################################
+##############################################################################################
+
+@app.route('/favicon.ico')
+def favicon():
+    print("favicon")
+    return send_from_directory(os.path.join(app.root_path, '../favicon'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+@app.route('/apple-touch-icon.png')
+def apple_touch_icon():
+    return send_from_directory(os.path.join(app.root_path, '../favicon'), 'apple-touch-icon.png', mimetype='image/png')
+
+@app.route('/favicon-32x32.png')
+def favicon_32():
+    return send_from_directory(os.path.join(app.root_path, '../favicon'), 'favicon-32x32.png', mimetype='image/png')
+
+@app.route('/favicon-16x16.png')
+def favicon_16():
+    return send_from_directory(os.path.join(app.root_path, '../favicon'), 'favicon-16x16.png', mimetype='image/png')
+
+@app.route('/site.webmanifest')
+def site_webmanifest():
+    return send_from_directory(os.path.join(app.root_path, '../favicon'), 'site.webmanifest')
+
+@app.route('/safari-pinned-tab.svg')
+def safari_pinned_tab():
+    return send_from_directory(os.path.join(app.root_path, '../favicon'), 'safari-pinned-tab.svg', mimetype='image/svg+xml')
 
 ##############################################################################################
 ########################################### Init #############################################
