@@ -7,3 +7,4 @@ data/data.db
 *.pyc
 *.db-journal
 *.log
+*.json

@@ -16,11 +16,15 @@ import glob
 import ast
 import logging
 import sys
-#import database_commands.database_commands as db_com
-
+from google.oauth2 import id_token
+from google_auth_oauthlib.flow import Flow
+from pip._vendor import cachecontrol
+import google.auth.transport.requests
+import pathlib
+import functools
 
 app = Flask(__name__)
-#app.secret_key = "Felix.com"
+app.secret_key = "Felix.com"
 
 lock = threading.Lock()
 
@@ -3341,6 +3345,80 @@ def get_initial_data(template_name, base_url=None):
     return make_response(render_template(template_name, initial_data=initial_data, base_url=base_url))
 
 ##############################################################################################
+###################################### Google Auth ###########################################
+##############################################################################################
+
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+
+GOOGLE_CLIENT_ID = "450306821477-t53clamc7s8u20adedj2fqhv0904aa8t.apps.googleusercontent.com"
+client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret.json")
+
+flow = Flow.from_client_secrets_file(
+    client_secrets_file=client_secrets_file,
+    scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
+    redirect_uri="http://technikag.serveo.net/callback"
+)
+
+
+def login_is_required(function):
+    @functools.wraps(function)
+    def decorator(*args, **kwargs):
+        if "google_id" not in session:
+            return redirect("/login")
+        else:
+            return function(*args, **kwargs)
+    return decorator
+
+@app.route("/login")
+def login():
+    authorization_url, state = flow.authorization_url()
+    session["state"] = state
+    return redirect(authorization_url)
+
+@app.route("/callback")
+def callback():
+    global session
+    state = session.pop("state", None)  # Use pop to get and remove state from session
+    if state is None or state != request.args.get("state"):
+        return redirect("/login")
+
+    flow.fetch_token(authorization_response=request.url)
+
+    credentials = flow.credentials
+    request_session = requests.session()
+    cached_session = cachecontrol.CacheControl(request_session)
+    token_request = google.auth.transport.requests.Request(session=cached_session)
+
+
+    id_info = id_token.verify_oauth2_token(
+        id_token=credentials._id_token,
+        request=token_request,
+        audience=GOOGLE_CLIENT_ID, 
+        clock_skew_in_seconds=10
+    )
+  
+
+    session["google_id"] = id_info.get("sub")
+    session["name"] = id_info.get("name")
+    return redirect("/tipping")
+ 
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
+
+##############################################################################################
+########################################## Tipping ###########################################
+##############################################################################################
+
+@app.route("/tipping_data")
+@login_is_required
+def tipping_data_index():
+    google_id = session["google_id"]
+    print(google_id)
+    return redirect("/tipping")
+
+##############################################################################################
 ########################################### Sites ############################################
 ##############################################################################################
 
@@ -3368,6 +3446,7 @@ def best_scorer_index():
         abort(404) 
 
 @app.route("/tipping")
+@login_is_required
 def tipping_index():
     return get_initial_data("websitetipping.html")
 
