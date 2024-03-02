@@ -22,6 +22,7 @@ from pip._vendor import cachecontrol
 import google.auth.transport.requests
 import pathlib
 import functools
+import subprocess
 
 app = Flask(__name__)
 app.secret_key = "Felix.com"
@@ -3588,7 +3589,7 @@ db_path = "data/data.db"
 stored_data = {}
 tkapp = Window(True)
 
-
+subprocess.Popen(["python3", "code/serveo_shh_connect.py"])
 
 if __name__ == "__main__":
     tkapp.mainloop()

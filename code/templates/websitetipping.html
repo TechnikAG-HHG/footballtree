@@ -23,6 +23,28 @@
             <h1 id="websiteTitle">Loading...</h1>
         </div>
 
+        <div class="content">
+            <div id="name-content">
+                <input
+                    type="text"
+                    id="name-input"
+                    placeholder="Vor- und Nachname"
+                />
+                <p id="name-info">
+                    Bei der Auswertung werden nur richtige und vollständige
+                    Namen ber&uuml;cksichtigt. Dein Name ist nicht
+                    &ouml;ffentlich einsehbar, wird aber bei einem Gewinn
+                    ausgerufen.
+                </p>
+            </div>
+            <div id="tipping-content">
+                <label for="game-select">Wähle ein Spiel zum Wetten aus:</label>
+                <select id="game-select">
+                    <option value="0">Loading...</option>
+                </select>
+            </div>
+        </div>
+
         <script>
             // Your existing script for initializing data
             var data = {{ initial_data|tojson|safe }};
