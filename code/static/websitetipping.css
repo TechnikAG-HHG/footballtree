@@ -60,3 +60,99 @@ body {
     box-shadow: 0 0.5vw 1vw 0 rgba(0, 0, 0, 0.24),
         0 1vw 3vw 0 rgba(0, 0, 0, 0.19);
 }
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 3vh;
+    margin-bottom: 3vh;
+}
+
+#name-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1vh;
+    margin-bottom: 3vh;
+    width: 80%;
+}
+
+#name-input {
+    width: 50vw;
+    height: 3vw;
+    font-size: 2vw;
+    padding: 0.5vw;
+    border-radius: 0.5vw;
+    border: 0.2vw solid #49ba67;
+    background-color: #1a1a1a;
+    color: white;
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    text-align: center;
+    outline: none;
+    align-self: center;
+    box-shadow: 0.7vw 0.7vw 0.7vw 0.2vw rgba(0, 0, 0, 0.501),
+        2vw 2vw 1vw 0.2vw rgba(0, 0, 0, 0.299);
+}
+
+#name-info {
+    color: white;
+    font-size: 0.7vw;
+    margin: 0;
+    margin-bottom: 1vw;
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    align-self: center;
+    margin-top: 0.3vh;
+}
+
+#tipping-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1vh;
+    margin-bottom: 3vh;
+    width: 80%;
+    height: 70%;
+}
+
+#label-game-select {
+    color: white;
+    font-size: 2vw;
+    margin: 0;
+    margin-bottom: 1vw;
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    align-self: center;
+}
+
+#game-select {
+    width: 40%;
+    height: 3vw;
+    font-size: 2.5vh;
+    padding: 0.5vw;
+    border-radius: 0.5vw;
+    border: 0.2vw solid #49ba67;
+    background-color: #1a1a1a;
+    color: white;
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    text-align: center;
+    outline: none;
+    align-self: center;
+    box-shadow: 0.7vw 0.7vw 0.7vw 0.2vw rgba(0, 0, 0, 0.501),
+        2vw 2vw 1vw 0.2vw rgba(0, 0, 0, 0.299);
+}
+
+#game-select option {
+    background-color: #1a1a1a;
+    color: white;
+    font-family: "Roboto", sans-serif;
+    text-align: center;
+    padding: 0.5vw 1vw;
+    font-size: 1.5vh;
+}
