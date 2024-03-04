@@ -210,16 +210,17 @@ p {
     .pauseTime,
     #pauseTimeProgress {
         height: 4vh;
+        border: 0.1vh solid #49ba67;
     }
 
     #pauseTimeStart,
     #pauseTimeEnd,
     #pauseTimeText {
-        font-size: 1.3vh;
+        font-size: 1.5vh;
     }
 
     table td {
-        font-size: 1.3vh;
-        border: 1.3px solid #49ba67;
+        font-size: 1.5vh;
+        border: 0.1vh solid #49ba67;
     }
 }
