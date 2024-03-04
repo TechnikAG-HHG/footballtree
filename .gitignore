@@ -1,8 +1,6 @@
-.vscode/settings.json
 *.txt
 *.db
 data/data.db
-*.db
 .vscode/settings.json
 *.pyc
 *.db-journal
