@@ -1,4 +1,5 @@
 var tippingData = {};
+var oldMatchesData;
 
 async function updateData() {
     // Include the last data version in the request headers
@@ -48,6 +49,13 @@ function generateDropdownData() {
 
     // Store the currently selected value
     var selectedValue = dropdown.value;
+
+    console.log("Matches data:", data["Matches"]);
+    console.log("Old matches data:", oldMatchesData);
+
+    if (JSON.stringify(data["Matches"]) === JSON.stringify(oldMatchesData)) {
+        return;
+    }
 
     while (dropdown.firstChild) {
         dropdown.removeChild(dropdown.firstChild);
@@ -161,6 +169,8 @@ function generateDropdownData() {
     if (voteContainer == null) {
         voteForMatch(document.getElementById("game-select").value);
     }
+
+    oldMatchesData = data["Matches"];
 }
 
 function voteForMatch(match) {
