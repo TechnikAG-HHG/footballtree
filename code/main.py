@@ -73,6 +73,7 @@ class Window(ctk.CTk):
         self.final_match_teams = []
         self.spiel_um_platz_3 = []
         self.matches = []
+        self.tippers_list_frame = None
         
         self.delay_time_label = None
         self.delay_time_save_for_blinking = 0
@@ -301,10 +302,10 @@ class Window(ctk.CTk):
             matchId INTEGER REFERENCES matchData(matchId),
             team1Goals INTEGER DEFAULT 0,
             team2Goals INTEGER DEFAULT 0,
-            googleId TEXT REFERENCES userData(googleId)
+            googleId TEXT REFERENCES userData(googleId),
+            points INTEGER DEFAULT 0
         )
         """
-        
         self.cursor.execute(tippingTableCreationQuery)
         self.connection.commit()
         
@@ -2421,14 +2422,119 @@ class Window(ctk.CTk):
     ###########################################################################################################  
     
     def create_tipping_elements(self):
-            
         # Create elements for the Contact frame
         tipping_frame = ctk.CTkFrame(self.tipping_frame, bg_color='#0e1718', fg_color='#0e1718')
-        tipping_frame.pack(pady=7, anchor=tk.NW, side=tk.LEFT, padx=15)
+        tipping_frame.pack(pady=7, anchor=tk.NW, side=tk.LEFT, padx=15, fill=tk.BOTH, expand=True)
+
+        self.tipping_tab_view = ctk.CTkTabview(tipping_frame, bg_color='#0e1718', fg_color='#0e1718', command=self.on_tipping_tab_change)
+        self.tipping_tab_view.pack(pady=0, anchor=tk.NW, side=tk.TOP, padx=0, fill=tk.BOTH, expand=True)
+
+        self.tipping_tab_list = self.tipping_tab_view.add("Tippers List")
+        self.tipping_tab_view.set("Tippers List")
+        self.tipping_tab_winners = self.tipping_tab_view.add("Winners")
+
+        self.create_tippers_list_elements()
+
+
+    def create_tippers_list_elements(self):
+        self.calculate_points_for_tippers_using_db()
+
+        getTippers = """
+        SELECT t.googleId, u.userName, t.points FROM tippingData t, userData u
+        WHERE t.googleId = u.googleId
+        ORDER BY t.points DESC
+        """
+        self.cursor.execute(getTippers)
+        tippers = self.cursor.fetchall()
+
+        self.tippers_list_frame = ttk.Frame(self.tipping_tab_list)
+        self.tippers_list_frame.grid(pady=7, sticky=tk.NSEW)
+
+        # Create a style
+        style = ttk.Style()
+        
+        style.theme_use("clam")
+
+        # Configure the Treeview heading
+        style.configure("Treeview.Heading",
+                        foreground='white',  # Set font color
+                        font=('Helvetica', 10, 'bold'),  # Set font size and style
+                        background='#0e1718',
+                        fieldbackground='#0e1718')
+
+        # Configure the Treeview content
+        style.configure("Treeview",
+                        foreground='white',  # Set font color
+                        font=('Helvetica', 10),
+                        background='#0e1718',
+                        fieldbackground='#0e1718')
+
+        # Create the treeview widget
+        tree = ttk.Treeview(self.tippers_list_frame, columns=('Tipper', 'Points'), show='headings')
+
+        # Configure column widths (optional)
+        tree.column('Tipper', width=100)
+        tree.column('Points', width=100)
+
+        # Create column headings
+        tree.heading('Tipper', text='Tipper')
+        tree.heading('Points', text='Points')
+
+        # Insert data into the treeview
+        for tipper in tippers:
+            tree.insert('', 'end', values=(tipper[1], tipper[2]))
+
+        tree.grid(sticky=tk.NSEW)  # Add treeview to GUI
             
-  
             
+    def on_tipping_tab_change(self):
+        current_tab = self.tipping_tab_view.get()
+        print("current_tab", current_tab)
+        
+        if current_tab == "Tippers List":
+            if self.tippers_list_frame:
+                self.tippers_list_frame.grid_forget()
+                self.tippers_list_frame.destroy()
+            self.create_tippers_list_elements()
             
+        
+    def calculate_points_for_tippers_using_db(self):
+        getTippersAndMatches = """
+        SELECT t.googleId, t.team1Goals, t.team2Goals, m.matchId, m.team1Id, m.team2Id, m.team1Goals, m.team2Goals 
+        FROM tippingData t
+        INNER JOIN matchData m ON t.matchId = m.matchId
+        ORDER BY m.matchId ASC
+        """
+        self.cursor.execute(getTippersAndMatches)
+        tippers_and_matches = self.cursor.fetchall()
+        
+        update_points = {}
+
+        for row in tippers_and_matches:
+            googleId, tipper_team1Goals, tipper_team2Goals, matchId, team1Id, team2Id, team1Goals, team2Goals = row
+
+            goal_difference = team1Goals - team2Goals
+            team1won = team1Goals > team2Goals
+            
+            if tipper_team1Goals == team1Goals and tipper_team2Goals == team2Goals:
+                points = 4
+            elif (tipper_team1Goals - tipper_team2Goals) == goal_difference:
+                points = 3
+            elif (tipper_team1Goals > tipper_team2Goals and team1won) or (tipper_team1Goals < tipper_team2Goals and not team1won):
+                points = 2    
+            else:
+                points = 0
+            
+            update_points[googleId] = update_points.get(googleId, 0) + points
+            
+        for googleId, points in update_points.items():
+            updatePoints = """
+            UPDATE tippingData
+            SET points = ?
+            WHERE googleId = ?
+            """
+            self.cursor.execute(updatePoints, (points, googleId))
+
     
     ###########################################################################################################
     ###########################################################################################################
@@ -3512,6 +3618,11 @@ def send_tipping_data():
     match_id = request.json['matchId']
     team1_goals = request.json['team1Goals']
     team2_goals = request.json['team2Goals']
+    
+    if match_id == "" or match_id == None:
+        return jsonify(message="Please enter a valid match id")
+    elif team1_goals == "" or team2_goals == "" or team1_goals == None or team2_goals == None:
+        return jsonify(message="Please enter a valid number")
     
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
