@@ -326,7 +326,7 @@ class Window(ctk.CTk):
         
         # create the variables for the settings
         self.volume = tk.IntVar(value=50)
-        self.active_mode = tk.IntVar(value=1)
+        self.active_mode = tk.IntVar(value=-1)
         self.debug_mode = tk.IntVar(value=0)
         self.start_time = tk.StringVar(value="08:00")
         self.time_interval = tk.StringVar(value="10m")
@@ -1784,9 +1784,8 @@ class Window(ctk.CTk):
                 self.spiel_select.set(values_list[self.active_match])
                 self.manual_select_active = False
             elif (values_list != [] and self.teams_playing.count(None) != 0) or (values_list != [] and self.manual_select_active == False):
-                self.on_match_select(values_list[0], matches)
-                self.manual_select_active = False
                 return
+
             elif self.manual_select_active == False:
                 self.active_match = -1
                 self.teams_playing = [None, None]
@@ -2143,6 +2142,18 @@ class Window(ctk.CTk):
                         return
                     else:
                         return
+                    
+                if new_match_index == 0 and next_match == False and self.active_mode.get() == 1:
+                    result = tkinter.messagebox.askyesno("Select no match", "You have reached the beginning of the matches. Do you want to select no match?")
+                    if result:
+                        self.active_match = -1
+                        self.teams_playing = [None, None]
+                        self.save_teams_playing_and_active_match()
+                        self.reload_spiel_button_command()
+                        self.show_frame(self.SPIEL_frame)
+                        return
+                    else:
+                        return
 
                 # Ensure the new index is within bounds
                 new_match_index = max(1, min(new_match_index, len(matches)))
@@ -2424,11 +2435,116 @@ class Window(ctk.CTk):
             
         # Create elements for the Contact frame
         tipping_frame = ctk.CTkFrame(self.tipping_frame, bg_color='#0e1718', fg_color='#0e1718')
-        tipping_frame.pack(pady=7, anchor=tk.NW, side=tk.LEFT, padx=15)
+        tipping_frame.pack(pady=7, anchor=tk.NW, side=tk.LEFT, padx=15, fill=tk.BOTH, expand=True)
+
+        self.tipping_tab_view = ctk.CTkTabview(tipping_frame, bg_color='#0e1718', fg_color='#0e1718', command=self.on_tipping_tab_change)
+        self.tipping_tab_view.pack(pady=0, anchor=tk.NW, side=tk.TOP, padx=0, fill=tk.BOTH, expand=True)
+
+        self.tipping_tab_list = self.tipping_tab_view.add("Tippers List")
+        self.tipping_tab_view.set("Tippers List")
+        self.tipping_tab_winners = self.tipping_tab_view.add("Winners")
+
+        self.create_tippers_list_elements()
+
+    def create_tippers_list_elements(self):
+        self.calculate_points_for_tippers_using_db()
+
+        getTippers = """
+        SELECT t.googleId, u.userName, t.points FROM tippingData t, userData u
+        WHERE t.googleId = u.googleId
+        ORDER BY t.points DESC
+        """
+        self.cursor.execute(getTippers)
+        tippers = self.cursor.fetchall()
+
+        self.tippers_list_frame = ttk.Frame(self.tipping_tab_list)
+        self.tippers_list_frame.pack(fill=tk.BOTH, expand=True)  # Change grid to pack
+
+        # Create a style
+        style = ttk.Style()
+        
+        style.theme_use("clam")
+        
+        # Configure the Treeview heading
+        style.configure("Treeview.Heading",
+                        foreground='white',  # Set font color
+                        font=('Helvetica', int(self.team_button_font_size*1.4), 'bold'),  # Set font size and style
+                        background='#0e1718',
+                        fieldbackground='#0e1718')
+
+        # Configure the Treeview content
+        style.configure("Treeview",
+                        foreground='white',  # Set font color
+                        font=('Helvetica', int(self.team_button_font_size*1.4)),
+                        background='#0e1718',
+                        fieldbackground='#0e1718')
+
+        # Create the treeview widget
+        tree = ttk.Treeview(self.tippers_list_frame, columns=('Tipper', 'Points'), show='headings')
+
+        # Configure column widths (optional)
+        tree.column('Tipper', width=100)
+        tree.column('Points', width=100)
+
+        # Create column headings
+        tree.heading('Tipper', text='Tipper')
+        tree.heading('Points', text='Points')
+
+        # Insert data into the treeview
+        for tipper in tippers:
+            tree.insert('', 'end', values=(tipper[1], tipper[2]))
+
+        tree.pack(fill=tk.BOTH, expand=True)  # Change grid to pack
             
-  
             
+    def on_tipping_tab_change(self):
+        current_tab = self.tipping_tab_view.get()
+        print("current_tab", current_tab)
+        
+        if current_tab == "Tippers List":
+            if self.tippers_list_frame:
+                self.tippers_list_frame.grid_forget()
+                self.tippers_list_frame.destroy()
+            self.create_tippers_list_elements()
             
+        
+    def calculate_points_for_tippers_using_db(self):
+        getTippersAndMatches = """
+        SELECT t.googleId, t.team1Goals, t.team2Goals, m.matchId, m.team1Id, m.team2Id, m.team1Goals, m.team2Goals 
+        FROM tippingData t
+        INNER JOIN matchData m ON t.matchId = m.matchId
+        ORDER BY m.matchId ASC
+        """
+        self.cursor.execute(getTippersAndMatches)
+        tippers_and_matches = self.cursor.fetchall()
+        
+        update_points = {}
+
+        for row in tippers_and_matches:
+            googleId, tipper_team1Goals, tipper_team2Goals, matchId, team1Id, team2Id, team1Goals, team2Goals = row
+
+            goal_difference = team1Goals - team2Goals
+            team1won = team1Goals > team2Goals
+            
+            if tipper_team1Goals == team1Goals and tipper_team2Goals == team2Goals:
+                points = 4
+            elif (tipper_team1Goals - tipper_team2Goals) == goal_difference:
+                points = 3
+            elif (tipper_team1Goals > tipper_team2Goals and team1won) or (tipper_team1Goals < tipper_team2Goals and not team1won):
+                points = 2    
+            else:
+                points = 0
+            
+            update_points[googleId] = update_points.get(googleId, 0) + points
+            
+        for googleId, points in update_points.items():
+            updatePoints = """
+            UPDATE tippingData
+            SET points = ?
+            WHERE googleId = ?
+            """
+            self.cursor.execute(updatePoints, (points, googleId))
+
     
     ###########################################################################################################
     ###########################################################################################################
@@ -3528,6 +3644,7 @@ def send_tipping_data():
     if match_id >= 0:
         if match_id <= tkapp.active_match:
             return jsonify(message="Match already started or finished")
+        match_id += 1 # To make it compatible with the database
     elif tkapp.active_match != -1 and tkapp.active_mode.get() == 2:
         match_id = (match_id * -1) - 2
         if match_id <= tkapp.active_match:
