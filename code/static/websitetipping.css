@@ -98,6 +98,17 @@ body {
         2vw 2vw 1vw 0.2vw rgba(0, 0, 0, 0.299);
 }
 
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
 #name-info {
     color: white;
     font-size: 0.7vw;
@@ -278,4 +289,79 @@ button.disabled:hover {
 
 div.disabled {
     border: 0.2vw solid #404040 !important;
+}
+
+@media (max-width: 800px) {
+    #name-input {
+        width: 90vw;
+        height: 6vw;
+        font-size: 2.5vh;
+        padding: 1vw;
+        border-radius: 1vw;
+        border: 0.1vh solid #49ba67;
+    }
+
+    #name-info {
+        font-size: 1vh;
+        text-align: center;
+        width: 90vw;
+    }
+
+    #tipping-content {
+        width: 90%;
+    }
+
+    #game-select {
+        width: 80%;
+        height: 4vh;
+        font-size: 4vw;
+        padding: 1vw;
+        border-radius: 1vw;
+    }
+
+    #game-select option {
+        padding: 1vw 2vw;
+        font-size: 3vw;
+    }
+
+    #label-game-select {
+        font-size: 2.5vh;
+    }
+
+    #vote-container {
+        width: 90%;
+    }
+
+    .teams {
+        margin-bottom: 4vh;
+    }
+
+    .names {
+        margin-bottom: 4vh;
+    }
+
+    .team {
+        font-size: 4vw;
+    }
+
+    #goals1,
+    #goals2 {
+        font-size: 4vw;
+        padding: 1vw;
+        border-radius: 1vw;
+    }
+
+    #submit-button {
+        font-size: 4vw;
+        padding: 2vw;
+        margin-bottom: 4vw;
+    }
+
+    .vote-title {
+        font-size: 6vw;
+    }
+
+    .vs {
+        font-size: 6vw;
+    }
 }
