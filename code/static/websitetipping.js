@@ -289,6 +289,12 @@ function voteForMatch(match) {
     submitButton.addEventListener("click", handleSubmit);
     voteContainer.appendChild(submitButton);
 
+    let message = document.createElement("p");
+    message.textContent = "";
+    message.classList.add("invisible");
+    message.id = "status-message";
+    voteContainer.appendChild(message);
+
     let container = document.getElementsByClassName("content")[0];
     container.appendChild(voteContainer);
 }
@@ -299,6 +305,12 @@ function handleSubmit(event) {
     var goals1 = document.getElementById("goals1").value;
     var goals2 = document.getElementById("goals2").value;
     var match = document.getElementById("game-select").value;
+    let name = document.getElementById("name-input").value;
+
+    if (name.length < 3) {
+        generateErrorMessage("Du musst einen Namen eingeben!");
+        return;
+    }
 
     if (match.split(".")[1]) {
         if (match.split(".")[1].startsWith(" Halbfinale")) {
@@ -312,8 +324,12 @@ function handleSubmit(event) {
         matchNumber = -5;
     }
 
-    console.log("Submitting tipping data for match", matchNumber);
-    console.log("Goals", goals1, goals2);
+    if (goals1 == "" || goals2 == "") {
+        generateErrorMessage(
+            "Du musst für beide Teams eine Toranzahl angeben!"
+        );
+        return;
+    }
 
     fetch("/send_tipping_data", {
         method: "POST",
@@ -330,9 +346,13 @@ function handleSubmit(event) {
         .then((data) => {
             console.log("Success:", data);
             updateData();
+            generateSuccessMessage(
+                "Deine Wette wurde erfolgreich abgeschickt!"
+            );
         })
         .catch((error) => {
             console.error("Error:", error);
+            generateErrorMessage("Fehler, bite versuche es erneut!");
         });
 }
 
@@ -340,6 +360,33 @@ function redirectTo(path) {
     window.location.href = path;
 }
 
+let messageTimeout;
+
+function showMessage(message, className) {
+    let statusMessage = document.getElementById("status-message");
+    statusMessage.classList.add(className);
+    statusMessage.classList.remove("invisible");
+    statusMessage.textContent = message;
+
+    clearTimeout(messageTimeout);
+    messageTimeout = setTimeout(function () {
+        statusMessage.classList.add("fade-out");
+        setTimeout(function () {
+            statusMessage.textContent = "";
+            statusMessage.classList.add("invisible");
+            statusMessage.classList.remove(className);
+            statusMessage.classList.remove("fade-out");
+        }, 1000); // same as the transition duration
+    }, 5000);
+}
+
+function generateErrorMessage(message) {
+    showMessage(message, "error-message");
+}
+
+function generateSuccessMessage(message) {
+    showMessage(message, "success-message");
+}
 document.getElementById("returnButton").addEventListener("click", function () {
     redirectTo("/");
 });
