@@ -3750,7 +3750,7 @@ global stored_data
 global initial_data
 global db_path
 
-start_server_and_ssh = False
+start_server_and_ssh = True
 
 db_path = "data/data.db"
 stored_data = {}

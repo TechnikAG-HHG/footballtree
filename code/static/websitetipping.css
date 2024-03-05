@@ -291,6 +291,28 @@ div.disabled {
     border: 0.2vw solid #404040 !important;
 }
 
+p#status-message {
+    font-size: 2vw;
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    height: 4vh;
+    margin: 0;
+    align-self: center;
+}
+
+.error-message {
+    color: #ff0000;
+}
+
+.success-message {
+    color: #49ba67;
+}
+
+#status-message.fade-out {
+    transition: opacity 1s;
+    opacity: 0;
+}
+
 @media (max-width: 800px) {
     #name-input {
         width: 90vw;
@@ -341,18 +363,18 @@ div.disabled {
     }
 
     .team {
-        font-size: 4vw;
+        font-size: 2vh;
     }
 
     #goals1,
     #goals2 {
-        font-size: 4vw;
+        font-size: 2vh;
         padding: 1vw;
         border-radius: 1vw;
     }
 
     #submit-button {
-        font-size: 4vw;
+        font-size: 2vh;
         padding: 2vw;
         margin-bottom: 4vw;
     }
@@ -363,5 +385,9 @@ div.disabled {
 
     .vs {
         font-size: 6vw;
+    }
+
+    p#status-message {
+        font-size: 1.7vh;
     }
 }
