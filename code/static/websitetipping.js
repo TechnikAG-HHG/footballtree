@@ -148,6 +148,18 @@ function generateDropdownData() {
     // If the previously selected option is disabled, select the first enabled option
     if (dropdown.value === selectedValue && dropdown.selectedIndex === -1) {
         dropdown.selectedIndex = 0;
+        voteForMatch(document.getElementById("game-select").value);
+    }
+
+    // Select the first option when the website loads
+    if (dropdown.selectedIndex === -1) {
+        dropdown.selectedIndex = 0;
+        voteForMatch(document.getElementById("game-select").value);
+    }
+
+    let voteContainer = document.getElementById("vote-container");
+    if (voteContainer == null) {
+        voteForMatch(document.getElementById("game-select").value);
     }
 }
 
@@ -283,11 +295,24 @@ function voteForMatch(match) {
 
 function handleSubmit(event) {
     event.preventDefault();
+    let matchNumber = -1;
     var goals1 = document.getElementById("goals1").value;
     var goals2 = document.getElementById("goals2").value;
     var match = document.getElementById("game-select").value;
 
-    console.log("Submitting tipping data for match", match);
+    if (match.split(".")[1]) {
+        if (match.split(".")[1].startsWith(" Halbfinale")) {
+            matchNumber = parseInt(match.split(".")[0]) * -1 - 1;
+        } else {
+            matchNumber = match.split(".")[0] - 1;
+        }
+    } else if (match.split(":")[0] == "Spiel um Platz 3") {
+        matchNumber = -4;
+    } else if (match.split(":")[0] == "Finale") {
+        matchNumber = -5;
+    }
+
+    console.log("Submitting tipping data for match", matchNumber);
     console.log("Goals", goals1, goals2);
 
     fetch("/send_tipping_data", {
@@ -296,7 +321,7 @@ function handleSubmit(event) {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            matchId: match.split(".")[0] - 1,
+            matchId: matchNumber,
             team1Goals: goals1,
             team2Goals: goals2,
         }),
