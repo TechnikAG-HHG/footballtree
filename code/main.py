@@ -41,6 +41,7 @@ class Window(ctk.CTk):
             ("Team Creation", self.show_Team_frame),
             ("Player Selection", self.show_player_frame),
             ("Active Match", self.show_SPIEL_frame),
+            ("Tipping", self.show_tipping_frame),
             ("Settings", self.show_settings_frame),
         ]
 
@@ -50,7 +51,10 @@ class Window(ctk.CTk):
 
         for text, command in buttons:
             button = ctk.CTkButton(navigation_frame, text=text, command=command, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
-            button.pack(side=tk.TOP, anchor=tk.N, pady=8, padx=14, fill=tk.X)
+            if text == "Settings":
+                button.pack(side=tk.BOTTOM, anchor=tk.S, pady=8, padx=14, fill=tk.X)
+            else:
+                button.pack(side=tk.TOP, anchor=tk.N, pady=8, padx=14, fill=tk.X)
             
             
     def __init__(self, start_server):
@@ -149,12 +153,14 @@ class Window(ctk.CTk):
         self.Team_frame = ctk.CTkFrame(self, fg_color='#0e1718', corner_radius=0)
         self.player_frame = ctk.CTkFrame(self, height=10, fg_color='#0e1718', corner_radius=0)
         self.SPIEL_frame = ctk.CTkFrame(self, fg_color='#0e1718', corner_radius=0)
+        self.tipping_frame = ctk.CTkFrame(self, fg_color='#0e1718', corner_radius=0)
         self.settings_frame = ctk.CTkFrame(self, fg_color='#0e1718', corner_radius=0)
 
         # Create elements for each frame
         self.create_Team_elements()
         self.create_player_elements()
         self.create_SPIEL_elements()
+        self.create_tipping_elements()
         self.create_settings_elements()
 
         if start_server:
@@ -386,31 +392,84 @@ class Window(ctk.CTk):
     ##############################################################################################
     ##############################################################################################
     ##############################################################################################
+    
+    def create_Team_elements(self):
+        # Create elements for the Team frame
+        canvas = tk.Canvas(self.Team_frame, bg="#0e1718")
+        canvas.pack(side="left", fill="both", expand=True, padx=10, pady=10)
+        
+        # Create a scrollbar and connect it to the canvas
+        scrollbar = ctk.CTkScrollbar(self.Team_frame, orientation='vertical', command=canvas.yview)
+        scrollbar.pack(side="right", fill="y")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        self.team_entries_frame = ctk.CTkFrame(canvas, fg_color="#0e1718")
+        canvas.create_window((0, 0), window=self.team_entries_frame, anchor="nw")
+        
+        name_entries = []
+        self.write_names_into_entry_fields()
+
+        self.team_entries_frame.bind("<Configure>", lambda event, canvas=canvas: self.on_frame_configure(canvas))
+
+        button_width = self.screenwidth / 15
+        button_height = self.screenheight / 27
+        button_font_size = self.screenwidth / 120
+        
+        self.get_teams_for_final_matches()
+        
+        team_button_frame = ctk.CTkFrame(self.Team_frame, bg_color='#142324', fg_color='#142324')
+        team_button_frame.pack(anchor=tk.NE, side=tk.TOP, pady=10, padx=10)
+
+        # Button to add a new name entry
+        add_button = ctk.CTkButton(team_button_frame, text="Add Name", command=self.add_name_entry, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
+        add_button.pack(pady=8, padx=10)
+
+        # Button to retrieve the entered names
+        submit_button = ctk.CTkButton(team_button_frame, text="Submit", command=self.save_team_names_in_db, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
+        submit_button.pack(pady=8, padx=10)
+
+        reload_button = ctk.CTkButton(team_button_frame, text="Reload", command=self.reload_button_command, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
+        reload_button.pack(pady=8, padx=10)
+
+
+    def write_names_into_entry_fields(self):
+        selectTeams = """
+        SELECT teamName, mp3Path FROM teamData
+        ORDER BY id ASC
+        """
+        self.cursor.execute(selectTeams)
+        
+        allfetched = self.cursor.fetchall()
+        
+        if not allfetched:
+            self.add_name_entry()
+        
+        for teamName, mp3_path in allfetched:
+            self.add_name_entry(teamName, mp3_path)
+
 
     def add_name_entry(self, entry_text="", mp3_path=""):
-        team_element_width = self.screenwidth / 10
-        team_element_height = self.screenheight / 30
-        team_element_font_size = self.screenwidth / 150
-        #logging.debug(entry_text)
+        if not hasattr(self, 'team_element_width'):
+            self.team_element_width = self.screenwidth / 10
+            self.team_element_height = self.screenheight / 30
+            self.team_element_font_size = self.screenwidth / 150
+
         count = len(self.name_entries) + 1
         team_id = count - 1
 
-        # Create a label with "Team 1" and the count
         label_text = f'Team {count}'
-        label = ctk.CTkLabel(self.team_entries_frame, text=label_text, font=("Helvetica", team_element_font_size * 1.2, "bold"))  # Increase font size
-        label.grid(row=len(self.name_entries), column=0, padx=15, pady=5, sticky='e')
+        label = ctk.CTkLabel(self.team_entries_frame, text=label_text, font=("Helvetica", self.team_element_font_size * 1.2, "bold"))
+        label.grid(row=team_id, column=0, padx=15, pady=5, sticky='e')
         
-        # Create a new entry field
-        new_entry = ctk.CTkEntry(self.team_entries_frame, font=("Helvetica", team_element_font_size), width=team_element_width, height=team_element_height)  # Increase font size
+        new_entry = ctk.CTkEntry(self.team_entries_frame, font=("Helvetica", self.team_element_font_size), width=self.team_element_width, height=self.team_element_height)
         
-        # Write entry_text to the entry field if it is not empty
         if entry_text:
             new_entry.insert(0, entry_text)
         
-        new_entry.grid(row=len(self.name_entries), column=1, pady=5, sticky='we')
+        new_entry.grid(row=team_id, column=1, pady=5, sticky='we')
         
-        new_file_dialog = ctk.CTkButton(self.team_entries_frame, text="Select mp3", command=lambda: self.save_mp3_path(new_file_dialog, team_id), width=team_element_width, height=team_element_height, font=("Helvetica", team_element_font_size), fg_color="#34757a", hover_color="#1f4346")
-        new_file_dialog.grid(row=len(self.name_entries), column=2, pady=5, sticky='we', padx=12)
+        new_file_dialog = ctk.CTkButton(self.team_entries_frame, text="Select mp3", command=lambda: self.save_mp3_path(new_file_dialog, team_id), width=self.team_element_width, height=self.team_element_height, font=("Helvetica", self.team_element_font_size), fg_color="#34757a", hover_color="#1f4346")
+        new_file_dialog.grid(row=team_id, column=2, pady=5, sticky='we', padx=12)
         
         if mp3_path:
             self.mp3_list[team_id] = mp3_path
@@ -535,65 +594,7 @@ class Window(ctk.CTk):
             self.updated_data.update({"Teams": get_data_for_website(0)})
             self.updated_data.update({"Matches": get_data_for_website(4)})
             self.updated_data.update({"finalMatches": get_data_for_website(6)})
-        
     
-    def write_names_into_entry_fields(self):
-        selectTeams = """
-        SELECT teamName, mp3Path FROM teamData
-        ORDER BY id ASC
-        """
-        self.cursor.execute(selectTeams)
-        
-        allfetched = self.cursor.fetchall()
-        
-        if allfetched == []:
-            self.add_name_entry()
-        
-        #logging.debug("allfetched", allfetched)
-        for teamName, mp3_path in allfetched:
-            #logging.debug("teamName", teamName)
-            #logging.debug("mp3_path", mp3_path)
-            self.add_name_entry(teamName, mp3_path)
-           
-
-    def create_Team_elements(self):
-        # Create elements for the Team frame
-        canvas = tk.Canvas(self.Team_frame, bg="#0e1718")
-        canvas.pack(side="left", fill="both", expand=True, padx=10, pady=10)
-        
-        # Create a scrollbar and connect it to the canvas
-        scrollbar = ctk.CTkScrollbar(self.Team_frame, orientation='vertical', command=canvas.yview)
-        scrollbar.pack(side="right", fill="y")
-        canvas.configure(yscrollcommand=scrollbar.set)
-        
-        self.team_entries_frame = ctk.CTkFrame(canvas, fg_color="#0e1718")
-        canvas.create_window((0, 0), window=self.team_entries_frame, anchor="nw")
-        
-        name_entries = []
-        self.write_names_into_entry_fields()
-
-        self.team_entries_frame.bind("<Configure>", lambda event, canvas=canvas: self.on_frame_configure(canvas))
-
-        button_width = self.screenwidth / 15
-        button_height = self.screenheight / 27
-        button_font_size = self.screenwidth / 120
-        
-        self.get_teams_for_final_matches()
-        
-        team_button_frame = ctk.CTkFrame(self.Team_frame, bg_color='#142324', fg_color='#142324')
-        team_button_frame.pack(anchor=tk.NE, side=tk.TOP, pady=10, padx=10)
-
-        # Button to add a new name entry
-        add_button = ctk.CTkButton(team_button_frame, text="Add Name", command=self.add_name_entry, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
-        add_button.pack(pady=8, padx=10)
-
-        # Button to retrieve the entered names
-        submit_button = ctk.CTkButton(team_button_frame, text="Submit", command=self.save_team_names_in_db, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
-        submit_button.pack(pady=8, padx=10)
-
-        reload_button = ctk.CTkButton(team_button_frame, text="Reload", command=self.reload_button_command, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
-        reload_button.pack(pady=8, padx=10)
-            
 
     def create_backup_of_db(self):
         backup_dir = "data/backups/"
@@ -2417,7 +2418,22 @@ class Window(ctk.CTk):
     ###########################################################################################################
     ###########################################################################################################
     ###########################################################################################################
-    ###########################################################################################################   
+    ###########################################################################################################  
+    
+    def create_tipping_elements(self):
+            
+        # Create elements for the Contact frame
+        tipping_frame = ctk.CTkFrame(self.tipping_frame, bg_color='#0e1718', fg_color='#0e1718')
+        tipping_frame.pack(pady=7, anchor=tk.NW, side=tk.LEFT, padx=15)
+            
+  
+            
+            
+    
+    ###########################################################################################################
+    ###########################################################################################################
+    ###########################################################################################################
+    ########################################################################################################### 
 
     def create_settings_elements(self):
         
@@ -2769,7 +2785,7 @@ class Window(ctk.CTk):
 
     def show_frame(self, frame):
         # Hide all frames and pack the selected frame
-        for frm in [self.Team_frame, self.player_frame, self.SPIEL_frame, self.settings_frame]: # self.settings_frame
+        for frm in [self.Team_frame, self.player_frame, self.SPIEL_frame, self.tipping_frame, self.settings_frame]:
             frm.pack_forget()
         frame.pack(fill=tk.BOTH, expand=True)
 
@@ -2795,7 +2811,12 @@ class Window(ctk.CTk):
         #logging.debug(stored_data)
         self.calculate_matches()
         self.show_frame(self.SPIEL_frame)
-        
+    
+    
+    def show_tipping_frame(self):
+        self.show_frame(self.tipping_frame)
+        self.watch_dog_process_can_be_active = False 
+       
         
     def show_settings_frame(self):
         self.show_frame(self.settings_frame)
@@ -3729,11 +3750,14 @@ global stored_data
 global initial_data
 global db_path
 
+start_server_and_ssh = False
+
 db_path = "data/data.db"
 stored_data = {}
-tkapp = Window(True)
+tkapp = Window(start_server_and_ssh)
 
-subprocess.Popen(["python3", "code/serveo_shh_connect.py"])
+if start_server_and_ssh:
+    subprocess.Popen(["python3", "code/serveo_shh_connect.py"])
 
 if __name__ == "__main__":
     tkapp.mainloop()
