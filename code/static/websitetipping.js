@@ -1,4 +1,5 @@
 var tippingData = {};
+var oldMatchesData;
 
 async function updateData() {
     // Include the last data version in the request headers
@@ -48,6 +49,13 @@ function generateDropdownData() {
 
     // Store the currently selected value
     var selectedValue = dropdown.value;
+
+    console.log("Matches data:", data["Matches"]);
+    console.log("Old matches data:", oldMatchesData);
+
+    if (JSON.stringify(data["Matches"]) === JSON.stringify(oldMatchesData)) {
+        return;
+    }
 
     while (dropdown.firstChild) {
         dropdown.removeChild(dropdown.firstChild);
@@ -148,7 +156,21 @@ function generateDropdownData() {
     // If the previously selected option is disabled, select the first enabled option
     if (dropdown.value === selectedValue && dropdown.selectedIndex === -1) {
         dropdown.selectedIndex = 0;
+        voteForMatch(document.getElementById("game-select").value);
     }
+
+    // Select the first option when the website loads
+    if (dropdown.selectedIndex === -1) {
+        dropdown.selectedIndex = 0;
+        voteForMatch(document.getElementById("game-select").value);
+    }
+
+    let voteContainer = document.getElementById("vote-container");
+    if (voteContainer == null) {
+        voteForMatch(document.getElementById("game-select").value);
+    }
+
+    oldMatchesData = data["Matches"];
 }
 
 function voteForMatch(match) {
@@ -277,18 +299,47 @@ function voteForMatch(match) {
     submitButton.addEventListener("click", handleSubmit);
     voteContainer.appendChild(submitButton);
 
+    let message = document.createElement("p");
+    message.textContent = "";
+    message.classList.add("invisible");
+    message.id = "status-message";
+    voteContainer.appendChild(message);
+
     let container = document.getElementsByClassName("content")[0];
     container.appendChild(voteContainer);
 }
 
 function handleSubmit(event) {
     event.preventDefault();
+    let matchNumber = -1;
     var goals1 = document.getElementById("goals1").value;
     var goals2 = document.getElementById("goals2").value;
     var match = document.getElementById("game-select").value;
+    let name = document.getElementById("name-input").value;
 
-    console.log("Submitting tipping data for match", match);
-    console.log("Goals", goals1, goals2);
+    if (name.length < 3) {
+        generateErrorMessage("Du musst einen Namen eingeben!");
+        return;
+    }
+
+    if (match.split(".")[1]) {
+        if (match.split(".")[1].startsWith(" Halbfinale")) {
+            matchNumber = parseInt(match.split(".")[0]) * -1 - 1;
+        } else {
+            matchNumber = match.split(".")[0] - 1;
+        }
+    } else if (match.split(":")[0] == "Spiel um Platz 3") {
+        matchNumber = -4;
+    } else if (match.split(":")[0] == "Finale") {
+        matchNumber = -5;
+    }
+
+    if (goals1 == "" || goals2 == "") {
+        generateErrorMessage(
+            "Du musst für beide Teams eine Toranzahl angeben!"
+        );
+        return;
+    }
 
     fetch("/send_tipping_data", {
         method: "POST",
@@ -296,7 +347,7 @@ function handleSubmit(event) {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            matchId: match.split(".")[0] - 1,
+            matchId: matchNumber,
             team1Goals: goals1,
             team2Goals: goals2,
         }),
@@ -305,9 +356,13 @@ function handleSubmit(event) {
         .then((data) => {
             console.log("Success:", data);
             updateData();
+            generateSuccessMessage(
+                "Deine Wette wurde erfolgreich abgeschickt!"
+            );
         })
         .catch((error) => {
             console.error("Error:", error);
+            generateErrorMessage("Fehler, bite versuche es erneut!");
         });
 }
 
@@ -315,6 +370,33 @@ function redirectTo(path) {
     window.location.href = path;
 }
 
+let messageTimeout;
+
+function showMessage(message, className) {
+    let statusMessage = document.getElementById("status-message");
+    statusMessage.classList.add(className);
+    statusMessage.classList.remove("invisible");
+    statusMessage.textContent = message;
+
+    clearTimeout(messageTimeout);
+    messageTimeout = setTimeout(function () {
+        statusMessage.classList.add("fade-out");
+        setTimeout(function () {
+            statusMessage.textContent = "";
+            statusMessage.classList.add("invisible");
+            statusMessage.classList.remove(className);
+            statusMessage.classList.remove("fade-out");
+        }, 1000); // same as the transition duration
+    }, 5000);
+}
+
+function generateErrorMessage(message) {
+    showMessage(message, "error-message");
+}
+
+function generateSuccessMessage(message) {
+    showMessage(message, "success-message");
+}
 document.getElementById("returnButton").addEventListener("click", function () {
     redirectTo("/");
 });

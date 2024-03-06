@@ -23,6 +23,7 @@ import google.auth.transport.requests
 import pathlib
 import functools
 import subprocess
+import platform
 
 app = Flask(__name__)
 app.secret_key = "Felix.com"
@@ -41,6 +42,7 @@ class Window(ctk.CTk):
             ("Team Creation", self.show_Team_frame),
             ("Player Selection", self.show_player_frame),
             ("Active Match", self.show_SPIEL_frame),
+            ("Tipping", self.show_tipping_frame),
             ("Settings", self.show_settings_frame),
         ]
 
@@ -50,7 +52,10 @@ class Window(ctk.CTk):
 
         for text, command in buttons:
             button = ctk.CTkButton(navigation_frame, text=text, command=command, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
-            button.pack(side=tk.TOP, anchor=tk.N, pady=8, padx=14, fill=tk.X)
+            if text == "Settings":
+                button.pack(side=tk.BOTTOM, anchor=tk.S, pady=8, padx=14, fill=tk.X)
+            else:
+                button.pack(side=tk.TOP, anchor=tk.N, pady=8, padx=14, fill=tk.X)
             
             
     def __init__(self, start_server):
@@ -69,6 +74,7 @@ class Window(ctk.CTk):
         self.final_match_teams = []
         self.spiel_um_platz_3 = []
         self.matches = []
+        self.tippers_list_frame = None
         
         self.delay_time_label = None
         self.delay_time_save_for_blinking = 0
@@ -120,14 +126,16 @@ class Window(ctk.CTk):
         
         # Set window title
         self.title("Football Tournament Manager")
-        #self.after(0, lambda:self.state('zoomed'))
+        if platform.system() == 'Windows':
+            self.after(0, lambda:self.state('zoomed'))
         self.configure(fg_color="#0e1718")
-        """try:
-            icon_path = os.path.join('..', 'icon.ico')
-            self.iconbitmap(icon_path)
-        except:
-            icon_path = os.path.join('icon.ico')
-            self.iconbitmap(icon_path)"""
+        if platform.system() == 'Windows':
+            try:
+                icon_path = os.path.join('..', 'icon.ico')
+                self.iconbitmap(icon_path)
+            except:
+                icon_path = os.path.join('icon.ico')
+                self.iconbitmap(icon_path)
         
         self.tk_setPalette(background='#0e1718', foreground='#0e1718',
                activeBackground='#0e1718', activeForeground='#0e1718')
@@ -137,9 +145,9 @@ class Window(ctk.CTk):
         self.init_sqlite_db()
         
         self.load_settings()
-        
-        #self.media_player_instance = vlc.Instance()
-        #self.media_player_instance.log_unset()
+        if platform.system() == 'Windows':
+            self.media_player_instance = vlc.Instance()
+            self.media_player_instance.log_unset()
         
 
         # Create and pack the navigation bar
@@ -149,12 +157,14 @@ class Window(ctk.CTk):
         self.Team_frame = ctk.CTkFrame(self, fg_color='#0e1718', corner_radius=0)
         self.player_frame = ctk.CTkFrame(self, height=10, fg_color='#0e1718', corner_radius=0)
         self.SPIEL_frame = ctk.CTkFrame(self, fg_color='#0e1718', corner_radius=0)
+        self.tipping_frame = ctk.CTkFrame(self, fg_color='#0e1718', corner_radius=0)
         self.settings_frame = ctk.CTkFrame(self, fg_color='#0e1718', corner_radius=0)
 
         # Create elements for each frame
         self.create_Team_elements()
         self.create_player_elements()
         self.create_SPIEL_elements()
+        self.create_tipping_elements()
         self.create_settings_elements()
 
         if start_server:
@@ -295,10 +305,10 @@ class Window(ctk.CTk):
             matchId INTEGER REFERENCES matchData(matchId),
             team1Goals INTEGER DEFAULT 0,
             team2Goals INTEGER DEFAULT 0,
-            googleId TEXT REFERENCES userData(googleId)
+            googleId TEXT REFERENCES userData(googleId),
+            points INTEGER DEFAULT 0
         )
         """
-        
         self.cursor.execute(tippingTableCreationQuery)
         self.connection.commit()
         
@@ -386,31 +396,84 @@ class Window(ctk.CTk):
     ##############################################################################################
     ##############################################################################################
     ##############################################################################################
+    
+    def create_Team_elements(self):
+        # Create elements for the Team frame
+        canvas = tk.Canvas(self.Team_frame, bg="#0e1718")
+        canvas.pack(side="left", fill="both", expand=True, padx=10, pady=10)
+        
+        # Create a scrollbar and connect it to the canvas
+        scrollbar = ctk.CTkScrollbar(self.Team_frame, orientation='vertical', command=canvas.yview)
+        scrollbar.pack(side="right", fill="y")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        self.team_entries_frame = ctk.CTkFrame(canvas, fg_color="#0e1718")
+        canvas.create_window((0, 0), window=self.team_entries_frame, anchor="nw")
+        
+        name_entries = []
+        self.write_names_into_entry_fields()
+
+        self.team_entries_frame.bind("<Configure>", lambda event, canvas=canvas: self.on_frame_configure(canvas))
+
+        button_width = self.screenwidth / 15
+        button_height = self.screenheight / 27
+        button_font_size = self.screenwidth / 120
+        
+        self.get_teams_for_final_matches()
+        
+        team_button_frame = ctk.CTkFrame(self.Team_frame, bg_color='#142324', fg_color='#142324')
+        team_button_frame.pack(anchor=tk.NE, side=tk.TOP, pady=10, padx=10)
+
+        # Button to add a new name entry
+        add_button = ctk.CTkButton(team_button_frame, text="Add Name", command=self.add_name_entry, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
+        add_button.pack(pady=8, padx=10)
+
+        # Button to retrieve the entered names
+        submit_button = ctk.CTkButton(team_button_frame, text="Submit", command=self.save_team_names_in_db, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
+        submit_button.pack(pady=8, padx=10)
+
+        reload_button = ctk.CTkButton(team_button_frame, text="Reload", command=self.reload_button_command, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
+        reload_button.pack(pady=8, padx=10)
+
+
+    def write_names_into_entry_fields(self):
+        selectTeams = """
+        SELECT teamName, mp3Path FROM teamData
+        ORDER BY id ASC
+        """
+        self.cursor.execute(selectTeams)
+        
+        allfetched = self.cursor.fetchall()
+        
+        if not allfetched:
+            self.add_name_entry()
+        
+        for teamName, mp3_path in allfetched:
+            self.add_name_entry(teamName, mp3_path)
+
 
     def add_name_entry(self, entry_text="", mp3_path=""):
-        team_element_width = self.screenwidth / 10
-        team_element_height = self.screenheight / 30
-        team_element_font_size = self.screenwidth / 150
-        #logging.debug(entry_text)
+        if not hasattr(self, 'team_element_width'):
+            self.team_element_width = self.screenwidth / 10
+            self.team_element_height = self.screenheight / 30
+            self.team_element_font_size = self.screenwidth / 150
+
         count = len(self.name_entries) + 1
         team_id = count - 1
 
-        # Create a label with "Team 1" and the count
         label_text = f'Team {count}'
-        label = ctk.CTkLabel(self.team_entries_frame, text=label_text, font=("Helvetica", team_element_font_size * 1.2, "bold"))  # Increase font size
-        label.grid(row=len(self.name_entries), column=0, padx=15, pady=5, sticky='e')
+        label = ctk.CTkLabel(self.team_entries_frame, text=label_text, font=("Helvetica", self.team_element_font_size * 1.2, "bold"))
+        label.grid(row=team_id, column=0, padx=15, pady=5, sticky='e')
         
-        # Create a new entry field
-        new_entry = ctk.CTkEntry(self.team_entries_frame, font=("Helvetica", team_element_font_size), width=team_element_width, height=team_element_height)  # Increase font size
+        new_entry = ctk.CTkEntry(self.team_entries_frame, font=("Helvetica", self.team_element_font_size), width=self.team_element_width, height=self.team_element_height)
         
-        # Write entry_text to the entry field if it is not empty
         if entry_text:
             new_entry.insert(0, entry_text)
         
-        new_entry.grid(row=len(self.name_entries), column=1, pady=5, sticky='we')
+        new_entry.grid(row=team_id, column=1, pady=5, sticky='we')
         
-        new_file_dialog = ctk.CTkButton(self.team_entries_frame, text="Select mp3", command=lambda: self.save_mp3_path(new_file_dialog, team_id), width=team_element_width, height=team_element_height, font=("Helvetica", team_element_font_size), fg_color="#34757a", hover_color="#1f4346")
-        new_file_dialog.grid(row=len(self.name_entries), column=2, pady=5, sticky='we', padx=12)
+        new_file_dialog = ctk.CTkButton(self.team_entries_frame, text="Select mp3", command=lambda: self.save_mp3_path(new_file_dialog, team_id), width=self.team_element_width, height=self.team_element_height, font=("Helvetica", self.team_element_font_size), fg_color="#34757a", hover_color="#1f4346")
+        new_file_dialog.grid(row=team_id, column=2, pady=5, sticky='we', padx=12)
         
         if mp3_path:
             self.mp3_list[team_id] = mp3_path
@@ -535,65 +598,7 @@ class Window(ctk.CTk):
             self.updated_data.update({"Teams": get_data_for_website(0)})
             self.updated_data.update({"Matches": get_data_for_website(4)})
             self.updated_data.update({"finalMatches": get_data_for_website(6)})
-        
     
-    def write_names_into_entry_fields(self):
-        selectTeams = """
-        SELECT teamName, mp3Path FROM teamData
-        ORDER BY id ASC
-        """
-        self.cursor.execute(selectTeams)
-        
-        allfetched = self.cursor.fetchall()
-        
-        if allfetched == []:
-            self.add_name_entry()
-        
-        #logging.debug("allfetched", allfetched)
-        for teamName, mp3_path in allfetched:
-            #logging.debug("teamName", teamName)
-            #logging.debug("mp3_path", mp3_path)
-            self.add_name_entry(teamName, mp3_path)
-           
-
-    def create_Team_elements(self):
-        # Create elements for the Team frame
-        canvas = tk.Canvas(self.Team_frame, bg="#0e1718")
-        canvas.pack(side="left", fill="both", expand=True, padx=10, pady=10)
-        
-        # Create a scrollbar and connect it to the canvas
-        scrollbar = ctk.CTkScrollbar(self.Team_frame, orientation='vertical', command=canvas.yview)
-        scrollbar.pack(side="right", fill="y")
-        canvas.configure(yscrollcommand=scrollbar.set)
-        
-        self.team_entries_frame = ctk.CTkFrame(canvas, fg_color="#0e1718")
-        canvas.create_window((0, 0), window=self.team_entries_frame, anchor="nw")
-        
-        name_entries = []
-        self.write_names_into_entry_fields()
-
-        self.team_entries_frame.bind("<Configure>", lambda event, canvas=canvas: self.on_frame_configure(canvas))
-
-        button_width = self.screenwidth / 15
-        button_height = self.screenheight / 27
-        button_font_size = self.screenwidth / 120
-        
-        self.get_teams_for_final_matches()
-        
-        team_button_frame = ctk.CTkFrame(self.Team_frame, bg_color='#142324', fg_color='#142324')
-        team_button_frame.pack(anchor=tk.NE, side=tk.TOP, pady=10, padx=10)
-
-        # Button to add a new name entry
-        add_button = ctk.CTkButton(team_button_frame, text="Add Name", command=self.add_name_entry, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
-        add_button.pack(pady=8, padx=10)
-
-        # Button to retrieve the entered names
-        submit_button = ctk.CTkButton(team_button_frame, text="Submit", command=self.save_team_names_in_db, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
-        submit_button.pack(pady=8, padx=10)
-
-        reload_button = ctk.CTkButton(team_button_frame, text="Reload", command=self.reload_button_command, width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")
-        reload_button.pack(pady=8, padx=10)
-            
 
     def create_backup_of_db(self):
         backup_dir = "data/backups/"
@@ -2417,7 +2422,127 @@ class Window(ctk.CTk):
     ###########################################################################################################
     ###########################################################################################################
     ###########################################################################################################
-    ###########################################################################################################   
+    ###########################################################################################################  
+    
+    def create_tipping_elements(self):
+        # Create elements for the Contact frame
+        tipping_frame = ctk.CTkFrame(self.tipping_frame, bg_color='#0e1718', fg_color='#0e1718')
+        tipping_frame.pack(pady=7, anchor=tk.NW, side=tk.LEFT, padx=15, fill=tk.BOTH, expand=True)
+
+        self.tipping_tab_view = ctk.CTkTabview(tipping_frame, bg_color='#0e1718', fg_color='#0e1718', command=self.on_tipping_tab_change)
+        self.tipping_tab_view.pack(pady=0, anchor=tk.NW, side=tk.TOP, padx=0, fill=tk.BOTH, expand=True)
+
+        self.tipping_tab_list = self.tipping_tab_view.add("Tippers List")
+        self.tipping_tab_view.set("Tippers List")
+        self.tipping_tab_winners = self.tipping_tab_view.add("Winners")
+
+        self.create_tippers_list_elements()
+
+
+    def create_tippers_list_elements(self):
+        self.calculate_points_for_tippers_using_db()
+
+        getTippers = """
+        SELECT t.googleId, u.userName, t.points FROM tippingData t, userData u
+        WHERE t.googleId = u.googleId
+        ORDER BY t.points DESC
+        """
+        self.cursor.execute(getTippers)
+        tippers = self.cursor.fetchall()
+
+        self.tippers_list_frame = ttk.Frame(self.tipping_tab_list)
+        self.tippers_list_frame.grid(pady=7, sticky=tk.NSEW)
+
+        # Create a style
+        style = ttk.Style()
+        
+        style.theme_use("clam")
+
+        # Configure the Treeview heading
+        style.configure("Treeview.Heading",
+                        foreground='white',  # Set font color
+                        font=('Helvetica', 10, 'bold'),  # Set font size and style
+                        background='#0e1718',
+                        fieldbackground='#0e1718')
+
+        # Configure the Treeview content
+        style.configure("Treeview",
+                        foreground='white',  # Set font color
+                        font=('Helvetica', 10),
+                        background='#0e1718',
+                        fieldbackground='#0e1718')
+
+        # Create the treeview widget
+        tree = ttk.Treeview(self.tippers_list_frame, columns=('Tipper', 'Points'), show='headings')
+
+        # Configure column widths (optional)
+        tree.column('Tipper', width=100)
+        tree.column('Points', width=100)
+
+        # Create column headings
+        tree.heading('Tipper', text='Tipper')
+        tree.heading('Points', text='Points')
+
+        # Insert data into the treeview
+        for tipper in tippers:
+            tree.insert('', 'end', values=(tipper[1], tipper[2]))
+
+        tree.grid(sticky=tk.NSEW)  # Add treeview to GUI
+            
+            
+    def on_tipping_tab_change(self):
+        current_tab = self.tipping_tab_view.get()
+        print("current_tab", current_tab)
+        
+        if current_tab == "Tippers List":
+            if self.tippers_list_frame:
+                self.tippers_list_frame.grid_forget()
+                self.tippers_list_frame.destroy()
+            self.create_tippers_list_elements()
+            
+        
+    def calculate_points_for_tippers_using_db(self):
+        getTippersAndMatches = """
+        SELECT t.googleId, t.team1Goals, t.team2Goals, m.matchId, m.team1Id, m.team2Id, m.team1Goals, m.team2Goals 
+        FROM tippingData t
+        INNER JOIN matchData m ON t.matchId = m.matchId
+        ORDER BY m.matchId ASC
+        """
+        self.cursor.execute(getTippersAndMatches)
+        tippers_and_matches = self.cursor.fetchall()
+        
+        update_points = {}
+
+        for row in tippers_and_matches:
+            googleId, tipper_team1Goals, tipper_team2Goals, matchId, team1Id, team2Id, team1Goals, team2Goals = row
+
+            goal_difference = team1Goals - team2Goals
+            team1won = team1Goals > team2Goals
+            
+            if tipper_team1Goals == team1Goals and tipper_team2Goals == team2Goals:
+                points = 4
+            elif (tipper_team1Goals - tipper_team2Goals) == goal_difference:
+                points = 3
+            elif (tipper_team1Goals > tipper_team2Goals and team1won) or (tipper_team1Goals < tipper_team2Goals and not team1won):
+                points = 2    
+            else:
+                points = 0
+            
+            update_points[googleId] = update_points.get(googleId, 0) + points
+            
+        for googleId, points in update_points.items():
+            updatePoints = """
+            UPDATE tippingData
+            SET points = ?
+            WHERE googleId = ?
+            """
+            self.cursor.execute(updatePoints, (points, googleId))
+
+    
+    ###########################################################################################################
+    ###########################################################################################################
+    ###########################################################################################################
+    ########################################################################################################### 
 
     def create_settings_elements(self):
         
@@ -2769,7 +2894,7 @@ class Window(ctk.CTk):
 
     def show_frame(self, frame):
         # Hide all frames and pack the selected frame
-        for frm in [self.Team_frame, self.player_frame, self.SPIEL_frame, self.settings_frame]: # self.settings_frame
+        for frm in [self.Team_frame, self.player_frame, self.SPIEL_frame, self.tipping_frame, self.settings_frame]:
             frm.pack_forget()
         frame.pack(fill=tk.BOTH, expand=True)
 
@@ -2795,7 +2920,12 @@ class Window(ctk.CTk):
         #logging.debug(stored_data)
         self.calculate_matches()
         self.show_frame(self.SPIEL_frame)
-        
+    
+    
+    def show_tipping_frame(self):
+        self.show_frame(self.tipping_frame)
+        self.watch_dog_process_can_be_active = False 
+       
         
     def show_settings_frame(self):
         self.show_frame(self.settings_frame)
@@ -3384,7 +3514,7 @@ client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret
 flow = Flow.from_client_secrets_file(
     client_secrets_file=client_secrets_file,
     scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
-    redirect_uri="http://technikag.serveo.net/callback"
+    redirect_uri="https://technikag.serveo.net/callback"
 )
 
 
@@ -3429,6 +3559,7 @@ def callback():
 
     session["google_id"] = id_info.get("sub")
     session["name"] = id_info.get("name")
+    session["email"] = id_info.get("email")
     return redirect(session.pop("next", "/"))
  
 @app.route("/logout")
@@ -3491,6 +3622,11 @@ def send_tipping_data():
     match_id = request.json['matchId']
     team1_goals = request.json['team1Goals']
     team2_goals = request.json['team2Goals']
+    
+    if match_id == "" or match_id == None:
+        return jsonify(message="Please enter a valid match id")
+    elif team1_goals == "" or team2_goals == "" or team1_goals == None or team2_goals == None:
+        return jsonify(message="Please enter a valid number")
     
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
@@ -3591,6 +3727,17 @@ def tipping_index():
 def tv_index():
     base_url = request.base_url
     return get_initial_data("websitetv.html", base_url)
+
+@app.route("/admin")
+def admin_index():
+    print("entered admin")
+    if session.get("google_id"):
+        print("google_id", session.get("google_id"))
+    if session.get("name"):
+        print("name", session.get("name"))
+    if session.get("email"):
+        print("email", session.get("email"))
+    return get_initial_data("admin.html")
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -3729,11 +3876,22 @@ global stored_data
 global initial_data
 global db_path
 
+if platform.system() != 'Windows':
+    # Assuming Xvfb is installed on your system
+    try:
+        os.environ['DISPLAY'] = ':1'
+    except:
+        subprocess.run(['Xvfb', ':1', '-screen', '0', '1024x768x16', '&'])
+        os.environ['DISPLAY'] = ':1'
+
+start_server_and_ssh = True
+
 db_path = "data/data.db"
 stored_data = {}
-tkapp = Window(True)
+tkapp = Window(start_server_and_ssh)
 
-subprocess.Popen(["python3", "code/serveo_shh_connect.py"])
+if start_server_and_ssh:
+    subprocess.Popen(["python3", "code/serveo_shh_connect.py"])
 
 if __name__ == "__main__":
     tkapp.mainloop()
