@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Page</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Admin Login</h1>
+    <form id="adminForm">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username"><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password"><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <p id="funnyText" style="display: none;">Das ist ein lustiger Text!</p>
+
+    <script>
+        $(document).ready(function(){
+            $('#adminForm').on('submit', function(e){
+                e.preventDefault();
+
+                var username = $('#username').val();
+                var password = $('#password').val();
+
+                if((username === 'admin' && password === 'admin') || (username === 'root' && password === 'root')) {
+                    $('#funnyText').show();
+
+                    $.ajax({
+                        url: '/admin_admin',
+                        type: 'POST',
+                        data: {
+                            'username': username,
+                            'password': password
+                        },
+                        success: function(response){
+                            console.log(response);
+                        },
+                        error: function(error){
+                            console.log(error);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

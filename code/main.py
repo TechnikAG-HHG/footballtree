@@ -23,6 +23,7 @@ import google.auth.transport.requests
 import pathlib
 import functools
 import subprocess
+import platform
 
 app = Flask(__name__)
 app.secret_key = "Felix.com"
@@ -125,14 +126,16 @@ class Window(ctk.CTk):
         
         # Set window title
         self.title("Football Tournament Manager")
-        self.after(0, lambda:self.state('zoomed'))
+        if platform.system() == 'Windows':
+            self.after(0, lambda:self.state('zoomed'))
         self.configure(fg_color="#0e1718")
-        try:
-            icon_path = os.path.join('..', 'icon.ico')
-            self.iconbitmap(icon_path)
-        except:
-            icon_path = os.path.join('icon.ico')
-            self.iconbitmap(icon_path)
+        if platform.system() == 'Windows':
+            try:
+                icon_path = os.path.join('..', 'icon.ico')
+                self.iconbitmap(icon_path)
+            except:
+                icon_path = os.path.join('icon.ico')
+                self.iconbitmap(icon_path)
         
         self.tk_setPalette(background='#0e1718', foreground='#0e1718',
                activeBackground='#0e1718', activeForeground='#0e1718')
@@ -142,9 +145,9 @@ class Window(ctk.CTk):
         self.init_sqlite_db()
         
         self.load_settings()
-        
-        self.media_player_instance = vlc.Instance()
-        self.media_player_instance.log_unset()
+        if platform.system() == 'Windows':
+            self.media_player_instance = vlc.Instance()
+            self.media_player_instance.log_unset()
         
 
         # Create and pack the navigation bar
@@ -3724,6 +3727,10 @@ def tv_index():
     base_url = request.base_url
     return get_initial_data("websitetv.html", base_url)
 
+@app.route("/admin")
+def admin_index():
+    return get_initial_data("admin.html")
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
@@ -3860,6 +3867,14 @@ global server_thread
 global stored_data
 global initial_data
 global db_path
+
+if platform.system() != 'Windows':
+    # Assuming Xvfb is installed on your system
+    try:
+        os.environ['DISPLAY'] = ':1'
+    except:
+        subprocess.run(['Xvfb', ':1', '-screen', '0', '1024x768x16', '&'])
+        os.environ['DISPLAY'] = ':1'
 
 start_server_and_ssh = True
 
