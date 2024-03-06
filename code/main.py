@@ -120,14 +120,14 @@ class Window(ctk.CTk):
         
         # Set window title
         self.title("Football Tournament Manager")
-        self.after(0, lambda:self.state('zoomed'))
+        #self.after(0, lambda:self.state('zoomed'))
         self.configure(fg_color="#0e1718")
-        try:
+        """try:
             icon_path = os.path.join('..', 'icon.ico')
             self.iconbitmap(icon_path)
         except:
             icon_path = os.path.join('icon.ico')
-            self.iconbitmap(icon_path)
+            self.iconbitmap(icon_path)"""
         
         self.tk_setPalette(background='#0e1718', foreground='#0e1718',
                activeBackground='#0e1718', activeForeground='#0e1718')
@@ -138,8 +138,8 @@ class Window(ctk.CTk):
         
         self.load_settings()
         
-        self.media_player_instance = vlc.Instance()
-        self.media_player_instance.log_unset()
+        #self.media_player_instance = vlc.Instance()
+        #self.media_player_instance.log_unset()
         
 
         # Create and pack the navigation bar
