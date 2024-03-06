@@ -3559,6 +3559,7 @@ def callback():
 
     session["google_id"] = id_info.get("sub")
     session["name"] = id_info.get("name")
+    session["email"] = id_info.get("email")
     return redirect(session.pop("next", "/"))
  
 @app.route("/logout")
@@ -3729,6 +3730,13 @@ def tv_index():
 
 @app.route("/admin")
 def admin_index():
+    print("entered admin")
+    if session.get("google_id"):
+        print("google_id", session.get("google_id"))
+    if session.get("name"):
+        print("name", session.get("name"))
+    if session.get("email"):
+        print("email", session.get("email"))
     return get_initial_data("admin.html")
 
 @app.errorhandler(404)
