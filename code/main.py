@@ -246,6 +246,19 @@ class Window(ctk.CTk):
         self.cursor.execute(finalMatchesDataTableCreationQuery)
         self.connection.commit()
         
+        KOMatchesDataTableCreationQuery = """
+        CREATE TABLE IF NOT EXISTS KOMatchesData (
+            matchId INTEGER PRIMARY KEY,
+            team1Id INTEGER REFERENCES teamData(id),
+            team2Id INTEGER REFERENCES teamData(id),
+            team1Goals INTEGER DEFAULT 0,
+            team2Goals INTEGER DEFAULT 0,
+            matchTime TEXT
+        )
+        """
+        self.cursor.execute(KOMatchesDataTableCreationQuery)
+        self.connection.commit()
+        
         playerPerMatchDataTableCreationQuery = """
         CREATE TABLE IF NOT EXISTS playerPerMatchData (
             id INTEGER PRIMARY KEY,
@@ -266,6 +279,17 @@ class Window(ctk.CTk):
         )
         """
         self.cursor.execute(playerPerMatchDataFinalTableCreationQuery)
+        self.connection.commit()
+        
+        playerPerMatchDataKO1TableCreationQuery = """
+        CREATE TABLE IF NOT EXISTS playerPerMatchDataKO (
+            id INTEGER PRIMARY KEY,
+            matchId INTEGER REFERENCES matchData(matchId),
+            playerName INTEGER REFERENCES playerData(playerName),
+            playerGoals INTEGER DEFAULT 0
+        )
+        """
+        self.cursor.execute(playerPerMatchDataKO1TableCreationQuery)
         self.connection.commit()
         
         settingsDataTableCreationQuery = """
@@ -293,12 +317,6 @@ class Window(ctk.CTk):
         self.settingscursor.execute(settingsDataTableCreationQuery)
         self.settingsconnection.commit()
         
-        # Create a first row if there is no row
-        self.settingscursor.execute("SELECT * FROM settingsData")
-        if self.settingscursor.fetchone() is None:
-            insert_query = "INSERT INTO settingsData (id) VALUES (?)"
-            self.settingscursor.execute(insert_query, (1,))
-            
         tippingTableCreationQuery = """
         CREATE TABLE IF NOT EXISTS tippingData (
             id INTEGER PRIMARY KEY,
@@ -321,6 +339,12 @@ class Window(ctk.CTk):
         """
         self.cursor.execute(userDataTableCreationQuery)
         self.connection.commit()
+        
+        # Create a first row if there is no row
+        self.settingscursor.execute("SELECT * FROM settingsData")
+        if self.settingscursor.fetchone() is None:
+            insert_query = "INSERT INTO settingsData (id) VALUES (?)"
+            self.settingscursor.execute(insert_query, (1,))
         
     
     def load_settings(self):
@@ -1314,8 +1338,10 @@ class Window(ctk.CTk):
 
         if self.active_mode.get() == 1:
             colum = "playerPerMatchData"
-        else:
+        elif self.active_mode.get() == 2:
             colum = "playerPerMatchDataFinal"
+        elif self.active_mode.get() == 3:
+            colum = "playerPerMatchDataKO"
 
         # get the player names for the current team
         self.cursor.execute("SELECT playerName FROM playerData WHERE teamId = ? ORDER BY id ASC", (team_id,))
@@ -1343,8 +1369,10 @@ class Window(ctk.CTk):
 
         if self.active_mode.get() == 1:
             colum = "playerPerMatchData"
-        else:
+        elif self.active_mode.get() == 2:
             colum = "playerPerMatchDataFinal"
+        elif self.active_mode.get() == 3:
+            colum = "playerPerMatchDataKO"
             
             
         selectingQuery = f"""
@@ -1369,8 +1397,10 @@ class Window(ctk.CTk):
 
         if self.active_mode.get() == 1:
             colum = "playerPerMatchData"
-        else:
+        elif self.active_mode.get() == 2:
             colum = "playerPerMatchDataFinal"
+        elif self.active_mode.get() == 3:
+            colum = "playerPerMatchDataKO"
             
         selectingQuery = f"""
             SELECT playerGoals 
@@ -1395,8 +1425,10 @@ class Window(ctk.CTk):
 
         if self.active_mode.get() == 1:
             colum = "playerPerMatchData"
-        else:
+        elif self.active_mode.get() == 2:
             colum = "playerPerMatchDataFinal"
+        elif self.active_mode.get() == 3:
+            colum = "playerPerMatchDataKO"
             
         updateQuery = f"""
             UPDATE {colum} 
@@ -1659,7 +1691,7 @@ class Window(ctk.CTk):
             self.manual_team_select_1.configure(state=tk.NORMAL)
             self.manual_team_select_1.set(self.read_teamNames()[self.teams_playing[1]])
             self.manual_team_select_2.set(self.read_teamNames()[self.teams_playing[0]])
-            if self.active_mode.get() == 1 or self.active_mode.get() == 2:
+            if self.active_mode.get() == 1 or self.active_mode.get() == 2 or self.active_mode.get() == 3:
                 self.active_match = self.get_active_match(self.teams_playing[0], self.teams_playing[1])
         
         #logging.debug("self.teams_playing", self.teams_playing)
@@ -1837,6 +1869,38 @@ class Window(ctk.CTk):
                 manual_select_label.place(relx=0.32, rely=0.9, anchor=tk.CENTER)
                 
                 self.manual_select_active_sure = True
+        elif self.active_mode.get() == 3:
+            values_list = self.get_values_list_mode1(matches)
+            self.spiel_select.configure(values=values_list)
+            #logging.debug("active_match in create_matches_labels", self.active_match)
+            self.active_match = self.get_active_match(self.teams_playing[0], self.teams_playing[1])
+                
+            if self.active_match >= 0:
+                self.spiel_select.set(values_list[self.active_match])
+                self.manual_select_active = False
+            elif (values_list != [] and self.teams_playing.count(None) != 0) or (values_list != [] and self.manual_select_active == False):
+                self.on_match_select(values_list[0], matches)
+                self.manual_select_active = False
+                return
+            elif self.manual_select_active == False:
+                self.active_match = -1
+                self.teams_playing = [None, None]
+                
+                if match_count > 0:
+                    self.reload_spiel_button_command()
+                
+                # Create an red label on the frame to show that no match is active
+                no_match_active_label = ctk.CTkLabel(frame, text="No Match Active", font=("Helvetica", self.team_button_font_size * 2, "bold"), fg_color="red")
+                no_match_active_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+                
+            else:
+                self.active_match = -1
+                logging.info("Manual Select Active")
+                
+                manual_select_label = ctk.CTkLabel(frame, text="Manual Select Active", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), fg_color="red")
+                manual_select_label.place(relx=0.32, rely=0.9, anchor=tk.CENTER)
+                
+                self.manual_select_active_sure = True
             
         next_match_button = ctk.CTkButton(spiel_select_frame, text="Next Match", command=lambda : self.next_previous_match_button(self.spiel_select, matches), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
         next_match_button.pack(pady=10, padx=10, side=tk.RIGHT, anchor=tk.SE)
@@ -1849,6 +1913,9 @@ class Window(ctk.CTk):
         for match in matches:
             values_list.append(match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1])
         return values_list
+    
+    def get_values_list_mode3(self, matches):
+        pass
 
 
     def get_active_match(self, team1, team2):
@@ -1868,6 +1935,18 @@ class Window(ctk.CTk):
         elif self.active_mode.get() == 2:
             getActiveMatch = """
             SELECT matchId FROM finalMatchesData
+            WHERE team1Id = ? AND team2Id = ?
+            """
+            self.cursor.execute(getActiveMatch, (team1, team2))
+            active_match = self.cursor.fetchone()
+            if active_match != None:
+                return active_match[0] -1
+            else:
+                return -1
+        
+        elif self.active_mode.get() == 3:
+            getActiveMatch = """
+            SELECT matchId FROM KOMatchesData
             WHERE team1Id = ? AND team2Id = ?
             """
             self.cursor.execute(getActiveMatch, (team1, team2))
@@ -2118,6 +2197,27 @@ class Window(ctk.CTk):
             #self.save_games_played_in_db(self.active_match)
             
             self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
+        
+        elif self.active_mode.get() == 3:
+            match_index = [match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1] for match in matches].index(selected_match)
+            #logging.debug("match_index", match_index)
+            # Get the teams playing in the selected match and if there are none, set teams_playing to None
+            team_names = self.read_teamNames()
+            
+            team1_index = team_names.index(matches[match_index]["teams"][0])
+            team2_index = team_names.index(matches[match_index]["teams"][1])
+
+            if team1_index and team2_index:
+                self.teams_playing = [team1_index, team2_index]
+            else:
+                self.teams_playing = [None, None]
+                
+            self.active_match = match_index
+            
+            self.save_games_played_in_db(match_index)
+            
+            self.updated_data.update({"Games": get_data_for_website(2)})
+            self.updated_data.update({"activeMatchNumber": self.active_match})
         
         self.reload_spiel_button_command()
         
@@ -3876,12 +3976,15 @@ global stored_data
 global initial_data
 global db_path
 
+import subprocess
+import os
+import platform
+
 if platform.system() != 'Windows':
-    # Assuming Xvfb is installed on your system
     try:
         os.environ['DISPLAY'] = ':1'
-    except:
-        subprocess.run(['Xvfb', ':1', '-screen', '0', '1024x768x16', '&'])
+    except KeyError:
+        subprocess.Popen(['Xvfb', ':1', '-screen', '0', '1024x768x16'])
         os.environ['DISPLAY'] = ':1'
 
 start_server_and_ssh = True
