@@ -3879,10 +3879,11 @@ global db_path
 if platform.system() != 'Windows':
     # Assuming Xvfb is installed on your system
     try:
-        os.environ['DISPLAY'] = ':1'
+        subprocess.Popen(['Xvfb', ':1', '-screen', '0', '1024x768x16'])
+        os.environ['DISPLAY'] = ":1"
     except:
-        subprocess.run(['Xvfb', ':1', '-screen', '0', '1024x768x16', '&'])
-        os.environ['DISPLAY'] = ':1'
+        os.environ['DISPLAY']
+        os.environ['DISPLAY'] = ":1"
 
 start_server_and_ssh = True
 

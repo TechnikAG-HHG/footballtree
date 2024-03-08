@@ -64,7 +64,7 @@ function generateTable() {
     var headRow = document.createElement("tr");
 
     var positionHead = document.createElement("td");
-    positionHead.textContent = "Position";
+    positionHead.textContent = "Platzierung";
     headRow.appendChild(positionHead);
 
     var nameHead = document.createElement("td");
@@ -76,7 +76,7 @@ function generateTable() {
     headRow.appendChild(teamHead);
 
     var goalsHead = document.createElement("td");
-    goalsHead.textContent = "Goals";
+    goalsHead.textContent = "Tore";
     headRow.appendChild(goalsHead);
 
     tableHead.appendChild(headRow);
@@ -135,15 +135,15 @@ function generateTable() {
 
     if (pos1counter > 1) {
         document.getElementsByClassName("firstText")[0].textContent =
-            pos1counter + " Players...";
+            pos1counter + " Spieler...";
     }
     if (pos2counter > 1) {
         document.getElementsByClassName("secondText")[0].textContent =
-            pos2counter + " Players...";
+            pos2counter + " Spieler...";
     }
     if (pos3counter > 1) {
         document.getElementsByClassName("thirdText")[0].textContent =
-            pos3counter + " Players...";
+            pos3counter + " Spieler...";
     }
 
     table.appendChild(tableBody);
