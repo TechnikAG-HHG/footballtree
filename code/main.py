@@ -281,7 +281,7 @@ class Window(ctk.CTk):
         self.cursor.execute(playerPerMatchDataFinalTableCreationQuery)
         self.connection.commit()
         
-        playerPerMatchDataKO1TableCreationQuery = """
+        playerPerMatchDataKOTableCreationQuery = """
         CREATE TABLE IF NOT EXISTS playerPerMatchDataKO (
             id INTEGER PRIMARY KEY,
             matchId INTEGER REFERENCES matchData(matchId),
@@ -289,7 +289,7 @@ class Window(ctk.CTk):
             playerGoals INTEGER DEFAULT 0
         )
         """
-        self.cursor.execute(playerPerMatchDataKO1TableCreationQuery)
+        self.cursor.execute(playerPerMatchDataKOTableCreationQuery)
         self.connection.commit()
         
         settingsDataTableCreationQuery = """
@@ -1914,7 +1914,8 @@ class Window(ctk.CTk):
             values_list.append(match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1])
         return values_list
     
-    def get_values_list_mode3(self, matches):
+    
+    def get_values_list_mode3(self):
         pass
 
 
@@ -2687,6 +2688,8 @@ class Window(ctk.CTk):
         option_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
         radio_button_1 = ctk.CTkRadioButton(phase_switcher_frame, text="Group Phase", variable=self.active_mode, value=1, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_radio_button_change)
         radio_button_1.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
+        radio_buttone_3 = ctk.CTkRadioButton(phase_switcher_frame, text="KO Phase", variable=self.active_mode, value=3, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_radio_button_change)
+        radio_buttone_3.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
         radio_button_2 = ctk.CTkRadioButton(phase_switcher_frame, text="Final Phase", variable=self.active_mode, value=2, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_radio_button_change)
         radio_button_2.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
         
@@ -2696,6 +2699,11 @@ class Window(ctk.CTk):
         self.pause_switch = ctk.CTkSwitch(self.pause_switcher_frame, text="Pause", variable=self.pause_mode, command=self.on_pause_switch_change, font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         self.pause_switch.pack(side=tk.TOP, pady=2, padx=0, anchor=tk.N)
         
+        self.ko_mode_switcher_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
+        self.ko_mode_switcher_frame.pack(pady=7, anchor=tk.NW, side=tk.TOP, padx=5)
+        
+        self.ko_mode_switch = ctk.CTkSwitch(self.ko_mode_switcher_frame, text="KO Mode", variable=self.ko_mode, command=self.on_ko_mode_switch_change, font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        self.ko_mode_switch.pack(side=tk.TOP, pady=2, padx=0, anchor=tk.N)
 
         best_scorer_active_switch_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
         best_scorer_active_switch_frame.pack(pady=5, anchor=tk.NW, side=tk.TOP, padx=5)
@@ -3475,6 +3483,9 @@ def get_data_for_website(which_data=-1):
             if tkapp.active_mode.get() == 2:
                 a_m += 2
                 a_m *= -1
+            elif tkapp.active_mode.get() == 3:
+                a_m += 100
+                a_m *= -1
             
             return a_m
         except:
@@ -3599,6 +3610,8 @@ def get_initial_data(template_name, base_url=None):
         "pauseMode": tkapp.pause_mode.get(),
         "timeIntervalFinalMatch": tkapp.time_interval_for_only_the_final_match.get().replace("m", ""),
         "bestScorerActive": tkapp.best_scorer_active.get(),
+        "ThereIsAnKOPhase": tkapp.there_is_an_ko_phase.get(),
+        "KOPhaseIsActive": tkapp.ko_phase_is_active.get(),
     }
     return make_response(render_template(template_name, initial_data=initial_data, base_url=base_url))
 
@@ -3982,12 +3995,13 @@ import platform
 
 if platform.system() != 'Windows':
     try:
-        os.environ['DISPLAY'] = ':1'
+        os.environ['DISPLAY']
     except KeyError:
         subprocess.Popen(['Xvfb', ':1', '-screen', '0', '1024x768x16'])
         os.environ['DISPLAY'] = ':1'
+        os.environ['DISPLAY']
 
-start_server_and_ssh = True
+start_server_and_ssh = False
 
 db_path = "data/data.db"
 stored_data = {}
