@@ -1,5 +1,6 @@
 var tippingData = {};
 var oldMatchesData;
+var oldActiveMatchNumber;
 
 async function updateData() {
     // Include the last data version in the request headers
@@ -50,10 +51,13 @@ function generateDropdownData() {
     // Store the currently selected value
     var selectedValue = dropdown.value;
 
-    console.log("Matches data:", data["Matches"]);
-    console.log("Old matches data:", oldMatchesData);
+    console.log("Active match number:", data["activeMatchNumber"]);
+    console.log("Old active match number:", oldActiveMatchNumber);
 
-    if (JSON.stringify(data["Matches"]) === JSON.stringify(oldMatchesData)) {
+    if (
+        JSON.stringify(data["Matches"]) === JSON.stringify(oldMatchesData) &&
+        data["activeMatchNumber"] == oldActiveMatchNumber
+    ) {
         return;
     }
 
@@ -122,7 +126,10 @@ function generateDropdownData() {
 
             option.textContent = `${group}: ${matchData[0]} vs ${matchData[1]}`;
 
-            if (Math.abs(data["activeMatchNumber"]) > i + 1) {
+            if (
+                Math.abs(data["activeMatchNumber"]) > i + 1 &&
+                data["pauseMode"] == false
+            ) {
                 option.style.color = "gray";
                 disabledOptions.push(option);
             } else {
@@ -153,17 +160,7 @@ function generateDropdownData() {
         dropdown.appendChild(option);
     });
 
-    // If the previously selected option is disabled, select the first enabled option
-    if (dropdown.value === selectedValue && dropdown.selectedIndex === -1) {
-        dropdown.selectedIndex = 0;
-        voteForMatch(document.getElementById("game-select").value);
-    }
-
-    // Select the first option when the website loads
-    if (dropdown.selectedIndex === -1) {
-        dropdown.selectedIndex = 0;
-        voteForMatch(document.getElementById("game-select").value);
-    }
+    voteForMatch(document.getElementById("game-select").value);
 
     let voteContainer = document.getElementById("vote-container");
     if (voteContainer == null) {
@@ -171,6 +168,7 @@ function generateDropdownData() {
     }
 
     oldMatchesData = data["Matches"];
+    oldActiveMatchNumber = data["activeMatchNumber"];
 }
 
 function voteForMatch(match) {
@@ -193,13 +191,16 @@ function voteForMatch(match) {
     }
 
     if (data["activeMatchNumber"] < -1) {
-        if (matchNumber > data["activeMatchNumber"] - 1) {
+        if (
+            matchNumber > data["activeMatchNumber"] - 1 &&
+            data["pauseMode"] == false
+        ) {
             matchPlayed = true;
-            console.log("Match played");
+            console.log("Match played 1");
         }
     } else if (matchNumber < data["activeMatchNumber"] + 1) {
         matchPlayed = true;
-        console.log("Match played");
+        console.log("Match played 2");
     }
 
     let voteContainer = document.getElementById("vote-container");
@@ -441,4 +442,4 @@ document.getElementById("name-input").addEventListener("keydown", function () {
 });
 
 updateData();
-setInterval(updateData, 5000);
+setInterval(updateData, 10000);
