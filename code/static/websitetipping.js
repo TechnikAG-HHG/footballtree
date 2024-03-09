@@ -1,5 +1,6 @@
 var tippingData = {};
 var oldMatchesData;
+var oldActiveMatchNumber;
 
 async function updateData() {
     // Include the last data version in the request headers
@@ -50,10 +51,13 @@ function generateDropdownData() {
     // Store the currently selected value
     var selectedValue = dropdown.value;
 
-    console.log("Matches data:", data["Matches"]);
-    console.log("Old matches data:", oldMatchesData);
+    console.log("Active match number:", data["activeMatchNumber"]);
+    console.log("Old active match number:", oldActiveMatchNumber);
 
-    if (JSON.stringify(data["Matches"]) === JSON.stringify(oldMatchesData)) {
+    if (
+        JSON.stringify(data["Matches"]) === JSON.stringify(oldMatchesData) &&
+        data["activeMatchNumber"] == oldActiveMatchNumber
+    ) {
         return;
     }
 
@@ -156,17 +160,7 @@ function generateDropdownData() {
         dropdown.appendChild(option);
     });
 
-    // If the previously selected option is disabled, select the first enabled option
-    if (dropdown.value === selectedValue && dropdown.selectedIndex === -1) {
-        dropdown.selectedIndex = 0;
-        voteForMatch(document.getElementById("game-select").value);
-    }
-
-    // Select the first option when the website loads
-    if (dropdown.selectedIndex === -1) {
-        dropdown.selectedIndex = 0;
-        voteForMatch(document.getElementById("game-select").value);
-    }
+    voteForMatch(document.getElementById("game-select").value);
 
     let voteContainer = document.getElementById("vote-container");
     if (voteContainer == null) {
@@ -174,6 +168,7 @@ function generateDropdownData() {
     }
 
     oldMatchesData = data["Matches"];
+    oldActiveMatchNumber = data["activeMatchNumber"];
 }
 
 function voteForMatch(match) {
