@@ -330,7 +330,7 @@ class Window(ctk.CTk):
         
         # create the variables for the settings
         self.volume = tk.IntVar(value=50)
-        self.active_mode = tk.IntVar(value=1)
+        self.active_mode = tk.IntVar(value=-1)
         self.debug_mode = tk.IntVar(value=0)
         self.start_time = tk.StringVar(value="08:00")
         self.time_interval = tk.StringVar(value="10m")
@@ -1788,9 +1788,8 @@ class Window(ctk.CTk):
                 self.spiel_select.set(values_list[self.active_match])
                 self.manual_select_active = False
             elif (values_list != [] and self.teams_playing.count(None) != 0) or (values_list != [] and self.manual_select_active == False):
-                self.on_match_select(values_list[0], matches)
-                self.manual_select_active = False
                 return
+
             elif self.manual_select_active == False:
                 self.active_match = -1
                 self.teams_playing = [None, None]
@@ -2147,6 +2146,18 @@ class Window(ctk.CTk):
                         return
                     else:
                         return
+                    
+                if new_match_index == 0 and next_match == False and self.active_mode.get() == 1:
+                    result = tkinter.messagebox.askyesno("Select no match", "You have reached the beginning of the matches. Do you want to select no match?")
+                    if result:
+                        self.active_match = -1
+                        self.teams_playing = [None, None]
+                        self.save_teams_playing_and_active_match()
+                        self.reload_spiel_button_command()
+                        self.show_frame(self.SPIEL_frame)
+                        return
+                    else:
+                        return
 
                 # Ensure the new index is within bounds
                 new_match_index = max(1, min(new_match_index, len(matches)))
@@ -2451,24 +2462,26 @@ class Window(ctk.CTk):
         tippers = self.cursor.fetchall()
 
         self.tippers_list_frame = ttk.Frame(self.tipping_tab_list)
-        self.tippers_list_frame.grid(pady=7, sticky=tk.NSEW)
+        self.tippers_list_frame.pack(fill=tk.BOTH, expand=True)  # Change grid to pack
+
 
         # Create a style
         style = ttk.Style()
         
         style.theme_use("clam")
 
+        
         # Configure the Treeview heading
         style.configure("Treeview.Heading",
                         foreground='white',  # Set font color
-                        font=('Helvetica', 10, 'bold'),  # Set font size and style
+                        font=('Helvetica', int(self.team_button_font_size*1.4), 'bold'),  # Set font size and style
                         background='#0e1718',
                         fieldbackground='#0e1718')
 
         # Configure the Treeview content
         style.configure("Treeview",
                         foreground='white',  # Set font color
-                        font=('Helvetica', 10),
+                        font=('Helvetica', int(self.team_button_font_size*1.4)),
                         background='#0e1718',
                         fieldbackground='#0e1718')
 
@@ -2487,7 +2500,7 @@ class Window(ctk.CTk):
         for tipper in tippers:
             tree.insert('', 'end', values=(tipper[1], tipper[2]))
 
-        tree.grid(sticky=tk.NSEW)  # Add treeview to GUI
+        tree.pack(fill=tk.BOTH, expand=True)  # Change grid to pack
             
             
     def on_tipping_tab_change(self):
@@ -2529,6 +2542,7 @@ class Window(ctk.CTk):
                 points = 0
             
             update_points[googleId] = update_points.get(googleId, 0) + points
+            
             
         for googleId, points in update_points.items():
             updatePoints = """
@@ -3643,6 +3657,7 @@ def send_tipping_data():
     if match_id >= 0:
         if match_id <= tkapp.active_match:
             return jsonify(message="Match already started or finished")
+        match_id += 1 # To make it compatible with the database
     elif tkapp.active_match != -1 and tkapp.active_mode.get() == 2:
         match_id = (match_id * -1) - 2
         if match_id <= tkapp.active_match:
