@@ -24,6 +24,7 @@ import pathlib
 import functools
 import subprocess
 import platform
+import traceback
 
 app = Flask(__name__)
 app.secret_key = "Felix.com"
@@ -3665,8 +3666,10 @@ def get_data_for_website(which_data=-1):
                     tipping_statistics[matchId] = (median_team1Goals, median_team2Goals, percent_team1Wins, percent_team2Wins)
 
                 # Combine both datasets
-                # Combine both datasets
-                combined_data = {matchId: all_matches[matchId] + ([tipping_statistics.get(matchId, (None, None, None, None))],) for matchId in all_matches}
+                combined_data = []
+                for matchId in all_matches:
+                    statistics = tipping_statistics.get(matchId, (None, None, None, None))
+                    combined_data.append(list(all_matches[matchId]) + list([statistics]))
                 return combined_data
             
             else:
