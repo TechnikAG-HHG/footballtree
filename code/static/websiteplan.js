@@ -79,49 +79,52 @@ function generateTableGroup(matches) {
         var row = tbody.insertRow();
 
         if (i == data["activeMatchNumber"] && data["pauseMode"] == false) {
-            row.style.backgroundColor = "black";
-        }
+            generateFullSize(match, i, row);
+        } else {
+            row.id = "section" + (i + 1); // Set the id of the row
 
-        row.id = "section" + (i + 1); // Set the id of the row
+            var cellTime = row.insertCell(0);
+            var matchTime = new Date(
+                startTime.getTime() + i * timeInterval * 60000
+            );
+            cellTime.textContent = formatTime(matchTime);
 
-        var cellTime = row.insertCell(0);
-        var matchTime = new Date(
-            startTime.getTime() + i * timeInterval * 60000
-        );
-        cellTime.textContent = formatTime(matchTime);
+            var cellMatchNumber = row.insertCell(1);
+            var matchNumber = i + 1;
+            cellMatchNumber.textContent = "Spiel " + matchNumber;
 
-        var cellMatchNumber = row.insertCell(1);
-        var matchNumber = i + 1;
-        cellMatchNumber.textContent = "Spiel " + matchNumber;
+            var cellGroup = row.insertCell(2);
+            cellGroup.textContent = `Gruppe ${match[4]}`;
 
-        var cellGroup = row.insertCell(2);
-        cellGroup.textContent = `Gruppe ${match[4]}`;
+            var cellFirstTeam = row.insertCell(3);
+            cellFirstTeam.textContent = match[0];
 
-        var cellFirstTeam = row.insertCell(3);
-        cellFirstTeam.textContent = match[0];
+            var cellSecondTeam = row.insertCell(4);
+            cellSecondTeam.textContent = match[1];
 
-        var cellSecondTeam = row.insertCell(4);
-        cellSecondTeam.textContent = match[1];
-
-        if (data["activeMatchNumber"] > i || data["activeMatchNumber"] < 0) {
-            if (match[2] > match[3]) {
-                cellFirstTeam.className = "style-winner";
-                cellSecondTeam.className = "style-loser";
-            } else if (match[2] < match[3]) {
-                cellSecondTeam.className = "style-winner";
-                cellFirstTeam.className = "style-loser";
-            } else {
-                cellFirstTeam.className = "style-draw";
-                cellSecondTeam.className = "style-draw";
+            if (
+                data["activeMatchNumber"] > i ||
+                data["activeMatchNumber"] < 0
+            ) {
+                if (match[2] > match[3]) {
+                    cellFirstTeam.className = "style-winner";
+                    cellSecondTeam.className = "style-loser";
+                } else if (match[2] < match[3]) {
+                    cellSecondTeam.className = "style-winner";
+                    cellFirstTeam.className = "style-loser";
+                } else {
+                    cellFirstTeam.className = "style-draw";
+                    cellSecondTeam.className = "style-draw";
+                }
             }
+
+            var cellT = row.insertCell(5);
+            cellT.textContent = match[2] + " : " + match[3];
+
+            finalMatchesTime = new Date(
+                startTime.getTime() + (i + 1) * timeInterval * 60000
+            );
         }
-
-        var cellT = row.insertCell(5);
-        cellT.textContent = match[2] + " : " + match[3];
-
-        finalMatchesTime = new Date(
-            startTime.getTime() + (i + 1) * timeInterval * 60000
-        );
 
         i++;
     });
@@ -374,6 +377,62 @@ function finalMatchTable() {
             i++;
         });
     }
+}
+
+function generateFullSize(match, i, row) {
+    // Create a bigger statistic entry in the table for the current match
+    row.id = "section" + (i + 1); // Set the id of the row
+    row.style.backgroundColor = "black";
+
+    var fullSize = row.insertCell(0);
+    fullSize.colSpan = 6;
+    fullSize.className = "fullSize";
+
+    var title = document.createElement("h2");
+    if (match[4] == 1) {
+        title.textContent = "Spiel " + (i + 1) + ": Gruppe A";
+    } else if (match[4] == 2) {
+        title.textContent = "Spiel " + (i + 1) + ": Gruppe B";
+    }
+    title.className = "title";
+    fullSize.appendChild(title);
+
+    var teamsGoalsDiv = document.createElement("div");
+    teamsGoalsDiv.className = "teamsGoalsDiv";
+    fullSize.appendChild(teamsGoalsDiv);
+
+    var team1Div = document.createElement("div");
+    team1Div.className = "team1Div";
+    teamsGoalsDiv.appendChild(team1Div);
+
+    var team1 = document.createElement("p");
+    team1.textContent = match[0];
+    team1.className = "team1";
+    team1Div.appendChild(team1);
+
+    var tipping1 = document.createElement("p");
+    tipping1.textContent = "Prozentzahl";
+    tipping1.className = "tipping1";
+    team1Div.appendChild(tipping1);
+
+    var goals = document.createElement("p");
+    goals.textContent = match[2] + " : " + match[3];
+    goals.className = "goals";
+    teamsGoalsDiv.appendChild(goals);
+
+    var team2Div = document.createElement("div");
+    team2Div.className = "team2Div";
+    teamsGoalsDiv.appendChild(team2Div);
+
+    var team2 = document.createElement("p");
+    team2.textContent = match[1];
+    team2.className = "team2";
+    team2Div.appendChild(team2);
+
+    var tipping2 = document.createElement("p");
+    tipping2.textContent = "Prozentzahl";
+    tipping2.className = "tipping2";
+    team2Div.appendChild(tipping2);
 }
 
 async function updateData() {
