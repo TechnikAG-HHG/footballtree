@@ -311,7 +311,9 @@ class Window(ctk.CTk):
             activeMatch INTEGER DEFAULT 0,
             pauseMode BOOLEAN DEFAULT 0,
             timeIntervalForOnlyTheFinalMatch TEXT DEFAULT "",
-            bestScorerActive BOOLEAN DEFAULT 0
+            bestScorerActive BOOLEAN DEFAULT 0,
+            thereAreKOMatches BOOLEAN DEFAULT 0,
+            timeIntervalKO TEXT DEFAULT ""
         )
         """
         self.settingscursor.execute(settingsDataTableCreationQuery)
@@ -359,11 +361,13 @@ class Window(ctk.CTk):
         self.start_time = tk.StringVar(value="08:00")
         self.time_interval = tk.StringVar(value="10m")
         self.time_intervalFM = tk.StringVar(value="10m")
+        self.time_intervalKO = tk.StringVar(value="10m")
         self.time_pause_before_FM = tk.StringVar(value="0m") 
         self.website_title = tk.StringVar(value="HHG-Fußballturnier")
         self.pause_mode = tk.BooleanVar(value=False)
         self.time_interval_for_only_the_final_match = tk.StringVar(value="10m")
         self.best_scorer_active = tk.BooleanVar(value=False)
+        self.there_is_an_ko_phase = tk.BooleanVar(value=False)
         
         # load the settings from the database into the variables
         if settings[5] is not None and settings[5] != "" and settings[5] != 0:
@@ -411,6 +415,12 @@ class Window(ctk.CTk):
         if settings[17] is not None and settings[17] != "" and settings[17] != 0:
             self.best_scorer_active.set(value=settings[17])
 
+        if settings[18] is not None and settings[18] != "" and settings[18] != 0:
+            self.there_is_an_ko_phase.set(value=settings[18])
+
+        if settings[19] is not None and settings[19] != "" and settings[19] != 0:
+            self.time_intervalKO.set(value=settings[19])
+            
         if self.debug_mode.get() == 1:
             self.console_handler.setLevel(logging.DEBUG)
         elif self.debug_mode.get() == 0:
@@ -1593,6 +1603,7 @@ class Window(ctk.CTk):
         #get the number of entrys in the matchData table
         self.cursor.execute("SELECT COUNT(*) FROM matchData")
         match_count = self.cursor.fetchone()[0]
+        timeinterval = int(self.time_interval.get().replace("m", ""))
         
         if self.active_mode.get() == 1:
             # Get the starttime from settings
@@ -1606,9 +1617,6 @@ class Window(ctk.CTk):
                 if next_match:
                     return "00:00", "00:00", False
                 return "00:00"
-
-            # get the time interval from settings
-            timeinterval = int(self.time_interval.get().replace("m", ""))
 
             # calculate the time for the current match
             current_match_time = starttime + datetime.timedelta(minutes=timeinterval * active_match)
@@ -1640,9 +1648,6 @@ class Window(ctk.CTk):
                 active_match = 3
                 final_match_active = 1
 
-            # get the time interval from settings
-            timeinterval = int(self.time_interval.get().replace("m", ""))
-            
             # get the interval for the final matches
             time_interval_final_matches = int(self.time_intervalFM.get().replace("m", ""))
             
@@ -1655,13 +1660,51 @@ class Window(ctk.CTk):
             #logging.debug(f"active_match: {active_match}, time_interval_final_matches: {time_interval_final_matches}, timeinterval: {timeinterval}, match_count: {match_count}, pause_between_final_matches: {pause_between_final_matches}")
 
             # calculate the time for the current match
-            current_match_time = starttime + datetime.timedelta(minutes=(final_match_active * time_interval_for_only_the_final_match) + (time_interval_final_matches * active_match) + (timeinterval * match_count) + pause_between_final_matches)
+            if self.there_is_an_ko_phase.get() == 0:
+                current_match_time = starttime + datetime.timedelta(minutes=(final_match_active * time_interval_for_only_the_final_match) + (time_interval_final_matches * active_match) + (timeinterval * match_count) + pause_between_final_matches)
+            else:
+                self.cursor.execute("SELECT COUNT(*) FROM KOMatchesData")
+                ko_match_count = self.cursor.fetchone()[0]
+                
+                current_match_time = starttime + datetime.timedelta(minutes=(final_match_active * time_interval_for_only_the_final_match) + (time_interval_final_matches * active_match) + (timeinterval * match_count) + (timeIntervalKO * ko_match_count) + pause_between_final_matches)
+    
 
             if next_match:
                 next_match_start_time = current_match_time + datetime.timedelta(minutes=time_interval_final_matches)                
                 if next_match_start_time.day != starttime.day:
                     return current_match_time.strftime('%H:%M'), next_match_start_time.strftime('%H:%M'), True
                 return current_match_time.strftime('%H:%M'), next_match_start_time.strftime('%H:%M'), False
+            # return the time in 00:00 format
+            return current_match_time.strftime('%H:%M')
+    
+        elif self.active_mode.get() == 3:
+            # Get the starttime from settings
+            starttime_str = str(self.start_time.get())
+            starttime = datetime.datetime.strptime(starttime_str, '%H:%M')
+
+            # get the number of the active match
+            active_match = self.get_active_match(self.teams_playing[0], self.teams_playing[1])
+            
+            if active_match < 0:
+                if next_match:
+                    return "00:00", "00:00", False
+                return "00:00"
+
+            # get the time interval from settings
+            timeIntervalKO = int(self.time_intervalKO.get().replace("m", ""))
+
+            # calculate the time for the current match
+            current_match_time = starttime + datetime.timedelta(minutes=timeIntervalKO * active_match + timeinterval * match_count) 
+
+            next_match_start_time = current_match_time + datetime.timedelta(minutes=timeIntervalKO)
+
+            #logging.debug("next_match_start_time", next_match_start_time, "current_match_time", current_match_time, "next_match_start_time.day", next_match_start_time.day, "current_match_time.day", current_match_time.day)
+
+            if next_match and active_match <= match_count:
+                if next_match_start_time.day != starttime.day:
+                    return current_match_time.strftime('%H:%M'), next_match_start_time.strftime('%H:%M'), True
+                return current_match_time.strftime('%H:%M'), (current_match_time + datetime.timedelta(minutes=timeinterval)).strftime('%H:%M'), False
+            
             # return the time in 00:00 format
             return current_match_time.strftime('%H:%M')
         
@@ -1869,8 +1912,9 @@ class Window(ctk.CTk):
                 manual_select_label.place(relx=0.32, rely=0.9, anchor=tk.CENTER)
                 
                 self.manual_select_active_sure = True
+
         elif self.active_mode.get() == 3:
-            values_list = self.get_values_list_mode1(matches)
+            values_list, pairedKoMatches = self.get_values_list_mode3()
             self.spiel_select.configure(values=values_list)
             #logging.debug("active_match in create_matches_labels", self.active_match)
             self.active_match = self.get_active_match(self.teams_playing[0], self.teams_playing[1])
@@ -1879,7 +1923,7 @@ class Window(ctk.CTk):
                 self.spiel_select.set(values_list[self.active_match])
                 self.manual_select_active = False
             elif (values_list != [] and self.teams_playing.count(None) != 0) or (values_list != [] and self.manual_select_active == False):
-                self.on_match_select(values_list[0], matches)
+                self.on_match_select(values_list[0], pairedKoMatches)
                 self.manual_select_active = False
                 return
             elif self.manual_select_active == False:
@@ -1914,9 +1958,61 @@ class Window(ctk.CTk):
             values_list.append(match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1])
         return values_list
     
+
+    def get_values_list_mode2(self):
+        
+        self.cache_vars["getfinalmatches_changed_using_var"] = True
+        
+        values_list = []
+        self.get_teams_for_final_matches()
+        endteam1 = getattr(self, 'endteam1', [None, None])
+        endteam2 = getattr(self, 'endteam2', [None, None])
+        endteam3 = getattr(self, 'endteam3', [None, None])
+        endteam4 = getattr(self, 'endteam4', [None, None])
+        values_list.append(f"Spiel 1 Halb: {endteam1[1]} vs {endteam3[1]}")
+        values_list.append(f"Spiel 2 Halb: {endteam2[1]} vs {endteam4[1]}")
+        values_list.append(self.get_spiel_um_platz_3(endteam1, endteam3, endteam2, endteam4))
+        values_list.append(self.get_final_match(endteam1, endteam3, endteam2, endteam4))
+        
+        active_match = self.active_match
+        if self.spiel_um_platz_3 != None and self.final_match_teams != None and self.spiel_um_platz_3 != [] and self.final_match_teams != []:
+            self.active_match = 0
+            self.save_active_match_in_final_phase(self.endteam1[0], self.endteam3[0])   
+            self.active_match = 1
+            self.save_active_match_in_final_phase(self.endteam2[0], self.endteam4[0])
+            self.active_match = 2
+            self.save_active_match_in_final_phase(self.spiel_um_platz_3[0][0], self.spiel_um_platz_3[1][0])
+            self.active_match = 3
+            self.save_active_match_in_final_phase(self.final_match_teams[0][0], self.final_match_teams[1][0])
+        self.active_match = active_match
+        
+        goles_spiele = []
+        
+        if self.spiel_um_platz_3 != None and self.final_match_teams != None and self.spiel_um_platz_3 != [] and self.final_match_teams != []:
+            goles_spiele.append([self.read_goals_for_match_from_db(self.endteam1[0], self.endteam3[0], 2), self.read_goals_for_match_from_db(self.endteam3[0], self.endteam1[0], 2)])
+            goles_spiele.append([self.read_goals_for_match_from_db(self.endteam2[0], self.endteam4[0], 2), self.read_goals_for_match_from_db(self.endteam4[0], self.endteam2[0], 2)])
+            goles_spiele.append([self.read_goals_for_match_from_db(self.spiel_um_platz_3[0][0], self.spiel_um_platz_3[1][0], 2), self.read_goals_for_match_from_db(self.spiel_um_platz_3[1][0], self.spiel_um_platz_3[0][0], 2)])
+            goles_spiele.append([self.read_goals_for_match_from_db(self.final_match_teams[0][0], self.final_match_teams[1][0], 2), self.read_goals_for_match_from_db(self.final_match_teams[1][0], self.final_match_teams[0][0], 2)])
+
+            if self.active_mode.get() == 2:
+                self.updated_data.update({"finalMatches": [[self.endteam1[1], self.endteam3[1], goles_spiele[0]], [self.endteam2[1], self.endteam4[1], goles_spiele[1]], [self.spiel_um_platz_3[0][1], self.spiel_um_platz_3[1][1], goles_spiele[2]], [self.final_match_teams[0][1], self.final_match_teams[1][1], goles_spiele[3]]]})
+            else:
+                #only send nones in the same structure
+                self.updated_data.update({"finalMatches": [[None, None, [None, None]], [None, None, [None, None]], [None, None, [None, None]], [None, None, [None, None]]]})
+        return values_list, self.active_match
     
+
     def get_values_list_mode3(self):
-        pass
+        #self.cache_vars["getfinalmatches_changed_using_var"] = True
+        values_list = []
+        pairedKOmatches = self.get_teams_for_KO_matches()
+        print("pairedKOmatches", pairedKOmatches)
+        for i, match in enumerate(pairedKOmatches):
+            values_list.append(f" {i+1}: {match[0][1]} vs {match[1][1]}")
+        
+        self.save_KO_matches_in_DB(pairedKOmatches)
+
+        return values_list, pairedKOmatches
 
 
     def get_active_match(self, team1, team2):
@@ -1956,51 +2052,35 @@ class Window(ctk.CTk):
                 return active_match[0] -1
             else:
                 return -1
-
-
-    def get_values_list_mode2(self):
-        
-        self.cache_vars["getfinalmatches_changed_using_var"] = True
-        
-        values_list = []
-        self.get_teams_for_final_matches()
-        endteam1 = getattr(self, 'endteam1', [None, None])
-        endteam2 = getattr(self, 'endteam2', [None, None])
-        endteam3 = getattr(self, 'endteam3', [None, None])
-        endteam4 = getattr(self, 'endteam4', [None, None])
-        values_list.append(f"Spiel 1 Halb: {endteam1[1]} vs {endteam3[1]}")
-        values_list.append(f"Spiel 2 Halb: {endteam2[1]} vs {endteam4[1]}")
-        values_list.append(self.get_spiel_um_platz_3(endteam1, endteam3, endteam2, endteam4))
-        values_list.append(self.get_final_match(endteam1, endteam3, endteam2, endteam4))
-        
-        active_match = self.active_match
-        if self.spiel_um_platz_3 != None and self.final_match_teams != None and self.spiel_um_platz_3 != [] and self.final_match_teams != []:
-            self.active_match = 0
-            self.save_active_match_in_final_phase(self.endteam1[0], self.endteam3[0])   
-            self.active_match = 1
-            self.save_active_match_in_final_phase(self.endteam2[0], self.endteam4[0])
-            self.active_match = 2
-            self.save_active_match_in_final_phase(self.spiel_um_platz_3[0][0], self.spiel_um_platz_3[1][0])
-            self.active_match = 3
-            self.save_active_match_in_final_phase(self.final_match_teams[0][0], self.final_match_teams[1][0])
-        self.active_match = active_match
-        
-        goles_spiele = []
-        
-        if self.spiel_um_platz_3 != None and self.final_match_teams != None and self.spiel_um_platz_3 != [] and self.final_match_teams != []:
-            goles_spiele.append([self.read_goals_for_match_from_db(self.endteam1[0], self.endteam3[0]), self.read_goals_for_match_from_db(self.endteam3[0], self.endteam1[0])])
-            goles_spiele.append([self.read_goals_for_match_from_db(self.endteam2[0], self.endteam4[0]), self.read_goals_for_match_from_db(self.endteam4[0], self.endteam2[0])])
-            goles_spiele.append([self.read_goals_for_match_from_db(self.spiel_um_platz_3[0][0], self.spiel_um_platz_3[1][0]), self.read_goals_for_match_from_db(self.spiel_um_platz_3[1][0], self.spiel_um_platz_3[0][0])])
-            goles_spiele.append([self.read_goals_for_match_from_db(self.final_match_teams[0][0], self.final_match_teams[1][0]), self.read_goals_for_match_from_db(self.final_match_teams[1][0], self.final_match_teams[0][0])])
-
-            if self.active_mode.get() == 2:
-                self.updated_data.update({"finalMatches": [[self.endteam1[1], self.endteam3[1], goles_spiele[0]], [self.endteam2[1], self.endteam4[1], goles_spiele[1]], [self.spiel_um_platz_3[0][1], self.spiel_um_platz_3[1][1], goles_spiele[2]], [self.final_match_teams[0][1], self.final_match_teams[1][1], goles_spiele[3]]]})
-            else:
-                #only send nones in the same structure
-                self.updated_data.update({"finalMatches": [[None, None, [None, None]], [None, None, [None, None]], [None, None, [None, None]], [None, None, [None, None]]]})
-        return values_list, self.active_match
     
     
+    def get_teams_for_KO_matches(self):
+        getAllTeamsByPointsAndGoalDifferenceDesc = """
+        SELECT id, teamName, goals, goalsReceived, (goals - goalsReceived) as goalDifference FROM teamData
+        WHERE groupNumber = 1
+        ORDER BY points DESC, goalDifference DESC, id ASC
+        """
+        getAllTeamsByPointsAndGoalDifferenceAsc = """
+        SELECT id, teamName, goals, goalsReceived, (goals - goalsReceived) as goalDifference FROM teamData
+        WHERE groupNumber = 2
+        ORDER BY points ASC, goalDifference ASC, id DESC
+        """
+
+        self.cursor.execute(getAllTeamsByPointsAndGoalDifferenceDesc)
+        teamsDesc = self.cursor.fetchall()
+
+        self.cursor.execute(getAllTeamsByPointsAndGoalDifferenceAsc)
+        teamsAsc = self.cursor.fetchall()
+
+        # Pair the teams together and flatten the list
+        paired_teams = [pair for pair in zip(teamsDesc, teamsAsc)]
+
+        while len(paired_teams) < 4:
+            paired_teams.append((0, 'No Team', 0, 0, 0))
+
+        return paired_teams
+            
+
     def get_top_two_teams(self, group_number):
         query = """
         SELECT id, teamName, goals, goalsReceived, (goals - goalsReceived) as goalDifference FROM teamData
@@ -2128,6 +2208,26 @@ class Window(ctk.CTk):
         self.cursor.execute(updateActiveMatch, (team1id, team2id, active_match_id))
 
         self.connection.commit()
+
+
+    def save_KO_matches_in_DB(self, pairedKOmatches):
+        #logging.debug(f"pairedKOmatches: {pairedKOmatches}")
+        for i, match in enumerate(pairedKOmatches):
+            #logging.debug(f"match: {match}")
+            insertKOmatch = """
+            INSERT OR IGNORE INTO KOMatchesData (matchId, team1Id, team2Id)
+            VALUES (?, ?, ?)
+            """
+            self.cursor.execute(insertKOmatch, (i+1, match[0][0], match[1][0]))
+
+            # If insertion failed due to a unique constraint, update the existing row
+            updateKOmatch = """
+            UPDATE KOMatchesData
+            SET team1Id = ?, team2Id = ?
+            WHERE matchId = ?
+            """
+            self.cursor.execute(updateKOmatch, (match[0][0], match[1][0], i+1))
+        self.connection.commit()
         
     
     def on_match_select(self, event, matches=[]):
@@ -2200,13 +2300,13 @@ class Window(ctk.CTk):
             self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
         
         elif self.active_mode.get() == 3:
-            match_index = [match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1] for match in matches].index(selected_match)
+            match_index = int(selected_match.split(":")[0]) - 1
             #logging.debug("match_index", match_index)
             # Get the teams playing in the selected match and if there are none, set teams_playing to None
             team_names = self.read_teamNames()
             
-            team1_index = team_names.index(matches[match_index]["teams"][0])
-            team2_index = team_names.index(matches[match_index]["teams"][1])
+            team1_index = team_names.index(matches[match_index][0][1])
+            team2_index = team_names.index(matches[match_index][1][1])
 
             if team1_index and team2_index:
                 self.teams_playing = [team1_index, team2_index]
@@ -2215,7 +2315,6 @@ class Window(ctk.CTk):
                 
             self.active_match = match_index
             
-            self.save_games_played_in_db(match_index)
             
             self.updated_data.update({"Games": get_data_for_website(2)})
             self.updated_data.update({"activeMatchNumber": self.active_match})
@@ -2400,8 +2499,11 @@ class Window(ctk.CTk):
         self.connection.commit()
        
         
-    def save_goals_for_match_in_db(self, teamID, team2ID, goals):
-        table_name = 'matchData' if self.active_mode.get() == 1 else 'finalMatchesData'
+    def save_goals_for_match_in_db(self, teamID, team2ID, goals, fromWhichMode=-1):
+        if fromWhichMode == -1:
+            table_name = 'matchData' if self.active_mode.get() == 1 else 'finalMatchesData' if self.active_mode.get() == 2 else 'KOMatchesData'
+        else:
+            table_name = 'matchData' if fromWhichMode == 1 else 'finalMatchesData' if fromWhichMode == 2 else 'KOMatchesData'
 
         get_team1_or_team2 = f"""
         SELECT 
@@ -2427,8 +2529,11 @@ class Window(ctk.CTk):
         self.connection.commit()
         
         
-    def read_goals_for_match_from_db(self, teamID, team2ID):
-        table_name = 'matchData' if self.active_mode.get() == 1 else 'finalMatchesData'
+    def read_goals_for_match_from_db(self, teamID, team2ID, fromWhichMode=-1):
+        if fromWhichMode == -1:
+            table_name = 'matchData' if self.active_mode.get() == 1 else 'finalMatchesData' if self.active_mode.get() == 2 else 'KOMatchesData'
+        else:
+            table_name = 'matchData' if fromWhichMode == 1 else 'finalMatchesData' if fromWhichMode == 2 else 'KOMatchesData'
 
         get_goals_for_match = f"""
         SELECT 
@@ -2654,8 +2759,15 @@ class Window(ctk.CTk):
         all_option_frame = ctk.CTkFrame(option_frame, bg_color='#0e1718', fg_color='#0e1718', width=self.screenwidth/3)
         all_option_frame.pack(pady=0, anchor=tk.NW, side=tk.TOP, padx=0)
         
+        utility_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        utility_frame.pack(pady=0, anchor=tk.N, side=tk.TOP, padx=5, expand=True, fill=tk.X)
+        
+        # phase switcher
+        all_switcher_frame = ctk.CTkFrame(utility_frame, bg_color='#0e1718', fg_color='#0e1718')
+        all_switcher_frame.pack(pady=0, side=tk.LEFT, padx=10, anchor=tk.NW, expand=False)
+        
         # volume slider
-        volume_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        volume_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
         volume_frame.pack(pady=10, anchor=tk.N, side=tk.TOP, padx=0)
         
         volume_label = ctk.CTkLabel(volume_frame, text="Volume", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
@@ -2673,13 +2785,6 @@ class Window(ctk.CTk):
             command=lambda event: self.on_volume_change(event), 
             height=30)
         volume_slider.pack(pady=0, padx=5, side=tk.LEFT, anchor=tk.NW, expand=True, fill=tk.X)
-        
-        utility_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        utility_frame.pack(pady=0, anchor=tk.N, side=tk.TOP, padx=5, expand=True, fill=tk.X)
-        
-        # phase switcher
-        all_switcher_frame = ctk.CTkFrame(utility_frame, bg_color='#0e1718', fg_color='#0e1718')
-        all_switcher_frame.pack(pady=0, side=tk.TOP, padx=0, anchor=tk.N, expand=False)
         
         phase_switcher_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
         phase_switcher_frame.pack(pady=7, anchor=tk.NW, side=tk.TOP, padx=5)
@@ -2699,11 +2804,11 @@ class Window(ctk.CTk):
         self.pause_switch = ctk.CTkSwitch(self.pause_switcher_frame, text="Pause", variable=self.pause_mode, command=self.on_pause_switch_change, font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         self.pause_switch.pack(side=tk.TOP, pady=2, padx=0, anchor=tk.N)
         
-        self.ko_mode_switcher_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
-        self.ko_mode_switcher_frame.pack(pady=7, anchor=tk.NW, side=tk.TOP, padx=5)
-        
-        self.ko_mode_switch = ctk.CTkSwitch(self.ko_mode_switcher_frame, text="KO Mode", variable=self.ko_mode, command=self.on_ko_mode_switch_change, font=("Helvetica", self.team_button_font_size*1.4, "bold"))
-        self.ko_mode_switch.pack(side=tk.TOP, pady=2, padx=0, anchor=tk.N)
+        self.there_is_an_ko_phase_switcher_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
+        self.there_is_an_ko_phase_switcher_frame.pack(pady=7, anchor=tk.NW, side=tk.TOP, padx=5)
+
+        self.there_is_an_ko_phase_switch = ctk.CTkSwitch(self.there_is_an_ko_phase_switcher_frame, text="There is an KO Phase", variable=self.there_is_an_ko_phase, command=self.on_there_is_an_ko_phase_switch_change, font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        self.there_is_an_ko_phase_switch.pack(side=tk.TOP, pady=2, padx=0, anchor=tk.N)
 
         best_scorer_active_switch_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
         best_scorer_active_switch_frame.pack(pady=5, anchor=tk.NW, side=tk.TOP, padx=5)
@@ -2711,9 +2816,11 @@ class Window(ctk.CTk):
         best_scorer_active_switch = ctk.CTkSwitch(best_scorer_active_switch_frame, text="Best Scorer Active", variable=self.best_scorer_active, command=self.on_best_scorer_active_switch_change, font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         best_scorer_active_switch.pack(side=tk.TOP, pady=2, padx=0, anchor=tk.N)
         
+        entry_frame = ctk.CTkFrame(utility_frame, bg_color='#0e1718', fg_color='#0e1718')
+        entry_frame.pack(pady=7, anchor=tk.NW, side=tk.LEFT, padx=10)
         
         # start time for matches
-        start_time_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        start_time_frame = ctk.CTkFrame(entry_frame, bg_color='#0e1718', fg_color='#0e1718')
         start_time_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
         
         start_time_label = ctk.CTkLabel(start_time_frame, text="Start Time", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
@@ -2725,7 +2832,7 @@ class Window(ctk.CTk):
         
         
         # time interval for matches
-        time_interval_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        time_interval_frame = ctk.CTkFrame(entry_frame, bg_color='#0e1718', fg_color='#0e1718')
         time_interval_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
         
         time_interval_label = ctk.CTkLabel(time_interval_frame, text="Time Interval For Group Phase", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
@@ -2735,21 +2842,19 @@ class Window(ctk.CTk):
         time_interval_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
         time_interval_entry.bind("<KeyRelease>", lambda event: self.on_time_interval_change(event))
         
+        #time interval for ko phase
+        time_intervalKO_frame = ctk.CTkFrame(entry_frame, bg_color='#0e1718', fg_color='#0e1718')
+        time_intervalKO_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
         
-        # pause time before final matches
-        time_pause_before_FM_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
-        time_pause_before_FM_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0)
+        time_intervalKO_label = ctk.CTkLabel(time_intervalKO_frame, text="Time Interval For KO Phase", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        time_intervalKO_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
         
-        time_pause_before_FM_label = ctk.CTkLabel(time_pause_before_FM_frame, text="Time Pause Between Final Matches", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
-        time_pause_before_FM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
-        
-        time_pause_before_FM_entry = ctk.CTkEntry(time_pause_before_FM_frame, textvariable=self.time_pause_before_FM, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
-        time_pause_before_FM_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
-        time_pause_before_FM_entry.bind("<KeyRelease>", lambda event: self.on_time_pause_before_FM_change(event))
-        
+        time_intervalKO_entry = ctk.CTkEntry(time_intervalKO_frame, textvariable=self.time_intervalKO, font=("Helvetica", self.team_button_font_size*1.3))
+        time_intervalKO_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
+        time_intervalKO_entry.bind("<KeyRelease>", lambda event: self.on_time_intervalKO_change(event))
         
         # time interval for final matches
-        time_intervalFM_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        time_intervalFM_frame = ctk.CTkFrame(entry_frame, bg_color='#0e1718', fg_color='#0e1718')
         time_intervalFM_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
         
         time_intervalFM_label = ctk.CTkLabel(time_intervalFM_frame, text="Time Interval For Final Matches", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
@@ -2760,7 +2865,7 @@ class Window(ctk.CTk):
         time_intervalFM_entry.bind("<KeyRelease>", lambda event: self.on_time_intervalFM_change(event))
         
         #time interval for final match
-        time_intervalFinalMatch_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        time_intervalFinalMatch_frame = ctk.CTkFrame(entry_frame, bg_color='#0e1718', fg_color='#0e1718')
         time_intervalFinalMatch_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
         
         time_intervalFinalMatch_label = ctk.CTkLabel(time_intervalFinalMatch_frame, text="Time For Final Match", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
@@ -2771,8 +2876,19 @@ class Window(ctk.CTk):
         time_intervalFinalMatch_entry.bind("<KeyRelease>", lambda event: self.on_time_intervalFinalMatch_change(event))
         
         
+        # pause time before final matches
+        time_pause_before_FM_frame = ctk.CTkFrame(entry_frame, bg_color='#0e1718', fg_color='#0e1718')
+        time_pause_before_FM_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0)
+        
+        time_pause_before_FM_label = ctk.CTkLabel(time_pause_before_FM_frame, text="Time Pause Between Final Matches", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        time_pause_before_FM_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
+        
+        time_pause_before_FM_entry = ctk.CTkEntry(time_pause_before_FM_frame, textvariable=self.time_pause_before_FM, font=("Helvetica", self.team_button_font_size*1.3), width=self.team_button_width*2)
+        time_pause_before_FM_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
+        time_pause_before_FM_entry.bind("<KeyRelease>", lambda event: self.on_time_pause_before_FM_change(event))
+        
         # website title
-        website_title_frame = ctk.CTkFrame(all_option_frame, bg_color='#0e1718', fg_color='#0e1718')
+        website_title_frame = ctk.CTkFrame(entry_frame, bg_color='#0e1718', fg_color='#0e1718')
         website_title_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
         
         website_title_label = ctk.CTkLabel(website_title_frame, text="Website Title", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
@@ -2903,6 +3019,22 @@ class Window(ctk.CTk):
         
         self.updated_data.update({"timeInterval": self.time_interval.get().replace("m", "")})
         
+    def on_time_intervalKO_change(self, event):
+        if self.time_intervalKO.get() == "":
+            return
+        if self.time_intervalKO.get()[-1] not in "0123456789m" or not "m" in self.time_intervalKO.get() or len(self.time_intervalKO.get()) < 1:
+            return
+        saveTimeIntervalKOInDB = """
+        UPDATE settingsData
+        SET timeIntervalKO = ?
+        WHERE id = 1
+        """
+        logging.debug(f"on_time_intervalKO_change {self.time_intervalKO.get()}")
+        self.settingscursor.execute(saveTimeIntervalKOInDB, (self.time_intervalKO.get(),))
+        self.settingsconnection.commit()
+        
+        self.updated_data.update({"timeIntervalKO": self.time_intervalKO.get().replace("m", "")})
+        
 
     def on_time_intervalFM_change(self, event):
         if self.time_intervalFM.get() == "":
@@ -2995,7 +3127,19 @@ class Window(ctk.CTk):
         
         self.updated_data.update({"bestScorerActive": selected_value})
       
-            
+    def on_there_is_an_ko_phase_switch_change(self):
+        selected_value = self.there_is_an_ko_phase.get()
+        saveModeInDB = """
+        UPDATE settingsData
+        SET thereIsAnKoPhase = ?
+        WHERE id = 1
+        """
+        self.settingscursor.execute(saveModeInDB, (selected_value,))
+        self.settingsconnection.commit()
+        
+        self.updated_data.update({"thereIsAnKoPhase": selected_value})
+
+
     ##############################################################################################
     ##############################################################################################
     ##############################################################################################
@@ -3611,7 +3755,6 @@ def get_initial_data(template_name, base_url=None):
         "timeIntervalFinalMatch": tkapp.time_interval_for_only_the_final_match.get().replace("m", ""),
         "bestScorerActive": tkapp.best_scorer_active.get(),
         "ThereIsAnKOPhase": tkapp.there_is_an_ko_phase.get(),
-        "KOPhaseIsActive": tkapp.ko_phase_is_active.get(),
     }
     return make_response(render_template(template_name, initial_data=initial_data, base_url=base_url))
 
@@ -3737,29 +3880,29 @@ def send_tipping_data():
     team2_goals = request.json['team2Goals']
     
     if match_id == "" or match_id == None:
-        return jsonify(message="Please enter a valid match id")
+        return "Please enter a valid match id", 400
     elif team1_goals == "" or team2_goals == "" or team1_goals == None or team2_goals == None:
-        return jsonify(message="Please enter a valid number")
+        return "Please enter a valid number", 400
     
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     
     if team1_goals == "" or team2_goals == "" or team1_goals == None or team2_goals == None:
-        return jsonify(message="Please enter a valid number")
+        return "Please enter a valid number", 400
     
     try:
         team1_goals = int(team1_goals)
         team2_goals = int(team2_goals)
     except:
-        return jsonify(message="Please enter a valid number")
+        return "Please enter a valid number", 400
     
     if match_id >= 0:
         if match_id <= tkapp.active_match:
-            return jsonify(message="Match already started or finished")
+            return "Match already started or finished", 400
     elif tkapp.active_match != -1 and tkapp.active_mode.get() == 2:
         match_id = (match_id * -1) - 2
         if match_id <= tkapp.active_match:
-            return jsonify(message="Match already started or finished")
+            return "Match already started or finished", 400
             
     
     cursor.execute("SELECT * FROM tippingData WHERE googleId = ? AND matchId = ?", (google_id, match_id))
@@ -3775,7 +3918,7 @@ def send_tipping_data():
     cursor.close()
     connection.close()
     
-    return jsonify(message="Data successfully updated or inserted")
+    return "Data successfully updated or inserted", 200
 
 # send user name to db
 @app.route("/send_user_name", methods=['POST'])
@@ -4001,14 +4144,14 @@ if platform.system() != 'Windows':
         os.environ['DISPLAY'] = ':1'
         os.environ['DISPLAY']
 
-start_server_and_ssh = False
+start_server_and_ssh = True
 
 db_path = "data/data.db"
 stored_data = {}
 tkapp = Window(start_server_and_ssh)
 
 if start_server_and_ssh:
-    subprocess.Popen(["python3", "code/serveo_shh_connect.py"])
+    subprocess.Popen(["python", "code/serveo_shh_connect.py"])
 
 if __name__ == "__main__":
     tkapp.mainloop()
