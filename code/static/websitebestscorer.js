@@ -39,10 +39,25 @@ async function updateData() {
         })
         .catch((error) => console.error("Error fetching best scorer:", error));
 
-    setTimeout(function () {
+    if (
+        best_scorer_players != null &&
+        best_scorer_players != undefined &&
+        best_scorer_players != "" &&
+        best_scorer_players !== 0
+    ) {
         drawWinnerPodest();
         generateTable();
-    }, 0);
+    } else {
+        let no_players = document.getElementById("noPlayers");
+        if (!no_players) {
+            let tablesContainer = document.getElementById("tablesContainer");
+
+            no_players = document.createElement("p");
+            no_players.textContent = "Keine Spieler gefunden";
+            no_players.id = "noPlayers";
+            tablesContainer.appendChild(no_players);
+        }
+    }
 }
 
 function redirectTo(path) {
@@ -64,7 +79,7 @@ function generateTable() {
     var headRow = document.createElement("tr");
 
     var positionHead = document.createElement("td");
-    positionHead.textContent = "Position";
+    positionHead.textContent = "Platzierung";
     headRow.appendChild(positionHead);
 
     var nameHead = document.createElement("td");
@@ -76,7 +91,7 @@ function generateTable() {
     headRow.appendChild(teamHead);
 
     var goalsHead = document.createElement("td");
-    goalsHead.textContent = "Goals";
+    goalsHead.textContent = "Tore";
     headRow.appendChild(goalsHead);
 
     tableHead.appendChild(headRow);
@@ -135,15 +150,15 @@ function generateTable() {
 
     if (pos1counter > 1) {
         document.getElementsByClassName("firstText")[0].textContent =
-            pos1counter + " Players...";
+            pos1counter + " Spieler...";
     }
     if (pos2counter > 1) {
         document.getElementsByClassName("secondText")[0].textContent =
-            pos2counter + " Players...";
+            pos2counter + " Spieler...";
     }
     if (pos3counter > 1) {
         document.getElementsByClassName("thirdText")[0].textContent =
-            pos3counter + " Players...";
+            pos3counter + " Spieler...";
     }
 
     table.appendChild(tableBody);
@@ -227,4 +242,4 @@ document.getElementById("returnButton").addEventListener("click", function () {
 });
 
 updateData();
-setInterval(updateData, 5000);
+setInterval(updateData, 10000);

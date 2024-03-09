@@ -61,4 +61,4 @@ window.addEventListener("load", function () {
 });
 
 updateData();
-setInterval(updateData, 5000);
+setInterval(updateData, 10000);

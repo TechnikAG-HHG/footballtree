@@ -23,6 +23,7 @@ import google.auth.transport.requests
 import pathlib
 import functools
 import subprocess
+import platform
 
 app = Flask(__name__)
 app.secret_key = "Felix.com"
@@ -73,6 +74,7 @@ class Window(ctk.CTk):
         self.final_match_teams = []
         self.spiel_um_platz_3 = []
         self.matches = []
+        self.tippers_list_frame = None
         
         self.delay_time_label = None
         self.delay_time_save_for_blinking = 0
@@ -124,14 +126,16 @@ class Window(ctk.CTk):
         
         # Set window title
         self.title("Football Tournament Manager")
-        self.after(0, lambda:self.state('zoomed'))
+        if platform.system() == 'Windows':
+            self.after(0, lambda:self.state('zoomed'))
         self.configure(fg_color="#0e1718")
-        try:
-            icon_path = os.path.join('..', 'icon.ico')
-            self.iconbitmap(icon_path)
-        except:
-            icon_path = os.path.join('icon.ico')
-            self.iconbitmap(icon_path)
+        if platform.system() == 'Windows':
+            try:
+                icon_path = os.path.join('..', 'icon.ico')
+                self.iconbitmap(icon_path)
+            except:
+                icon_path = os.path.join('icon.ico')
+                self.iconbitmap(icon_path)
         
         self.tk_setPalette(background='#0e1718', foreground='#0e1718',
                activeBackground='#0e1718', activeForeground='#0e1718')
@@ -141,9 +145,9 @@ class Window(ctk.CTk):
         self.init_sqlite_db()
         
         self.load_settings()
-        
-        self.media_player_instance = vlc.Instance()
-        self.media_player_instance.log_unset()
+        if platform.system() == 'Windows':
+            self.media_player_instance = vlc.Instance()
+            self.media_player_instance.log_unset()
         
 
         # Create and pack the navigation bar
@@ -301,10 +305,10 @@ class Window(ctk.CTk):
             matchId INTEGER REFERENCES matchData(matchId),
             team1Goals INTEGER DEFAULT 0,
             team2Goals INTEGER DEFAULT 0,
-            googleId TEXT REFERENCES userData(googleId)
+            googleId TEXT REFERENCES userData(googleId),
+            points INTEGER DEFAULT 0
         )
         """
-        
         self.cursor.execute(tippingTableCreationQuery)
         self.connection.commit()
         
@@ -2432,7 +2436,6 @@ class Window(ctk.CTk):
     ###########################################################################################################  
     
     def create_tipping_elements(self):
-            
         # Create elements for the Contact frame
         tipping_frame = ctk.CTkFrame(self.tipping_frame, bg_color='#0e1718', fg_color='#0e1718')
         tipping_frame.pack(pady=7, anchor=tk.NW, side=tk.LEFT, padx=15, fill=tk.BOTH, expand=True)
@@ -2445,6 +2448,7 @@ class Window(ctk.CTk):
         self.tipping_tab_winners = self.tipping_tab_view.add("Winners")
 
         self.create_tippers_list_elements()
+
 
     def create_tippers_list_elements(self):
         self.calculate_points_for_tippers_using_db()
@@ -2460,10 +2464,12 @@ class Window(ctk.CTk):
         self.tippers_list_frame = ttk.Frame(self.tipping_tab_list)
         self.tippers_list_frame.pack(fill=tk.BOTH, expand=True)  # Change grid to pack
 
+
         # Create a style
         style = ttk.Style()
         
         style.theme_use("clam")
+
         
         # Configure the Treeview heading
         style.configure("Treeview.Heading",
@@ -2536,6 +2542,7 @@ class Window(ctk.CTk):
                 points = 0
             
             update_points[googleId] = update_points.get(googleId, 0) + points
+            
             
         for googleId, points in update_points.items():
             updatePoints = """
@@ -3521,7 +3528,7 @@ client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret
 flow = Flow.from_client_secrets_file(
     client_secrets_file=client_secrets_file,
     scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
-    redirect_uri="http://technikag.serveo.net/callback"
+    redirect_uri="https://technikag.serveo.net/callback"
 )
 
 
@@ -3566,6 +3573,7 @@ def callback():
 
     session["google_id"] = id_info.get("sub")
     session["name"] = id_info.get("name")
+    session["email"] = id_info.get("email")
     return redirect(session.pop("next", "/"))
  
 @app.route("/logout")
@@ -3628,6 +3636,11 @@ def send_tipping_data():
     match_id = request.json['matchId']
     team1_goals = request.json['team1Goals']
     team2_goals = request.json['team2Goals']
+    
+    if match_id == "" or match_id == None:
+        return jsonify(message="Please enter a valid match id")
+    elif team1_goals == "" or team2_goals == "" or team1_goals == None or team2_goals == None:
+        return jsonify(message="Please enter a valid number")
     
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
@@ -3729,6 +3742,17 @@ def tipping_index():
 def tv_index():
     base_url = request.base_url
     return get_initial_data("websitetv.html", base_url)
+
+@app.route("/admin")
+def admin_index():
+    print("entered admin")
+    if session.get("google_id"):
+        print("google_id", session.get("google_id"))
+    if session.get("name"):
+        print("name", session.get("name"))
+    if session.get("email"):
+        print("email", session.get("email"))
+    return get_initial_data("admin.html")
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -3867,7 +3891,16 @@ global stored_data
 global initial_data
 global db_path
 
-start_server_and_ssh = False
+if platform.system() != 'Windows':
+    # Assuming Xvfb is installed on your system
+    try:
+        subprocess.Popen(['Xvfb', ':1', '-screen', '0', '1024x768x16'])
+        os.environ['DISPLAY'] = ":1"
+    except:
+        os.environ['DISPLAY']
+        os.environ['DISPLAY'] = ":1"
+
+start_server_and_ssh = True
 
 db_path = "data/data.db"
 stored_data = {}
