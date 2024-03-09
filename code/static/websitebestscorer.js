@@ -39,10 +39,25 @@ async function updateData() {
         })
         .catch((error) => console.error("Error fetching best scorer:", error));
 
-    setTimeout(function () {
+    if (
+        best_scorer_players != null &&
+        best_scorer_players != undefined &&
+        best_scorer_players != "" &&
+        best_scorer_players !== 0
+    ) {
         drawWinnerPodest();
         generateTable();
-    }, 0);
+    } else {
+        let no_players = document.getElementById("noPlayers");
+        if (!no_players) {
+            let tablesContainer = document.getElementById("tablesContainer");
+
+            no_players = document.createElement("p");
+            no_players.textContent = "Keine Spieler gefunden";
+            no_players.id = "noPlayers";
+            tablesContainer.appendChild(no_players);
+        }
+    }
 }
 
 function redirectTo(path) {
