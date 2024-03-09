@@ -4138,11 +4138,11 @@ import platform
 
 if platform.system() != 'Windows':
     try:
-        os.environ['DISPLAY']
-    except KeyError:
         subprocess.Popen(['Xvfb', ':1', '-screen', '0', '1024x768x16'])
-        os.environ['DISPLAY'] = ':1'
+        os.environ['DISPLAY'] = ":1"
+    except:
         os.environ['DISPLAY']
+        os.environ['DISPLAY'] = ":1"
 
 start_server_and_ssh = True
 
