@@ -442,4 +442,4 @@ document.getElementById("name-input").addEventListener("keydown", function () {
 });
 
 updateData();
-setInterval(updateData, 5000);
+setInterval(updateData, 10000);

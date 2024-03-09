@@ -227,4 +227,4 @@ document.getElementById("returnButton").addEventListener("click", function () {
 });
 
 updateData();
-setInterval(updateData, 5000);
+setInterval(updateData, 10000);
