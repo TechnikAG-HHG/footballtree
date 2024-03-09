@@ -122,7 +122,10 @@ function generateDropdownData() {
 
             option.textContent = `${group}: ${matchData[0]} vs ${matchData[1]}`;
 
-            if (Math.abs(data["activeMatchNumber"]) > i + 1) {
+            if (
+                Math.abs(data["activeMatchNumber"]) > i + 1 &&
+                data["pauseMode"] == false
+            ) {
                 option.style.color = "gray";
                 disabledOptions.push(option);
             } else {
@@ -193,13 +196,16 @@ function voteForMatch(match) {
     }
 
     if (data["activeMatchNumber"] < -1) {
-        if (matchNumber > data["activeMatchNumber"] - 1) {
+        if (
+            matchNumber > data["activeMatchNumber"] - 1 &&
+            data["pauseMode"] == false
+        ) {
             matchPlayed = true;
-            console.log("Match played");
+            console.log("Match played 1");
         }
     } else if (matchNumber < data["activeMatchNumber"] + 1) {
         matchPlayed = true;
-        console.log("Match played");
+        console.log("Match played 2");
     }
 
     let voteContainer = document.getElementById("vote-container");
