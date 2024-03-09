@@ -1959,7 +1959,6 @@ class Window(ctk.CTk):
     
 
     def get_values_list_mode2(self):
-        
         self.cache_vars["getfinalmatches_changed_using_var"] = True
         
         values_list = []
@@ -2643,15 +2642,15 @@ class Window(ctk.CTk):
     
     def create_tipping_elements(self):
         # Create elements for the Contact frame
-        tipping_frame = ctk.CTkFrame(self.tipping_frame, bg_color='#0e1718', fg_color='#0e1718')
-        tipping_frame.pack(pady=7, anchor=tk.NW, side=tk.LEFT, padx=15, fill=tk.BOTH, expand=True)
+        self.delete_tipping_frame = ctk.CTkFrame(self.tipping_frame, bg_color='#0e1718', fg_color='#0e1718')
+        self.delete_tipping_frame.pack(pady=7, anchor=tk.NW, side=tk.LEFT, padx=15, fill=tk.BOTH, expand=True)
 
-        self.tipping_tab_view = ctk.CTkTabview(tipping_frame, bg_color='#0e1718', fg_color='#0e1718', command=self.on_tipping_tab_change)
+        self.tipping_tab_view = ctk.CTkTabview(self.delete_tipping_frame, bg_color='#0e1718', fg_color='#0e1718', command=self.on_tipping_tab_change)
         self.tipping_tab_view.pack(pady=0, anchor=tk.NW, side=tk.TOP, padx=0, fill=tk.BOTH, expand=True)
 
         self.tipping_tab_list = self.tipping_tab_view.add("Tippers List")
         self.tipping_tab_view.set("Tippers List")
-        self.tipping_tab_winners = self.tipping_tab_view.add("Winners")
+        #self.tipping_tab_winners = self.tipping_tab_view.add("Winners")
 
         self.create_tippers_list_elements()
 
@@ -2757,6 +2756,17 @@ class Window(ctk.CTk):
             WHERE googleId = ?
             """
             self.cursor.execute(updatePoints, (points, googleId))
+
+
+    def reload_tipping_page(self):
+        #if there is an self.delete_tipping_frame  frame created, delete it
+        if self.delete_tipping_frame:
+            self.delete_tipping_frame.forget()
+            self.delete_tipping_frame.destroy()
+        self.tipping_tab_view.forget()
+        self.tipping_tab_view.forget()
+        self.create_tipping_elements()
+        self.show_frame(self.tipping_frame)
 
     
     ###########################################################################################################
@@ -3032,7 +3042,8 @@ class Window(ctk.CTk):
         self.settingsconnection.commit()
         
         self.updated_data.update({"timeInterval": self.time_interval.get().replace("m", "")})
-        
+
+
     def on_time_intervalKO_change(self, event):
         if self.time_intervalKO.get() == "":
             return
@@ -3140,7 +3151,8 @@ class Window(ctk.CTk):
         self.settingsconnection.commit()
         
         self.updated_data.update({"bestScorerActive": selected_value})
-      
+
+
     def on_there_is_an_ko_phase_switch_change(self):
         selected_value = self.there_is_an_ko_phase.get()
         saveModeInDB = """
@@ -3189,6 +3201,7 @@ class Window(ctk.CTk):
     
     
     def show_tipping_frame(self):
+        self.reload_tipping_page()
         self.show_frame(self.tipping_frame)
         self.watch_dog_process_can_be_active = False 
        
@@ -3604,6 +3617,7 @@ def get_data_for_website(which_data=-1):
 
                 get_all_matches = """
                 SELECT 
+                    m.matchId,
                     t1.teamName as team1Name, 
                     t2.teamName as team2Name, 
                     m.team1Goals, 
@@ -3617,17 +3631,43 @@ def get_data_for_website(which_data=-1):
 
                 cursor.execute(get_all_matches)
 
-                all_matches = cursor.fetchall()
+                all_matches = {row[0]: row[1:] for row in cursor.fetchall()}
+
+                get_tipping_statistics_query = """
+                SELECT matchId, team1Goals, team2Goals
+                FROM tippingData
+                ORDER BY matchId
+                """
+                cursor.execute(get_tipping_statistics_query)
+
+                tipping_data = cursor.fetchall()
 
                 cursor.close()
                 connection.close()
-                
-                if all_matches != []:
-                    tkapp.cache_vars["getmatches_changed_using_var"] = False
-                    
-                    tkapp.cache["Matches"] = all_matches
 
-                return all_matches
+                # Group data by matchId
+                grouped_data = {}
+                for row in tipping_data:
+                    if row[0] not in grouped_data:
+                        grouped_data[row[0]] = {'team1Goals': [], 'team2Goals': []}
+                    grouped_data[row[0]]['team1Goals'].append(row[1])
+                    grouped_data[row[0]]['team2Goals'].append(row[2])
+
+                # Calculate median and percentages
+                tipping_statistics = {}
+                for matchId, data in grouped_data.items():
+                    team1Goals = sorted(data['team1Goals'])
+                    team2Goals = sorted(data['team2Goals'])
+                    median_team1Goals = team1Goals[len(team1Goals) // 2]
+                    median_team2Goals = team2Goals[len(team2Goals) // 2]
+                    percent_team1Wins = sum(1 for goal in team1Goals if goal > median_team2Goals) / len(team1Goals) * 100 if median_team1Goals != median_team2Goals else 50
+                    percent_team2Wins = sum(1 for goal in team2Goals if goal > median_team1Goals) / len(team2Goals) * 100 if median_team1Goals != median_team2Goals else 50
+                    tipping_statistics[matchId] = (median_team1Goals, median_team2Goals, percent_team1Wins, percent_team2Wins)
+
+                # Combine both datasets
+                # Combine both datasets
+                combined_data = {matchId: all_matches[matchId] + ([tipping_statistics.get(matchId, (None, None, None, None))],) for matchId in all_matches}
+                return combined_data
             
             else:
                 return tkapp.cache.get("Matches")
@@ -3705,6 +3745,11 @@ def get_data_for_website(which_data=-1):
         start_time = tkapp.start_time.get()
         a, b = start_time.split(":")
         return [int(a), int(b)]
+    
+    elif which_data == 8:
+
+
+        return tipping_statistics
     
 
 def ich_kann_nicht_mehr(teamID, team2ID):
@@ -3960,7 +4005,7 @@ def send_user_name():
     
     return jsonify(message="Data successfully updated or inserted")
 
-    
+
 ##############################################################################################
 ########################################### Sites ############################################
 ##############################################################################################
