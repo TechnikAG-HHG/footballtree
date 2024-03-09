@@ -375,4 +375,4 @@ window.onresize = function () {
 };
 
 // call updateData() every 2 seconds
-setInterval(updateData, 5000);
+setInterval(updateData, 10000);
