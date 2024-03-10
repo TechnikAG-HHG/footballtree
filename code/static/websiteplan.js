@@ -202,8 +202,6 @@ function updatePauseTime() {
     }
 }
 
-<<<<<<< Updated upstream
-=======
 function KOMatchTable() {
     if (
         data["Matches"] == null ||
@@ -265,7 +263,7 @@ function KOMatchTable() {
                             match,
                             i,
                             row,
-                            (gameName = "K.O.-Spiel")
+                            (gameName = "K.O.-Spiel " + (y + 1))
                         );
                     } else {
                         row.id = "section" + i * -1; // Set the id of the row
@@ -319,7 +317,6 @@ function KOMatchTable() {
     }
 }
 
->>>>>>> Stashed changes
 function finalMatchTable() {
     if (
         data["Matches"] == null ||
@@ -332,7 +329,7 @@ function finalMatchTable() {
         return; // Add return statement here
     }
 
-    if ("finalMatches" in data) {
+    if ("finalMatches" in data && data["finalMatches"] != null) {
         if (data["pauseBeforeFM"] != null && data["pauseBeforeFM"] != "0") {
             let requestedtime = parseInt(data["pauseBeforeFM"]);
             generatePauseTime(requestedtime);
@@ -630,6 +627,7 @@ async function updateData() {
 
     setTimeout(function () {
         generateTableGroup(data["Matches"]);
+        KOMatchTable();
         finalMatchTable();
         setTimeout(function () {
             if (window.innerWidth > 1000) {
