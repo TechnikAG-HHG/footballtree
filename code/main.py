@@ -2119,7 +2119,10 @@ class Window(ctk.CTk):
             goles_spiele.append([self.read_goals_for_match_from_db(self.final_match_teams[0][0], self.final_match_teams[1][0], 2), self.read_goals_for_match_from_db(self.final_match_teams[1][0], self.final_match_teams[0][0], 2)])
 
             if self.active_mode.get() == 2:
-                self.updated_data.update({"finalMatches": [[self.endteam1[1], self.endteam3[1], goles_spiele[0]], [self.endteam2[1], self.endteam4[1], goles_spiele[1]], [self.spiel_um_platz_3[0][1], self.spiel_um_platz_3[1][1], goles_spiele[2]], [self.final_match_teams[0][1], self.final_match_teams[1][1], goles_spiele[3]]]})
+                try:
+                    self.updated_data.update("finalMatches", get_data_for_website(6))
+                except:
+                    pass
             else:
                 #only send nones in the same structure
                 self.updated_data.update({"finalMatches": [[None, None, [None, None]], [None, None, [None, None]], [None, None, [None, None]], [None, None, [None, None]]]})
@@ -3941,9 +3944,6 @@ def get_data_for_website(which_data=-1):
             return 0
     
     elif which_data == 6 and tkapp.active_mode.get() == 2:
-        
-        if tkapp.pause_mode.get() == 1:
-            return None
     
         if tkapp.cache_vars.get("getfinalmatches_changed_using_var") == True:
             
@@ -3975,11 +3975,64 @@ def get_data_for_website(which_data=-1):
             else:
                 final_goles.append([0, 0])
 
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+
+            get_tipping_statistics_query = """
+            SELECT matchId, team1Goals, team2Goals
+            FROM tippingData
+            ORDER BY matchId
+            """
+            cursor.execute(get_tipping_statistics_query)
+
+            tipping_data = cursor.fetchall()
+
+            cursor.close()
+            connection.close()
+
+            # Group data by matchId
+            grouped_data = {}
+            for row in tipping_data:
+                if row[0] not in grouped_data:
+                    grouped_data[row[0]] = {'team1Goals': [], 'team2Goals': []}
+                grouped_data[row[0]]['team1Goals'].append(row[1])
+                grouped_data[row[0]]['team2Goals'].append(row[2])
+
+            # Calculate median and percentages
+            tipping_statistics = {}
+            for matchId, data in grouped_data.items():
+                matchId *= -1
+                matchId = matchId - 1
+                if matchId < 0:
+                    continue
+                team1Goals = sorted(data['team1Goals'])
+                team2Goals = sorted(data['team2Goals'])
+                median_team1Goals = team1Goals[len(team1Goals) // 2]
+                median_team2Goals = team2Goals[len(team2Goals) // 2]
+                percent_team1Wins = sum(1 for goal in team1Goals if goal > median_team2Goals) / len(team1Goals) * 100 if median_team1Goals != median_team2Goals else 50
+                percent_team2Wins = sum(1 for goal in team2Goals if goal > median_team1Goals) / len(team2Goals) * 100 if median_team1Goals != median_team2Goals else 50
+                print(f"matchId {matchId}, median_team1Goals {median_team1Goals}, median_team2Goals {median_team2Goals}, percent_team1Wins {percent_team1Wins}, percent_team2Wins {percent_team2Wins}")
+                tipping_statistics[matchId] = (median_team1Goals, median_team2Goals, percent_team1Wins, percent_team2Wins)
+
+            #
+            #    # Combine both datasets
+            #    combined_data = []
+            #    for matchId in all_matches:
+            #        statistics = tipping_statistics.get(matchId, (None, None, None, None))
+            #        combined_data.append(list(all_matches[matchId]) + list([statistics]))
+            #    return combined_data
+                
+            combined_data = []
+            for matchId in range(1, 5):
+                statistics = tipping_statistics.get(matchId, (None, None, None, None))
+                combined_data.append(statistics)
+                print(f"matchId {matchId}, statistics {statistics}")
+
             v = [
-                [tkapp.endteam1[1] if tkapp.endteam1 and tkapp.endteam1[1] != "No Team" else None, tkapp.endteam3[1] if tkapp.endteam3 and tkapp.endteam3[1] != "No Team" else None, final_goles[0]], 
-                [tkapp.endteam2[1] if tkapp.endteam2 and tkapp.endteam2[1] != "No Team" else None, tkapp.endteam4[1] if tkapp.endteam4 and tkapp.endteam4[1] != "No Team" else None, final_goles[1]], 
-                [tkapp.spiel_um_platz_3[0][1] if tkapp.spiel_um_platz_3 else None, tkapp.spiel_um_platz_3[1][1] if tkapp.spiel_um_platz_3 else None, final_goles[2]], 
-                [tkapp.final_match_teams[0][1] if tkapp.final_match_teams else None, tkapp.final_match_teams[1][1] if tkapp.final_match_teams else None, final_goles[3]]
+                [tkapp.endteam1[1] if tkapp.endteam1 and tkapp.endteam1[1] != "No Team" else None, tkapp.endteam3[1] if tkapp.endteam3 and tkapp.endteam3[1] != "No Team" else None, final_goles[0][0], final_goles[0][1], combined_data[0]],
+                [tkapp.endteam2[1] if tkapp.endteam2 and tkapp.endteam2[1] != "No Team" else None, tkapp.endteam4[1] if tkapp.endteam4 and tkapp.endteam4[1] != "No Team" else None, final_goles[1][0], final_goles[1][1], combined_data[1]],
+                [tkapp.spiel_um_platz_3[0][1] if tkapp.spiel_um_platz_3 else None, tkapp.spiel_um_platz_3[1][1] if tkapp.spiel_um_platz_3 else None, final_goles[2][0], final_goles[2][1], combined_data[2]],
+                [tkapp.final_match_teams[0][1] if tkapp.final_match_teams else None, tkapp.final_match_teams[1][1] if tkapp.final_match_teams else None, final_goles[3][0], final_goles[3][1], combined_data[3]]
             ]
             logging.debug(f"v {v}")
             
@@ -3998,9 +4051,35 @@ def get_data_for_website(which_data=-1):
         return [int(a), int(b)]
     
     elif which_data == 8:
+        if tkapp.cache_vars.get("getkomatches_changed_using_var") == True or True:
+            
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+
+            getAllMatchesFromKOMatchesDB = """
+            SELECT 
+                t1.teamName as team1Name, 
+                t2.teamName as team2Name, 
+                m.team1Goals, 
+                m.team2Goals
+            FROM KOMatchesData m
+            JOIN teamData t1 ON m.team1Id = t1.id
+            JOIN teamData t2 ON m.team2Id = t2.id
+            ORDER BY m.matchId ASC
+            """
+
+            cursor.execute(getAllMatchesFromKOMatchesDB)
+
+            all_matches = cursor.fetchall()
 
 
-        return tipping_statistics
+            return all_matches
+        
+        else:
+            return tkapp.cache.get("KOMatches")
+        
+    else:
+        return None    
     
 
 def ich_kann_nicht_mehr(teamID, team2ID):
@@ -4067,6 +4146,7 @@ def get_initial_data(template_name, base_url=None):
         "timeIntervalFinalMatch": tkapp.time_interval_for_only_the_final_match.get().replace("m", ""),
         "bestScorerActive": tkapp.best_scorer_active.get(),
         "ThereIsAnKOPhase": tkapp.there_is_an_ko_phase.get(),
+        "KOMatches": get_data_for_website(8),
     }
     return make_response(render_template(template_name, initial_data=initial_data, base_url=base_url))
 
@@ -4223,12 +4303,12 @@ def send_tipping_data():
             cursor.close()
             connection.close()
             return "Match already started or finished", 400
-    elif tkapp.active_match != -1 and tkapp.active_mode.get() == 2:
-        match_id = (match_id * -1) - 2
-        if match_id <= tkapp.active_match:
-            cursor.close()
-            connection.close()
-            return "Match already started or finished", 400
+    #elif tkapp.active_match != -1 and tkapp.active_mode.get() == 2:
+        #match_id = (match_id * -1) - 2
+        #if match_id <= tkapp.active_match and False:
+        #    cursor.close()
+        #    connection.close()
+        #    return "Match already started or finished", 400
             
     
     cursor.execute("SELECT * FROM tippingData WHERE googleId = ? AND matchId = ?", (google_id, match_id))
