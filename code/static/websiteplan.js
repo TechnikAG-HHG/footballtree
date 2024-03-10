@@ -206,6 +206,94 @@ function updatePauseTime() {
     }
 }
 
+function KOMatchTable() {
+    if (
+        data["Matches"] == null ||
+        data["Matches"] == "null" ||
+        data["Matches"] == "" ||
+        data["Matches"] == "[]" ||
+        data["Matches"] === 0
+    ) {
+        console.log("No matches found");
+        return; // Add return statement here
+    }
+
+    if ("KOMatches" in data) {
+        var tablesContainer = document.getElementById("tablesContainer");
+
+        var table = tablesContainer.querySelector(".tableKOMatches");
+        if (table) {
+            table.remove();
+        }
+
+        table = document.createElement("table");
+        var thead = document.createElement("thead");
+        var tbody = document.createElement("tbody");
+
+        table.className = "tableKOMatches";
+
+        var headerRow = thead.insertRow(0);
+        var headerCellTime = headerRow.insertCell(0);
+        headerCellTime.textContent = "Zeit";
+        headerCellTime.className = "headerCell";
+
+        var headerCellGroup = headerRow.insertCell(1);
+        headerCellGroup.textContent = "K.O.-Spiele";
+        headerCellGroup.className = "headerCell";
+        headerCellGroup.colSpan = 3;
+
+        var headerCellT = headerRow.insertCell(2);
+        headerCellT.textContent = "Tore";
+        headerCellT.className = "headerCell";
+
+        table.appendChild(thead);
+        table.appendChild(tbody);
+        tablesContainer.appendChild(table);
+
+        var KOMatches = data["KOMatches"];
+        if (KOMatches == null) {
+            var matches = data["KOMatches"];
+            var i = 0;
+            matches.forEach((match) => {
+                var row = tbody.insertRow();
+
+                row.id = "section" + (i + 1); // Set the id of the row
+
+                var cellTime = row.insertCell(0);
+                var matchTime = new Date(
+                    startTime.getTime() + i * timeInterval * 60000
+                );
+                cellTime.textContent = formatTime(matchTime);
+
+                var cellMatchNumber = row.insertCell(1);
+                cellMatchNumber.textContent = "Spiel " + (i + 1);
+
+                var cellFirstTeam = row.insertCell(2);
+                cellFirstTeam.textContent = match[0];
+
+                var cellSecondTeam = row.insertCell(3);
+                cellSecondTeam.textContent = match[1];
+
+                if (match[2] > match[3]) {
+                    cellFirstTeam.className = "style-winner";
+                    cellSecondTeam.className = "style-loser";
+                } else if (match[2] < match[3]) {
+                    cellSecondTeam.className = "style-winner";
+                    cellFirstTeam.className = "style-loser";
+                } else {
+                    cellFirstTeam.className = "style-draw";
+                    cellSecondTeam.className = "style-draw";
+                }
+
+                var cellT = row.insertCell(4);
+                cellT.textContent = match[2] + " : " + match[3];
+
+                i++;
+            });
+        }
+    }
+}
+
 function finalMatchTable() {
     if (
         data["Matches"] == null ||
@@ -512,6 +600,7 @@ async function updateData() {
 
     setTimeout(function () {
         generateTableGroup(data["Matches"]);
+        KOMatchTable();
         finalMatchTable();
     }, 0);
 }
