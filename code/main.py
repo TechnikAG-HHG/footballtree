@@ -613,20 +613,7 @@ class Window(ctk.CTk):
             self.reset_player_stats()
             self.reset_player_per_match_data()
 
-            self.cursor.execute("UPDATE matchData SET team1Goals = 0, team2Goals = 0, matchTime = ''")
-            self.cursor.execute("DROP TABLE finalMatchesData")
-
-            finalMatchesDataTableCreationQuery = """
-            CREATE TABLE IF NOT EXISTS finalMatchesData (
-                matchId INTEGER PRIMARY KEY,
-                team1Id INTEGER REFERENCES teamData(id),
-                team2Id INTEGER REFERENCES teamData(id),
-                team1Goals INTEGER DEFAULT 0,
-                team2Goals INTEGER DEFAULT 0,
-                matchTime TEXT
-            )
-            """
-            self.cursor.execute(finalMatchesDataTableCreationQuery)
+            self.reset_match_datas()
         
             self.reload_requried_on_click_SPIEL = True
             
@@ -650,12 +637,65 @@ class Window(ctk.CTk):
         # Create new backup with a unique name
         timestamp = time.strftime("%Y%m%d-%H%M%S")
         backup_path = backup_dir + "backup_" + timestamp + ".db"
+
+        connection = sqlite3.connect(self.db_path)
         with sqlite3.connect(backup_path) as backup_conn:
-            self.connection.backup(backup_conn)
+            connection.backup(backup_conn)
+            backup_conn.commit()
         logging.debug("Backup created")
+
+        connection.commit()
+
 
         return backup_path
 
+    def reset_match_datas(self):
+            self.cursor.execute("UPDATE matchData SET team1Goals = 0, team2Goals = 0, matchTime = ''")
+            self.cursor.execute("DROP TABLE finalMatchesData")
+
+            finalMatchesDataTableCreationQuery = """
+            CREATE TABLE IF NOT EXISTS finalMatchesData (
+                matchId INTEGER PRIMARY KEY,
+                team1Id INTEGER REFERENCES teamData(id),
+                team2Id INTEGER REFERENCES teamData(id),
+                team1Goals INTEGER DEFAULT 0,
+                team2Goals INTEGER DEFAULT 0,
+                matchTime TEXT
+            )
+            """
+            self.cursor.execute(finalMatchesDataTableCreationQuery)
+            self.connection.commit()
+
+            self.cursor.execute("DROP TABLE KOMatchesData")
+
+            KOMatchesDataTableCreationQuery = """
+            CREATE TABLE IF NOT EXISTS KOMatchesData (
+                matchId INTEGER PRIMARY KEY,
+                team1Id INTEGER REFERENCES teamData(id),
+                team2Id INTEGER REFERENCES teamData(id),
+                team1Goals INTEGER DEFAULT 0,
+                team2Goals INTEGER DEFAULT 0,
+                matchTime TEXT
+            )
+            """
+            self.cursor.execute(KOMatchesDataTableCreationQuery)
+            self.connection.commit()
+
+            self.cursor.execute("DROP TABLE tippingData")
+
+            tippingTableCreationQuery = """
+            CREATE TABLE IF NOT EXISTS tippingData (
+                id INTEGER PRIMARY KEY,
+                matchId INTEGER REFERENCES matchData(matchId),
+                team1Goals INTEGER DEFAULT 0,
+                team2Goals INTEGER DEFAULT 0,
+                googleId TEXT REFERENCES userData(googleId),
+                points INTEGER DEFAULT 0
+            )
+            """
+            self.cursor.execute(tippingTableCreationQuery)
+            self.connection.commit()
+            
 
     ##############################################################################################
     ##############################################################################################
@@ -1489,7 +1529,20 @@ class Window(ctk.CTk):
         """
         self.cursor.execute(playerPerMatchDataFinalTableCreationQuery)
         self.connection.commit()
-    
+
+        self.cursor.execute("DROP TABLE IF EXISTS playerPerMatchDataKO")
+
+        playerPerMatchDataKOTableCreationQuery = """
+        CREATE TABLE IF NOT EXISTS playerPerMatchDataKO (
+            id INTEGER PRIMARY KEY,
+            matchId INTEGER REFERENCES matchData(matchId),
+            playerName INTEGER REFERENCES playerData(playerName),
+            playerGoals INTEGER DEFAULT 0
+        )
+        """
+        self.cursor.execute(playerPerMatchDataKOTableCreationQuery)
+        self.connection.commit()
+
     
     def configure_team_select(self, team_select, state, team_name):
         team_select.configure(state=state)
@@ -2373,6 +2426,7 @@ class Window(ctk.CTk):
                             self.pause_mode.set(1)
                             self.on_pause_switch_change()
                             self.active_mode.set(2)
+                            self.save_active_mode_in_db()
                             self.on_radio_button_change()
                             self.update_idletasks()
                             self.update()
@@ -2383,6 +2437,7 @@ class Window(ctk.CTk):
                         result = tkinter.messagebox.askyesno("End of Matches", "You have reached the end of the matches. Do you want to select the first KO match?")
                         if result:
                             self.active_mode.set(3)
+                            self.save_active_mode_in_db()
                             values_list, pairedKoMatches = self.get_values_list_mode3()
                             self.on_match_select(values_list[0], pairedKoMatches)
                             self.save_teams_playing_and_active_match()
@@ -2447,6 +2502,7 @@ class Window(ctk.CTk):
                         result = tkinter.messagebox.askyesno("Select no match", "You have reached the beginning of the final matches. Do you want to select the last match of the group phase?")
                         if result:
                             self.active_mode.set(1)
+                            self.save_active_mode_in_db()
                             values_list = self.get_values_list_mode1(matches)
                             self.on_match_select(values_list[-1], matches)
                             self.save_teams_playing_and_active_match()
@@ -2460,6 +2516,7 @@ class Window(ctk.CTk):
                         result = tkinter.messagebox.askyesno("Select no match", "You have reached end of the final matches. Do you want to select the last KO match?")
                         if result:
                             self.active_mode.set(3)
+                            self.save_active_mode_in_db()
                             values_list, pairedKoMatches = self.get_values_list_mode3()
                             self.on_match_select(values_list[-1], pairedKoMatches)
                             self.save_teams_playing_and_active_match()
@@ -2504,6 +2561,7 @@ class Window(ctk.CTk):
                         self.pause_mode.set(1)
                         self.on_pause_switch_change()
                         self.active_mode.set(2)
+                        self.save_active_mode_in_db()
                         self.on_radio_button_change()
                         self.update_idletasks()
                         self.update()
@@ -2515,6 +2573,7 @@ class Window(ctk.CTk):
                     result = tkinter.messagebox.askyesno("Select no match", "You have reached the beginning of the KO matches. Do you want to select the last match of the group phase?")
                     if result:
                         self.active_mode.set(1)
+                        self.save_active_mode_in_db()
                         values_list = self.get_values_list_mode1(matches)
                         self.on_match_select(values_list[-1], matches)
                         self.save_teams_playing_and_active_match()
@@ -2773,6 +2832,16 @@ class Window(ctk.CTk):
             """
             self.settingscursor.execute(updateTeamsPlaying, (str(self.teams_playing), self.active_match))
             self.settingsconnection.commit()
+    
+
+    def save_active_mode_in_db(self):
+        updateActiveMode = """
+        UPDATE settingsData
+        SET activeMode = ?
+        WHERE id = 1
+        """
+        self.settingscursor.execute(updateActiveMode, (self.active_mode.get(),))
+        self.settingsconnection.commit()
     
     
     ###########################################################################################################
