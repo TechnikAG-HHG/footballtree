@@ -251,44 +251,65 @@ function KOMatchTable() {
         tablesContainer.appendChild(table);
 
         var KOMatches = data["KOMatches"];
-        if (KOMatches == null) {
+        if (KOMatches != null) {
             var matches = data["KOMatches"];
-            var i = 0;
+            var i = 100;
+            var y = 0;
             matches.forEach((match) => {
                 var row = tbody.insertRow();
 
-                row.id = "section" + (i + 1); // Set the id of the row
-
-                var cellTime = row.insertCell(0);
-                var matchTime = new Date(
-                    startTime.getTime() + i * timeInterval * 60000
-                );
-                cellTime.textContent = formatTime(matchTime);
-
-                var cellMatchNumber = row.insertCell(1);
-                cellMatchNumber.textContent = "Spiel " + (i + 1);
-
-                var cellFirstTeam = row.insertCell(2);
-                cellFirstTeam.textContent = match[0];
-
-                var cellSecondTeam = row.insertCell(3);
-                cellSecondTeam.textContent = match[1];
-
-                if (match[2] > match[3]) {
-                    cellFirstTeam.className = "style-winner";
-                    cellSecondTeam.className = "style-loser";
-                } else if (match[2] < match[3]) {
-                    cellSecondTeam.className = "style-winner";
-                    cellFirstTeam.className = "style-loser";
+                if (data["activeMatchNumber"] < -1) {
+                    if (
+                        i + 1 == Math.abs(data["activeMatchNumber"]) &&
+                        data["pauseMode"] == false
+                    ) {
+                        generateFullSize(
+                            match,
+                            i,
+                            row,
+                            (gameName = "K.O.-Spiel")
+                        );
+                    }
                 } else {
-                    cellFirstTeam.className = "style-draw";
-                    cellSecondTeam.className = "style-draw";
+                    row.id = "section" + i * -1; // Set the id of the row
+
+                    var cellTime = row.insertCell(0);
+                    var matchTime = new Date(
+                        startTime.getTime() + i * timeInterval * 60000
+                    );
+                    cellTime.textContent = formatTime(matchTime);
+
+                    var cellMatchNumber = row.insertCell(1);
+                    cellMatchNumber.textContent = "Spiel " + (y + 1);
+
+                    var cellFirstTeam = row.insertCell(2);
+                    cellFirstTeam.textContent = match[0];
+
+                    var cellSecondTeam = row.insertCell(3);
+                    cellSecondTeam.textContent = match[1];
+
+                    if (
+                        Math.abs(data["activeMatchNumber"]) > i &&
+                        data["KOMatches"] != null
+                    ) {
+                        if (match[2] > match[3]) {
+                            cellFirstTeam.className = "style-winner";
+                            cellSecondTeam.className = "style-loser";
+                        } else if (match[2] < match[3]) {
+                            cellSecondTeam.className = "style-winner";
+                            cellFirstTeam.className = "style-loser";
+                        } else {
+                            cellFirstTeam.className = "style-draw";
+                            cellSecondTeam.className = "style-draw";
+                        }
+                    }
+
+                    var cellT = row.insertCell(4);
+                    cellT.textContent = match[2] + " : " + match[3];
                 }
 
-                var cellT = row.insertCell(4);
-                cellT.textContent = match[2] + " : " + match[3];
-
                 i++;
+                y++;
             });
         }
     }
