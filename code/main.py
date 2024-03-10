@@ -2075,8 +2075,6 @@ class Window(ctk.CTk):
         previous_match_button.pack(pady=10, padx=10, side=tk.LEFT, anchor=tk.SW)
 
         self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
-        self.cache_vars["getkomatches_changed_using_var"] = True
-        self.updated_data.update({"KOMatches": get_data_for_website(8)})
 
         self.save_teams_playing_and_active_match()
 
@@ -2485,6 +2483,8 @@ class Window(ctk.CTk):
                             self.on_match_select(values_list[0])
                             self.update_idletasks()
                             self.update()
+                            self.cache_vars["getkomatches_changed_using_var"] = True
+                            self.updated_data.update({"KOMatches": get_data_for_website(8)})
                             
                             self.cache_vars["getfinalmatches_changed_using_var"] = True
                             self.updated_data.update({"finalMatches": get_data_for_website(6)})
@@ -2503,6 +2503,8 @@ class Window(ctk.CTk):
                             self.show_frame(self.SPIEL_frame)
                             new_match_index = max(1, min(new_match_index, len(matches)))
                             self.save_games_played_in_db(new_match_index - 1)
+                            self.cache_vars["getkomatches_changed_using_var"] = True
+                            self.updated_data.update({"KOMatches": get_data_for_website(8)})
 
                             return
                         else:
@@ -2572,6 +2574,8 @@ class Window(ctk.CTk):
                             self.on_match_select(values_list[-1], matches)
                             self.save_teams_playing_and_active_match()
                             self.show_frame(self.SPIEL_frame)
+                            self.cache_vars["getkomatches_changed_using_var"] = True
+                            self.updated_data.update({"KOMatches": get_data_for_website(8)})
                             
                             self.cache_vars["getfinalmatches_changed_using_var"] = True
                             self.updated_data.update({"finalMatches": get_data_for_website(6)})
@@ -2588,6 +2592,8 @@ class Window(ctk.CTk):
                             self.on_match_select(values_list[-1], pairedKoMatches)
                             self.save_teams_playing_and_active_match()
                             self.show_frame(self.SPIEL_frame)
+                            self.cache_vars["getkomatches_changed_using_var"] = True
+                            self.updated_data.update({"KOMatches": get_data_for_website(8)})
                             
                             self.cache_vars["getfinalmatches_changed_using_var"] = True
                             self.updated_data.update({"finalMatches": get_data_for_website(6)})
@@ -2630,6 +2636,8 @@ class Window(ctk.CTk):
                         self.on_match_select(values_list[0])
                         self.update_idletasks()
                         self.update()
+                        self.cache_vars["getkomatches_changed_using_var"] = True
+                        self.updated_data.update({"KOMatches": get_data_for_website(8)})
                         
                         self.cache_vars["getfinalmatches_changed_using_var"] = True
                         self.updated_data.update({"finalMatches": get_data_for_website(6)})
@@ -2646,6 +2654,8 @@ class Window(ctk.CTk):
                         self.on_match_select(values_list[-1], matches)
                         self.save_teams_playing_and_active_match()
                         self.show_frame(self.SPIEL_frame)
+                        self.cache_vars["getkomatches_changed_using_var"] = True
+                        self.updated_data.update({"KOMatches": get_data_for_website(8)})
                         return
                     else:
                         return
@@ -3326,6 +3336,9 @@ class Window(ctk.CTk):
         self.reload_spiel_button_command(True)
         self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
         self.updated_data.update({"finalMatches": get_data_for_website(6)})
+        self.cache_vars["getkomatches_changed_using_var"] = True
+        self.updated_data.update({"KOMatches": get_data_for_website(8)})
+
         
         
     def on_radio_debug_button_change(self):
@@ -4248,11 +4261,11 @@ def get_data_for_website(which_data=-1):
 
 
                 return combined_data
+            else:
+                return tkapp.cache.get("KOMatches")
         except:
             return []
         
-        else:
-            return tkapp.cache.get("KOMatches")
         
     else:
         return None    
