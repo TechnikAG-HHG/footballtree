@@ -4026,6 +4026,8 @@ def ich_kann_nicht_mehr(teamID, team2ID):
     
     if onefetched is None:
         logging.debug("ich_kann_nicht_mehr: onefetched is None")
+        cursor.close()
+        connection.close()
         return 0
             
     team1_or_team2 = onefetched[0]
@@ -4158,6 +4160,8 @@ def tipping_data_index():
     fetch_one = cursor.fetchone()
     
     if fetch_one is None:
+        cursor.close()
+        connection.close()
         return jsonify(name=None, tips=None)
     name = fetch_one[0]
     
@@ -4173,6 +4177,8 @@ def tipping_data_index():
     fetch_all = cursor.fetchall()
     
     if fetch_all == []:
+        cursor.close()
+        connection.close()
         return jsonify(name=name, tips=None)
     
     tips = {row[0]: {"team1Goals": row[1], "team2Goals": row[2]} for row in fetch_all}
