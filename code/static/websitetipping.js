@@ -201,7 +201,7 @@ function generateDropdownData() {
         }
     }
 
-    if (!(data["activeMatchNumber"] < -4)) {
+    if (!(data["activeMatchNumber"] < -4) && data["activeMatchNumber"] != -1) {
         var groupDivider = document.createElement("option");
         groupDivider.disabled = true;
         groupDivider.textContent = "";
@@ -400,6 +400,9 @@ function handleSubmit(event) {
     if (match.split(".")[1]) {
         if (match.split(".")[1].startsWith(" Halbfinale")) {
             matchNumber = parseInt(match.split(".")[0]) * -1 - 1;
+        } else if (matchNumber < -99) {
+            matchPlayed = true;
+            console.log("Match played 2");
         } else {
             matchNumber = match.split(".")[0] - 1;
         }
