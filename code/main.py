@@ -648,8 +648,6 @@ class Window(ctk.CTk):
         connection = sqlite3.connect(self.db_path)
         with sqlite3.connect(backup_path) as backup_conn:
             connection.backup(backup_conn)
-            backup_conn.commit()
-            backup_conn.close()
         logging.debug("Backup created")
 
 
