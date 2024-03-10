@@ -353,7 +353,6 @@ function handleSubmit(event) {
             team2Goals: goals2,
         }),
     })
-        .then((response) => response.json())
         .then((data) => {
             console.log("Success:", data);
             updateData();
