@@ -2929,10 +2929,9 @@ class Window(ctk.CTk):
         self.calculate_points_for_tippers_using_db()
 
         getTippers = """
-        SELECT t.googleId, u.userName, SUM(t.points) as total_points FROM tippingData t, userData u
+        SELECT t.googleId, u.userName, t.points as total_points FROM tippingData t, userData u
         WHERE t.googleId = u.googleId
-        GROUP BY t.googleId, u.userName
-        ORDER BY total_points DESC
+        LIMIT 1
         """
         self.cursor.execute(getTippers)
         tippers = self.cursor.fetchall()
@@ -3000,6 +2999,8 @@ class Window(ctk.CTk):
         """
         self.cursor.execute(getTippersAndMatches)
         tippers_and_matches = self.cursor.fetchall()
+
+        print("tippers_and_matches", tippers_and_matches)
         
         update_points = {}
 
@@ -3018,6 +3019,8 @@ class Window(ctk.CTk):
             else:
                 points = 0
             
+            print("googleId", googleId, "points", points)
+
             update_points[googleId] = update_points.get(googleId, 0) + points
             
             
