@@ -2389,7 +2389,9 @@ class Window(ctk.CTk):
             self.active_match = match_index
             
             self.save_games_played_in_db(match_index)
-            
+
+            self.cache_vars["getgames_changed_using_var"] = True
+
             self.updated_data.update({"Games": get_data_for_website(2)})
             self.updated_data.update({"activeMatchNumber": self.active_match})
             
@@ -2468,7 +2470,6 @@ class Window(ctk.CTk):
                 # Get the current match index
                 current_match_index = [match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1] for match in matches].index(spiel_select.get()) + 1
 
-                self.save_games_played_in_db(current_match_index)
                 
                 # Calculate the new match index
                 new_match_index = current_match_index + 1 if next_match else current_match_index - 1
@@ -2500,6 +2501,9 @@ class Window(ctk.CTk):
                             self.save_teams_playing_and_active_match()
                             #self.reload_spiel_button_command()
                             self.show_frame(self.SPIEL_frame)
+                            new_match_index = max(1, min(new_match_index, len(matches)))
+                            self.save_games_played_in_db(new_match_index - 1)
+
                             return
                         else:
                             return
@@ -2516,8 +2520,10 @@ class Window(ctk.CTk):
                     else:
                         return
 
+
                 # Ensure the new index is within bounds
                 new_match_index = max(1, min(new_match_index, len(matches)))
+                self.save_games_played_in_db(new_match_index - 1)
 
                 # Get the teams playing in the selected match
                 team_names = self.read_teamNames()
@@ -2529,6 +2535,8 @@ class Window(ctk.CTk):
                 self.teams_playing = teams_playing
                 self.reload_spiel_button_command()
                 self.show_frame(self.SPIEL_frame)
+
+                self.cache_vars["getgames_changed_using_var"] = True
                 
                 self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
                 self.updated_data.update({"Games": get_data_for_website(2)})
@@ -2595,7 +2603,7 @@ class Window(ctk.CTk):
                 
             #logging.debug("self.active_match", self.active_match)
             
-            #self.save_games_played_in_db(self.active_match)
+            self.save_games_played_in_db(self.active_match)
             
             self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
             
@@ -2608,8 +2616,6 @@ class Window(ctk.CTk):
 
                 values_list, pairedKoMatches = self.get_values_list_mode3()
 
-                #self.save_games_played_in_db(current_match_index)
-                
                 # Calculate the new match index
                 new_match_index = current_match_index + 1 if next_match else current_match_index - 1
                 
@@ -2645,6 +2651,8 @@ class Window(ctk.CTk):
                         return
                 # Ensure the new index is within bounds
                 new_match_index = max(1, min(new_match_index, len(matches)))
+
+                self.save_games_played_in_db(new_match_index - 1)
 
                 # Get the teams playing in the selected match
                 team_names = self.read_teamNames()
@@ -2855,30 +2863,96 @@ class Window(ctk.CTk):
     def save_games_played_in_db(self, match_index):
         
         self.cache_vars["getgames_changed_using_var"] = True
+
+        if self.active_mode.get() == 1:
         
-        teams_ids = self.read_teamIds()
-        for teamID in teams_ids:
-            #logging.debug("accsed matchData in save_games_played_in_db")
-            
-            getPlayed = """
-            SELECT matchId FROM matchData
-            WHERE (team1Id = ? OR team2Id = ?) AND matchId < ?
-            """
-            self.cursor.execute(getPlayed, (teamID, teamID, match_index + 1))
-            
-            played = self.cursor.fetchall()
-            
-            #logging.debug("played", played)
-            
-            played = len(played)
-            
-            updatePlayed = """
-            UPDATE teamData
-            SET games = ?
-            WHERE id = ?
-            """
-            
-            self.cursor.execute(updatePlayed, (played, teamID))
+            teams_ids = self.read_teamIds()
+            for teamID in teams_ids:
+                #logging.debug("accsed matchData in save_games_played_in_db")
+                
+                getPlayed = """
+                SELECT matchId FROM matchData
+                WHERE (team1Id = ? OR team2Id = ?) AND matchId < ?
+                """
+                self.cursor.execute(getPlayed, (teamID, teamID, match_index + 1))
+                
+                played = self.cursor.fetchall()
+                
+                #logging.debug("played", played)
+                
+                played = len(played)
+                
+                updatePlayed = """
+                UPDATE teamData
+                SET games = ?
+                WHERE id = ?
+                """
+                
+                self.cursor.execute(updatePlayed, (played, teamID))
+        elif self.active_mode.get() == 2:
+            teams_ids = self.read_teamIds()
+            for teamID in teams_ids:
+                #logging.debug("accsed finalMatchesData in save_games_played_in_db")
+                
+                getPlayed = """
+                SELECT matchId FROM finalMatchesData
+                WHERE (team1Id = ? OR team2Id = ?) AND matchId < ?
+                """
+                self.cursor.execute(getPlayed, (teamID, teamID, match_index + 1))
+                
+                played = self.cursor.fetchall()
+                
+                #get the matches from phase 1 using sql count
+                getPlayedPhase1 = """
+                SELECT COUNT(matchId) FROM matchData
+                WHERE (team1Id = ? OR team2Id = ?)
+                """
+                self.cursor.execute(getPlayedPhase1, (teamID, teamID))
+
+                playedPhase1 = self.cursor.fetchone()[0]
+
+                played = playedPhase1
+
+
+                updatePlayed = """
+                UPDATE teamData
+                SET games = ?
+                WHERE id = ?
+                """
+
+                self.cursor.execute(updatePlayed, (played, teamID))
+        elif self.active_mode.get() == 3:
+            teams_ids = self.read_teamIds()
+            for teamID in teams_ids:
+                #logging.debug("accsed KOMatchesData in save_games_played_in_db")
+                
+                getPlayed = """
+                SELECT matchId FROM KOMatchesData
+                WHERE (team1Id = ? OR team2Id = ?) AND matchId < ?
+                """
+                self.cursor.execute(getPlayed, (teamID, teamID, match_index + 1))
+                
+                played = self.cursor.fetchall()
+                
+                #get the matches from phase 1 using sql count
+                getPlayedPhase1 = """
+                SELECT COUNT(matchId) FROM matchData
+                WHERE (team1Id = ? OR team2Id = ?)
+                """
+                self.cursor.execute(getPlayedPhase1, (teamID, teamID))
+
+                playedPhase1 = self.cursor.fetchone()[0]
+
+                played = playedPhase1
+
+                updatePlayed = """
+                UPDATE teamData
+                SET games = ?
+                WHERE id = ?
+                """
+
+                self.cursor.execute(updatePlayed, (played, teamID))
+
         
         self.connection.commit()
         self.updated_data.update({"Games": get_data_for_website(2)})
@@ -3019,7 +3093,7 @@ class Window(ctk.CTk):
             else:
                 points = 0
             
-            print("googleId", googleId, "points", points)
+            #print("googleId", googleId, "points", points)
 
             update_points[googleId] = update_points.get(googleId, 0) + points
             
@@ -3890,8 +3964,6 @@ def get_data_for_website(which_data=-1):
                 
                 return points_in_order
             else:
-                cursor.close()
-                connection.close()
                 return tkapp.cache.get("Points")
         except:
             return []
