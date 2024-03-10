@@ -310,12 +310,22 @@ function finalMatchTable() {
         finalMatchesSliced.forEach((match) => {
             var row = tbody.insertRow();
 
+            var matchNumber = i;
+            var gameName;
+            if (i == totalMatchNumber) {
+                gameName = "Finale";
+            } else if (i == totalMatchNumber - 1) {
+                gameName = "Spiel um Platz 3";
+            } else {
+                gameName = "Halbfinalspiel " + matchNumber;
+            }
+
             if (data["activeMatchNumber"] < -1) {
                 if (
                     i + 1 == Math.abs(data["activeMatchNumber"]) &&
                     data["pauseMode"] == false
                 ) {
-                    row.style.backgroundColor = "black";
+                    generateFullSize(match, i, row, gameName);
                 }
             }
 
@@ -340,14 +350,7 @@ function finalMatchTable() {
             cellTime.textContent = formatTime(matchTime);
 
             var cellMatchNumber = row.insertCell(1);
-            var matchNumber = i;
-            if (i == totalMatchNumber) {
-                cellMatchNumber.textContent = "Finale";
-            } else if (i == totalMatchNumber - 1) {
-                cellMatchNumber.textContent = "Spiel um Platz 3";
-            } else {
-                cellMatchNumber.textContent = "Halbfinalspiel " + matchNumber;
-            }
+            cellMatchNumber.textContent = gameName;
 
             var cellFirstTeam = row.insertCell(2);
             cellFirstTeam.textContent = match[0];
@@ -379,7 +382,7 @@ function finalMatchTable() {
     }
 }
 
-function generateFullSize(match, i, row) {
+function generateFullSize(match, i, row, gameName = null) {
     // Create a bigger statistic entry in the table for the current match
     row.id = "section" + (i + 1); // Set the id of the row
     row.style.backgroundColor = "black";
@@ -389,51 +392,95 @@ function generateFullSize(match, i, row) {
     fullSize.className = "fullSize";
 
     var title = document.createElement("h2");
-    if (match[4] == 1) {
+    if (gameName != null) {
+        title.textContent = gameName;
+    } else if (match[4] == 1) {
         title.textContent = "Spiel " + (i + 1) + ": Gruppe A";
     } else if (match[4] == 2) {
         title.textContent = "Spiel " + (i + 1) + ": Gruppe B";
     }
+
     title.className = "title";
     fullSize.appendChild(title);
 
-    var teamsGoalsDiv = document.createElement("div");
-    teamsGoalsDiv.className = "teamsGoalsDiv";
-    fullSize.appendChild(teamsGoalsDiv);
+    var contentDiv = document.createElement("div");
+    contentDiv.className = "contentDiv";
+    fullSize.appendChild(contentDiv);
 
-    var tippingDiv = document.createElement("div");
-    tippingDiv.className = "tippingDiv";
-    teamsGoalsDiv.appendChild(tippingDiv);
+    var team1Div = document.createElement("div");
+    team1Div.className = "team1Div";
+    contentDiv.appendChild(team1Div);
 
-    var description = document.createElement("p");
-    description.textContent = "Tippspielauswertung";
-    description.className = "description";
-    tippingDiv.appendChild(description);
+    var goalsDiv = document.createElement("div");
+    goalsDiv.className = "goalsDiv";
+    contentDiv.appendChild(goalsDiv);
+
+    var team2Div = document.createElement("div");
+    team2Div.className = "team2Div";
+    contentDiv.appendChild(team2Div);
 
     var team1 = document.createElement("p");
     team1.textContent = match[0];
     team1.className = "team1";
-    teamsGoalsDiv.appendChild(team1);
+    team1Div.appendChild(team1);
 
     var goals = document.createElement("p");
     goals.textContent = match[2] + " : " + match[3];
     goals.className = "goals";
-    teamsGoalsDiv.appendChild(goals);
+    goalsDiv.appendChild(goals);
 
     var team2 = document.createElement("p");
     team2.textContent = match[1];
     team2.className = "team2";
-    teamsGoalsDiv.appendChild(team2);
+    team2Div.appendChild(team2);
 
-    var tipping1 = document.createElement("p");
-    tipping1.textContent = match[5][2] + "%";
-    tipping1.className = "tipping1";
-    tippingDiv.appendChild(tipping1);
+    if (match[5][2] == null || match[5][3] == null) {
+        var tipping1 = document.createElement("p");
+        tipping1.textContent = " ";
+        tipping1.className = "tipping1";
+        team1Div.appendChild(tipping1);
 
-    var tipping2 = document.createElement("p");
-    tipping2.textContent = match[5][3] + "%";
-    tipping2.className = "tipping2";
-    tippingDiv.appendChild(tipping2);
+        var mustVote = document.createElement("p");
+        mustVote.textContent = "Noch nicht getippt";
+        mustVote.className = "style-loser";
+        goalsDiv.appendChild(mustVote);
+
+        var tipping2 = document.createElement("p");
+        tipping2.textContent = " ";
+        tipping2.className = "tipping2";
+        team2Div.appendChild(tipping2);
+    } else {
+        var tipping1 = document.createElement("p");
+        tipping1.textContent = match[5][2] + "%";
+        tipping1.className = "tipping1";
+        team1Div.appendChild(tipping1);
+
+        var tippingGoals = document.createElement("p");
+        tippingGoals.textContent = `${match[5][0]} : ${match[5][1]}`;
+        tippingGoals.className = "tippingGoals";
+        goalsDiv.appendChild(tippingGoals);
+
+        var tipping2 = document.createElement("p");
+        tipping2.textContent = match[5][3] + "%";
+        tipping2.className = "tipping2";
+        team2Div.appendChild(tipping2);
+
+        if (match[5][2] > match[5][3]) {
+            tipping1.className = "style-winner";
+            tipping2.className = "style-loser";
+        } else if (match[5][2] < match[5][3]) {
+            tipping2.className = "style-winner";
+            tipping1.className = "style-loser";
+        } else {
+            tipping1.className = "style-draw";
+            tipping2.className = "style-draw";
+        }
+    }
+
+    var description = document.createElement("p");
+    description.textContent = "Tippspielauswertung";
+    description.className = "description";
+    fullSize.appendChild(description);
 }
 
 async function updateData() {
