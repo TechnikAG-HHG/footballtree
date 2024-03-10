@@ -4100,8 +4100,8 @@ def get_data_for_website(which_data=-1):
                 if tkapp.there_is_an_ko_phase.get() == 0:
                     return None
                 
-                #if tkapp.active_mode.get() == 1 and tkapp.pause_time_before_ko.get() == 0:
-                #    return None 
+                if tkapp.active_mode.get() == 1: #and tkapp.pause_time_before_ko.get() == 0:
+                    return None 
                 
                 connection = sqlite3.connect(db_path)
                 cursor = connection.cursor()
