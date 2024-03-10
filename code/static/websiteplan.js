@@ -105,8 +105,10 @@ function generateTableGroup(matches) {
             cellSecondTeam.textContent = match[1];
 
             if (
-                data["activeMatchNumber"] > i ||
-                data["activeMatchNumber"] < 0
+                (data["activeMatchNumber"] != -1 &&
+                    data["activeMatchNumber"] > i) ||
+                (data["activeMatchNumber"] < 0 &&
+                    data["activeMatchNumber"] != -1)
             ) {
                 if (match[2] > match[3]) {
                     cellFirstTeam.className = "style-winner";
