@@ -202,7 +202,6 @@ function updatePauseTime() {
     }
 }
 
-
 function KOMatchTable() {
     if (
         data["Matches"] == null ||
@@ -264,7 +263,7 @@ function KOMatchTable() {
                             match,
                             i,
                             row,
-                            (gameName = "K.O.-Spiel")
+                            (gameName = "K.O.-Spiel " + (y + 1))
                         );
                     } else {
                         row.id = "section" + i * -1; // Set the id of the row
@@ -330,7 +329,7 @@ function finalMatchTable() {
         return; // Add return statement here
     }
 
-    if ("finalMatches" in data) {
+    if ("finalMatches" in data && data["finalMatches"] != null) {
         if (data["pauseBeforeFM"] != null && data["pauseBeforeFM"] != "0") {
             let requestedtime = parseInt(data["pauseBeforeFM"]);
             generatePauseTime(requestedtime);
