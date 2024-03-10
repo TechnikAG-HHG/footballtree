@@ -101,6 +101,67 @@ function generateDropdownData() {
         }
     }
 
+    if (!(data["activeMatchNumber"] < -1)) {
+        var KOdivider = document.createElement("option");
+        KOdivider.disabled = true;
+        KOdivider.textContent = "";
+        enabledOptions.push(KOdivider);
+    } else {
+        var KOdivider = document.createElement("option");
+        KOdivider.disabled = true;
+        KOdivider.textContent = "";
+        disabledOptions.push(KOdivider);
+    }
+
+    if (data["KOMatches"] != null && data["KOMatches"].length != 0) {
+        for (var i = 0; i < data["KOMatches"].length; i++) {
+            if (
+                data["KOMatches"][i][0] == null ||
+                data["KOMatches"][i][1] == null
+            ) {
+                continue;
+            }
+
+            let group;
+            var option = document.createElement("option");
+            matchData = data["KOMatches"][i];
+
+            group = i + 1 + ". K.O. Spiel";
+
+            option.textContent = `${group}: ${matchData[0]} vs ${matchData[1]}`;
+
+            if (
+                (data["activeMatchNumber"] < -1 &&
+                    data["activeMatchNumber"] > -99) ||
+                data["activeMatchNumber"] < (i + 99) * -1
+            ) {
+                option.style.color = "gray";
+                disabledOptions.push(option);
+            } else {
+                enabledOptions.push(option);
+            }
+
+            // Set the selected option if it matches the currently selected value
+            if (option.textContent === selectedValue) {
+                option.selected = true;
+            }
+        }
+
+        if (
+            !(data["activeMatchNumber"] < -1 && data["activeMatchNumber"] > -99)
+        ) {
+            var finalDivider = document.createElement("option");
+            finalDivider.disabled = true;
+            finalDivider.textContent = "";
+            enabledOptions.push(finalDivider);
+        } else {
+            var finalDivider = document.createElement("option");
+            finalDivider.disabled = true;
+            finalDivider.textContent = "";
+            disabledOptions.push(finalDivider);
+        }
+    }
+
     if (data["finalMatches"] != null && data["finalMatches"].length != 0) {
         for (var i = 0; i < data["finalMatches"].length; i++) {
             if (
@@ -143,6 +204,13 @@ function generateDropdownData() {
         }
     }
 
+    if (!(data["activeMatchNumber"] < -4)) {
+        var groupDivider = document.createElement("option");
+        groupDivider.disabled = true;
+        groupDivider.textContent = "";
+        enabledOptions.push(groupDivider);
+    }
+
     // Append the enabled options first
     enabledOptions.forEach((option) => {
         dropdown.appendChild(option);
@@ -181,6 +249,10 @@ function voteForMatch(match) {
             matchNumber = parseInt(match.split(".")[0]) * -1 - 1;
             console.log("Voting for match", matchNumber);
             matchData = data["finalMatches"][Math.abs(matchNumber) - 2];
+        } else if (match.split(".")[1].startsWith(" K")) {
+            matchData = data["KOMatches"][matchNumber];
+            matchNumber = (parseInt(match.split(".")[0]) + 98) * -1;
+            console.log("Voting for match", matchNumber);
         }
     } else if (match.split(":")[0] == "Spiel um Platz 3") {
         matchNumber = -4;
@@ -190,17 +262,25 @@ function voteForMatch(match) {
         matchData = data["finalMatches"][3];
     }
 
-    if (data["activeMatchNumber"] < -1) {
+    if (data["activeMatchNumber"] < -1 && data["activeMatchNumber"] > -99) {
         if (
             matchNumber > data["activeMatchNumber"] - 1 &&
             data["pauseMode"] == false
         ) {
             matchPlayed = true;
             console.log("Match played 1");
+        } else if (matchNumber < -99) {
+            matchPlayed = true;
+            console.log("Match played 2");
+        }
+    } else if (data["activeMatchNumber"] < -99) {
+        if (matchNumber > data["activeMatchNumber"]) {
+            matchPlayed = true;
+            console.log("Match played 3");
         }
     } else if (matchNumber < data["activeMatchNumber"] + 1) {
         matchPlayed = true;
-        console.log("Match played 2");
+        console.log("Match played 4");
     }
 
     let voteContainer = document.getElementById("vote-container");
