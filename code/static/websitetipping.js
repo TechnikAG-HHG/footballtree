@@ -201,7 +201,7 @@ function generateDropdownData() {
         }
     }
 
-    if (!(data["activeMatchNumber"] < -4) && data["activeMatchNumber"] != -1) {
+    if (!(data["activeMatchNumber"] < -4) && data["activeMatchNumber"] < -1) {
         var groupDivider = document.createElement("option");
         groupDivider.disabled = true;
         groupDivider.textContent = "";
