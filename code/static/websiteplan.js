@@ -2,6 +2,8 @@ var matchCount = 0; // Global variable to keep track of the total number of matc
 var timeInterval = data["timeInterval"]; // Global variable to keep track of the time interval between matches
 
 var startTime = new Date(); // Set the start time
+var finalMatchesTime = new Date(); // Set the final matches time
+var KOMatchesTime = new Date(); // Set the K.O. matches time
 
 startTime.setHours(0, 0, 0, 0);
 
@@ -121,19 +123,13 @@ function generateTableGroup(matches) {
             var cellT = row.insertCell(5);
             cellT.textContent = match[2] + " : " + match[3];
 
-            finalMatchesTime = new Date(
+            KOMatchesTime = new Date(
                 startTime.getTime() + (i + 1) * timeInterval * 60000
             );
         }
 
         i++;
     });
-
-    setTimeout(function () {
-        if (window.innerWidth > 1000) {
-            window.location.hash = `section${data["activeMatchNumber"]}`;
-        }
-    }, 500);
 }
 
 function generatePauseTime(time) {
@@ -206,6 +202,7 @@ function updatePauseTime() {
     }
 }
 
+
 function KOMatchTable() {
     if (
         data["Matches"] == null ||
@@ -215,6 +212,7 @@ function KOMatchTable() {
         data["Matches"] === 0
     ) {
         console.log("No matches found");
+        finalMatchesTime = new Date(KOMatchesTime.getTime());
         return; // Add return statement here
     }
 
@@ -252,15 +250,14 @@ function KOMatchTable() {
 
         var KOMatches = data["KOMatches"];
         if (KOMatches != null) {
-            var matches = data["KOMatches"];
             var i = 100;
             var y = 0;
-            matches.forEach((match) => {
+            KOMatches.forEach((match) => {
                 var row = tbody.insertRow();
 
                 if (data["activeMatchNumber"] < -1) {
                     if (
-                        i + 1 == Math.abs(data["activeMatchNumber"]) &&
+                        i == Math.abs(data["activeMatchNumber"]) &&
                         data["pauseMode"] == false
                     ) {
                         generateFullSize(
@@ -269,48 +266,54 @@ function KOMatchTable() {
                             row,
                             (gameName = "K.O.-Spiel")
                         );
-                    }
-                } else {
-                    row.id = "section" + i * -1; // Set the id of the row
+                    } else {
+                        row.id = "section" + i * -1; // Set the id of the row
 
-                    var cellTime = row.insertCell(0);
-                    var matchTime = new Date(
-                        startTime.getTime() + i * timeInterval * 60000
-                    );
-                    cellTime.textContent = formatTime(matchTime);
+                        var cellTime = row.insertCell(0);
+                        var matchTime = new Date(
+                            KOMatchesTime.getTime() +
+                                y * data["timeIntervalFM"] * 60000
+                        );
+                        cellTime.textContent = formatTime(matchTime);
 
-                    var cellMatchNumber = row.insertCell(1);
-                    cellMatchNumber.textContent = "Spiel " + (y + 1);
+                        var cellMatchNumber = row.insertCell(1);
+                        cellMatchNumber.textContent = "K.O. Spiel " + (y + 1);
 
-                    var cellFirstTeam = row.insertCell(2);
-                    cellFirstTeam.textContent = match[0];
+                        var cellFirstTeam = row.insertCell(2);
+                        cellFirstTeam.textContent = match[0];
 
-                    var cellSecondTeam = row.insertCell(3);
-                    cellSecondTeam.textContent = match[1];
+                        var cellSecondTeam = row.insertCell(3);
+                        cellSecondTeam.textContent = match[1];
 
-                    if (
-                        Math.abs(data["activeMatchNumber"]) > i &&
-                        data["KOMatches"] != null
-                    ) {
-                        if (match[2] > match[3]) {
-                            cellFirstTeam.className = "style-winner";
-                            cellSecondTeam.className = "style-loser";
-                        } else if (match[2] < match[3]) {
-                            cellSecondTeam.className = "style-winner";
-                            cellFirstTeam.className = "style-loser";
-                        } else {
-                            cellFirstTeam.className = "style-draw";
-                            cellSecondTeam.className = "style-draw";
+                        if (
+                            Math.abs(data["activeMatchNumber"]) > i &&
+                            data["KOMatches"] != null
+                        ) {
+                            if (match[2] > match[3]) {
+                                cellFirstTeam.className = "style-winner";
+                                cellSecondTeam.className = "style-loser";
+                            } else if (match[2] < match[3]) {
+                                cellSecondTeam.className = "style-winner";
+                                cellFirstTeam.className = "style-loser";
+                            } else {
+                                cellFirstTeam.className = "style-draw";
+                                cellSecondTeam.className = "style-draw";
+                            }
                         }
-                    }
 
-                    var cellT = row.insertCell(4);
-                    cellT.textContent = match[2] + " : " + match[3];
+                        var cellT = row.insertCell(4);
+                        cellT.textContent = match[2] + " : " + match[3];
+                    }
                 }
 
                 i++;
                 y++;
             });
+
+            finalMatchesTime = new Date(
+                KOMatchesTime.getTime() +
+                    (y - 1) * data["timeIntervalFM"] * 60000
+            );
         }
     }
 }
@@ -627,6 +630,11 @@ async function updateData() {
         generateTableGroup(data["Matches"]);
         KOMatchTable();
         finalMatchTable();
+        setTimeout(function () {
+            if (window.innerWidth > 1000) {
+                window.location.hash = `section${data["activeMatchNumber"]}`;
+            }
+        }, 500);
     }, 0);
 }
 
@@ -661,3 +669,4 @@ updateData();
 // call updateData() every 5 seconds
 setInterval(updateData, 10000);
 setInterval(updatePauseTime, 100);
+window.location.hash = ``;
