@@ -4052,6 +4052,9 @@ def get_data_for_website(which_data=-1):
     
     elif which_data == 8:
         if tkapp.cache_vars.get("getkomatches_changed_using_var") == True or True:
+
+            if tkapp.there_is_an_ko_phase.get() == 0:
+                return 'None'
             
             connection = sqlite3.connect(db_path)
             cursor = connection.cursor()
@@ -4072,8 +4075,51 @@ def get_data_for_website(which_data=-1):
 
             all_matches = cursor.fetchall()
 
+            get_tipping_statistics_query = """
+            SELECT matchId, team1Goals, team2Goals
+            FROM tippingData
+            ORDER BY matchId
+            """
+            cursor.execute(get_tipping_statistics_query)
 
-            return all_matches
+            tipping_data = cursor.fetchall()
+
+            cursor.close()
+            connection.close()
+
+            # Group data by matchId
+            grouped_data = {}
+            for row in tipping_data:
+                if row[0] not in grouped_data:
+                    grouped_data[row[0]] = {'team1Goals': [], 'team2Goals': []}
+                grouped_data[row[0]]['team1Goals'].append(row[1])
+                grouped_data[row[0]]['team2Goals'].append(row[2])
+
+            # Calculate median and percentages
+                
+            tipping_statistics = {}
+
+            for matchId, data in grouped_data.items():
+                team1Goals = sorted(data['team1Goals'])
+                team2Goals = sorted(data['team2Goals'])
+                median_team1Goals = team1Goals[len(team1Goals) // 2]
+                median_team2Goals = team2Goals[len(team2Goals) // 2]
+                percent_team1Wins = sum(1 for goal in team1Goals if goal > median_team2Goals) / len(team1Goals) * 100 if median_team1Goals != median_team2Goals else 50
+                percent_team2Wins = sum(1 for goal in team2Goals if goal > median_team1Goals) / len(team2Goals) * 100 if median_team1Goals != median_team2Goals else 50
+                tipping_statistics[matchId] = (median_team1Goals, median_team2Goals, percent_team1Wins, percent_team2Wins)
+
+            combined_data = []
+            for foo in all_matches:
+                statistics = tipping_statistics.get(foo[0], (None, None, None, None))
+                combined_data.append(list(foo) + list([statistics]))
+
+            tkapp.cache_vars["getkomatches_changed_using_var"] = False
+
+            tkapp.cache["KOMatches"] = combined_data
+
+
+
+            return combined_data
         
         else:
             return tkapp.cache.get("KOMatches")
