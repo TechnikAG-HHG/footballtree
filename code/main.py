@@ -572,6 +572,7 @@ class Window(ctk.CTk):
             )
             """
             self.cursor.execute(teamDataTableCreationQuery)
+            self.connection.commit()
 
             existing_teams = set()
             new_team_data = []
@@ -595,6 +596,7 @@ class Window(ctk.CTk):
                                 break
 
             self.cursor.executemany("INSERT INTO teamData (teamName, groupNumber) VALUES (?, ?)", new_team_data)
+            self.connection.commit()
 
             team_ids = [row[0] for row in self.cursor.execute("SELECT id FROM teamData").fetchall()]
 
@@ -604,6 +606,7 @@ class Window(ctk.CTk):
                     self.mp3_list[team_id-1] = old_mp3_list[team_id-1]
 
             self.cursor.executemany("UPDATE teamData SET mp3Path = ? WHERE id = ?", [(mp3_path, team_id + 1) for team_id, mp3_path in self.mp3_list.items()])
+            self.connection.commit()
 
             self.calculate_matches()
             self.get_teams_for_final_matches()
@@ -850,7 +853,7 @@ class Window(ctk.CTk):
                         insert_query = "INSERT INTO playerData (playerName, playerNumber, goals, teamId) VALUES (?, ?, ?, ?)"
                         self.cursor.execute(insert_query, (entry_text, entry_text2, entry_text3, team_id))
 
-            self.connection.commit()
+        self.connection.commit()
 
     
     def add_name_entry_player(self, Frame, Counter, entry_text="", entry_text2="", entry_text3=""):
@@ -1104,6 +1107,7 @@ class Window(ctk.CTk):
 
     def reset_player_stats(self):
         self.cursor.execute("UPDATE playerData SET goals = 0")
+        self.connection.commit()
 
 
     ##############################################################################################
@@ -2345,22 +2349,20 @@ class Window(ctk.CTk):
 
 
     def save_KO_matches_in_DB(self, pairedKOmatches):
-        #logging.debug(f"pairedKOmatches: {pairedKOmatches}")
-        for i, match in enumerate(pairedKOmatches):
-            #logging.debug(f"match: {match}")
-            insertKOmatch = """
-            INSERT OR IGNORE INTO KOMatchesData (matchId, team1Id, team2Id)
-            VALUES (?, ?, ?)
-            """
-            self.cursor.execute(insertKOmatch, (i+1, match[0][0], match[1][0]))
-
-            # If insertion failed due to a unique constraint, update the existing row
-            updateKOmatch = """
-            UPDATE KOMatchesData
-            SET team1Id = ?, team2Id = ?
-            WHERE matchId = ?
-            """
-            self.cursor.execute(updateKOmatch, (match[0][0], match[1][0], i+1))
+        insertKOmatch = """
+        INSERT OR IGNORE INTO KOMatchesData (matchId, team1Id, team2Id)
+        VALUES (?, ?, ?)
+        """
+        updateKOmatch = """
+        UPDATE KOMatchesData
+        SET team1Id = ?, team2Id = ?
+        WHERE matchId = ?
+        """
+        insert_data = [(i+1, match[0][0], match[1][0]) for i, match in enumerate(pairedKOmatches)]
+        update_data = [(match[0][0], match[1][0], i+1) for i, match in enumerate(pairedKOmatches)]
+        
+        self.cursor.executemany(insertKOmatch, insert_data)
+        self.cursor.executemany(updateKOmatch, update_data)
         self.connection.commit()
         
     
@@ -3011,6 +3013,8 @@ class Window(ctk.CTk):
             WHERE googleId = ?
             """
             self.cursor.execute(updatePoints, (points, googleId))
+        
+        self.connection.commit()
 
 
     def reload_tipping_page(self):
