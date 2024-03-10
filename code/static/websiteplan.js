@@ -435,56 +435,56 @@ function finalMatchTable() {
                     data["pauseMode"] == false
                 ) {
                     generateFullSize(match, i, row, gameName);
-                }
-            }
-
-            row.id = "section" + (i + 1) * -1; // Set the id of the row
-
-            var cellTime = row.insertCell(0);
-
-            if (
-                data["timeIntervalFM"] == null ||
-                data["timeIntervalFM"] == "0"
-            ) {
-                var matchTime = new Date(
-                    finalMatchesTime.getTime() + i * timeInterval * 60000
-                );
-            } else {
-                var matchTime = new Date(
-                    finalMatchesTime.getTime() +
-                        i * data["timeIntervalFM"] * 60000
-                );
-            }
-
-            cellTime.textContent = formatTime(matchTime);
-
-            var cellMatchNumber = row.insertCell(1);
-            cellMatchNumber.textContent = gameName;
-
-            var cellFirstTeam = row.insertCell(2);
-            cellFirstTeam.textContent = match[0];
-
-            var cellSecondTeam = row.insertCell(3);
-            cellSecondTeam.textContent = match[1];
-
-            if (
-                Math.abs(data["activeMatchNumber"]) - 1 > i &&
-                data["finalMatches"] != null
-            ) {
-                if (match[2][0] > match[2][1]) {
-                    cellFirstTeam.className = "style-winner";
-                    cellSecondTeam.className = "style-loser";
-                } else if (match[2][0] < match[2][1]) {
-                    cellSecondTeam.className = "style-winner";
-                    cellFirstTeam.className = "style-loser";
                 } else {
-                    cellFirstTeam.className = "style-draw";
-                    cellSecondTeam.className = "style-draw";
+                    row.id = "section" + (i + 1) * -1; // Set the id of the row
+                    var cellTime = row.insertCell(0);
+
+                    if (
+                        data["timeIntervalFM"] == null ||
+                        data["timeIntervalFM"] == "0"
+                    ) {
+                        var matchTime = new Date(
+                            finalMatchesTime.getTime() +
+                                i * timeInterval * 60000
+                        );
+                    } else {
+                        var matchTime = new Date(
+                            finalMatchesTime.getTime() +
+                                i * data["timeIntervalFM"] * 60000
+                        );
+                    }
+
+                    cellTime.textContent = formatTime(matchTime);
+
+                    var cellMatchNumber = row.insertCell(1);
+                    cellMatchNumber.textContent = gameName;
+
+                    var cellFirstTeam = row.insertCell(2);
+                    cellFirstTeam.textContent = match[0];
+
+                    var cellSecondTeam = row.insertCell(3);
+                    cellSecondTeam.textContent = match[1];
+
+                    if (
+                        Math.abs(data["activeMatchNumber"]) - 1 > i &&
+                        data["finalMatches"] != null
+                    ) {
+                        if (match[2][0] > match[2][1]) {
+                            cellFirstTeam.className = "style-winner";
+                            cellSecondTeam.className = "style-loser";
+                        } else if (match[2][0] < match[2][1]) {
+                            cellSecondTeam.className = "style-winner";
+                            cellFirstTeam.className = "style-loser";
+                        } else {
+                            cellFirstTeam.className = "style-draw";
+                            cellSecondTeam.className = "style-draw";
+                        }
+                    }
+
+                    var cellT = row.insertCell(4);
+                    cellT.textContent = match[2][0] + " : " + match[2][1];
                 }
             }
-
-            var cellT = row.insertCell(4);
-            cellT.textContent = match[2][0] + " : " + match[2][1];
 
             i++;
         });
@@ -496,18 +496,22 @@ function generateFullSize(match, i, row, gameName = null) {
     row.id = "section" + (i + 1); // Set the id of the row
     row.style.backgroundColor = "black";
 
-    var fullSize = row.insertCell(0);
-    fullSize.colSpan = 6;
-    fullSize.className = "fullSize";
+    var dataNumber = 5;
+    var colSpan = 6;
 
     var title = document.createElement("h2");
     if (gameName != null) {
         title.textContent = gameName;
+        dataNumber = 4;
+        colSpan = 5;
     } else if (match[4] == 1) {
         title.textContent = "Spiel " + (i + 1) + ": Gruppe A";
     } else if (match[4] == 2) {
         title.textContent = "Spiel " + (i + 1) + ": Gruppe B";
     }
+    var fullSize = row.insertCell(0);
+    fullSize.colSpan = colSpan;
+    fullSize.className = "fullSize";
 
     title.className = "title";
     fullSize.appendChild(title);
@@ -543,7 +547,7 @@ function generateFullSize(match, i, row, gameName = null) {
     team2.className = "team2";
     team2Div.appendChild(team2);
 
-    if (match[5][2] == null || match[5][3] == null) {
+    if (match[dataNumber][2] == null || match[dataNumber][3] == null) {
         var tipping1 = document.createElement("p");
         tipping1.textContent = " ";
         tipping1.className = "tipping1";
@@ -560,24 +564,24 @@ function generateFullSize(match, i, row, gameName = null) {
         team2Div.appendChild(tipping2);
     } else {
         var tipping1 = document.createElement("p");
-        tipping1.textContent = match[5][2] + "%";
+        tipping1.textContent = match[dataNumber][2] + "%";
         tipping1.className = "tipping1";
         team1Div.appendChild(tipping1);
 
         var tippingGoals = document.createElement("p");
-        tippingGoals.textContent = `${match[5][0]} : ${match[5][1]}`;
+        tippingGoals.textContent = `${match[dataNumber][0]} : ${match[dataNumber][1]}`;
         tippingGoals.className = "tippingGoals";
         goalsDiv.appendChild(tippingGoals);
 
         var tipping2 = document.createElement("p");
-        tipping2.textContent = match[5][3] + "%";
+        tipping2.textContent = match[dataNumber][3] + "%";
         tipping2.className = "tipping2";
         team2Div.appendChild(tipping2);
 
-        if (match[5][2] > match[5][3]) {
+        if (match[dataNumber][2] > match[dataNumber][3]) {
             tipping1.className = "style-winner";
             tipping2.className = "style-loser";
-        } else if (match[5][2] < match[5][3]) {
+        } else if (match[dataNumber][2] < match[dataNumber][3]) {
             tipping2.className = "style-winner";
             tipping1.className = "style-loser";
         } else {
