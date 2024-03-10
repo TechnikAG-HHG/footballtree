@@ -11,7 +11,6 @@ from flask import Flask, send_file, request, abort, render_template, make_respon
 import sqlite3
 import vlc
 import datetime
-import os
 import glob
 import ast
 import logging
@@ -22,16 +21,14 @@ from pip._vendor import cachecontrol
 import google.auth.transport.requests
 import pathlib
 import functools
-import subprocess
 import platform
+import subprocess
 import traceback
 
 app = Flask(__name__)
 app.secret_key = "Felix.com"
 
 lock = threading.Lock()
-
-debug_mode = True
 
 class Window(ctk.CTk):
     
@@ -614,7 +611,14 @@ class Window(ctk.CTk):
             self.reset_player_per_match_data()
 
             self.reset_match_datas()
-        
+
+            self.active_mode.set(1)
+            self.pause_mode.set(False)
+
+            self.save_active_mode_in_db()
+
+            self.on_pause_switch_change()
+
             self.reload_requried_on_click_SPIEL = True
             
             self.updated_data.update({"Teams": get_data_for_website(0)})
@@ -648,6 +652,7 @@ class Window(ctk.CTk):
 
 
         return backup_path
+
 
     def reset_match_datas(self):
             self.cursor.execute("UPDATE matchData SET team1Goals = 0, team2Goals = 0, matchTime = ''")
@@ -1118,8 +1123,29 @@ class Window(ctk.CTk):
         
         SPIEL_button = ctk.CTkButton(manual_manual_frame, text="Reload", command=lambda : self.reload_spiel_button_command(True), width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")            
         SPIEL_button.pack(pady=10, side=tk.BOTTOM, anchor=tk.S, padx=10) 
+
+        if self.pause_mode.get() == 1:
+            pause_mode_active_label = ctk.CTkLabel(manual_frame, text="Pause Mode Active", font=("Helvetica", button_font_size * 1.5, "bold"), fg_color="red")
+            pause_mode_active_label.place(relx=0.7, rely=0.4)
         
+        if self.best_scorer_active.get() == 1:
+            best_scorer_active_label = ctk.CTkLabel(manual_frame, text="Best Scorer Active", font=("Helvetica", button_font_size * 1.5, "bold"), fg_color="red")
+            best_scorer_active_label.place(relx=0.7, rely=0.2)
         
+        if self.there_is_an_ko_phase.get() == 1:
+            ko_phase_active_label = ctk.CTkLabel(manual_frame, text="KO Phase Active", font=("Helvetica", button_font_size * 1.5, "bold"), text_color="green")
+            ko_phase_active_label.place(relx=0.7, rely=0.6)
+
+        if self.active_mode.get() == 1:
+            active_mode_label = ctk.CTkLabel(manual_frame, text=f"Active Mode: Group Phase ({self.active_mode.get()})", font=("Helvetica", button_font_size * 1.5, "bold"), text_color="green")
+            active_mode_label.place(relx=0.7, rely=0.8)
+        elif self.active_mode.get() == 3:
+            active_mode_label = ctk.CTkLabel(manual_frame, text=f"Active Mode: KO Phase ({self.active_mode.get()})", font=("Helvetica", button_font_size * 1.5, "bold"), text_color="green")
+            active_mode_label.place(relx=0.7, rely=0.8)
+        elif self.active_mode.get() == 2:
+            active_mode_label = ctk.CTkLabel(manual_frame, text=f"Active Mode: Final Matches ({self.active_mode.get()})", font=("Helvetica", button_font_size * 1.5, "bold"), text_color="green")
+            active_mode_label.place(relx=0.7, rely=0.8)
+
         # Assuming self.spiel_buttons is initialized as an empty dictionary
         self.spiel_buttons = {}
         
@@ -1926,24 +1952,32 @@ class Window(ctk.CTk):
             if self.active_match >= 0:
                 self.spiel_select.set(values_list[self.active_match])
                 self.manual_select_active = False
-            elif (values_list != [] and self.teams_playing.count(None) != 0) or (values_list != [] and self.manual_select_active == False):
+                #print("Case 1", "self.active_match", self.active_match, "values_list", values_list)
+
+            elif (values_list != [] and self.teams_playing.count(None) != 0) or (values_list != [] and self.manual_select_active == False and self.active_match != -1):
+                #print("Case 2", "self.active_match", self.active_match, "values_list", values_list)
                 return
 
             elif self.manual_select_active == False:
+                #print("Case 3", "self.active_match", self.active_match, "values_list", values_list)
                 self.active_match = -1
                 self.teams_playing = [None, None]
                 
                 if match_count > 0:
                     self.reload_spiel_button_command()
                 
+                try:
                 # Create an red label on the frame to show that no match is active
-                no_match_active_label = ctk.CTkLabel(frame, text="No Match Active", font=("Helvetica", self.team_button_font_size * 2, "bold"), fg_color="red")
-                no_match_active_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+                    no_match_active_label = ctk.CTkLabel(frame, text="No Match Active", font=("Helvetica", self.team_button_font_size * 2, "bold"), fg_color="red")
+                    no_match_active_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
-                start_button = ctk.CTkButton(self.frame, text="Start", command=lambda : self.start_match_in_first_game_in_group_phase(), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), height=self.team_button_height)
-                start_button.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
+                    start_button = ctk.CTkButton(self.frame, text="Start", command=lambda : self.start_match_in_first_game_in_group_phase(), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), height=self.team_button_height)
+                    start_button.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
+                except:
+                    pass
                 
             else:
+                #print("Case 4", "self.active_match", self.active_match, "values_list", values_list)
                 self.active_match = -1
                 logging.info("Manual Select Active")
                 
@@ -1959,8 +1993,15 @@ class Window(ctk.CTk):
             values_list, active_match = self.get_values_list_mode2()
             self.spiel_select.configure(values=values_list)
             if active_match >= 0:
-                self.spiel_select.set(values_list[active_match])
-                self.manual_select_active = False
+                if len(values_list) > active_match:
+                    self.spiel_select.set(values_list[active_match])
+                    self.manual_select_active = False
+                else:
+                    self.active_match = -1
+                    self.teams_playing = [None, None]
+                    # Create an red label on the frame to show that no match is active
+                    no_match_active_label = ctk.CTkLabel(frame, text="No Match Active", font=("Helvetica", self.team_button_font_size * 2, "bold"), fg_color="red")
+                    no_match_active_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
             elif (values_list != [] and self.teams_playing.count(None) != 0) or (values_list != [] and self.manual_select_active == False):
                 self.on_match_select(values_list[0], matches)
                 self.manual_select_active = False
@@ -2022,6 +2063,8 @@ class Window(ctk.CTk):
         next_match_button.pack(pady=10, padx=10, side=tk.RIGHT, anchor=tk.SE)
         previous_match_button = ctk.CTkButton(self.spiel_select_frame, text="Previous Match", command=lambda : self.next_previous_match_button(self.spiel_select, matches, False), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
         previous_match_button.pack(pady=10, padx=10, side=tk.LEFT, anchor=tk.SW)
+
+        self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
 
 
     def start_match_in_first_game_in_group_phase(self):
@@ -2087,7 +2130,6 @@ class Window(ctk.CTk):
         #self.cache_vars["getfinalmatches_changed_using_var"] = True
         values_list = []
         pairedKOmatches = self.get_teams_for_KO_matches()
-        print("pairedKOmatches", pairedKOmatches)
         for i, match in enumerate(pairedKOmatches):
             values_list.append(f" {i+1}: {match[0][1]} vs {match[1][1]}")
         
@@ -2313,9 +2355,8 @@ class Window(ctk.CTk):
     
     def on_match_select(self, event, matches=[]):
         selected_match = event
-        #logging.debug(f"on_match_select selected_match: {selected_match}, matches: {matches}")
-        #logging.debug(selected_match)
-        #logging.debug(matches)
+        logging.debug(f"on_match_select selected_match: {selected_match}, matches: {matches}")
+        logging.debug(f"selected_match: {selected_match}, matches: {matches}")
         if self.active_mode.get() == 1 and matches != []:
             match_index = [match["number"] + ": " + match["teams"][0] + " vs " + match["teams"][1] for match in matches].index(selected_match)
             #logging.debug("match_index", match_index)
@@ -2382,14 +2423,10 @@ class Window(ctk.CTk):
         
         elif self.active_mode.get() == 3:
             match_index = int(selected_match.split(":")[0]) - 1
-            print("match_index", match_index, "selected_match", selected_match)
-
             #logging.debug("match_index", match_index)
             # Get the teams playing in the selected match and if there are none, set teams_playing to None
             team_names = self.read_teamNames()
 
-            print("matches", matches)
-            
             team1_index = team_names.index(matches[match_index][0][1])
             team2_index = team_names.index(matches[match_index][1][1])
 
@@ -2421,34 +2458,35 @@ class Window(ctk.CTk):
                 new_match_index = current_match_index + 1 if next_match else current_match_index - 1
                 if new_match_index > len(matches):
                     if self.there_is_an_ko_phase.get() == 0:
-                        result = tkinter.messagebox.askyesno("End of Matches", "You have reached the end of the matches. Do you want activate the pause and the final matches?")
+                        result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the end of the matches. Do you want activate the pause and the final matches?")
                         if result:
                             self.pause_mode.set(1)
                             self.on_pause_switch_change()
                             self.active_mode.set(2)
                             self.save_active_mode_in_db()
-                            self.on_radio_button_change()
+                            values_list, active_match = self.get_values_list_mode2()
+                            self.on_match_select(values_list[0])
                             self.update_idletasks()
                             self.update()
                             return
                         else:
                             return
                     elif self.there_is_an_ko_phase.get() == 1:
-                        result = tkinter.messagebox.askyesno("End of Matches", "You have reached the end of the matches. Do you want to select the first KO match?")
+                        result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the end of the matches. Do you want to select the first KO match?")
                         if result:
                             self.active_mode.set(3)
                             self.save_active_mode_in_db()
                             values_list, pairedKoMatches = self.get_values_list_mode3()
                             self.on_match_select(values_list[0], pairedKoMatches)
                             self.save_teams_playing_and_active_match()
-                            self.reload_spiel_button_command()
+                            #self.reload_spiel_button_command()
                             self.show_frame(self.SPIEL_frame)
                             return
                         else:
                             return
                     
                 if new_match_index == 0 and next_match == False and self.active_mode.get() == 1:
-                    result = tkinter.messagebox.askyesno("Select no match", "You have reached the beginning of the matches. Do you want to select no match?")
+                    result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the beginning of the matches. Do you want to select no match?")
                     if result:
                         self.active_match = -1
                         self.teams_playing = [None, None]
@@ -2499,28 +2537,26 @@ class Window(ctk.CTk):
                     self.active_match -= 1
                 else:
                     if self.there_is_an_ko_phase.get() == 0:
-                        result = tkinter.messagebox.askyesno("Select no match", "You have reached the beginning of the final matches. Do you want to select the last match of the group phase?")
+                        result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the beginning of the final matches. Do you want to select the last match of the group phase?")
                         if result:
                             self.active_mode.set(1)
                             self.save_active_mode_in_db()
                             values_list = self.get_values_list_mode1(matches)
                             self.on_match_select(values_list[-1], matches)
                             self.save_teams_playing_and_active_match()
-                            self.reload_spiel_button_command()
                             self.show_frame(self.SPIEL_frame)
                             return
                         else:
                             return
 
                     elif self.there_is_an_ko_phase.get() == 1:
-                        result = tkinter.messagebox.askyesno("Select no match", "You have reached end of the final matches. Do you want to select the last KO match?")
+                        result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached end of the final matches. Do you want to select the last KO match?")
                         if result:
                             self.active_mode.set(3)
                             self.save_active_mode_in_db()
                             values_list, pairedKoMatches = self.get_values_list_mode3()
                             self.on_match_select(values_list[-1], pairedKoMatches)
                             self.save_teams_playing_and_active_match()
-                            self.reload_spiel_button_command()
                             self.show_frame(self.SPIEL_frame)
                             return
                         else:
@@ -2532,14 +2568,11 @@ class Window(ctk.CTk):
             
             self.on_match_select(values_list[active_match])
                 
-            #self.reload_spiel_button_command()
-            #self.show_frame(self.SPIEL_frame)
-            
-            self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
-            
             #logging.debug("self.active_match", self.active_match)
             
             #self.save_games_played_in_db(self.active_match)
+            
+            self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
             
             self.updated_data.update({"Games": get_data_for_website(2)})
         
@@ -2556,13 +2589,14 @@ class Window(ctk.CTk):
                 new_match_index = current_match_index + 1 if next_match else current_match_index - 1
                 
                 if new_match_index > len(pairedKoMatches):
-                    result = tkinter.messagebox.askyesno("End of Matches", "You have reached the end of the matches. Do you want activate the pause and the final matches?")
+                    result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the end of the matches. Do you want activate the pause and the final matches?")
                     if result:
                         self.pause_mode.set(1)
                         self.on_pause_switch_change()
                         self.active_mode.set(2)
                         self.save_active_mode_in_db()
-                        self.on_radio_button_change()
+                        values_list, _ = self.get_values_list_mode2()
+                        self.on_match_select(values_list[0])
                         self.update_idletasks()
                         self.update()
                         return
@@ -2570,14 +2604,13 @@ class Window(ctk.CTk):
                         return
                     
                 if new_match_index == 0 and next_match == False and self.active_mode.get() == 3:
-                    result = tkinter.messagebox.askyesno("Select no match", "You have reached the beginning of the KO matches. Do you want to select the last match of the group phase?")
+                    result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the beginning of the KO matches. Do you want to select the last match of the group phase?")
                     if result:
                         self.active_mode.set(1)
                         self.save_active_mode_in_db()
                         values_list = self.get_values_list_mode1(matches)
                         self.on_match_select(values_list[-1], matches)
                         self.save_teams_playing_and_active_match()
-                        self.reload_spiel_button_command()
                         self.show_frame(self.SPIEL_frame)
                         return
                     else:
@@ -2832,7 +2865,7 @@ class Window(ctk.CTk):
             """
             self.settingscursor.execute(updateTeamsPlaying, (str(self.teams_playing), self.active_match))
             self.settingsconnection.commit()
-    
+
 
     def save_active_mode_in_db(self):
         updateActiveMode = """
@@ -2843,7 +2876,7 @@ class Window(ctk.CTk):
         self.settingscursor.execute(updateActiveMode, (self.active_mode.get(),))
         self.settingsconnection.commit()
     
-    
+
     ###########################################################################################################
     ###########################################################################################################
     ###########################################################################################################
@@ -3673,6 +3706,7 @@ class Window(ctk.CTk):
                 
         self.updated_data.update({"Points": get_data_for_website(3)})    
        
+
 ##############################################################################################
 ##############################################################################################
 ##############################################################################################
@@ -4034,6 +4068,7 @@ def get_initial_data(template_name, base_url=None):
     }
     return make_response(render_template(template_name, initial_data=initial_data, base_url=base_url))
 
+
 ##############################################################################################
 ###################################### Google Auth ###########################################
 ##############################################################################################
@@ -4098,6 +4133,7 @@ def callback():
 def logout():
     session.clear()
     return redirect("/")
+
 
 ##############################################################################################
 ########################################## Tipping ###########################################
@@ -4283,6 +4319,7 @@ def admin_index():
 def page_not_found(e):
     return render_template('404.html'), 404
 
+
 ##############################################################################################
 ########################################### Data #############################################
 ##############################################################################################
@@ -4406,6 +4443,7 @@ def site_webmanifest():
 def safari_pinned_tab():
     return send_from_directory(os.path.join(app.root_path, '../favicon'), 'safari-pinned-tab.svg', mimetype='image/svg+xml')
 
+
 ##############################################################################################
 ########################################### Init #############################################
 ##############################################################################################
@@ -4416,9 +4454,6 @@ global stored_data
 global initial_data
 global db_path
 
-import subprocess
-import os
-import platform
 
 if platform.system() != 'Windows':
     try:
@@ -4428,7 +4463,7 @@ if platform.system() != 'Windows':
         os.environ['DISPLAY']
         os.environ['DISPLAY'] = ":1"
 
-start_server_and_ssh = False
+start_server_and_ssh = True
 
 db_path = "data/data.db"
 stored_data = {}
