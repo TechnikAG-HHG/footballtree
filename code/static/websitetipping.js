@@ -400,9 +400,9 @@ function handleSubmit(event) {
     if (match.split(".")[1]) {
         if (match.split(".")[1].startsWith(" Halbfinale")) {
             matchNumber = parseInt(match.split(".")[0]) * -1 - 1;
-        } else if (matchNumber < -99) {
-            matchPlayed = true;
-            console.log("Match played 2");
+        } else if (match.split(".")[1].startsWith(" K")) {
+            matchData = data["KOMatches"][matchNumber];
+            matchNumber = (parseInt(match.split(".")[0]) + 99) * -1;
         } else {
             matchNumber = match.split(".")[0] - 1;
         }
