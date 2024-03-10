@@ -1973,6 +1973,8 @@ class Window(ctk.CTk):
 
                     start_button = ctk.CTkButton(self.frame, text="Start", command=lambda : self.start_match_in_first_game_in_group_phase(), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), height=self.team_button_height)
                     start_button.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
+
+                    self.updated_data.update({"activeMatchNumber": -1})
                 except:
                     pass
                 
@@ -2065,6 +2067,8 @@ class Window(ctk.CTk):
         previous_match_button.pack(pady=10, padx=10, side=tk.LEFT, anchor=tk.SW)
 
         self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
+
+        self.save_teams_playing_and_active_match()
 
 
     def start_match_in_first_game_in_group_phase(self):
@@ -3938,9 +3942,10 @@ def get_data_for_website(which_data=-1):
             elif tkapp.active_mode.get() == 3:
                 a_m += 100
                 a_m *= -1
-            
+            tkapp.updated_data.update({"activeMatchNumber": a_m})
             return a_m
         except:
+            logging.error("Error in get_data_for_website(5)")
             return 0
     
     elif which_data == 6 and tkapp.active_mode.get() == 2:
@@ -4194,6 +4199,7 @@ def get_initial_data(template_name, base_url=None):
         "ThereIsAnKOPhase": tkapp.there_is_an_ko_phase.get(),
         "KOMatches": get_data_for_website(8),
     }
+    print("initial_data", initial_data)
     return make_response(render_template(template_name, initial_data=initial_data, base_url=base_url))
 
 
