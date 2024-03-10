@@ -404,7 +404,7 @@ class Window(ctk.CTk):
             logging.debug(f"settings[13]: {settings[13]}")
             logging.debug(f"Type of self.teams_playing: {type(self.teams_playing)}")
         
-        if settings[14] is not None and settings[14] != "" and settings[14] != 0:
+        if settings[14] is not None:
             self.active_match = settings[14]
             
         if settings[15] is not None and settings[15] != "" and settings[15] != 0:
@@ -1103,7 +1103,11 @@ class Window(ctk.CTk):
                     self.teams_playing = [None, None]
                     
                     no_match_active_label = ctk.CTkLabel(self.SPIEL_frame, text="No Match Active", font=("Helvetica", self.team_button_font_size * 2, "bold"), fg_color="red")
-                    no_match_active_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+                    no_match_active_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)#
+
+                    if self.active_mode.get() == 1:
+                        start_button = ctk.CTkButton(self.SPIEL_frame, text="Start", command=lambda : self.start_match_in_first_game_in_group_phase(), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), height=self.team_button_height)
+                        start_button.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
                     
                     return
                 
@@ -1115,7 +1119,11 @@ class Window(ctk.CTk):
                 
                 no_match_active_label = ctk.CTkLabel(self.SPIEL_frame, text="No Match Active", font=("Helvetica", self.team_button_font_size * 2, "bold"), fg_color="red")
                 no_match_active_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
-                
+
+                if self.active_mode.get() == 1:
+                    start_button = ctk.CTkButton(self.SPIEL_frame, text="Start", command=lambda : self.start_match_in_first_game_in_group_phase(), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), height=self.team_button_height)
+                    start_button.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
+
                 break
                 
             self.team_id = self.teams_playing[i]
@@ -1657,6 +1665,8 @@ class Window(ctk.CTk):
             
             # calculate the time for the current match
             time_interval_for_only_the_final_match = int(self.time_interval_for_only_the_final_match.get().replace("m", ""))
+
+            timeIntervalKO = int(self.time_intervalKO.get().replace("m", ""))
             
             #logging.debug(f"active_match: {active_match}, time_interval_final_matches: {time_interval_final_matches}, timeinterval: {timeinterval}, match_count: {match_count}, pause_between_final_matches: {pause_between_final_matches}")
 
@@ -1782,7 +1792,6 @@ class Window(ctk.CTk):
         
         self.calculate_points()
         
-                
         # Delete all entry fields
         self.SPIEL_frame.destroy()
         #self.SPIEL_frame.grid_forget()
@@ -1839,13 +1848,11 @@ class Window(ctk.CTk):
         
         matches = self.calculate_matches()
         
-        spiel_select_frame = ctk.CTkFrame(frame, fg_color='#142324', corner_radius=5)
-        spiel_select_frame.pack(pady=10, padx=10, anchor=tk.SW, side=tk.LEFT)
+        self.spiel_select_frame = ctk.CTkFrame(frame, fg_color='#142324', corner_radius=5)
+        self.spiel_select_frame.pack(pady=10, padx=10, anchor=tk.SW, side=tk.LEFT)
         
         width = self.screenwidth / 9
         
-        self.spiel_select = ctk.CTkComboBox(spiel_select_frame, font=("Helvetica", self.team_button_font_size * 1.2), width=width, values=[""], command=lambda event: self.on_match_select(event, matches))
-        self.spiel_select.pack(pady=10, side=tk.TOP, anchor=tk.N, padx=10)
         
         self.cursor.execute("SELECT COUNT(*) FROM matchData")
         match_count = self.cursor.fetchone()[0]
@@ -1855,6 +1862,9 @@ class Window(ctk.CTk):
             self.teams_playing = [None, None]
 
         if self.active_mode.get() == 1:
+            self.spiel_select = ctk.CTkComboBox(self.spiel_select_frame, font=("Helvetica", self.team_button_font_size * 1.2), width=width, values=[""], command=lambda event: self.on_match_select(event, matches))
+            self.spiel_select.pack(pady=10, side=tk.TOP, anchor=tk.N, padx=10)
+
             values_list = self.get_values_list_mode1(matches)
             self.spiel_select.configure(values=values_list)
             #logging.debug("active_match in create_matches_labels", self.active_match)
@@ -1876,6 +1886,9 @@ class Window(ctk.CTk):
                 # Create an red label on the frame to show that no match is active
                 no_match_active_label = ctk.CTkLabel(frame, text="No Match Active", font=("Helvetica", self.team_button_font_size * 2, "bold"), fg_color="red")
                 no_match_active_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+                start_button = ctk.CTkButton(self.frame, text="Start", command=lambda : self.start_match_in_first_game_in_group_phase(), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), height=self.team_button_height)
+                start_button.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
                 
             else:
                 self.active_match = -1
@@ -1887,6 +1900,9 @@ class Window(ctk.CTk):
                 self.manual_select_active_sure = True
             
         elif self.active_mode.get() == 2:
+            self.spiel_select = ctk.CTkComboBox(self.spiel_select_frame, font=("Helvetica", self.team_button_font_size * 1.2), width=width, values=[""], command=lambda event: self.on_match_select(event, matches))
+            self.spiel_select.pack(pady=10, side=tk.TOP, anchor=tk.N, padx=10)
+
             values_list, active_match = self.get_values_list_mode2()
             self.spiel_select.configure(values=values_list)
             if active_match >= 0:
@@ -1915,8 +1931,11 @@ class Window(ctk.CTk):
 
         elif self.active_mode.get() == 3:
             values_list, pairedKoMatches = self.get_values_list_mode3()
+
+            self.spiel_select = ctk.CTkComboBox(self.spiel_select_frame, font=("Helvetica", self.team_button_font_size * 1.2), width=width, values=[""], command=lambda event: self.on_match_select(event, pairedKoMatches))
+            self.spiel_select.pack(pady=10, side=tk.TOP, anchor=tk.N, padx=10)
             self.spiel_select.configure(values=values_list)
-            #logging.debug("active_match in create_matches_labels", self.active_match)
+
             self.active_match = self.get_active_match(self.teams_playing[0], self.teams_playing[1])
                 
             if self.active_match >= 0:
@@ -1946,10 +1965,20 @@ class Window(ctk.CTk):
                 
                 self.manual_select_active_sure = True
             
-        next_match_button = ctk.CTkButton(spiel_select_frame, text="Next Match", command=lambda : self.next_previous_match_button(self.spiel_select, matches), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
+        next_match_button = ctk.CTkButton(self.spiel_select_frame, text="Next Match", command=lambda : self.next_previous_match_button(self.spiel_select, matches), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
         next_match_button.pack(pady=10, padx=10, side=tk.RIGHT, anchor=tk.SE)
-        previous_match_button = ctk.CTkButton(spiel_select_frame, text="Previous Match", command=lambda : self.next_previous_match_button(self.spiel_select, matches, False), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
+        previous_match_button = ctk.CTkButton(self.spiel_select_frame, text="Previous Match", command=lambda : self.next_previous_match_button(self.spiel_select, matches, False), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.2, "bold"), height=self.team_button_height, width=self.team_button_width)
         previous_match_button.pack(pady=10, padx=10, side=tk.LEFT, anchor=tk.SW)
+
+
+    def start_match_in_first_game_in_group_phase(self):
+        if self.active_mode.get() == 1:
+            values_list = self.get_values_list_mode1(self.calculate_matches())
+            self.on_match_select(values_list[0], self.calculate_matches())
+            self.manual_select_active = False
+            self.reload_spiel_button_command(True)
+        else:
+            logging.error("The active mode is not 1")
 
     
     def get_values_list_mode1(self, matches):
@@ -2300,9 +2329,13 @@ class Window(ctk.CTk):
         
         elif self.active_mode.get() == 3:
             match_index = int(selected_match.split(":")[0]) - 1
+            print("match_index", match_index, "selected_match", selected_match)
+
             #logging.debug("match_index", match_index)
             # Get the teams playing in the selected match and if there are none, set teams_playing to None
             team_names = self.read_teamNames()
+
+            print("matches", matches)
             
             team1_index = team_names.index(matches[match_index][0][1])
             team2_index = team_names.index(matches[match_index][1][1])
@@ -2315,8 +2348,8 @@ class Window(ctk.CTk):
             self.active_match = match_index
             
             
-            self.updated_data.update({"Games": get_data_for_website(2)})
-            self.updated_data.update({"activeMatchNumber": self.active_match})
+            #self.updated_data.update({"Games": get_data_for_website(2)})
+            #self.updated_data.update({"activeMatchNumber": self.active_match})
         
         self.reload_spiel_button_command()
         
@@ -2333,19 +2366,31 @@ class Window(ctk.CTk):
                 
                 # Calculate the new match index
                 new_match_index = current_match_index + 1 if next_match else current_match_index - 1
-                
                 if new_match_index > len(matches):
-                    result = tkinter.messagebox.askyesno("End of Matches", "You have reached the end of the matches. Do you want activate the pause and the final matches?")
-                    if result:
-                        self.pause_mode.set(1)
-                        self.on_pause_switch_change()
-                        self.active_mode.set(2)
-                        self.on_radio_button_change()
-                        self.update_idletasks()
-                        self.update()
-                        return
-                    else:
-                        return
+                    if self.there_is_an_ko_phase.get() == 0:
+                        result = tkinter.messagebox.askyesno("End of Matches", "You have reached the end of the matches. Do you want activate the pause and the final matches?")
+                        if result:
+                            self.pause_mode.set(1)
+                            self.on_pause_switch_change()
+                            self.active_mode.set(2)
+                            self.on_radio_button_change()
+                            self.update_idletasks()
+                            self.update()
+                            return
+                        else:
+                            return
+                    elif self.there_is_an_ko_phase.get() == 1:
+                        result = tkinter.messagebox.askyesno("End of Matches", "You have reached the end of the matches. Do you want to select the first KO match?")
+                        if result:
+                            self.active_mode.set(3)
+                            values_list, pairedKoMatches = self.get_values_list_mode3()
+                            self.on_match_select(values_list[0], pairedKoMatches)
+                            self.save_teams_playing_and_active_match()
+                            self.reload_spiel_button_command()
+                            self.show_frame(self.SPIEL_frame)
+                            return
+                        else:
+                            return
                     
                 if new_match_index == 0 and next_match == False and self.active_mode.get() == 1:
                     result = tkinter.messagebox.askyesno("Select no match", "You have reached the beginning of the matches. Do you want to select no match?")
@@ -2397,6 +2442,32 @@ class Window(ctk.CTk):
             else:
                 if self.active_match > 0:
                     self.active_match -= 1
+                else:
+                    if self.there_is_an_ko_phase.get() == 0:
+                        result = tkinter.messagebox.askyesno("Select no match", "You have reached the beginning of the final matches. Do you want to select the last match of the group phase?")
+                        if result:
+                            self.active_mode.set(1)
+                            values_list = self.get_values_list_mode1(matches)
+                            self.on_match_select(values_list[-1], matches)
+                            self.save_teams_playing_and_active_match()
+                            self.reload_spiel_button_command()
+                            self.show_frame(self.SPIEL_frame)
+                            return
+                        else:
+                            return
+
+                    elif self.there_is_an_ko_phase.get() == 1:
+                        result = tkinter.messagebox.askyesno("Select no match", "You have reached end of the final matches. Do you want to select the last KO match?")
+                        if result:
+                            self.active_mode.set(3)
+                            values_list, pairedKoMatches = self.get_values_list_mode3()
+                            self.on_match_select(values_list[-1], pairedKoMatches)
+                            self.save_teams_playing_and_active_match()
+                            self.reload_spiel_button_command()
+                            self.show_frame(self.SPIEL_frame)
+                            return
+                        else:
+                            return
             
             # self.reload_spiel_button_command()
               
@@ -2414,6 +2485,74 @@ class Window(ctk.CTk):
             #self.save_games_played_in_db(self.active_match)
             
             self.updated_data.update({"Games": get_data_for_website(2)})
+        
+        elif self.active_mode.get() == 3:
+            try:
+                # Get the current match index
+                current_match_index = int(spiel_select.get().split(":")[0])
+
+                values_list, pairedKoMatches = self.get_values_list_mode3()
+
+                #self.save_games_played_in_db(current_match_index)
+                
+                # Calculate the new match index
+                new_match_index = current_match_index + 1 if next_match else current_match_index - 1
+                
+                if new_match_index > len(pairedKoMatches):
+                    result = tkinter.messagebox.askyesno("End of Matches", "You have reached the end of the matches. Do you want activate the pause and the final matches?")
+                    if result:
+                        self.pause_mode.set(1)
+                        self.on_pause_switch_change()
+                        self.active_mode.set(2)
+                        self.on_radio_button_change()
+                        self.update_idletasks()
+                        self.update()
+                        return
+                    else:
+                        return
+                    
+                if new_match_index == 0 and next_match == False and self.active_mode.get() == 3:
+                    result = tkinter.messagebox.askyesno("Select no match", "You have reached the beginning of the KO matches. Do you want to select the last match of the group phase?")
+                    if result:
+                        self.active_mode.set(1)
+                        values_list = self.get_values_list_mode1(matches)
+                        self.on_match_select(values_list[-1], matches)
+                        self.save_teams_playing_and_active_match()
+                        self.reload_spiel_button_command()
+                        self.show_frame(self.SPIEL_frame)
+                        return
+                    else:
+                        return
+                # Ensure the new index is within bounds
+                new_match_index = max(1, min(new_match_index, len(matches)))
+
+                # Get the teams playing in the selected match
+                team_names = self.read_teamNames()
+                teams_playing = [team_names.index(pairedKoMatches[new_match_index - 1][0][1]), team_names.index(pairedKoMatches[new_match_index - 1][1][1])] if new_match_index > 0 else [None, None]
+                
+                self.active_match = new_match_index - 1
+
+                # Update the buttons
+                self.teams_playing = teams_playing
+                self.reload_spiel_button_command()
+                self.show_frame(self.SPIEL_frame)
+                
+                self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
+                self.updated_data.update({"Games": get_data_for_website(2)})
+                
+
+                # logging.debug statements
+                logging.debug(f"current_match_index: {current_match_index}")
+                logging.debug(f"new_match_index: {new_match_index}")
+                logging.debug(f"teams_playing: {teams_playing}")
+                
+            except ValueError:
+                # Handle the case where the selected match is not found in the list
+                logging.debug("Selected match not found in the list.")
+                
+                values_list, pairedKoMatches = self.get_values_list_mode3()
+
+                self.on_match_select(values_list[0], pairedKoMatches)
 
 
     def global_scored_a_point(self, teamID, team2ID, direction="UP"):
@@ -2626,7 +2765,7 @@ class Window(ctk.CTk):
         
         
     def save_teams_playing_and_active_match(self):
-        if self.teams_playing[0] != None and self.teams_playing[1] != None:
+        if self.teams_playing[0] != None and self.teams_playing[1] != None or self.active_match == -1:
             updateTeamsPlaying = """
             UPDATE settingsData
             SET teams_playing = ?, activeMatch = ?
@@ -2660,9 +2799,10 @@ class Window(ctk.CTk):
         self.calculate_points_for_tippers_using_db()
 
         getTippers = """
-        SELECT t.googleId, u.userName, t.points FROM tippingData t, userData u
+        SELECT t.googleId, u.userName, SUM(t.points) as total_points FROM tippingData t, userData u
         WHERE t.googleId = u.googleId
-        ORDER BY t.points DESC
+        GROUP BY t.googleId, u.userName
+        ORDER BY total_points DESC
         """
         self.cursor.execute(getTippers)
         tippers = self.cursor.fetchall()
@@ -2686,6 +2826,7 @@ class Window(ctk.CTk):
 
         # Configure the Treeview content
         style.configure("Treeview",
+                        rowheight=30,  # Increase row height
                         foreground='white',  # Set font color
                         font=('Helvetica', int(self.team_button_font_size*1.4)),
                         background='#0e1718',
@@ -2964,12 +3105,16 @@ class Window(ctk.CTk):
         if self.updated_data.get("finalMatches") != None:
             del self.updated_data["finalMatches"]
             
-        if selected_value == 2:
+        if selected_value == 1:
+            self.active_match = -1
+            self.teams_playing = [None, None]
+
+        elif selected_value == 2:
             self.cursor.execute("SELECT COUNT(*) FROM matchData")
             match_count = self.cursor.fetchone()[0]
             self.save_games_played_in_db(match_count)
             
-        self.reload_spiel_button_command()
+        self.reload_spiel_button_command(True)
         self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
         self.updated_data.update({"finalMatches": get_data_for_website(6)})
         
@@ -3158,7 +3303,7 @@ class Window(ctk.CTk):
         selected_value = self.there_is_an_ko_phase.get()
         saveModeInDB = """
         UPDATE settingsData
-        SET thereIsAnKoPhase = ?
+        SET thereAreKOMatches = ?
         WHERE id = 1
         """
         self.settingscursor.execute(saveModeInDB, (selected_value,))
@@ -4214,7 +4359,7 @@ if platform.system() != 'Windows':
         os.environ['DISPLAY']
         os.environ['DISPLAY'] = ":1"
 
-start_server_and_ssh = True
+start_server_and_ssh = False
 
 db_path = "data/data.db"
 stored_data = {}
