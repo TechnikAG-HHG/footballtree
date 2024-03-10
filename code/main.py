@@ -4031,11 +4031,16 @@ def get_data_for_website(which_data=-1):
                 for matchId in all_matches:
                     statistics = tipping_statistics.get(matchId, (None, None, None, None))
                     combined_data.append(list(all_matches[matchId]) + list([statistics]))
+
+                tkapp.cache_vars["getmatches_changed_using_var"] = False
+
+                tkapp.cache["Matches"] = combined_data
+
                 return combined_data
             
             else:
                 return tkapp.cache.get("Matches")
-        except:
+        except OSError:
             return []
     
     elif which_data == 5:
@@ -4633,43 +4638,31 @@ def update_data():
     timeatstart = time.time()
     
     last_data_update = request.headers.get('Last-Data-Update', 0)
-    #logging.debug("last_data_update", last_data_update)
     
-    updated_data = tkapp.updated_data
+    updated_data = tkapp.updated_data.copy()  # Create a copy to avoid modifying the original data
     
-    
-    if updated_data != {}:
-        
-        #logging.debug("updated_data)  ", updated_data, "last_data_update", last_data_update, "should be updated")
-        #logging.debug(updated_data.keys())
-        #logging.debug(updated_data.values())
+    if updated_data:
+        keys_to_remove = []
         for key, value in updated_data.items():
             for key2, value2 in stored_data.items():
                 if key in value2.keys():
-                    stored_data.pop(key2)
-                    break
+                    keys_to_remove.append(key2)
+                    
+        for key in keys_to_remove:
+            stored_data.pop(key)
             
-            stored_data.update({time.time()-3:{key:value}})
-            #logging.debug("stored_data", stored_data)
+        for key, value in updated_data.items():
+            stored_data.update({timeatstart:{key:value}})
+            timeatstart += 1  # Ensure unique keys for each update
         
-        updated_data.update({"LastUpdate": timeatstart})
-        
-    for key, value in stored_data.items():
-        #logging.debug("magucken")
-        if key >= float(last_data_update):
-            #logging.debug("key", key, "value", value, "last_data_update", last_data_update, "should be updated")
-            updated_data.update(value)
-            updated_data.update({"LastUpdate": timeatstart})
-            #logging.debug("updated_data", updated_data)
-            
+        updated_data["LastUpdate"] = timeatstart  # Update 'LastUpdate' key only once
     
-    #logging.debug("stored_data", stored_data, "updated_data", updated_data, "last_data_update", last_data_update)
-        
-    #logging.debug("updated_data", updated_data)
-
+    for key, value in stored_data.items():
+        if key >= float(last_data_update):
+            updated_data.update(value)
+    
     tkapp.delete_updated_data()
     
-    #updated_data = {'Players': {"Player1":"Erik Van Doof","Player2":"Felix Schweigmann"}}  # You can modify this data as needed
     return jsonify(updated_data)
 
 
