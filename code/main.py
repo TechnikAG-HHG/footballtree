@@ -101,6 +101,7 @@ class Window(ctk.CTk):
             "getfinalmatches_changed_using_var": True,
             "getteams_changed_using_var": True,
             "getbestscorer_changed_using_var": True,
+            "getkomatches_changed_using_var": True,
         }
 
         # Get the screen size
@@ -1972,15 +1973,16 @@ class Window(ctk.CTk):
                 if match_count > 0:
                     self.reload_spiel_button_command()
                 
+                self.updated_data.update({"activeMatchNumber": -1})
                 try:
                 # Create an red label on the frame to show that no match is active
+
                     no_match_active_label = ctk.CTkLabel(frame, text="No Match Active", font=("Helvetica", self.team_button_font_size * 2, "bold"), fg_color="red")
                     no_match_active_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
                     start_button = ctk.CTkButton(self.frame, text="Start", command=lambda : self.start_match_in_first_game_in_group_phase(), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), height=self.team_button_height)
                     start_button.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
 
-                    self.updated_data.update({"activeMatchNumber": -1})
                 except:
                     pass
                 
@@ -2073,6 +2075,8 @@ class Window(ctk.CTk):
         previous_match_button.pack(pady=10, padx=10, side=tk.LEFT, anchor=tk.SW)
 
         self.updated_data.update({"activeMatchNumber": get_data_for_website(5)})
+        self.cache_vars["getkomatches_changed_using_var"] = True
+        self.updated_data.update({"KOMatches": get_data_for_website(8)})
 
         self.save_teams_playing_and_active_match()
 
@@ -2082,7 +2086,7 @@ class Window(ctk.CTk):
             values_list = self.get_values_list_mode1(self.calculate_matches())
             self.on_match_select(values_list[0], self.calculate_matches())
             self.manual_select_active = False
-            self.reload_spiel_button_command(True)
+            self.show_frame(self.SPIEL_frame) # Fix for player doubleing
         else:
             logging.error("The active mode is not 1")
 
@@ -3925,10 +3929,12 @@ def get_data_for_website(which_data=-1):
                 for matchId, data in grouped_data.items():
                     team1Goals = sorted(data['team1Goals'])
                     team2Goals = sorted(data['team2Goals'])
-                    median_team1Goals = team1Goals[len(team1Goals) // 2]
-                    median_team2Goals = team2Goals[len(team2Goals) // 2]
-                    percent_team1Wins = sum(1 for goal in team1Goals if goal > median_team2Goals) / len(team1Goals) * 100 if median_team1Goals != median_team2Goals else 50
-                    percent_team2Wins = sum(1 for goal in team2Goals if goal > median_team1Goals) / len(team2Goals) * 100 if median_team1Goals != median_team2Goals else 50
+                    median_team1Goals = team1Goals[len(team1Goals) / 2]
+                    median_team2Goals = team2Goals[len(team2Goals) / 2]
+                    medianRounded_team1Goals = round(median_team1Goals, 2)
+                    medianRounded_team2Goals = round(median_team2Goals, 2)
+                    percent_team1Wins = sum(1 for goal in team1Goals if goal > median_team2Goals) / len(team1Goals) * 100 if medianRounded_team1Goals != medianRounded_team2Goals else 50
+                    percent_team2Wins = sum(1 for goal in team2Goals if goal > median_team1Goals) / len(team2Goals) * 100 if medianRounded_team2Goals != medianRounded_team1Goals else 50
                     tipping_statistics[matchId] = (median_team1Goals, median_team2Goals, percent_team1Wins, percent_team2Wins)
 
                 # Combine both datasets
@@ -4025,10 +4031,12 @@ def get_data_for_website(which_data=-1):
                         continue
                     team1Goals = sorted(data['team1Goals'])
                     team2Goals = sorted(data['team2Goals'])
-                    median_team1Goals = team1Goals[len(team1Goals) // 2]
-                    median_team2Goals = team2Goals[len(team2Goals) // 2]
-                    percent_team1Wins = sum(1 for goal in team1Goals if goal > median_team2Goals) / len(team1Goals) * 100 if median_team1Goals != median_team2Goals else 50
-                    percent_team2Wins = sum(1 for goal in team2Goals if goal > median_team1Goals) / len(team2Goals) * 100 if median_team1Goals != median_team2Goals else 50
+                    median_team1Goals = team1Goals[len(team1Goals) / 2]
+                    median_team2Goals = team2Goals[len(team2Goals) / 2]
+                    medianRounded_team1Goals = round(median_team1Goals, 2)
+                    medianRounded_team2Goals = round(median_team2Goals, 2)
+                    percent_team1Wins = sum(1 for goal in team1Goals if goal > median_team2Goals) / len(team1Goals) * 100 if medianRounded_team1Goals != medianRounded_team2Goals else 50
+                    percent_team2Wins = sum(1 for goal in team2Goals if goal > median_team1Goals) / len(team2Goals) * 100 if medianRounded_team2Goals != medianRounded_team1Goals else 50
                     print(f"matchId {matchId}, median_team1Goals {median_team1Goals}, median_team2Goals {median_team2Goals}, percent_team1Wins {percent_team1Wins}, percent_team2Wins {percent_team2Wins}")
                     tipping_statistics[matchId] = (median_team1Goals, median_team2Goals, percent_team1Wins, percent_team2Wins)
 
@@ -4071,10 +4079,13 @@ def get_data_for_website(which_data=-1):
         return [int(a), int(b)]
     
     elif which_data == 8:
-        if tkapp.cache_vars.get("getkomatches_changed_using_var") == True or True:
+        if tkapp.cache_vars.get("getkomatches_changed_using_var") == True:
 
             if tkapp.there_is_an_ko_phase.get() == 0:
-                return 'None'
+                return None
+            
+            #if tkapp.active_mode.get() == 1 and tkapp.pause_time_before_ko.get() == 0:
+            #    return None 
             
             connection = sqlite3.connect(db_path)
             cursor = connection.cursor()
@@ -4120,12 +4131,16 @@ def get_data_for_website(which_data=-1):
             tipping_statistics = {}
 
             for matchId, data in grouped_data.items():
+                matchId *= -1
+                matchId = matchId - 100
                 team1Goals = sorted(data['team1Goals'])
                 team2Goals = sorted(data['team2Goals'])
-                median_team1Goals = team1Goals[len(team1Goals) // 2]
-                median_team2Goals = team2Goals[len(team2Goals) // 2]
-                percent_team1Wins = sum(1 for goal in team1Goals if goal > median_team2Goals) / len(team1Goals) * 100 if median_team1Goals != median_team2Goals else 50
-                percent_team2Wins = sum(1 for goal in team2Goals if goal > median_team1Goals) / len(team2Goals) * 100 if median_team1Goals != median_team2Goals else 50
+                median_team1Goals = team1Goals[len(team1Goals) / 2]
+                median_team2Goals = team2Goals[len(team2Goals) / 2]
+                medianRounded_team1Goals = round(median_team1Goals, 2)
+                medianRounded_team2Goals = round(median_team2Goals, 2)
+                percent_team1Wins = sum(1 for goal in team1Goals if goal > median_team2Goals) / len(team1Goals) * 100 if medianRounded_team1Goals != medianRounded_team2Goals else 50
+                percent_team2Wins = sum(1 for goal in team2Goals if goal > median_team1Goals) / len(team2Goals) * 100 if medianRounded_team1Goals != medianRounded_team2Goals else 50
                 tipping_statistics[matchId] = (median_team1Goals, median_team2Goals, percent_team1Wins, percent_team2Wins)
 
             combined_data = []
@@ -4214,7 +4229,7 @@ def get_initial_data(template_name, base_url=None):
         "ThereIsAnKOPhase": tkapp.there_is_an_ko_phase.get(),
         "KOMatches": get_data_for_website(8),
     }
-    print("initial_data", initial_data)
+    #print("initial_data", initial_data)
     return make_response(render_template(template_name, initial_data=initial_data, base_url=base_url))
 
 
