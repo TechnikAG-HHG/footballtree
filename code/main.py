@@ -646,10 +646,14 @@ class Window(ctk.CTk):
         with sqlite3.connect(backup_path) as backup_conn:
             connection.backup(backup_conn)
             backup_conn.commit()
+            backup_conn.close()
         logging.debug("Backup created")
+
+
 
         connection.commit()
 
+        connection.close()
 
         return backup_path
 
@@ -3805,6 +3809,8 @@ def get_data_for_website(which_data=-1):
             else:
                 return tkapp.cache.get("Games")
         except:
+            cursor.close()
+            connection.close()
             return []
     
     elif which_data == 3:
@@ -3860,6 +3866,8 @@ def get_data_for_website(which_data=-1):
                 
                 return points_in_order
             else:
+                cursor.close()
+                connection.close()
                 return tkapp.cache.get("Points")
         except:
             return []
@@ -3930,6 +3938,8 @@ def get_data_for_website(which_data=-1):
             else:
                 return tkapp.cache.get("Matches")
         except:
+            cursor.close()
+            connection.close()
             return []
     
     elif which_data == 5:
