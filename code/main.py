@@ -4031,8 +4031,8 @@ def get_data_for_website(which_data=-1):
                 for matchId, data in grouped_data.items():
                     team1Goals = sorted(data['team1Goals'])
                     team2Goals = sorted(data['team2Goals'])
-                    median_team1Goals = team1Goals[len(team1Goals) / 2]
-                    median_team2Goals = team2Goals[len(team2Goals) / 2]
+                    median_team1Goals = team1Goals[len(team1Goals) // 2]
+                    median_team2Goals = team2Goals[len(team2Goals) // 2]
                     medianRounded_team1Goals = round(median_team1Goals, 2)
                     medianRounded_team2Goals = round(median_team2Goals, 2)
                     percent_team1Wins = sum(1 for goal in team1Goals if goal > median_team2Goals) / len(team1Goals) * 100 if medianRounded_team1Goals != medianRounded_team2Goals else 50
@@ -4136,8 +4136,8 @@ def get_data_for_website(which_data=-1):
                         continue
                     team1Goals = sorted(data['team1Goals'])
                     team2Goals = sorted(data['team2Goals'])
-                    median_team1Goals = team1Goals[len(team1Goals) / 2]
-                    median_team2Goals = team2Goals[len(team2Goals) / 2]
+                    median_team1Goals = team1Goals[len(team1Goals) // 2]
+                    median_team2Goals = team2Goals[len(team2Goals) // 2]
                     medianRounded_team1Goals = round(median_team1Goals, 2)
                     medianRounded_team2Goals = round(median_team2Goals, 2)
                     percent_team1Wins = sum(1 for goal in team1Goals if goal > median_team2Goals) / len(team1Goals) * 100 if medianRounded_team1Goals != medianRounded_team2Goals else 50
@@ -4241,8 +4241,8 @@ def get_data_for_website(which_data=-1):
                     matchId = matchId - 100
                     team1Goals = sorted(data['team1Goals'])
                     team2Goals = sorted(data['team2Goals'])
-                    median_team1Goals = team1Goals[len(team1Goals) / 2]
-                    median_team2Goals = team2Goals[len(team2Goals) / 2]
+                    median_team1Goals = team1Goals[len(team1Goals) // 2]
+                    median_team2Goals = team2Goals[len(team2Goals) // 2]
                     medianRounded_team1Goals = round(median_team1Goals, 2)
                     medianRounded_team2Goals = round(median_team2Goals, 2)
                     percent_team1Wins = sum(1 for goal in team1Goals if goal > median_team2Goals) / len(team1Goals) * 100 if medianRounded_team1Goals != medianRounded_team2Goals else 50
@@ -4581,6 +4581,7 @@ def tv_index():
     return get_initial_data("websitetv.html", base_url)
 
 @app.route("/admin")
+@login_is_required
 def admin_index():
     print("entered admin")
     if session.get("google_id"):
