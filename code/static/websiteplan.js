@@ -401,9 +401,22 @@ function generateFullSize(match, i, row) {
     teamsGoalsDiv.className = "teamsGoalsDiv";
     fullSize.appendChild(teamsGoalsDiv);
 
+    var descDiv = document.createElement("div");
+    descDiv.className = "descDiv";
+    teamsGoalsDiv.appendChild(descDiv);
+
+    var description = document.createElement("p");
+    description.textContent = "Tippspielauswertung";
+    description.className = "description";
+    descDiv.appendChild(description);
+
+    var dataDiv = document.createElement("div");
+    dataDiv.className = "dataDiv";
+    teamsGoalsDiv.appendChild(dataDiv);
+
     var team1Div = document.createElement("div");
     team1Div.className = "team1Div";
-    teamsGoalsDiv.appendChild(team1Div);
+    dataDiv.appendChild(team1Div);
 
     var team1 = document.createElement("p");
     team1.textContent = match[0];
@@ -411,18 +424,18 @@ function generateFullSize(match, i, row) {
     team1Div.appendChild(team1);
 
     var tipping1 = document.createElement("p");
-    tipping1.textContent = "Prozentzahl";
+    tipping1.textContent = match[5][2] + "%";
     tipping1.className = "tipping1";
     team1Div.appendChild(tipping1);
 
     var goals = document.createElement("p");
     goals.textContent = match[2] + " : " + match[3];
     goals.className = "goals";
-    teamsGoalsDiv.appendChild(goals);
+    dataDiv.appendChild(goals);
 
     var team2Div = document.createElement("div");
     team2Div.className = "team2Div";
-    teamsGoalsDiv.appendChild(team2Div);
+    dataDiv.appendChild(team2Div);
 
     var team2 = document.createElement("p");
     team2.textContent = match[1];
@@ -430,7 +443,7 @@ function generateFullSize(match, i, row) {
     team2Div.appendChild(team2);
 
     var tipping2 = document.createElement("p");
-    tipping2.textContent = "Prozentzahl";
+    tipping2.textContent = match[5][3] + "%";
     tipping2.className = "tipping2";
     team2Div.appendChild(tipping2);
 }
