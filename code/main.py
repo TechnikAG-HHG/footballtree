@@ -3721,6 +3721,8 @@ class Window(ctk.CTk):
             elif match[2] != 0 and match[3] != 0:
                 self.add_points_for_team_in_db(match[0], 1)
                 self.add_points_for_team_in_db(match[1], 1)
+        
+        self.cache_vars["getpoints_changed_using_active_match"] = -1
                 
         self.updated_data.update({"Points": get_data_for_website(3)})    
        
