@@ -4070,6 +4070,7 @@ def get_data_for_website(which_data=-1):
                 # Calculate median and percentages
                 tipping_statistics = {}
                 for matchId, data in grouped_data.items():
+                    matchId += 1
                     team1Goals = data['team1Goals']
                     team2Goals = data['team2Goals']
                     average_team1Goals = sum(team1Goals) / len(team1Goals) if team1Goals else 0
@@ -4094,7 +4095,7 @@ def get_data_for_website(which_data=-1):
             
             else:
                 return tkapp.cache.get("Matches")
-        except OSError:
+        except:
             return []
     
     elif which_data == 5:
