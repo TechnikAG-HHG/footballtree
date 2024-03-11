@@ -73,6 +73,7 @@ class Window(ctk.CTk):
         self.spiel_um_platz_3 = []
         self.matches = []
         self.tippers_list_frame = None
+        self.media_player_instance_save = None
         
         self.delay_time_label = None
         self.delay_time_save_for_blinking = 0
@@ -3648,11 +3649,16 @@ class Window(ctk.CTk):
             return
         if volume == "":
             volume = self.volume
+
+        if self.media_player_instance_save != None:
+            self.media_player_instance_save.release()
+        
         player = self.media_player_instance.media_player_new()
         media = self.media_player_instance.media_new(file_path)
         player.set_media(media)
         player.audio_set_volume(int(volume.get()))
         player.play()
+        self.media_player_instance_save = player
         #logging.debug("play_mp3", file_path, "volume", volume.get(), "self.volume", self.volume.get(), "player", player,"media", media)
    
         
