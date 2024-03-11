@@ -1969,11 +1969,14 @@ class Window(ctk.CTk):
                 #print("Case 3", "self.active_match", self.active_match, "values_list", values_list)
                 self.active_match = -1
                 self.teams_playing = [None, None]
+
+                self.updated_data.update({"activeMatchNumber": -1})
                 
                 if match_count > 0:
                     self.reload_spiel_button_command()
                 
                 self.updated_data.update({"activeMatchNumber": -1})
+                
                 try:
                 # Create an red label on the frame to show that no match is active
 
@@ -3340,7 +3343,6 @@ class Window(ctk.CTk):
         self.updated_data.update({"KOMatches": get_data_for_website(8)})
 
         
-        
     def on_radio_debug_button_change(self):
         selected_value = self.debug_mode.get()
         saveModeInDB = """
@@ -4676,7 +4678,7 @@ def update_data():
             updated_data.update(value)
     
     tkapp.delete_updated_data()
-    
+
     return jsonify(updated_data)
 
 
