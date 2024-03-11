@@ -1132,12 +1132,18 @@ class Window(ctk.CTk):
         SPIEL_button.pack(pady=10, side=tk.BOTTOM, anchor=tk.S, padx=10) 
 
         if self.pause_mode.get() == 1:
-            pause_mode_active_label = ctk.CTkLabel(manual_frame, text="Pause Mode Active", font=("Helvetica", button_font_size * 1.5, "bold"), fg_color="red")
-            pause_mode_active_label.place(relx=0.7, rely=0.4)
+            #pause_mode_active_label = ctk.CTkLabel(manual_frame, text="Pause Mode Active", font=("Helvetica", button_font_size * 1.5, "bold"), fg_color="red")
+            #pause_mode_active_label.place(relx=0.7, rely=0.4)
+            #Replace the label with a button
+            self.pause_mode_active_button = ctk.CTkButton(manual_frame, text="Pause Mode Active", command=self.on_pause_button_change, fg_color="red", hover_color="#801818", font=("Helvetica", button_font_size * 1.5, "bold"), height=button_height)
+            self.pause_mode_active_button.place(relx=0.7, rely=0.3)
         
         if self.best_scorer_active.get() == 1:
-            best_scorer_active_label = ctk.CTkLabel(manual_frame, text="Best Scorer Active", font=("Helvetica", button_font_size * 1.5, "bold"), fg_color="red")
-            best_scorer_active_label.place(relx=0.7, rely=0.2)
+            #best_scorer_active_label = ctk.CTkLabel(manual_frame, text="Best Scorer Active", font=("Helvetica", button_font_size * 1.5, "bold"), fg_color="red")
+            #best_scorer_active_label.place(relx=0.7, rely=0.1)
+            #Replace the label with a button
+            self.best_scorer_active_button = ctk.CTkButton(manual_frame, text="Best Scorer Active", command=self.on_best_scorer_button_change, fg_color="red", hover_color="#801818", font=("Helvetica", button_font_size * 1.5, "bold"), height=button_height)
+            self.best_scorer_active_button.place(relx=0.7, rely=0.1)
         
         if self.there_is_an_ko_phase.get() == 1:
             ko_phase_active_label = ctk.CTkLabel(manual_frame, text="KO Phase Active", font=("Helvetica", button_font_size * 1.5, "bold"), text_color="green")
@@ -3534,6 +3540,35 @@ class Window(ctk.CTk):
         self.settingsconnection.commit()
         
         self.updated_data.update({"thereIsAnKoPhase": selected_value})
+
+
+    def on_pause_button_change(self):
+        #######################################
+        #This is not the Pause Switch Function!
+        #######################################
+        result = tkinter.messagebox.askyesno("Pause Manager", "Do you want to disable the pause mode?")
+        if result:
+            self.pause_mode.set(0)
+            self.on_pause_switch_change()
+            button = self.pause_mode_active_button
+            button.pack_forget()
+            button.destroy()
+            return
+        else:
+            return
+        
+    
+    def on_best_scorer_button_change(self):
+        result = tkinter.messagebox.askyesno("Best Scorer Manager", "Do you want to disable the best scorer mode?")
+        if result:
+            self.best_scorer_active.set(0)
+            self.on_best_scorer_active_switch_change()
+            button = self.best_scorer_active_button
+            button.pack_forget()
+            button.destroy()
+            return
+        else:
+            return
 
 
     ##############################################################################################
