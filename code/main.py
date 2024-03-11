@@ -4527,34 +4527,33 @@ def send_tipping_data():
     elif team1_goals == "" or team2_goals == "" or team1_goals == None or team2_goals == None:
         return "Please enter a valid number", 400
     
-    connection = sqlite3.connect(db_path)
-    cursor = connection.cursor()
     
     if team1_goals == "" or team2_goals == "" or team1_goals == None or team2_goals == None:
-        cursor.close()
-        connection.close()
         return "Please enter a valid number", 400
     
     try:
         team1_goals = int(team1_goals)
         team2_goals = int(team2_goals)
     except:
-        cursor.close()
-        connection.close()
         return "Please enter a valid number", 400
+    
+    if team1_goals >= 25 or team2_goals >= 25:
+        return "Please enter a valid number, too high", 400
     
     if match_id >= 0:
         if match_id <= tkapp.active_match:
-            cursor.close()
-            connection.close()
             return "Match already started or finished", 400
-    #elif tkapp.active_match != -1 and tkapp.active_mode.get() == 2:
-        #match_id = (match_id * -1) - 2
-        #if match_id <= tkapp.active_match and False:
-        #    cursor.close()
-        #    connection.close()
-        #    return "Match already started or finished", 400
+    elif tkapp.active_match != -1 and tkapp.active_mode.get() == 2:
+        match_id = (match_id * -1) - 2
+        if match_id <= tkapp.active_match:
+            return "Match already started or finished", 400
+    elif tkapp.active_match != -1 and tkapp.active_mode.get() == 3:
+        match_id = (match_id * -1) - 100
+        if match_id <= tkapp.active_match:
+            return "Match already started or finished", 400
             
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
     
     cursor.execute("SELECT * FROM tippingData WHERE googleId = ? AND matchId = ?", (google_id, match_id))
     result = cursor.fetchone()
