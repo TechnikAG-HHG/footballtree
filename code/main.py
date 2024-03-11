@@ -3026,9 +3026,10 @@ class Window(ctk.CTk):
         self.calculate_points_for_tippers_using_db()
 
         getTippers = """
-        SELECT t.googleId, u.userName, t.points as total_points FROM tippingData t, userData u
+        SELECT t.googleId, u.userName, MAX(t.points) as total_points FROM tippingData t, userData u
         WHERE t.googleId = u.googleId
-        LIMIT 1
+        GROUP BY t.googleId, u.userName
+        ORDER BY total_points DESC, u.userName ASC
         """
         self.cursor.execute(getTippers)
         tippers = self.cursor.fetchall()
@@ -3106,12 +3107,13 @@ class Window(ctk.CTk):
 
             goal_difference = team1Goals - team2Goals
             team1won = team1Goals > team2Goals
+            team2won = team1Goals < team2Goals
             
             if tipper_team1Goals == team1Goals and tipper_team2Goals == team2Goals:
                 points = 4
             elif (tipper_team1Goals - tipper_team2Goals) == goal_difference:
                 points = 3
-            elif (tipper_team1Goals > tipper_team2Goals and team1won) or (tipper_team1Goals < tipper_team2Goals and not team1won):
+            elif (tipper_team1Goals > tipper_team2Goals and team1won) or (tipper_team1Goals < tipper_team2Goals and team2won):
                 points = 2    
             else:
                 points = 0
