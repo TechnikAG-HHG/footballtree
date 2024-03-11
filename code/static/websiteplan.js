@@ -134,7 +134,7 @@ function generateTableGroup(matches) {
     });
 }
 
-function generatePauseTime(time) {
+function generatePauseTime(time, pauses=) {
     if (time == 0 || time == null || time == "0") {
         let pauseTimeDiv = document.getElementById("pauseTime");
         if (pauseTimeDiv) {
@@ -181,7 +181,6 @@ function generatePauseTime(time) {
         pauseTimeDiv.appendChild(pauseTimeText);
         pauseTimeDiv.appendChild(pauseTimeEnd);
         pauseTimeDiv.appendChild(pauseTimeElement);
-        tablesContainer.appendChild(pauseTimeDiv);
     }
 
     finalMatchesTime = new Date(
