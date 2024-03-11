@@ -112,12 +112,12 @@ function generateTables() {
     updateTables(data);
 }
 
-function updateData() {
+async function updateData() {
     // Include the last data version in the request headers
     var headers = new Headers();
     headers.append("Last-Data-Update", data["LastUpdate"]);
 
-    fetch("/update_data", {
+    await fetch("/update_data", {
         headers: headers,
     })
         .then((response) => response.json())
@@ -128,15 +128,13 @@ function updateData() {
                     data[key] = updatedData[key];
                 }
             }
-            // Wait 500ms before calling updateTables
-            setTimeout(function () {
-                updateTableSize();
-            }, 500);
         })
         .catch((error) => console.error("Error fetching data:", error));
 
     document.title = data["websiteTitle"];
     document.getElementById("websiteTitle").textContent = data["websiteTitle"];
+
+    updateTableSize();
 }
 
 function updateTables(data) {
