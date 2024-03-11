@@ -624,6 +624,10 @@ class Window(ctk.CTk):
             self.on_pause_switch_change()
 
             self.reload_requried_on_click_SPIEL = True
+
+            self.cache_vars["getteams_changed_using_var"] = True
+            self.cache_vars["getmatches_changed_using_var"] = True
+            self.cache_vars["getfinalmatches_changed_using_var"] = True
             
             self.updated_data.update({"Teams": get_data_for_website(0)})
             self.updated_data.update({"Matches": get_data_for_website(4)})
@@ -4694,8 +4698,8 @@ def update_data():
     
     if updated_data:
         keys_to_remove = []
-        print("updated_data", updated_data)
-        print("stored_data", stored_data)
+        #print("updated_data", updated_data)
+        #print("stored_data", stored_data)
         for key, value in updated_data.items():
             for key2, value2 in stored_data.items():
                 if key in value2.keys():
