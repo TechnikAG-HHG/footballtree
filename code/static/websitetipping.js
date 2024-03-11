@@ -313,9 +313,7 @@ function voteForMatch(match) {
     goals1.placeholder = "Tore";
     goals1.min = "0";
     goals1.addEventListener("input", function () {
-        if (goals1.value < 0) {
-            goals1.value = 0;
-        }
+        goals1.value = goals1.value.replace(/\D/g, ""); // Remove non-numeric characters
     });
     if (tippingData["tips"] != null) {
         if (tippingData["tips"][matchNumber] != null) {
@@ -349,9 +347,7 @@ function voteForMatch(match) {
     goals2.placeholder = "Tore";
     goals2.min = "0";
     goals2.addEventListener("input", function () {
-        if (goals2.value < 0) {
-            goals2.value = 0;
-        }
+        goals2.value = goals2.value.replace(/\D/g, ""); // Remove non-numeric characters
     });
     if (tippingData["tips"] != null) {
         if (tippingData["tips"][matchNumber] != null) {
@@ -430,6 +426,12 @@ function handleSubmit(event) {
             team2Goals: goals2,
         }),
     })
+        .then((response) => {
+            if (response.status === 400) {
+                throw new Error("Bad Request");
+            }
+            return response.json();
+        })
         .then((data) => {
             console.log("Success:", data);
             updateData();
@@ -439,7 +441,7 @@ function handleSubmit(event) {
         })
         .catch((error) => {
             console.error("Error:", error);
-            generateErrorMessage("Fehler, bite versuche es erneut!");
+            generateErrorMessage("Fehler, bitte versuche es erneut!");
         });
 }
 
