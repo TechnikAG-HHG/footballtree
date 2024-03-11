@@ -11,7 +11,7 @@ def maintain_connection():
                 '-i',
                 r'code/new/mykey',
                 '-o',
-                'ServerAliveInterval=600',
+                'ServerAliveInterval=6',
                 '-o',
                 'TCPKeepAlive=no',
                 'serveo.net'
@@ -28,7 +28,7 @@ def maintain_connection():
                         '-i',
                         r'code/new/mykey',
                         '-o',
-                        'ServerAliveInterval=600',
+                        'ServerAliveInterval=6',
                         '-o',
                         'TCPKeepAlive=no',
                         'serveo.net'

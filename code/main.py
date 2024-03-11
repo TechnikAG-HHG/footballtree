@@ -625,9 +625,17 @@ class Window(ctk.CTk):
 
             self.reload_requried_on_click_SPIEL = True
 
-            self.cache_vars["getteams_changed_using_var"] = True
-            self.cache_vars["getmatches_changed_using_var"] = True
-            self.cache_vars["getfinalmatches_changed_using_var"] = True
+            self.cache_vars = {
+                "points_changed_using_active_match": -1,
+                "getmatches_changed_using_var": True,
+                "getgames_changed_using_var": True,
+                "getgoals_changed_using_var": True,
+                "getteams_changed_using_var": True,
+                "getfinalmatches_changed_using_var": True,
+                "getteams_changed_using_var": True,
+                "getbestscorer_changed_using_var": True,
+                "getkomatches_changed_using_var": True,
+            }
             
             self.updated_data.update({"Teams": get_data_for_website(0)})
             self.updated_data.update({"Matches": get_data_for_website(4)})
@@ -1191,6 +1199,7 @@ class Window(ctk.CTk):
                     if self.active_mode.get() == 1:
                         start_button = ctk.CTkButton(self.SPIEL_frame, text="Start", command=lambda : self.start_match_in_first_game_in_group_phase(), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), height=self.team_button_height)
                         start_button.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
+                        self.updated_data.update({"activeMatchNumber": -1})
                     
                     return
                 
@@ -1206,6 +1215,7 @@ class Window(ctk.CTk):
                 if self.active_mode.get() == 1:
                     start_button = ctk.CTkButton(self.SPIEL_frame, text="Start", command=lambda : self.start_match_in_first_game_in_group_phase(), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), height=self.team_button_height)
                     start_button.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
+                    self.updated_data.update({"activeMatchNumber": -1})
 
                 break
                 
@@ -1995,6 +2005,7 @@ class Window(ctk.CTk):
 
                     start_button = ctk.CTkButton(self.frame, text="Start", command=lambda : self.start_match_in_first_game_in_group_phase(), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), height=self.team_button_height)
                     start_button.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
+                    self.updated_data.update({"activeMatchNumber": -1})
 
                 except:
                     pass
@@ -3664,9 +3675,9 @@ class Window(ctk.CTk):
 
         teams = initial_data["Teams"][:]  # Create a copy of the teams array
         
-        teams.sort()
+        #teams.sort()
         
-        #logging.debug("calculate_matches: teams", teams)
+        logging.debug(f"calculate_matches: teams {teams}")
 
         # If the number of teams is odd, add a "dummy" team
         #if len(teams) % 2 != 0:
@@ -4557,6 +4568,9 @@ def send_tipping_data():
     
     cursor.close()
     connection.close()
+
+    tkapp.cache_vars["getmatches_changed_using_var"] = True
+    tkapp.updated_data.update({"Matches": get_data_for_website(4)})
     
     return "Data successfully updated or inserted", 200
 
