@@ -312,8 +312,12 @@ function voteForMatch(match) {
     goals1.id = "goals1";
     goals1.placeholder = "Tore";
     goals1.min = "0";
+    goals1.max = "25";
     goals1.addEventListener("input", function () {
         goals1.value = goals1.value.replace(/\D/g, ""); // Remove non-numeric characters
+        if (goals1.value > 25) {
+            goals1.value = 25;
+        }
     });
     if (tippingData["tips"] != null) {
         if (tippingData["tips"][matchNumber] != null) {
@@ -346,8 +350,12 @@ function voteForMatch(match) {
     goals2.id = "goals2";
     goals2.placeholder = "Tore";
     goals2.min = "0";
+    goals2.max = "25";
     goals2.addEventListener("input", function () {
         goals2.value = goals2.value.replace(/\D/g, ""); // Remove non-numeric characters
+        if (goals2.value > 25) {
+            goals2.value = 25;
+        }
     });
     if (tippingData["tips"] != null) {
         if (tippingData["tips"][matchNumber] != null) {
@@ -360,15 +368,7 @@ function voteForMatch(match) {
     }
     team2Div.appendChild(goals2);
 
-    let submitButton = document.createElement("button");
-    submitButton.textContent = "Wette abschicken";
-    submitButton.id = "submit-button";
-    if (matchPlayed) {
-        submitButton.disabled = true;
-        submitButton.classList.add("disabled");
-    }
-    submitButton.addEventListener("click", handleSubmit);
-    voteContainer.appendChild(submitButton);
+    generateButton(matchPlayed, voteContainer);
 
     let message = document.createElement("p");
     message.textContent = "";
@@ -380,8 +380,7 @@ function voteForMatch(match) {
     container.appendChild(voteContainer);
 }
 
-function handleSubmit(event) {
-    event.preventDefault();
+function handleSubmit() {
     let matchNumber = -1;
     var goals1 = document.getElementById("goals1").value;
     var goals2 = document.getElementById("goals2").value;
@@ -430,7 +429,7 @@ function handleSubmit(event) {
             if (response.status === 400) {
                 throw new Error("Bad Request");
             }
-            return response.json();
+            return response.text();
         })
         .then((data) => {
             console.log("Success:", data);
@@ -476,6 +475,33 @@ function generateErrorMessage(message) {
 function generateSuccessMessage(message) {
     showMessage(message, "success-message");
 }
+
+let lastClicked = null;
+const COOLDOWN_TIME = 2000; // 10 seconds
+function generateButton(matchPlayed, voteContainer) {
+    let button = document.createElement("button");
+    button.innerText = "Wette abschicken";
+    button.id = "submit-button";
+    if (matchPlayed) {
+        button.disabled = true;
+        button.classList.add("disabled");
+    } else {
+        button.onclick = function () {
+            let now = Date.now();
+            if (lastClicked && now - lastClicked < COOLDOWN_TIME) {
+                generateErrorMessage(
+                    "Bitte warte einen Moment, bevor du erneut klickst!",
+                    "error-message"
+                );
+            } else {
+                lastClicked = now;
+                handleSubmit();
+            }
+        };
+    }
+    voteContainer.appendChild(button);
+}
+
 document.getElementById("returnButton").addEventListener("click", function () {
     redirectTo("/");
 });
