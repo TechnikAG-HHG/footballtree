@@ -109,8 +109,6 @@ function generateTables() {
         tablesContainer.appendChild(table);
     }
 
-    console.log("Initial data:", data);
-
     updateTables(data);
 }
 

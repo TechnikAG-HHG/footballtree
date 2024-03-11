@@ -217,7 +217,7 @@ function KOMatchTable() {
         return; // Add return statement here
     }
 
-    if ("KOMatches" in data) {
+    if ("KOMatches" in data && data["KOMatches"] != null) {
         var tablesContainer = document.getElementById("tablesContainer");
 
         var table = tablesContainer.querySelector(".tableKOMatches");
