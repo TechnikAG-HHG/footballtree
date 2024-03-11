@@ -4694,6 +4694,8 @@ def update_data():
     
     if updated_data:
         keys_to_remove = []
+        print("updated_data", updated_data)
+        print("stored_data", stored_data)
         for key, value in updated_data.items():
             for key2, value2 in stored_data.items():
                 if key in value2.keys():
@@ -4702,11 +4704,12 @@ def update_data():
         for key in keys_to_remove:
             stored_data.pop(key)
             
+            
         for key, value in updated_data.items():
             stored_data.update({timeatstart:{key:value}})
             timeatstart += 1  # Ensure unique keys for each update
         
-        updated_data["LastUpdate"] = timeatstart  # Update 'LastUpdate' key only once
+    updated_data["LastUpdate"] = timeatstart  # Update 'LastUpdate' key only once
     
     for key, value in stored_data.items():
         if key >= float(last_data_update):
