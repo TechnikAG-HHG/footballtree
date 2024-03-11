@@ -7,7 +7,7 @@ async function updateData() {
     var headers = new Headers();
     headers.append("Last-Data-Update", data["LastUpdate"]);
 
-    fetch("/update_data", {
+    await fetch("/update_data", {
         headers: headers,
     })
         .then((response) => response.json())
