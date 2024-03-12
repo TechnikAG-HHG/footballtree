@@ -3225,11 +3225,33 @@ class Window(ctk.CTk):
         radio_button_2 = ctk.CTkRadioButton(phase_switcher_frame, text="Final Phase", variable=self.active_mode, value=2, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_radio_button_change)
         radio_button_2.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
         
-        self.pause_switcher_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
-        self.pause_switcher_frame.pack(pady=7, anchor=tk.NW, side=tk.TOP, padx=5)
+        ############################################################################################################
+
+        #self.pause_switcher_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
+        #self.pause_switcher_frame.pack(pady=7, anchor=tk.NW, side=tk.TOP, padx=5)
         
-        self.pause_switch = ctk.CTkSwitch(self.pause_switcher_frame, text="Pause", variable=self.pause_mode, command=self.on_pause_switch_change, font=("Helvetica", self.team_button_font_size*1.4, "bold"))
-        self.pause_switch.pack(side=tk.TOP, pady=2, padx=0, anchor=tk.N)
+        #self.pause_switch = ctk.CTkSwitch(self.pause_switcher_frame, text="Pause", variable=self.pause_mode, command=self.on_pause_switch_change, font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        #self.pause_switch.pack(side=tk.TOP, pady=2, padx=0, anchor=tk.N)
+
+        pause_radio_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
+        pause_radio_frame.pack(pady=7, anchor=tk.NW, side=tk.TOP, padx=5)
+
+        pause_label = ctk.CTkLabel(pause_radio_frame, text="Pause Modes Switcher", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        pause_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
+
+        pause_radio_button_1 = ctk.CTkRadioButton(pause_radio_frame, text="Pause Off", variable=self.pause_mode, value=0, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
+        pause_radio_button_1.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
+
+        pause_radio_button_2 = ctk.CTkRadioButton(pause_radio_frame, text="Pause Before The Final Match", variable=self.pause_mode, value=1, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
+        pause_radio_button_2.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
+
+        pause_radio_button_3 = ctk.CTkRadioButton(pause_radio_frame, text="Pause Before Final Matches", variable=self.pause_mode, value=2, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
+        pause_radio_button_3.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
+
+        pause_radio_button_4 = ctk.CTkRadioButton(pause_radio_frame, text="Pause Before KO Matches", variable=self.pause_mode, value=3, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
+        pause_radio_button_4.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
+
+        ############################################################################################################
         
         self.there_is_an_ko_phase_switcher_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
         self.there_is_an_ko_phase_switcher_frame.pack(pady=7, anchor=tk.NW, side=tk.TOP, padx=5)
@@ -4445,6 +4467,13 @@ def get_data_for_website(which_data=-1):
                 return tkapp.cache.get("KOMatches")
         except:
             return []
+    
+    elif which_data == 9:
+        pauseMode = -1
+
+        if tkapp.pause_mode.get() != 0:
+            pauseMode = tkapp.pause_mode.get() + 1
+
         
         
     else:
@@ -4511,7 +4540,7 @@ def get_initial_data(template_name, base_url=None):
         "startTime": get_data_for_website(7),
         "websiteTitle": tkapp.website_title.get(),
         "LastUpdate": 0,
-        "pauseMode": tkapp.pause_mode.get(),
+        "pauseMode": tkapp.pause_mode.get(), 
         "timeIntervalFinalMatch": tkapp.time_interval_for_only_the_final_match.get().replace("m", ""),
         "bestScorerActive": tkapp.best_scorer_active.get(),
         "KOMatches": get_data_for_website(8),
