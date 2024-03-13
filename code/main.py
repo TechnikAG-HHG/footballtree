@@ -367,7 +367,7 @@ class Window(ctk.CTk):
         self.time_intervalKO = tk.StringVar(value="10m")
         self.time_pause_before_FM = tk.StringVar(value="0m") 
         self.website_title = tk.StringVar(value="HHG-Fußballturnier")
-        self.pause_mode = tk.BooleanVar(value=False)
+        self.pause_mode = tk.IntVar(value=0)
         self.time_interval_for_only_the_final_match = tk.StringVar(value="10m")
         self.best_scorer_active = tk.BooleanVar(value=False)
         self.there_is_an_ko_phase = tk.BooleanVar(value=False)
@@ -2016,11 +2016,11 @@ class Window(ctk.CTk):
                 try:
                 # Create an red label on the frame to show that no match is active
 
-                    no_match_active_label = ctk.CTkLabel(frame, text="No Match Active", font=("Helvetica", self.team_button_font_size * 2, "bold"), fg_color="red")
-                    no_match_active_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+                    #no_match_active_label = ctk.CTkLabel(frame, text="No Match Active", font=("Helvetica", self.team_button_font_size * 2, "bold"), fg_color="red")
+                    #no_match_active_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
-                    start_button = ctk.CTkButton(self.frame, text="Start", command=lambda : self.start_match_in_first_game_in_group_phase(), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), height=self.team_button_height)
-                    start_button.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
+                    #start_button = ctk.CTkButton(self.frame, text="Start", command=lambda : self.start_match_in_first_game_in_group_phase(), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), height=self.team_button_height)
+                    #start_button.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
                     self.updated_data.update({"activeMatchNumber": -1})
 
                 except:
@@ -2177,7 +2177,14 @@ class Window(ctk.CTk):
                     pass
             else:
                 #only send nones in the same structure
-                self.updated_data.update({"finalMatches": [[None, None, [None, None]], [None, None, [None, None]], [None, None, [None, None]], [None, None, [None, None]]]})
+                self.updated_data.update({
+                    "finalMatches": [
+                        [None, None, None, None, [None, None, None, None]],
+                        [None, None, None, None, [None, None, None, None]],
+                        [None, None, None, None, [None, None, None, None]],
+                        [None, None, None, None, [None, None, None, None]]
+                    ]
+                })
         return values_list, self.active_match
     
 
@@ -3239,16 +3246,16 @@ class Window(ctk.CTk):
         pause_label = ctk.CTkLabel(pause_radio_frame, text="Pause Modes Switcher", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         pause_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
 
-        pause_radio_button_1 = ctk.CTkRadioButton(pause_radio_frame, text="Pause Off", variable=self.pause_mode, value=0, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
+        pause_radio_button_1 = ctk.CTkRadioButton(pause_radio_frame, text="Off", variable=self.pause_mode, value=0, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
         pause_radio_button_1.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
 
-        pause_radio_button_2 = ctk.CTkRadioButton(pause_radio_frame, text="Pause Before The Final Match", variable=self.pause_mode, value=1, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
+        pause_radio_button_2 = ctk.CTkRadioButton(pause_radio_frame, text="Before The Final Match", variable=self.pause_mode, value=1, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
         pause_radio_button_2.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
 
-        pause_radio_button_3 = ctk.CTkRadioButton(pause_radio_frame, text="Pause Before Final Matches", variable=self.pause_mode, value=2, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
+        pause_radio_button_3 = ctk.CTkRadioButton(pause_radio_frame, text="Before Final Matches", variable=self.pause_mode, value=2, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
         pause_radio_button_3.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
 
-        pause_radio_button_4 = ctk.CTkRadioButton(pause_radio_frame, text="Pause Before KO Matches", variable=self.pause_mode, value=3, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
+        pause_radio_button_4 = ctk.CTkRadioButton(pause_radio_frame, text="Before KO Matches", variable=self.pause_mode, value=3, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
         pause_radio_button_4.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
 
         ############################################################################################################
@@ -3426,7 +3433,9 @@ class Window(ctk.CTk):
     def on_radio_button_change(self):
         self.cache_vars["getfinalmatches_changed_using_var"] = True
         selected_value = self.active_mode.get()
-        if self.read_teamNames() == [] and selected_value != 1:
+
+        print("selected_value", selected_value, "self.read_teamNames()", self.read_teamNames())
+        if self.read_teamNames() == [''] and selected_value != 1:
             self.active_mode.set(1)
             self.on_radio_button_change()
             return
@@ -4390,14 +4399,16 @@ def get_data_for_website(which_data=-1):
     
     elif which_data == 8:
         try:
-            if tkapp.cache_vars.get("getkomatches_changed_using_var") == True:
 
-                if tkapp.there_is_an_ko_phase.get() == 0:
-                    return None
-                
-                if tkapp.active_mode.get() == 1: #and tkapp.pause_time_before_ko.get() == 0:
-                    return None 
-                
+            if tkapp.there_is_an_ko_phase.get() == 0:
+                tkapp.cache_vars["getkomatches_changed_using_var"] = True
+                return None
+            
+            if tkapp.active_mode.get() == 1: #and tkapp.pause_time_before_ko.get() == 0:
+                tkapp.cache_vars["getkomatches_changed_using_var"] = True
+                return None 
+            
+            if tkapp.cache_vars.get("getkomatches_changed_using_var") == True:
                 connection = sqlite3.connect(db_path)
                 cursor = connection.cursor()
 
