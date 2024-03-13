@@ -2016,11 +2016,11 @@ class Window(ctk.CTk):
                 try:
                 # Create an red label on the frame to show that no match is active
 
-                    no_match_active_label = ctk.CTkLabel(frame, text="No Match Active", font=("Helvetica", self.team_button_font_size * 2, "bold"), fg_color="red")
-                    no_match_active_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+                    #no_match_active_label = ctk.CTkLabel(frame, text="No Match Active", font=("Helvetica", self.team_button_font_size * 2, "bold"), fg_color="red")
+                    #no_match_active_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
-                    start_button = ctk.CTkButton(self.frame, text="Start", command=lambda : self.start_match_in_first_game_in_group_phase(), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), height=self.team_button_height)
-                    start_button.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
+                    #start_button = ctk.CTkButton(self.frame, text="Start", command=lambda : self.start_match_in_first_game_in_group_phase(), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size * 1.5, "bold"), height=self.team_button_height)
+                    #start_button.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
                     self.updated_data.update({"activeMatchNumber": -1})
 
                 except:
@@ -3426,7 +3426,9 @@ class Window(ctk.CTk):
     def on_radio_button_change(self):
         self.cache_vars["getfinalmatches_changed_using_var"] = True
         selected_value = self.active_mode.get()
-        if self.read_teamNames() == [] and selected_value != 1:
+
+        print("selected_value", selected_value, "self.read_teamNames()", self.read_teamNames())
+        if self.read_teamNames() == [''] and selected_value != 1:
             self.active_mode.set(1)
             self.on_radio_button_change()
             return
