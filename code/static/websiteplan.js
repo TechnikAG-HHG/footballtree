@@ -5,7 +5,7 @@ var startTime = new Date(); // Set the start time
 var finalMatchesTime = new Date(); // Set the final matches time
 var KOMatchesTime = new Date(); // Set the K.O. matches time
 
-var pauseCount = 0; // Global variable to keep track of the total number of pauses
+var pauseCount = 3; // Global variable to keep track of the total number of pauses
 var pauseTimes = []; // Global array to keep track of the pause times
 
 startTime.setHours(0, 0, 0, 0);
@@ -138,12 +138,12 @@ function generateTableGroup(matches) {
     });
 }
 
-function generatePauseTime(time, pos, startTime) {
+function generatePauseTime(time, pos, startTime, pauseID) {
     if (time == 0 || time == null || time == "0") {
-        let pauseTimeDiv = document.getElementById(`pauseTime${pos}`);
+        let pauseTimeDiv = document.getElementById(`pauseTime${pauseID}`);
         if (pauseTimeDiv) {
             pauseTimeDiv.remove();
-            pauseTimes[pos] = null;
+            pauseTimes[pauseID] = null;
         }
     }
 
@@ -161,42 +161,42 @@ function generatePauseTime(time, pos, startTime) {
         return startTime;
     }
 
-    let pauseTimeText = document.getElementById(`pauseTimeText${pos}`);
-    let pauseTimeElement = document.getElementById(`pauseTimeProgress${pos}`);
-    let pauseTimeStart = document.getElementById(`pauseTimeStart${pos}`);
-    let pauseTimeEnd = document.getElementById(`pauseTimeEnd${pos}`);
+    let pauseTimeText = document.getElementById(`pauseTimeText${pauseID}`);
+    let pauseTimeElement = document.getElementById(`pauseTimeProgress${pauseID}`);
+    let pauseTimeStart = document.getElementById(`pauseTimeStart${pauseID}`);
+    let pauseTimeEnd = document.getElementById(`pauseTimeEnd${pauseID}`);
 
     if (pauseTimeElement) {
         pauseTimeText.textContent = `Pause ${time} Minuten`;
         pauseTimeStart.textContent = `${formatTime(startTime)}`;
         pauseTimeEnd.textContent = `${formatTime(stopTime)}`;
 
-        pauseTimes[pos] = startTime;
+        pauseTimes[pauseID] = startTime;
     } else {
-        pauseTimes[pos] = startTime;
+        pauseTimes[pauseID] = startTime;
 
         let pauseTimeDiv = document.createElement("div");
         pauseTimeDiv.className = "pauseTime";
 
         pauseTimeElement = document.createElement("progress");
-        pauseTimeElement.id = `pauseTimeProgress${pos}`;
+        pauseTimeElement.id = `pauseTimeProgress${pauseID}`;
         pauseTimeElement.className = "pauseTimeProgress";
         pauseTimeElement.max = time * 60;
         pauseTimeElement.value = 0;
 
         pauseTimeText = document.createElement("p");
         pauseTimeText.textContent = `Pause ${time} Minuten`;
-        pauseTimeText.id = `pauseTimeText${pos}`;
+        pauseTimeText.id = `pauseTimeText${pauseID}`;
         pauseTimeText.className = "pauseTimeText";
 
         pauseTimeStart = document.createElement("p");
         pauseTimeStart.textContent = `${formatTime(startTime)}`;
-        pauseTimeStart.id = `pauseTimeStart${pos}`;
+        pauseTimeStart.id = `pauseTimeStart${pauseID}`;
         pauseTimeStart.className = "pauseTimeStart";
 
         pauseTimeEnd = document.createElement("p");
         pauseTimeEnd.textContent = `${formatTime(stopTime)}`;
-        pauseTimeEnd.id = `pauseTimeEnd${pos}`;
+        pauseTimeEnd.id = `pauseTimeEnd${pauseID}`;
         pauseTimeEnd.className = "pauseTimeEnd";
 
         pauseTimeDiv.appendChild(pauseTimeStart);
@@ -224,8 +224,9 @@ function generatePauseTime(time, pos, startTime) {
 }
 
 function checkForPauseUpdate() {
-    for (let i = 0; i < pauseCount; i++) {
-        let pauseTimeElement = document.getElementsByClassName(`pauseTimeProgress${i}`)[0];
+    console.log("Checking for pause update");
+    for (var i = 0; i < pauseCount; i++) {
+        var pauseTimeElement = document.getElementById(`pauseTimeProgress${i}`);
         if (pauseTimeElement) {
             break;
         }
@@ -234,6 +235,7 @@ function checkForPauseUpdate() {
     if (i == data["pauseMode"]) {
         intervalActivated = true;
     } else {
+        pauseTimeElement.value = 0;
         intervalActivated = false;
     }
 }
@@ -241,14 +243,13 @@ function checkForPauseUpdate() {
 function updatePauseTime() {
     if (intervalActivated == true) {
         // update the progress bar with the current time and the finalmatchtime
-        let pauseTimeElement = document.getElementById(`progress${data["pauseMode"]}`);
+        let pauseTimeElement = document.getElementById(`pauseTimeProgress${data["pauseMode"]}`);
+        console.log(pauseTimeElement);
         if (pauseTimeElement) {
-            //console.log(finalMatchesTime);
             let currentTime = new Date();
-            let timeDifference = currentTime - startTime;
+            let timeDifference = currentTime - pauseTimes[data["pauseMode"]];
             let timeDifferenceInSeconds = timeDifference / 1000;
             pauseTimeElement.value = timeDifferenceInSeconds;
-            //console.log(timeDifferenceInSeconds);
         }
     }
 }
@@ -268,6 +269,11 @@ function KOMatchTable() {
     }
 
     if ("KOMatches" in data && data["KOMatches"] != null) {
+        if (data["pauseBeforeKOMatches"] != null && data["pauseBeforeKOMatches"] != "0") {
+            var requestedtime = parseInt(data["pauseBeforeKOMatches"]);
+            KOMatchesTime = generatePauseTime(requestedtime, 12, KOMatchesTime, 0);
+        }
+
         var tablesContainer = document.getElementById("tablesContainer");
 
         var table = tablesContainer.querySelector(".tableKOMatches");
@@ -330,6 +336,7 @@ function KOMatchTable() {
                             KOMatchesTime.getTime() +
                                 y * data["timeIntervalFM"] * 60000
                         );
+
                         cellTime.textContent = formatTime(matchTime);
 
                         var cellMatchNumber = row.insertCell(1);
@@ -368,7 +375,7 @@ function KOMatchTable() {
 
             finalMatchesTime = new Date(
                 KOMatchesTime.getTime() +
-                    (y - 1) * data["timeIntervalFM"] * 60000
+                    y * data["timeIntervalFM"] * 60000
             );
         }
     }
@@ -391,33 +398,11 @@ function finalMatchTable() {
         if (data["pauseBeforeFM"] != null && data["pauseBeforeFM"] != "0") {
             var requestedtime = parseInt(data["pauseBeforeFM"]);
             if (data["KOMatches"] != null) {
-                finalMatchesTime = generatePauseTime(requestedtime, -103, finalMatchesTime);
+                finalMatchesTime = new Date (generatePauseTime(requestedtime, -103, finalMatchesTime, 1));
             } else {
-                finalMatchesTime = generatePauseTime(requestedtime, 12, finalMatchesTime);
+                finalMatchesTime = new Date(generatePauseTime(requestedtime, 12, finalMatchesTime, 1));
             }
             finalMatchesTime = new Date(finalMatchesTime.getTime() - data["timeIntervalFM"] * 60000);
-        /*} else {
-            let pauseTimeElement =
-                document.getElementsByClassName("pauseTime")[0];
-            if (pauseTimeElement) {
-                pauseTimeElement.remove();
-                console.log("Removed pauseTimeElement");
-            }*/
-        }
-
-        if (data["pauseMode"] == true && intervalActivated == false) {
-            updatePauseTime(pauseCount - 1, requestedtime);
-            intervalActivated = true;
-        }
-
-        if (data["pauseMode"] == -1) {
-            let pauseTimeElement = document.getElementById("pauseTimeProgress");
-
-            if (pauseTimeElement) {
-                pauseTimeElement.value = 0;
-            }
-
-            intervalActivated = false;
         }
 
         var tablesContainer = document.getElementById("tablesContainer");
@@ -489,8 +474,14 @@ function finalMatchTable() {
             var gameName;
             if (i == totalMatchNumber) {
                 gameName = "Finale";
+                if (data["halfTimePause"] != null && data["halfTimePause"] != "0") {
+                    finalMatchesTime = new Date(generatePauseTime(parseInt(data["halfTimePause"]), -4, finalMatchesTime, 2));
+                }
             } else if (i == totalMatchNumber - 1) {
                 gameName = "Spiel um Platz 3";
+                if (data["pauseBeforeTheFinalMatch"] != null && data["pauseBeforeTheFinalMatch"] != "0") {
+                    finalMatchesTime = new Date(generatePauseTime(parseInt(data["pauseBeforeTheFinalMatch"]), -3, new Date(finalMatchesTime.getTime() + data["timeIntervalFM"] * 60000), 3));
+                }
             } else {
                 gameName = "Halbfinalspiel " + matchNumber;
             }
@@ -509,18 +500,16 @@ function finalMatchTable() {
                         data["timeIntervalFM"] == null ||
                         data["timeIntervalFM"] == "0"
                     ) {
-                        var matchTime = new Date(
-                            finalMatchesTime.getTime() +
-                                i * timeInterval * 60000
+                        finalMatchesTime = new Date(
+                            finalMatchesTime.getTime() + timeInterval * 60000
                         );
                     } else {
-                        var matchTime = new Date(
-                            finalMatchesTime.getTime() +
-                                i * data["timeIntervalFM"] * 60000
+                        finalMatchesTime = new Date(
+                            finalMatchesTime.getTime() + data["timeIntervalFM"] * 60000
                         );
                     }
 
-                    cellTime.textContent = formatTime(matchTime);
+                    cellTime.textContent = formatTime(finalMatchesTime);
 
                     var cellMatchNumber = row.insertCell(1);
                     cellMatchNumber.textContent = gameName;
@@ -692,6 +681,7 @@ async function updateData() {
     await generateTableGroup(data["Matches"]);
     await KOMatchTable();
     await finalMatchTable();
+    await checkForPauseUpdate();
     await new Promise(resolve => setTimeout(resolve, 500));
     if (window.innerWidth > 1000) {
         window.location.hash = `section${data["activeMatchNumber"]}`;
