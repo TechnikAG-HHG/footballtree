@@ -5,11 +5,15 @@ var startTime = new Date(); // Set the start time
 var finalMatchesTime = new Date(); // Set the final matches time
 var KOMatchesTime = new Date(); // Set the K.O. matches time
 
+var pauseCount = 3; // Global variable to keep track of the total number of pauses
+var pauseTimes = []; // Global array to keep track of the pause times
+
 startTime.setHours(0, 0, 0, 0);
 
 var intervalActivated = false;
 
 function generateTableGroup(matches) {
+    console.log("Generating table group");
     if (
         data["Matches"] == null ||
         data["Matches"] == "null" ||
@@ -80,7 +84,7 @@ function generateTableGroup(matches) {
     matches.forEach((match) => {
         var row = tbody.insertRow();
 
-        if (i == data["activeMatchNumber"] && data["pauseMode"] == false) {
+        if (i == data["activeMatchNumber"] && data["pauseMode"] == -1) {
             generateFullSize(match, i, row);
         } else {
             row.id = "section" + (i + 1); // Set the id of the row
@@ -134,83 +138,130 @@ function generateTableGroup(matches) {
     });
 }
 
-function generatePauseTime(time) {
+function generatePauseTime(time, pos, startTime, pauseID) {
     if (time == 0 || time == null || time == "0") {
-        let pauseTimeDiv = document.getElementById("pauseTime");
+        let pauseTimeDiv = document.getElementById(`pauseTime${pauseID}`);
         if (pauseTimeDiv) {
             pauseTimeDiv.remove();
+            pauseTimes[pauseID] = null;
         }
     }
 
-    oldfinalMatchesTime = finalMatchesTime;
-    finalMatchesTime = new Date(finalMatchesTime.getTime() + time * 60000);
+    stopTime = new Date(startTime.getTime() + time * 60000);
+    if (pos > -1) {
+        var colSpan = 6;
+    } else {
+        var colSpan = 5;
+    }
 
-    let tablesContainer = document.getElementById("tablesContainer");
+    // get the element with the id section-position
+    let elementBeforePause = document.getElementById(`section${pos}`);
 
-    let pauseTimeText = document.getElementById("pauseTimeText");
-    let pauseTimeElement = document.getElementById("pauseTimeProgress");
-    let pauseTimeStart = document.getElementById("pauseTimeStart");
-    let pauseTimeEnd = document.getElementById("pauseTimeEnd");
+    if (elementBeforePause == null) {
+        return startTime;
+    }
+
+    let pauseTimeText = document.getElementById(`pauseTimeText${pauseID}`);
+    let pauseTimeElement = document.getElementById(`pauseTimeProgress${pauseID}`);
+    let pauseTimeStart = document.getElementById(`pauseTimeStart${pauseID}`);
+    let pauseTimeEnd = document.getElementById(`pauseTimeEnd${pauseID}`);
 
     if (pauseTimeElement) {
         pauseTimeText.textContent = `Pause ${time} Minuten`;
-        pauseTimeStart.textContent = `${formatTime(oldfinalMatchesTime)}`;
-        pauseTimeEnd.textContent = `${formatTime(finalMatchesTime)}`;
+        pauseTimeStart.textContent = `${formatTime(startTime)}`;
+        pauseTimeEnd.textContent = `${formatTime(stopTime)}`;
+
+        pauseTimes[pauseID] = startTime;
     } else {
+        pauseTimes[pauseID] = startTime;
+
         let pauseTimeDiv = document.createElement("div");
         pauseTimeDiv.className = "pauseTime";
 
         pauseTimeElement = document.createElement("progress");
-        pauseTimeElement.id = "pauseTimeProgress";
+        pauseTimeElement.id = `pauseTimeProgress${pauseID}`;
+        pauseTimeElement.className = "pauseTimeProgress";
         pauseTimeElement.max = time * 60;
         pauseTimeElement.value = 0;
 
         pauseTimeText = document.createElement("p");
         pauseTimeText.textContent = `Pause ${time} Minuten`;
-        pauseTimeText.id = "pauseTimeText";
+        pauseTimeText.id = `pauseTimeText${pauseID}`;
+        pauseTimeText.className = "pauseTimeText";
 
         pauseTimeStart = document.createElement("p");
-        pauseTimeStart.textContent = `${formatTime(oldfinalMatchesTime)}`;
-        pauseTimeStart.id = "pauseTimeStart";
+        pauseTimeStart.textContent = `${formatTime(startTime)}`;
+        pauseTimeStart.id = `pauseTimeStart${pauseID}`;
+        pauseTimeStart.className = "pauseTimeStart";
 
         pauseTimeEnd = document.createElement("p");
-        pauseTimeEnd.textContent = `${formatTime(finalMatchesTime)}`;
-        pauseTimeEnd.id = "pauseTimeEnd";
+        pauseTimeEnd.textContent = `${formatTime(stopTime)}`;
+        pauseTimeEnd.id = `pauseTimeEnd${pauseID}`;
+        pauseTimeEnd.className = "pauseTimeEnd";
 
         pauseTimeDiv.appendChild(pauseTimeStart);
         pauseTimeDiv.appendChild(pauseTimeText);
         pauseTimeDiv.appendChild(pauseTimeEnd);
         pauseTimeDiv.appendChild(pauseTimeElement);
-        tablesContainer.appendChild(pauseTimeDiv);
+
+        if (elementBeforePause.nextSibling) {
+            let pauseTimeTr = document.createElement("tr");
+            let pauseTimeTd = document.createElement("td");
+            pauseTimeTd.colSpan = colSpan;
+            pauseTimeTd.appendChild(pauseTimeDiv);
+            pauseTimeTr.appendChild(pauseTimeTd);
+
+            elementBeforePause.parentNode.insertBefore(
+                pauseTimeTr,
+                elementBeforePause.nextSibling
+            );
+        } else {
+            document.getElementById('tablesContainer').appendChild(pauseTimeDiv);
+        }
     }
 
-    finalMatchesTime = new Date(
-        finalMatchesTime.getTime() - data["timeIntervalFM"] * 60000
-    );
+    return stopTime;
+}
+
+function checkForPauseUpdate() {
+    console.log("Checking for pause update");
+    for (var i = 0; i < pauseCount; i++) {
+        var pauseTimeElement = document.getElementById(`pauseTimeProgress${i}`);
+        if (pauseTimeElement) {
+            break;
+        }
+    }
+
+    if (i == data["pauseMode"]) {
+        intervalActivated = true;
+    } else {
+        pauseTimeElement.value = 0;
+        intervalActivated = false;
+    }
 }
 
 function updatePauseTime() {
     if (intervalActivated == true) {
         // update the progress bar with the current time and the finalmatchtime
-        let pauseTimeElement = document.getElementById("pauseTimeProgress");
+        let pauseTimeElement = document.getElementById(`pauseTimeProgress${data["pauseMode"]}`);
+        console.log(pauseTimeElement);
         if (pauseTimeElement) {
-            //console.log(finalMatchesTime);
             let currentTime = new Date();
-            let timeDifference = currentTime - oldfinalMatchesTime;
+            let timeDifference = currentTime - pauseTimes[data["pauseMode"]];
             let timeDifferenceInSeconds = timeDifference / 1000;
             pauseTimeElement.value = timeDifferenceInSeconds;
-            //console.log(timeDifferenceInSeconds);
         }
     }
 }
 
 function KOMatchTable() {
+    console.log("Generating K.O. match table");
     if (
-        data["Matches"] == null ||
-        data["Matches"] == "null" ||
-        data["Matches"] == "" ||
-        data["Matches"] == "[]" ||
-        data["Matches"] === 0
+        data["KOMatches"] == null ||
+        data["KOMatches"] == "null" ||
+        data["KOMatches"] == "" ||
+        data["KOMatches"] == "[]" ||
+        data["KOMatches"] === 0
     ) {
         console.log("No matches found");
         finalMatchesTime = new Date(KOMatchesTime.getTime());
@@ -218,36 +269,46 @@ function KOMatchTable() {
     }
 
     if ("KOMatches" in data && data["KOMatches"] != null) {
+        if (data["pauseBeforeKOMatches"] != null && data["pauseBeforeKOMatches"] != "0") {
+            var requestedtime = parseInt(data["pauseBeforeKOMatches"]);
+            KOMatchesTime = generatePauseTime(requestedtime, 12, KOMatchesTime, 0);
+        }
+
         var tablesContainer = document.getElementById("tablesContainer");
 
         var table = tablesContainer.querySelector(".tableKOMatches");
+        var tbody;
+
         if (table) {
-            table.remove();
+            tbody = table.querySelector("tbody");
+            while (tbody.firstChild) {
+                tbody.removeChild(tbody.firstChild);
+            }
+        } else {
+            table = document.createElement("table");
+            var thead = document.createElement("thead");
+            tbody = document.createElement("tbody");
+
+            table.className = "tableKOMatches";
+
+            var headerRow = thead.insertRow(0);
+            var headerCellTime = headerRow.insertCell(0);
+            headerCellTime.textContent = "Zeit";
+            headerCellTime.className = "headerCell";
+
+            var headerCellGroup = headerRow.insertCell(1);
+            headerCellGroup.textContent = "K.O.-Spiele";
+            headerCellGroup.className = "headerCell";
+            headerCellGroup.colSpan = 3;
+
+            var headerCellT = headerRow.insertCell(2);
+            headerCellT.textContent = "Tore";
+            headerCellT.className = "headerCell";
+
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            tablesContainer.appendChild(table);
         }
-
-        table = document.createElement("table");
-        var thead = document.createElement("thead");
-        var tbody = document.createElement("tbody");
-
-        table.className = "tableKOMatches";
-
-        var headerRow = thead.insertRow(0);
-        var headerCellTime = headerRow.insertCell(0);
-        headerCellTime.textContent = "Zeit";
-        headerCellTime.className = "headerCell";
-
-        var headerCellGroup = headerRow.insertCell(1);
-        headerCellGroup.textContent = "K.O.-Spiele";
-        headerCellGroup.className = "headerCell";
-        headerCellGroup.colSpan = 3;
-
-        var headerCellT = headerRow.insertCell(2);
-        headerCellT.textContent = "Tore";
-        headerCellT.className = "headerCell";
-
-        table.appendChild(thead);
-        table.appendChild(tbody);
-        tablesContainer.appendChild(table);
 
         var KOMatches = data["KOMatches"];
         if (KOMatches != null) {
@@ -259,7 +320,7 @@ function KOMatchTable() {
                 if (data["activeMatchNumber"] < -1) {
                     if (
                         i == Math.abs(data["activeMatchNumber"]) &&
-                        data["pauseMode"] == false
+                        data["pauseMode"] == -1
                     ) {
                         generateFullSize(
                             match,
@@ -275,6 +336,7 @@ function KOMatchTable() {
                             KOMatchesTime.getTime() +
                                 y * data["timeIntervalFM"] * 60000
                         );
+
                         cellTime.textContent = formatTime(matchTime);
 
                         var cellMatchNumber = row.insertCell(1);
@@ -313,13 +375,14 @@ function KOMatchTable() {
 
             finalMatchesTime = new Date(
                 KOMatchesTime.getTime() +
-                    (y - 1) * data["timeIntervalFM"] * 60000
+                    y * data["timeIntervalFM"] * 60000
             );
         }
     }
 }
 
 function finalMatchTable() {
+    console.log("Generating final match table");
     if (
         data["Matches"] == null ||
         data["Matches"] == "null" ||
@@ -333,30 +396,13 @@ function finalMatchTable() {
 
     if ("finalMatches" in data && data["finalMatches"] != null) {
         if (data["pauseBeforeFM"] != null && data["pauseBeforeFM"] != "0") {
-            let requestedtime = parseInt(data["pauseBeforeFM"]);
-            generatePauseTime(requestedtime);
-        } else {
-            let pauseTimeElement =
-                document.getElementsByClassName("pauseTime")[0];
-            if (pauseTimeElement) {
-                pauseTimeElement.remove();
-                console.log("Removed pauseTimeElement");
+            var requestedtime = parseInt(data["pauseBeforeFM"]);
+            if (data["KOMatches"] != null) {
+                finalMatchesTime = new Date (generatePauseTime(requestedtime, -103, finalMatchesTime, 1));
+            } else {
+                finalMatchesTime = new Date(generatePauseTime(requestedtime, 12, finalMatchesTime, 1));
             }
-        }
-
-        if (data["pauseMode"] == true && intervalActivated == false) {
-            updatePauseTime();
-            intervalActivated = true;
-        }
-
-        if (data["pauseMode"] == false) {
-            let pauseTimeElement = document.getElementById("pauseTimeProgress");
-
-            if (pauseTimeElement) {
-                pauseTimeElement.value = 0;
-            }
-
-            intervalActivated = false;
+            finalMatchesTime = new Date(finalMatchesTime.getTime() - data["timeIntervalFM"] * 60000);
         }
 
         var tablesContainer = document.getElementById("tablesContainer");
@@ -394,7 +440,7 @@ function finalMatchTable() {
         if (finalMatches == null) {
             var finalMatchesSliced = [];
             while (finalMatchesSliced.length < 4) {
-                finalMatchesSliced.push(["???", "???", ["0", "0"]]);
+                finalMatchesSliced.push(["???", "???", "0", "0", [null, null, null, null]]);
             }
 
             var totalMatchNumber = 4;
@@ -422,13 +468,20 @@ function finalMatchTable() {
         var i = 1;
         finalMatchesSliced.forEach((match) => {
             var row = tbody.insertRow();
+            console.log("Match:", match);
 
             var matchNumber = i;
             var gameName;
             if (i == totalMatchNumber) {
                 gameName = "Finale";
+                if (data["halfTimePause"] != null && data["halfTimePause"] != "0") {
+                    finalMatchesTime = new Date(generatePauseTime(parseInt(data["halfTimePause"]), -4, finalMatchesTime, 2));
+                }
             } else if (i == totalMatchNumber - 1) {
                 gameName = "Spiel um Platz 3";
+                if (data["pauseBeforeTheFinalMatch"] != null && data["pauseBeforeTheFinalMatch"] != "0") {
+                    finalMatchesTime = new Date(generatePauseTime(parseInt(data["pauseBeforeTheFinalMatch"]), -3, new Date(finalMatchesTime.getTime() + data["timeIntervalFM"] * 60000), 3));
+                }
             } else {
                 gameName = "Halbfinalspiel " + matchNumber;
             }
@@ -436,7 +489,7 @@ function finalMatchTable() {
             if (data["activeMatchNumber"] < -1) {
                 if (
                     i + 1 == Math.abs(data["activeMatchNumber"]) &&
-                    data["pauseMode"] == false
+                    data["pauseMode"] == -1
                 ) {
                     generateFullSize(match, i, row, gameName);
                 } else {
@@ -447,18 +500,16 @@ function finalMatchTable() {
                         data["timeIntervalFM"] == null ||
                         data["timeIntervalFM"] == "0"
                     ) {
-                        var matchTime = new Date(
-                            finalMatchesTime.getTime() +
-                                i * timeInterval * 60000
+                        finalMatchesTime = new Date(
+                            finalMatchesTime.getTime() + timeInterval * 60000
                         );
                     } else {
-                        var matchTime = new Date(
-                            finalMatchesTime.getTime() +
-                                i * data["timeIntervalFM"] * 60000
+                        finalMatchesTime = new Date(
+                            finalMatchesTime.getTime() + data["timeIntervalFM"] * 60000
                         );
                     }
 
-                    cellTime.textContent = formatTime(matchTime);
+                    cellTime.textContent = formatTime(finalMatchesTime);
 
                     var cellMatchNumber = row.insertCell(1);
                     cellMatchNumber.textContent = gameName;
@@ -486,7 +537,7 @@ function finalMatchTable() {
                     }
 
                     var cellT = row.insertCell(4);
-                    cellT.textContent = match[2][0] + " : " + match[2][1];
+                    cellT.textContent = match[2] + " : " + match[3];
                 }
             }
 
@@ -627,16 +678,14 @@ async function updateData() {
     document.title = data["websiteTitle"];
     document.getElementById("websiteTitle").textContent = data["websiteTitle"];
 
-    setTimeout(function () {
-        generateTableGroup(data["Matches"]);
-        KOMatchTable();
-        finalMatchTable();
-        setTimeout(function () {
-            if (window.innerWidth > 1000) {
-                window.location.hash = `section${data["activeMatchNumber"]}`;
-            }
-        }, 500);
-    }, 0);
+    await generateTableGroup(data["Matches"]);
+    await KOMatchTable();
+    await finalMatchTable();
+    await checkForPauseUpdate();
+    await new Promise(resolve => setTimeout(resolve, 500));
+    if (window.innerWidth > 1000) {
+        window.location.hash = `section${data["activeMatchNumber"]}`;
+    }
 }
 
 function formatTime(date) {
