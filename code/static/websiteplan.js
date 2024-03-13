@@ -5,6 +5,9 @@ var startTime = new Date(); // Set the start time
 var finalMatchesTime = new Date(); // Set the final matches time
 var KOMatchesTime = new Date(); // Set the K.O. matches time
 
+var pauseCount = 0; // Global variable to keep track of the total number of pauses
+var pauseTimes = []; // Global array to keep track of the pause times
+
 startTime.setHours(0, 0, 0, 0);
 
 var intervalActivated = false;
@@ -81,7 +84,7 @@ function generateTableGroup(matches) {
     matches.forEach((match) => {
         var row = tbody.insertRow();
 
-        if (i == data["activeMatchNumber"] && data["pauseMode"] == false) {
+        if (i == data["activeMatchNumber"] && data["pauseMode"] == -1) {
             generateFullSize(match, i, row);
         } else {
             row.id = "section" + (i + 1); // Set the id of the row
@@ -140,6 +143,7 @@ function generatePauseTime(time, pos, startTime) {
         let pauseTimeDiv = document.getElementById(`pauseTime${pos}`);
         if (pauseTimeDiv) {
             pauseTimeDiv.remove();
+            pauseTimes[pos] = null;
         }
     }
 
@@ -166,7 +170,11 @@ function generatePauseTime(time, pos, startTime) {
         pauseTimeText.textContent = `Pause ${time} Minuten`;
         pauseTimeStart.textContent = `${formatTime(startTime)}`;
         pauseTimeEnd.textContent = `${formatTime(stopTime)}`;
+
+        pauseTimes[pos] = startTime;
     } else {
+        pauseTimes[pos] = startTime;
+
         let pauseTimeDiv = document.createElement("div");
         pauseTimeDiv.className = "pauseTime";
 
@@ -215,14 +223,29 @@ function generatePauseTime(time, pos, startTime) {
     return stopTime;
 }
 
+function checkForPauseUpdate() {
+    for (let i = 0; i < pauseCount; i++) {
+        let pauseTimeElement = document.getElementsByClassName(`pauseTimeProgress${i}`)[0];
+        if (pauseTimeElement) {
+            break;
+        }
+    }
+
+    if (i == data["pauseMode"]) {
+        intervalActivated = true;
+    } else {
+        intervalActivated = false;
+    }
+}
+
 function updatePauseTime() {
     if (intervalActivated == true) {
         // update the progress bar with the current time and the finalmatchtime
-        let pauseTimeElement = document.getElementById("pauseTimeProgress");
+        let pauseTimeElement = document.getElementById(`progress${data["pauseMode"]}`);
         if (pauseTimeElement) {
             //console.log(finalMatchesTime);
             let currentTime = new Date();
-            let timeDifference = currentTime - oldfinalMatchesTime;
+            let timeDifference = currentTime - startTime;
             let timeDifferenceInSeconds = timeDifference / 1000;
             pauseTimeElement.value = timeDifferenceInSeconds;
             //console.log(timeDifferenceInSeconds);
@@ -291,7 +314,7 @@ function KOMatchTable() {
                 if (data["activeMatchNumber"] < -1) {
                     if (
                         i == Math.abs(data["activeMatchNumber"]) &&
-                        data["pauseMode"] == false
+                        data["pauseMode"] == -1
                     ) {
                         generateFullSize(
                             match,
@@ -366,9 +389,9 @@ function finalMatchTable() {
 
     if ("finalMatches" in data && data["finalMatches"] != null) {
         if (data["pauseBeforeFM"] != null && data["pauseBeforeFM"] != "0") {
-            let requestedtime = parseInt(data["pauseBeforeFM"]);
+            var requestedtime = parseInt(data["pauseBeforeFM"]);
             if (data["KOMatches"] != null) {
-                finalMatchesTime = generatePauseTime(requestedtime, -102, finalMatchesTime);
+                finalMatchesTime = generatePauseTime(requestedtime, -103, finalMatchesTime);
             } else {
                 finalMatchesTime = generatePauseTime(requestedtime, 12, finalMatchesTime);
             }
@@ -383,11 +406,11 @@ function finalMatchTable() {
         }
 
         if (data["pauseMode"] == true && intervalActivated == false) {
-            updatePauseTime();
+            updatePauseTime(pauseCount - 1, requestedtime);
             intervalActivated = true;
         }
 
-        if (data["pauseMode"] == false) {
+        if (data["pauseMode"] == -1) {
             let pauseTimeElement = document.getElementById("pauseTimeProgress");
 
             if (pauseTimeElement) {
@@ -432,7 +455,7 @@ function finalMatchTable() {
         if (finalMatches == null) {
             var finalMatchesSliced = [];
             while (finalMatchesSliced.length < 4) {
-                finalMatchesSliced.push(["???", "???", ["0", "0"]]);
+                finalMatchesSliced.push(["???", "???", "0", "0", [null, null, null, null]]);
             }
 
             var totalMatchNumber = 4;
@@ -460,6 +483,7 @@ function finalMatchTable() {
         var i = 1;
         finalMatchesSliced.forEach((match) => {
             var row = tbody.insertRow();
+            console.log("Match:", match);
 
             var matchNumber = i;
             var gameName;
@@ -474,7 +498,7 @@ function finalMatchTable() {
             if (data["activeMatchNumber"] < -1) {
                 if (
                     i + 1 == Math.abs(data["activeMatchNumber"]) &&
-                    data["pauseMode"] == false
+                    data["pauseMode"] == -1
                 ) {
                     generateFullSize(match, i, row, gameName);
                 } else {
