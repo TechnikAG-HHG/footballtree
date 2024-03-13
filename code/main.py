@@ -3426,6 +3426,10 @@ class Window(ctk.CTk):
     def on_radio_button_change(self):
         self.cache_vars["getfinalmatches_changed_using_var"] = True
         selected_value = self.active_mode.get()
+        if self.read_teamNames() == [] and selected_value != 1:
+            self.active_mode.set(1)
+            self.on_radio_button_change()
+            return
         saveModeInDB = """
         UPDATE settingsData
         SET activeMode = ?
@@ -3604,7 +3608,7 @@ class Window(ctk.CTk):
         self.settingscursor.execute(saveModeInDB, (selected_value,))
         self.settingsconnection.commit()
         
-        self.updated_data.update({"pauseMode": selected_value})
+        self.updated_data.update({"pauseMode": get_data_for_website(9)})
         
         
     def on_time_intervalFinalMatch_change(self, event):
@@ -4472,10 +4476,8 @@ def get_data_for_website(which_data=-1):
         pauseMode = -1
 
         if tkapp.pause_mode.get() != 0:
-            pauseMode = tkapp.pause_mode.get() + 1
+            pauseMode = tkapp.pause_mode.get()
 
-        
-        
     else:
         return None    
     
@@ -4540,7 +4542,7 @@ def get_initial_data(template_name, base_url=None):
         "startTime": get_data_for_website(7),
         "websiteTitle": tkapp.website_title.get(),
         "LastUpdate": 0,
-        "pauseMode": tkapp.pause_mode.get(), 
+        "pauseMode": get_data_for_website(9), 
         "timeIntervalFinalMatch": tkapp.time_interval_for_only_the_final_match.get().replace("m", ""),
         "bestScorerActive": tkapp.best_scorer_active.get(),
         "KOMatches": get_data_for_website(8),
