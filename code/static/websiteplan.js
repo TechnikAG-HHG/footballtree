@@ -455,7 +455,7 @@ function finalMatchTable() {
                     var finalMatchesSliced = finalMatches.slice(0, 2);
                 }
                 while (finalMatchesSliced.length < finalMatches.length) {
-                    finalMatchesSliced.push(["???", "???", ["0", "0"]]);
+                    finalMatchesSliced.push(["???", "???", "0", "0", [null, null, null, null]]);
                 }
             } else {
                 var finalMatchesSliced = finalMatches;
