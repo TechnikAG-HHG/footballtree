@@ -144,6 +144,11 @@ function generatePauseTime(time, pos, startTime) {
     }
 
     stopTime = new Date(startTime.getTime() + time * 60000);
+    if (pos > -1) {
+        var colSpan = 6;
+    } else {
+        var colSpan = 5;
+    }
 
     // get the element with the id section-position
     let elementBeforePause = document.getElementById(`section${pos}`);
@@ -194,7 +199,7 @@ function generatePauseTime(time, pos, startTime) {
         if (elementBeforePause.nextSibling) {
             let pauseTimeTr = document.createElement("tr");
             let pauseTimeTd = document.createElement("td");
-            pauseTimeTd.colSpan = 6;
+            pauseTimeTd.colSpan = colSpan;
             pauseTimeTd.appendChild(pauseTimeDiv);
             pauseTimeTr.appendChild(pauseTimeTd);
 
@@ -363,7 +368,7 @@ function finalMatchTable() {
         if (data["pauseBeforeFM"] != null && data["pauseBeforeFM"] != "0") {
             let requestedtime = parseInt(data["pauseBeforeFM"]);
             if (data["KOMatches"] != null) {
-                finalMatchesTime = generatePauseTime(requestedtime, -103, finalMatchesTime);
+                finalMatchesTime = generatePauseTime(requestedtime, -102, finalMatchesTime);
             } else {
                 finalMatchesTime = generatePauseTime(requestedtime, 12, finalMatchesTime);
             }
