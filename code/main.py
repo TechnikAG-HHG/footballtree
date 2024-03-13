@@ -367,7 +367,7 @@ class Window(ctk.CTk):
         self.time_intervalKO = tk.StringVar(value="10m")
         self.time_pause_before_FM = tk.StringVar(value="0m") 
         self.website_title = tk.StringVar(value="HHG-Fußballturnier")
-        self.pause_mode = tk.BooleanVar(value=False)
+        self.pause_mode = tk.IntVar(value=0)
         self.time_interval_for_only_the_final_match = tk.StringVar(value="10m")
         self.best_scorer_active = tk.BooleanVar(value=False)
         self.there_is_an_ko_phase = tk.BooleanVar(value=False)
