@@ -633,7 +633,7 @@ class Window(ctk.CTk):
             self.reset_match_datas()
 
             self.active_mode.set(1)
-            self.pause_mode.set(False)
+            self.pause_mode.set(0)
 
             self.save_active_mode_in_db()
 
