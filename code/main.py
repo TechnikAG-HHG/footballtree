@@ -4488,6 +4488,7 @@ def get_data_for_website(which_data=-1):
 
         if tkapp.pause_mode.get() != 0:
             pauseMode = tkapp.pause_mode.get()
+        return pauseMode
 
     else:
         return None    
