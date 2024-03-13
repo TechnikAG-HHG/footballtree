@@ -3239,16 +3239,16 @@ class Window(ctk.CTk):
         pause_label = ctk.CTkLabel(pause_radio_frame, text="Pause Modes Switcher", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         pause_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW)
 
-        pause_radio_button_1 = ctk.CTkRadioButton(pause_radio_frame, text="Pause Off", variable=self.pause_mode, value=0, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
+        pause_radio_button_1 = ctk.CTkRadioButton(pause_radio_frame, text="Off", variable=self.pause_mode, value=0, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
         pause_radio_button_1.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
 
-        pause_radio_button_2 = ctk.CTkRadioButton(pause_radio_frame, text="Pause Before The Final Match", variable=self.pause_mode, value=1, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
+        pause_radio_button_2 = ctk.CTkRadioButton(pause_radio_frame, text="Before The Final Match", variable=self.pause_mode, value=1, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
         pause_radio_button_2.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
 
-        pause_radio_button_3 = ctk.CTkRadioButton(pause_radio_frame, text="Pause Before Final Matches", variable=self.pause_mode, value=2, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
+        pause_radio_button_3 = ctk.CTkRadioButton(pause_radio_frame, text="Before Final Matches", variable=self.pause_mode, value=2, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
         pause_radio_button_3.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
 
-        pause_radio_button_4 = ctk.CTkRadioButton(pause_radio_frame, text="Pause Before KO Matches", variable=self.pause_mode, value=3, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
+        pause_radio_button_4 = ctk.CTkRadioButton(pause_radio_frame, text="Before KO Matches", variable=self.pause_mode, value=3, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
         pause_radio_button_4.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
 
         ############################################################################################################
