@@ -2177,7 +2177,14 @@ class Window(ctk.CTk):
                     pass
             else:
                 #only send nones in the same structure
-                self.updated_data.update({"finalMatches": [[None, None, [None, None]], [None, None, [None, None]], [None, None, [None, None]], [None, None, [None, None]]]})
+                self.updated_data.update({
+                    "finalMatches": [
+                        [None, None, None, None, [None, None, None, None]],
+                        [None, None, None, None, [None, None, None, None]],
+                        [None, None, None, None, [None, None, None, None]],
+                        [None, None, None, None, [None, None, None, None]]
+                    ]
+                })
         return values_list, self.active_match
     
 
