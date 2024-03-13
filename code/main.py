@@ -4392,14 +4392,16 @@ def get_data_for_website(which_data=-1):
     
     elif which_data == 8:
         try:
-            if tkapp.cache_vars.get("getkomatches_changed_using_var") == True:
 
-                if tkapp.there_is_an_ko_phase.get() == 0:
-                    return None
-                
-                if tkapp.active_mode.get() == 1: #and tkapp.pause_time_before_ko.get() == 0:
-                    return None 
-                
+            if tkapp.there_is_an_ko_phase.get() == 0:
+                tkapp.cache_vars["getkomatches_changed_using_var"] = True
+                return None
+            
+            if tkapp.active_mode.get() == 1: #and tkapp.pause_time_before_ko.get() == 0:
+                tkapp.cache_vars["getkomatches_changed_using_var"] = True
+                return None 
+            
+            if tkapp.cache_vars.get("getkomatches_changed_using_var") == True:
                 connection = sqlite3.connect(db_path)
                 cursor = connection.cursor()
 
