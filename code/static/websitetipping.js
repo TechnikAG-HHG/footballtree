@@ -131,9 +131,9 @@ function generateDropdownData() {
             option.textContent = `${group}: ${matchData[0]} vs ${matchData[1]}`;
 
             if (
-                (data["activeMatchNumber"] < -1 &&
+                ((data["activeMatchNumber"] < -1 &&
                     data["activeMatchNumber"] > -99) ||
-                data["activeMatchNumber"] < (i + 99) * -1
+                data["activeMatchNumber"] < (i + 99) * -1) && data["pauseMode"] != 0
             ) {
                 option.style.color = "gray";
                 disabledOptions.push(option);
@@ -187,7 +187,7 @@ function generateDropdownData() {
 
             option.textContent = `${group}: ${matchData[0]} vs ${matchData[1]}`;
 
-            if (Math.abs(data["activeMatchNumber"]) > i + 1) {
+            if (Math.abs(data["activeMatchNumber"]) > i + 1 && data["pauseMode"] != 1) {
                 option.style.color = "gray";
                 disabledOptions.push(option);
             } else {
