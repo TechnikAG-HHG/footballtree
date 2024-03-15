@@ -4290,6 +4290,18 @@ def get_data_for_website(which_data=-1):
             elif tkapp.active_mode.get() == 3:
                 a_m += 100
                 a_m *= -1
+
+            if tkapp.pause_mode.get() == 0:
+                #count all group phase matches
+                connection = sqlite3.connect(db_path)
+                cursor = connection.cursor()
+
+                get_all_matches = """
+                SELECT COUNT(*) FROM matchData
+                """
+                a_m = cursor.execute(get_all_matches).fetchone()[0]
+                return a_m
+            
             tkapp.updated_data.update({"activeMatchNumber": a_m})
             return a_m
         except:
