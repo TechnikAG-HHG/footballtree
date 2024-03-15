@@ -1,5 +1,5 @@
 function drawTree() {
-    var teamCount = 2;
+    var teamCount = 4;
     var boxes = teamCount;
     var boxheight = 30;
     var boxestodraw = 0;
@@ -268,7 +268,7 @@ function writeTeamData(matchCount = 2) {
         ) {
             var finalMatchesSliced = [];
             while (finalMatchesSliced.length < 4) {
-                finalMatchesSliced.push(["???", "???", ["0", "0"]]);
+                finalMatchesSliced.push(["???", "???", "0", "0", [null, null, null, null]]);
             }
 
             var totalMatchNumber = 4;
@@ -283,7 +283,7 @@ function writeTeamData(matchCount = 2) {
                     var finalMatchesSliced = finalMatches.slice(0, 2);
                 }
                 while (finalMatchesSliced.length < finalMatches.length) {
-                    finalMatchesSliced.push(["???", "???", ["0", "0"]]);
+                    finalMatchesSliced.push(["???", "???", "0", "0", [null, null, null, null]]);
                 }
             } else {
                 var finalMatchesSliced = finalMatches;
@@ -322,6 +322,71 @@ function writeTeamData(matchCount = 2) {
             }
         }
         finalMatchesSliced.reverse();
+    }
+
+    if ("KOMatches" in data) {
+        var KOMatches = data["KOMatches"];
+        if (
+            KOMatches == null ||
+            (KOMatches[0][0] == null && KOMatches[0][1] == null)
+        ) {
+            var KOMatchesSliced = [];
+            while (KOMatchesSliced.length < 4) {
+                KOMatchesSliced.push(["???", "???", "0", "0", [null, null, null, null]]);
+            }
+
+            var totalMatchNumber = 4;
+        } else {
+            if (KOMatches.length > Math.abs(data["activeMatchNumber"])) {
+                if (
+                    KOMatches.length / 2 <
+                    Math.abs(data["activeMatchNumber"])
+                ) {
+                    var KOMatchesSliced = KOMatches;
+                } else {
+                    var KOMatchesSliced = KOMatches.slice(0, 2);
+                }
+                while (KOMatchesSliced.length < KOMatches.length) {
+                    KOMatchesSliced.push(["???", "???", "0", "0", [null, null, null, null]]);
+                }
+            } else {
+                var KOMatchesSliced = KOMatches;
+            }
+
+            var totalMatchNumber = KOMatchesSliced.length;
+        }
+
+        KOMatchesSliced.reverse();
+
+        for (var i = 4; i < (matchCount * 2) + 4; i++) {
+            console.log("KOMatchesSliced[i]:", KOMatchesSliced[i]);
+            var match = KOMatchesSliced[i - 4];
+            var team1 = match[0];
+            var team2 = match[1];
+            var score1 = match[2];
+            var score2 = match[3];
+
+            var matchElement = document.querySelector(`.text${i - 1}`);
+
+            if (matchElement) {
+                while (matchElement.firstChild) {
+                    matchElement.removeChild(matchElement.firstChild);
+                }
+
+                let div1 = document.createElement("div");
+                div1.textContent = team1;
+                matchElement.appendChild(div1);
+
+                let div2 = document.createElement("div");
+                div2.textContent = `${score1} : ${score2}`;
+                matchElement.appendChild(div2);
+
+                let div3 = document.createElement("div");
+                div3.textContent = team2;
+                matchElement.appendChild(div3);
+            }
+        }
+        KOMatchesSliced.reverse();
     }
 }
 
