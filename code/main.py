@@ -1789,23 +1789,25 @@ class Window(ctk.CTk):
             time_interval_final_matches = int(self.time_intervalFM.get().replace("m", ""))
             
             # get time pause final matches
-            pause_between_final_matches = int(self.time_pause_before_FM.get().replace("m", ""))
+            pause_before_final_matches = int(self.time_pause_before_FM.get().replace("m", ""))
             
             # calculate the time for the current match
             time_interval_for_only_the_final_match = int(self.time_interval_for_only_the_final_match.get().replace("m", ""))
 
             timeIntervalKO = int(self.time_intervalKO.get().replace("m", ""))
+
             
             #logging.debug(f"active_match: {active_match}, time_interval_final_matches: {time_interval_final_matches}, timeinterval: {timeinterval}, match_count: {match_count}, pause_between_final_matches: {pause_between_final_matches}")
 
             # calculate the time for the current match
             if self.there_is_an_ko_phase.get() == 0:
-                current_match_time = starttime + datetime.timedelta(minutes=(final_match_active * time_interval_for_only_the_final_match) + (time_interval_final_matches * active_match) + (timeinterval * match_count) + pause_between_final_matches)
+                current_match_time = starttime + datetime.timedelta(minutes=(final_match_active * time_interval_for_only_the_final_match) + (time_interval_final_matches * active_match) + (timeinterval * match_count) + pause_before_final_matches)
             else:
                 self.cursor.execute("SELECT COUNT(*) FROM KOMatchesData")
                 ko_match_count = self.cursor.fetchone()[0]
+                pauseBeforeKOMatches = int(self.time_pause_before_KO.get().replace("m", ""))
                 
-                current_match_time = starttime + datetime.timedelta(minutes=(final_match_active * time_interval_for_only_the_final_match) + (time_interval_final_matches * active_match) + (timeinterval * match_count) + (timeIntervalKO * ko_match_count) + pause_between_final_matches)
+                current_match_time = starttime + datetime.timedelta(minutes=(final_match_active * time_interval_for_only_the_final_match) + (time_interval_final_matches * active_match) + (timeinterval * match_count) + (timeIntervalKO * ko_match_count) + pause_before_final_matches + pauseBeforeKOMatches)
     
 
             if next_match:
@@ -1832,8 +1834,10 @@ class Window(ctk.CTk):
             # get the time interval from settings
             timeIntervalKO = int(self.time_intervalKO.get().replace("m", ""))
 
+            pauseBeforeKOMatches = int(self.time_pause_before_KO.get().replace("m", ""))
+
             # calculate the time for the current match
-            current_match_time = starttime + datetime.timedelta(minutes=timeIntervalKO * active_match + timeinterval * match_count) 
+            current_match_time = starttime + datetime.timedelta(minutes=(timeIntervalKO * active_match) + (timeinterval * match_count) + pauseBeforeKOMatches)
 
             next_match_start_time = current_match_time + datetime.timedelta(minutes=timeIntervalKO)
 
