@@ -391,7 +391,7 @@ function finalMatchTable() {
         data["Matches"] === 0
     ) {
         console.log("No matches found");
-        return; // Add return statement here
+        return;
     }
 
     if ("finalMatches" in data && data["finalMatches"] != null) {
@@ -470,6 +470,9 @@ function finalMatchTable() {
             var row = tbody.insertRow();
             console.log("Match:", match);
 
+            finalMatchesTime = new Date(
+                finalMatchesTime.getTime() + data["timeIntervalFM"] * 60000);
+
             var matchNumber = i;
             var gameName;
             if (i == totalMatchNumber) {
@@ -478,9 +481,10 @@ function finalMatchTable() {
                     finalMatchesTime = new Date(generatePauseTime(parseInt(data["halfTimePause"]), -4, finalMatchesTime, 2));
                 }
             } else if (i == totalMatchNumber - 1) {
+                console.log("Spiel um Platz 3");
                 gameName = "Spiel um Platz 3";
                 if (data["pauseBeforeTheFinalMatch"] != null && data["pauseBeforeTheFinalMatch"] != "0") {
-                    finalMatchesTime = new Date(generatePauseTime(parseInt(data["pauseBeforeTheFinalMatch"]), -3, new Date(finalMatchesTime.getTime() + data["timeIntervalFM"] * 60000), 3));
+                    finalMatchesTime = new Date(generatePauseTime(parseInt(data["pauseBeforeTheFinalMatch"]), -3, finalMatchesTime, 3));
                 }
             } else {
                 gameName = "Halbfinalspiel " + matchNumber;
@@ -491,23 +495,10 @@ function finalMatchTable() {
                     i + 1 == Math.abs(data["activeMatchNumber"]) &&
                     data["pauseMode"] == -1
                 ) {
-                    generateFullSize(match, i, row, gameName);
+                    generateFullSize(match, data["activeMatchNumber"], i, row, gameName);
                 } else {
                     row.id = "section" + (i + 1) * -1; // Set the id of the row
                     var cellTime = row.insertCell(0);
-
-                    if (
-                        data["timeIntervalFM"] == null ||
-                        data["timeIntervalFM"] == "0"
-                    ) {
-                        finalMatchesTime = new Date(
-                            finalMatchesTime.getTime() + timeInterval * 60000
-                        );
-                    } else {
-                        finalMatchesTime = new Date(
-                            finalMatchesTime.getTime() + data["timeIntervalFM"] * 60000
-                        );
-                    }
 
                     cellTime.textContent = formatTime(finalMatchesTime);
 
@@ -546,9 +537,9 @@ function finalMatchTable() {
     }
 }
 
-function generateFullSize(match, i, row, gameName = null) {
+function generateFullSize(match, matchID, i, row, gameName = null) {
     // Create a bigger statistic entry in the table for the current match
-    row.id = "section" + (i + 1); // Set the id of the row
+    row.id = "section" + matchID; // Set the id of the row
     row.style.backgroundColor = "black";
 
     var dataNumber = 5;
