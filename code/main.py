@@ -3505,11 +3505,9 @@ class Window(ctk.CTk):
             if len(time_parts) != 2:
                 return False
             hour, minute = time_parts
-            if not hour.isdigit() or not minute.isdigit():
+            if not (hour.isdigit() and minute.isdigit() and len(hour) == 2 and len(minute) == 2):
                 return False
             if not (0 <= int(hour) <= 23 and 0 <= int(minute) <= 59):
-                return False
-            if len(minute) != 2:
                 return False
             return True
         else:
@@ -3519,17 +3517,22 @@ class Window(ctk.CTk):
     def on_start_time_change(self, event):
         if self.start_time.get() == "":
             return
-        if not self.is_valid_time(str(self.start_time.get())):
+        time_str = str(self.start_time.get())
+        if not self.is_valid_time(time_str):
             logging.warning(f"Invalid time format. Please enter time in HH:MM format.")
             return
+
+        # Format time correctly
+        hour, minute = time_str.split(":")
+        formatted_time = f"{int(hour):02d}:{int(minute):02d}"
 
         saveStartTimeInDB = """
         UPDATE settingsData
         SET startTime = ?
         WHERE id = 1
         """
-        logging.debug(f"on_start_time_change {self.start_time.get()}")
-        self.settingscursor.execute(saveStartTimeInDB, (self.start_time.get(),))
+        logging.debug(f"on_start_time_change {formatted_time}")
+        self.settingscursor.execute(saveStartTimeInDB, (formatted_time,))
         self.settingsconnection.commit()
 
         self.updated_data.update({"startTime": get_data_for_website(7)})
