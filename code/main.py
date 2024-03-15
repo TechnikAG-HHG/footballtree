@@ -2340,6 +2340,7 @@ class Window(ctk.CTk):
                 self.endteam1, self.endteam3 = teams[:2]
                 self.endteam2, self.endteam4 = teams[2:]
 
+
     def get_spiel_um_platz_3(self, team1, team2, team3, team4):
         #get the best two teams from the database(with most points)
         getGoles1 = """
@@ -2569,8 +2570,9 @@ class Window(ctk.CTk):
                     if self.there_is_an_ko_phase.get() == 0:
                         result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the end of the matches. Do you want activate the pause and the final matches?")
                         if result:
-                            self.pause_mode.set(1)
-                            self.on_pause_switch_change()
+                            if int(self.time_intervalFM.get().replace("m", "")) != 0:
+                                self.pause_mode.set(2)
+                                self.on_pause_switch_change()
                             self.active_mode.set(2)
                             self.save_active_mode_in_db()
                             values_list, active_match = self.get_values_list_mode2()
@@ -2586,8 +2588,11 @@ class Window(ctk.CTk):
                         else:
                             return
                     elif self.there_is_an_ko_phase.get() == 1:
-                        result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the end of the matches. Do you want to select the first KO match?")
+                        result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the end of the matches. Do you want to activate the pause and the KO matches?")
                         if result:
+                            if int(self.time_intervalKO.get().replace("m", "")) != 0:
+                                self.pause_mode.set(1)
+                                self.on_pause_switch_change()
                             self.active_mode.set(3)
                             self.save_active_mode_in_db()
                             values_list, pairedKoMatches = self.get_values_list_mode3()
@@ -2655,6 +2660,13 @@ class Window(ctk.CTk):
             if next_match:
                 if self.active_match < 3:
                     self.active_match += 1
+
+                if self.active_match == 3:
+                    result = tkinter.messagebox.askyesno("Selecting Helper", "Do want to activate the Half-Time break and switch to the last final match?")
+                    if result:
+                        if int(self.time_intervalFM.get().replace("m", "")) != 0:
+                            self.pause_mode.set(3)
+                            self.on_pause_switch_change()
             else:
                 if self.active_match > 0:
                     self.active_match -= 1
@@ -2722,8 +2734,9 @@ class Window(ctk.CTk):
                 if new_match_index > len(pairedKoMatches):
                     result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the end of the matches. Do you want activate the pause and the final matches?")
                     if result:
-                        self.pause_mode.set(1)
-                        self.on_pause_switch_change()
+                        if int(self.time_intervalFM.get().replace("m", "")) != 0:
+                            self.pause_mode.set(2)
+                            self.on_pause_switch_change()
                         self.active_mode.set(2)
                         self.save_active_mode_in_db()
                         values_list, _ = self.get_values_list_mode2()
