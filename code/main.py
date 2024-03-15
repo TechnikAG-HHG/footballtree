@@ -4259,8 +4259,8 @@ def get_data_for_website(which_data=-1):
                     average_team2Goals = sum(team2Goals) / len(team2Goals) if team2Goals else 0
                     averageRounded_team1Goals = round(average_team1Goals, 2)
                     averageRounded_team2Goals = round(average_team2Goals, 2)
-                    percent_team1Wins = sum(1 for goal in team1Goals if goal > average_team2Goals) / len(team1Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
-                    percent_team2Wins = sum(1 for goal in team2Goals if goal > average_team1Goals) / len(team2Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
+                    percent_team1Wins = sum(1 for i, goal in enumerate(team1Goals) if goal > team2Goals[i]) / len(team1Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
+                    percent_team2Wins = sum(1 for i, goal in enumerate(team2Goals) if goal > team1Goals[i]) / len(team2Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
                     tipping_statistics[matchId] = (average_team1Goals, average_team2Goals, percent_team1Wins, percent_team2Wins)
 
                 # Combine both datasets
@@ -4364,8 +4364,8 @@ def get_data_for_website(which_data=-1):
                     average_team2Goals = sum(team2Goals) / len(team2Goals) if team2Goals else 0
                     averageRounded_team1Goals = round(average_team1Goals, 2)
                     averageRounded_team2Goals = round(average_team2Goals, 2)
-                    percent_team1Wins = sum(1 for goal in team1Goals if goal > average_team2Goals) / len(team1Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
-                    percent_team2Wins = sum(1 for goal in team2Goals if goal > average_team1Goals) / len(team2Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
+                    percent_team1Wins = sum(1 for i, goal in enumerate(team1Goals) if goal > team2Goals[i]) / len(team1Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
+                    percent_team2Wins = sum(1 for i, goal in enumerate(team2Goals) if goal > team1Goals[i]) / len(team2Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
                     tipping_statistics[matchId] = (average_team1Goals, average_team2Goals, percent_team1Wins, percent_team2Wins)
 
                 #
@@ -4471,8 +4471,8 @@ def get_data_for_website(which_data=-1):
                     average_team2Goals = sum(team2Goals) / len(team2Goals) if team2Goals else 0
                     averageRounded_team1Goals = round(average_team1Goals, 2)
                     averageRounded_team2Goals = round(average_team2Goals, 2)
-                    percent_team1Wins = sum(1 for goal in team1Goals if goal > average_team2Goals) / len(team1Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
-                    percent_team2Wins = sum(1 for goal in team2Goals if goal > average_team1Goals) / len(team2Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
+                    percent_team1Wins = sum(1 for i, goal in enumerate(team1Goals) if goal > team2Goals[i]) / len(team1Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
+                    percent_team2Wins = sum(1 for i, goal in enumerate(team2Goals) if goal > team1Goals[i]) / len(team2Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
                     tipping_statistics[matchId] = (average_team1Goals, average_team2Goals, percent_team1Wins, percent_team2Wins)
 
                 combined_data = []
