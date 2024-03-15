@@ -516,10 +516,10 @@ function finalMatchTable() {
                         Math.abs(data["activeMatchNumber"]) - 1 > i &&
                         data["finalMatches"] != null
                     ) {
-                        if (match[2][0] > match[2][1]) {
+                        if (match[2] > match[3]) {
                             cellFirstTeam.className = "style-winner";
                             cellSecondTeam.className = "style-loser";
-                        } else if (match[2][0] < match[2][1]) {
+                        } else if (match[2] < match[3]) {
                             cellSecondTeam.className = "style-winner";
                             cellFirstTeam.className = "style-loser";
                         } else {
