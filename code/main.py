@@ -123,7 +123,12 @@ class Window(ctk.CTk):
         logging.getLogger().addHandler(self.console_handler)
 
         logging.debug("Started logging")
-        
+
+        #check if there is an admins.json file
+        if not os.path.exists("data/admins.json"):
+            with open("data/admins.json", "w") as f:
+                pass
+                
         
         # Set window title
         self.title("Football Tournament Manager")
