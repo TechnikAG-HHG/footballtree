@@ -85,7 +85,7 @@ function generateTableGroup(matches) {
         var row = tbody.insertRow();
 
         if (i == data["activeMatchNumber"] && data["pauseMode"] == -1) {
-            generateFullSize(match, i, row);
+            generateFullSize(match, data["activeMatchNumber"], i, row);
         } else {
             row.id = "section" + (i + 1); // Set the id of the row
 
@@ -324,6 +324,7 @@ function KOMatchTable() {
                     ) {
                         generateFullSize(
                             match,
+                            data["activeMatchNumber"],
                             i,
                             row,
                             (gameName = "K.O.-Spiel " + (y + 1))
