@@ -309,7 +309,7 @@ p#status-message {
 }
 
 #status-message.fade-out {
-    transition: opacity 1s;
+    transition: 1s;
     opacity: 0;
 }
 

@@ -57,17 +57,17 @@ function generateDropdownData() {
     if (
         JSON.stringify(data["Matches"]) === JSON.stringify(oldMatchesData) &&
         data["activeMatchNumber"] == oldActiveMatchNumber
-    ) {
-        return;
-    }
-
-    while (dropdown.firstChild) {
-        dropdown.removeChild(dropdown.firstChild);
-    }
-
-    var disabledOptions = [];
-    var enabledOptions = [];
-
+        ) {
+            return;
+        }
+        
+        while (dropdown.firstChild) {
+            dropdown.removeChild(dropdown.firstChild);
+        }
+        
+        var disabledOptions = [];
+        var enabledOptions = [];
+        
     for (var i = 0; i < data["Matches"].length; i++) {
         let group;
         var option = document.createElement("option");
@@ -225,7 +225,13 @@ function generateDropdownData() {
         dropdown.appendChild(option);
     });
 
-    voteForMatch(document.getElementById("game-select").value);
+    
+    if (!(
+        JSON.stringify(data["Matches"]) === JSON.stringify(oldMatchesData) &&
+        data["activeMatchNumber"] == oldActiveMatchNumber
+    )) {
+        voteForMatch(document.getElementById("game-select").value);
+    }
 
     let voteContainer = document.getElementById("vote-container");
     if (voteContainer == null) {
@@ -372,7 +378,6 @@ function voteForMatch(match) {
 
     let message = document.createElement("p");
     message.textContent = "";
-    message.classList.add("invisible");
     message.id = "status-message";
     voteContainer.appendChild(message);
 
@@ -408,6 +413,7 @@ function handleSubmit() {
     }
 
     if (goals1 == "" || goals2 == "") {
+        console.log("No goals entered");
         generateErrorMessage(
             "Du musst für beide Teams eine Toranzahl angeben!"
         );
@@ -453,15 +459,18 @@ let messageTimeout;
 function showMessage(message, className) {
     let statusMessage = document.getElementById("status-message");
     statusMessage.classList.add(className);
-    statusMessage.classList.remove("invisible");
     statusMessage.textContent = message;
 
-    clearTimeout(messageTimeout);
+    console.log("Message shown");
+
+    console.log(messageTimeout);
+
+    //clearTimeout(messageTimeout);
     messageTimeout = setTimeout(function () {
+        console.log("Message hidden");
         statusMessage.classList.add("fade-out");
         setTimeout(function () {
             statusMessage.textContent = "";
-            statusMessage.classList.add("invisible");
             statusMessage.classList.remove(className);
             statusMessage.classList.remove("fade-out");
         }, 1000); // same as the transition duration
