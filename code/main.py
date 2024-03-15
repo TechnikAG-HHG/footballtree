@@ -2288,16 +2288,51 @@ class Window(ctk.CTk):
             result.append((0, 'No Team', 0, 0, 0))
 
         return result
+    
+    
+    def get_top_two_teams_KO_phase(self):
+        query = """
+        SELECT 
+            winningTeamId,
+            winningTeamName,
+            COUNT(*) as wins
+        FROM (
+            SELECT 
+                CASE 
+                    WHEN k.team1Goals > k.team2Goals THEN t1.id
+                    ELSE t2.id
+                END as winningTeamId,
+                CASE 
+                    WHEN k.team1Goals > k.team2Goals THEN t1.teamName
+                    ELSE t2.teamName
+                END as winningTeamName
+            FROM KOMatchesData k
+            LEFT JOIN teamData t1 ON t1.id = k.team1Id
+            LEFT JOIN teamData t2 ON t2.id = k.team2Id
+        ) as subquery
+        GROUP BY winningTeamId
+        ORDER BY wins DESC
+        LIMIT 4
+        """
+        self.cursor.execute(query)
+        result = self.cursor.fetchall()
+
+        return result
 
 
     def get_teams_for_final_matches(self):
-        teams1 = self.get_top_two_teams(1)
-        teams2 = self.get_top_two_teams(2)
-
-        if teams1 and teams2:
-            self.endteam1, self.endteam2 = teams1
-            self.endteam4, self.endteam3 = teams2
-             
+        if self.there_is_an_ko_phase.get() == 0:
+            teams1 = self.get_top_two_teams(1)
+            teams2 = self.get_top_two_teams(2)
+            if teams1 and teams2:
+                self.endteam1, self.endteam2 = teams1
+                self.endteam4, self.endteam3 = teams2
+                
+        elif self.there_is_an_ko_phase.get() == 1:
+            teams = self.get_top_two_teams_KO_phase()
+            if teams:
+                self.endteam1, self.endteam3 = teams[:2]
+                self.endteam2, self.endteam4 = teams[2:]
 
     def get_spiel_um_platz_3(self, team1, team2, team3, team4):
         #get the best two teams from the database(with most points)
@@ -4249,7 +4284,7 @@ def get_data_for_website(which_data=-1):
                     grouped_data[row[0]]['team1Goals'].append(row[1])
                     grouped_data[row[0]]['team2Goals'].append(row[2])
 
-                # Calculate median and percentages
+                # Calculate percentages
                 tipping_statistics = {}
                 for matchId, data in grouped_data.items():
                     matchId += 1
@@ -4257,10 +4292,23 @@ def get_data_for_website(which_data=-1):
                     team2Goals = data['team2Goals']
                     average_team1Goals = sum(team1Goals) / len(team1Goals) if team1Goals else 0
                     average_team2Goals = sum(team2Goals) / len(team2Goals) if team2Goals else 0
-                    averageRounded_team1Goals = round(average_team1Goals, 2)
-                    averageRounded_team2Goals = round(average_team2Goals, 2)
-                    percent_team1Wins = sum(1 for i, goal in enumerate(team1Goals) if goal > team2Goals[i]) / len(team1Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
-                    percent_team2Wins = sum(1 for i, goal in enumerate(team2Goals) if goal > team1Goals[i]) / len(team2Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
+                    #averageRounded_team1Goals = round(average_team1Goals, 2)
+                    #averageRounded_team2Goals = round(average_team2Goals, 2)
+
+                    team1Wins = 0
+                    team2Wins = 0
+                    for team1Goal, team2Goal in zip(team1Goals, team2Goals):
+                        if team1Goal > team2Goal:
+                            team1Wins += 1
+                        elif team1Goal == team2Goal:
+                            team1Wins += 0.5
+                            team2Wins += 0.5
+                        if team2Goal > team1Goal:
+                            team2Wins += 1
+
+                    percent_team1Wins = team1Wins / len(team1Goals) * 100 if team1Goals else 0
+                    percent_team2Wins = team2Wins / len(team2Goals) * 100 if team2Goals else 0
+
                     tipping_statistics[matchId] = (average_team1Goals, average_team2Goals, percent_team1Wins, percent_team2Wins)
 
                 # Combine both datasets
@@ -4372,12 +4420,23 @@ def get_data_for_website(which_data=-1):
                         continue
                     team1Goals = data['team1Goals']
                     team2Goals = data['team2Goals']
-                    average_team1Goals = sum(team1Goals) / len(team1Goals) if team1Goals else 0
-                    average_team2Goals = sum(team2Goals) / len(team2Goals) if team2Goals else 0
-                    averageRounded_team1Goals = round(average_team1Goals, 2)
-                    averageRounded_team2Goals = round(average_team2Goals, 2)
-                    percent_team1Wins = sum(1 for i, goal in enumerate(team1Goals) if goal > team2Goals[i]) / len(team1Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
-                    percent_team2Wins = sum(1 for i, goal in enumerate(team2Goals) if goal > team1Goals[i]) / len(team2Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
+                    #averageRounded_team1Goals = round(average_team1Goals, 2)
+                    #averageRounded_team2Goals = round(average_team2Goals, 2)
+
+                    team1Wins = 0
+                    team2Wins = 0
+                    for team1Goal, team2Goal in zip(team1Goals, team2Goals):
+                        if team1Goal > team2Goal:
+                            team1Wins += 1
+                        elif team1Goal == team2Goal:
+                            team1Wins += 0.5
+                            team2Wins += 0.5
+                        if team2Goal > team1Goal:
+                            team2Wins += 1
+
+                    percent_team1Wins = team1Wins / len(team1Goals) * 100 if team1Goals else 0
+                    percent_team2Wins = team2Wins / len(team2Goals) * 100 if team2Goals else 0
+
                     tipping_statistics[matchId] = (average_team1Goals, average_team2Goals, percent_team1Wins, percent_team2Wins)
 
                 #
@@ -4481,10 +4540,23 @@ def get_data_for_website(which_data=-1):
                     team2Goals = data['team2Goals']
                     average_team1Goals = sum(team1Goals) / len(team1Goals) if team1Goals else 0
                     average_team2Goals = sum(team2Goals) / len(team2Goals) if team2Goals else 0
-                    averageRounded_team1Goals = round(average_team1Goals, 2)
-                    averageRounded_team2Goals = round(average_team2Goals, 2)
-                    percent_team1Wins = sum(1 for i, goal in enumerate(team1Goals) if goal > team2Goals[i]) / len(team1Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
-                    percent_team2Wins = sum(1 for i, goal in enumerate(team2Goals) if goal > team1Goals[i]) / len(team2Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
+                    #averageRounded_team1Goals = round(average_team1Goals, 2)
+                    #averageRounded_team2Goals = round(average_team2Goals, 2)
+
+                    team1Wins = 0
+                    team2Wins = 0
+                    for team1Goal, team2Goal in zip(team1Goals, team2Goals):
+                        if team1Goal > team2Goal:
+                            team1Wins += 1
+                        elif team1Goal == team2Goal:
+                            team1Wins += 0.5
+                            team2Wins += 0.5
+                        if team2Goal > team1Goal:
+                            team2Wins += 1
+
+                    percent_team1Wins = team1Wins / len(team1Goals) * 100 if team1Goals else 0
+                    percent_team2Wins = team2Wins / len(team2Goals) * 100 if team2Goals else 0
+
                     tipping_statistics[matchId] = (average_team1Goals, average_team2Goals, percent_team1Wins, percent_team2Wins)
 
                 combined_data = []
@@ -4502,6 +4574,7 @@ def get_data_for_website(which_data=-1):
             else:
                 return tkapp.cache.get("KOMatches")
         except:
+            logging.info("Error in get_data_for_website(8)")
             return []
     
     elif which_data == 9:
