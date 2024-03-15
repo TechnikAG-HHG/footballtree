@@ -33,7 +33,7 @@ def get_key():
 
 app = Flask(__name__)
 limiter = Limiter(
-    app,
+    app=app,
     key_func=get_key,  # use get_key function for rate limiting
     default_limits=["20 per minute"],
     storage_uri="memory://"
