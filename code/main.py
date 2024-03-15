@@ -8,6 +8,8 @@ import requests
 import os
 import time
 from flask import Flask, send_file, request, abort, render_template, make_response, session, redirect, jsonify, send_from_directory
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import sqlite3
 import vlc
 import datetime
@@ -23,11 +25,20 @@ import pathlib
 import functools
 import platform
 import subprocess
+import json
 import traceback
 
-app = Flask(__name__)
-app.secret_key = "Felix.com"
+def get_key():
+    return session.get('email', 'anonymous')
 
+app = Flask(__name__)
+limiter = Limiter(
+    app,
+    key_func=get_key,  # use get_key function for rate limiting
+    default_limits=["20 per minute"],
+    storage_uri="memory://"
+)
+app.secret_key = "Felix.com"
 lock = threading.Lock()
 
 class Window(ctk.CTk):
@@ -4572,6 +4583,7 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 GOOGLE_CLIENT_ID = "450306821477-t53clamc7s8u20adedj2fqhv0904aa8t.apps.googleusercontent.com"
 client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret.json")
+admins_file = os.path.join(pathlib.Path(__file__).parent, "admins.json")
 
 flow = Flow.from_client_secrets_file(
     client_secrets_file=client_secrets_file,
@@ -4579,6 +4591,14 @@ flow = Flow.from_client_secrets_file(
     redirect_uri="https://technikag.serveo.net/callback"
 )
 
+def is_admin():
+    if "email" in session:
+        with open(admins_file, "r") as file:
+            admins = json.load(file)
+        print(session["email"] in admins)
+        return session["email"] in admins
+    else:
+        return False
 
 def login_is_required(function):
     @functools.wraps(function)
@@ -4591,12 +4611,14 @@ def login_is_required(function):
     return decorator
 
 @app.route("/login")
+@limiter.limit("15 per minute", exempt_when=lambda: 'email' in session and is_admin())
 def login():
     authorization_url, state = flow.authorization_url()
     session["state"] = state
     return redirect(authorization_url)
 
 @app.route("/callback")
+@limiter.limit("15 per minute", exempt_when=lambda: 'email' in session and is_admin())
 def callback():
     global session
     state = session.pop("state", None)  # Use pop to get and remove state from session
@@ -4625,6 +4647,7 @@ def callback():
     return redirect(session.pop("next", "/"))
  
 @app.route("/logout")
+@limiter.limit("2 per minute", exempt_when=lambda: 'email' in session and is_admin())
 def logout():
     session.clear()
     return redirect("/")
@@ -4635,6 +4658,7 @@ def logout():
 ##############################################################################################
 
 @app.route("/tipping_data")
+@limiter.limit("10 per minute", exempt_when=lambda: 'email' in session and is_admin())
 @login_is_required
 def tipping_data_index():
     google_id = session["google_id"]
@@ -4682,6 +4706,7 @@ def tipping_data_index():
     return jsonify(name=name, tips=tips)
 
 @app.route("/send_tipping_data", methods=['POST'])
+@limiter.limit("20 per minute", exempt_when=lambda: 'email' in session and is_admin())
 @login_is_required
 def send_tipping_data():
     google_id = session["google_id"]
@@ -4743,6 +4768,7 @@ def send_tipping_data():
 
 # send user name to db
 @app.route("/send_user_name", methods=['POST'])
+@limiter.limit("30 per minute", exempt_when=lambda: 'email' in session and is_admin())
 @login_is_required
 def send_user_name():
     google_id = session["google_id"]
@@ -4773,22 +4799,28 @@ def send_user_name():
 ##############################################################################################
 
 @app.route("/")
+@limiter.limit("1 per minute", exempt_when=lambda: 'email' in session and is_admin())
 def home():
+    print("entered home")
     return get_initial_data("websitemain.html")
 
 @app.route("/group")
+@limiter.limit("10 per minute", exempt_when=lambda: 'email' in session and is_admin())
 def index():
     return get_initial_data("websitegroup.html")
 
 @app.route("/tree")
+@limiter.limit("10 per minute", exempt_when=lambda: 'email' in session and is_admin())
 def tree_index():
     return get_initial_data("websitetree.html")
 
 @app.route("/plan")
+@limiter.limit("10 per minute", exempt_when=lambda: 'email' in session and is_admin())
 def plan_index():
     return get_initial_data("websiteplan.html")
 
 @app.route("/best_scorer")
+@limiter.limit("10 per minute", exempt_when=lambda: 'email' in session and is_admin())
 def best_scorer_index():
     if tkapp.best_scorer_active.get() == 1:
         return get_initial_data("websitebestscorer.html")
@@ -4796,16 +4828,19 @@ def best_scorer_index():
         abort(404) 
 
 @app.route("/tipping")
+@limiter.limit("10 per minute", exempt_when=lambda: 'email' in session and is_admin())
 @login_is_required
 def tipping_index():
     return get_initial_data("websitetipping.html")
 
 @app.route("/tv")
+@limiter.limit("10 per minute", exempt_when=lambda: 'email' in session and is_admin())
 def tv_index():
     base_url = request.base_url
     return get_initial_data("websitetv.html", base_url)
 
 @app.route("/admin")
+@limiter.limit("10 per minute", exempt_when=lambda: 'email' in session and is_admin())
 @login_is_required
 def admin_index():
     print("entered admin")
@@ -4817,9 +4852,17 @@ def admin_index():
         print("email", session.get("email"))
     return get_initial_data("admin.html")
 
+##############################################################################################
+######################################### Handler ############################################
+##############################################################################################
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    return make_response(jsonify(error="ratelimit exceeded %s" % e.description), 429)
 
 
 ##############################################################################################
@@ -4827,6 +4870,7 @@ def page_not_found(e):
 ##############################################################################################
 
 @app.route('/best_scorer_data')
+@limiter.limit("10 per minute", exempt_when=lambda: 'email' in session and is_admin())
 def get_best_scorer_data():
     if tkapp.best_scorer_active.get() == 1:
         if tkapp.cache_vars.get("getbestscorer_changed_using_var") == True:
@@ -4873,6 +4917,7 @@ def get_best_scorer_data():
         abort(404)
 
 @app.route('/update_data')
+@limiter.limit("15 per minute", exempt_when=lambda: 'email' in session and is_admin())
 def update_data():   
     timeatstart = time.time()
     
@@ -4913,26 +4958,32 @@ def update_data():
 ##############################################################################################
 
 @app.route('/favicon.ico')
+@limiter.limit("10 per minute")
 def favicon():
     return send_from_directory(os.path.join(app.root_path, '../favicon'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @app.route('/apple-touch-icon.png')
+@limiter.limit("10 per minute")
 def apple_touch_icon():
     return send_from_directory(os.path.join(app.root_path, '../favicon'), 'apple-touch-icon.png', mimetype='image/png')
 
 @app.route('/favicon-32x32.png')
+@limiter.limit("10 per minute")
 def favicon_32():
     return send_from_directory(os.path.join(app.root_path, '../favicon'), 'favicon-32x32.png', mimetype='image/png')
 
 @app.route('/favicon-16x16.png')
+@limiter.limit("10 per minute")
 def favicon_16():
     return send_from_directory(os.path.join(app.root_path, '../favicon'), 'favicon-16x16.png', mimetype='image/png')
 
 @app.route('/site.webmanifest')
+@limiter.limit("10 per minute")
 def site_webmanifest():
     return send_from_directory(os.path.join(app.root_path, '../favicon'), 'site.webmanifest')
 
 @app.route('/safari-pinned-tab.svg')
+@limiter.limit("10 per minute")
 def safari_pinned_tab():
     return send_from_directory(os.path.join(app.root_path, '../favicon'), 'safari-pinned-tab.svg', mimetype='image/svg+xml')
 
