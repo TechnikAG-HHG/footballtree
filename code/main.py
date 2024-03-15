@@ -1170,28 +1170,30 @@ class Window(ctk.CTk):
             #pause_mode_active_label.place(relx=0.7, rely=0.4)
             #Replace the label with a button
             self.pause_mode_active_button = ctk.CTkButton(manual_frame, text="Pause Mode Active", command=self.on_pause_button_change, fg_color="red", hover_color="#801818", font=("Helvetica", button_font_size * 1.5, "bold"), height=button_height)
-            self.pause_mode_active_button.place(relx=0.7, rely=0.3)
+            self.pause_mode_active_button.place(relx=0.65, rely=0.0)
         
         if self.best_scorer_active.get() == 1:
             #best_scorer_active_label = ctk.CTkLabel(manual_frame, text="Best Scorer Active", font=("Helvetica", button_font_size * 1.5, "bold"), fg_color="red")
-            #best_scorer_active_label.place(relx=0.7, rely=0.1)
+            #best_scorer_active_label.place(relx=0.65, rely=0.1)
             #Replace the label with a button
-            self.best_scorer_active_button = ctk.CTkButton(manual_frame, text="Best Scorer Active", command=self.on_best_scorer_button_change, fg_color="red", hover_color="#801818", font=("Helvetica", button_font_size * 1.5, "bold"), height=button_height)
-            self.best_scorer_active_button.place(relx=0.7, rely=0.1)
+            #self.best_scorer_active_button = ctk.CTkButton(manual_frame, text="Best Scorer Active", command=self.on_best_scorer_button_change, fg_color="red", hover_color="#801818", font=("Helvetica", button_font_size * 1.5, "bold"), height=button_height)
+            #self.best_scorer_active_button.place(relx=0.65, rely=0.3)
+            self.best_scorer_active_button = ctk.CTkButton(manual_frame, text="Best Scorer Active", command=self.on_best_scorer_button_change, fg_color="#c1d231", hover_color="#c1d231", font=("Helvetica", button_font_size * 1.5, "bold"), height=button_height, text_color="#0740a4")
+            self.best_scorer_active_button.place(relx=0.65, rely=0.3)
         
         if self.there_is_an_ko_phase.get() == 1:
             ko_phase_active_label = ctk.CTkLabel(manual_frame, text="KO Phase Active", font=("Helvetica", button_font_size * 1.5, "bold"), text_color="green")
-            ko_phase_active_label.place(relx=0.7, rely=0.6)
+            ko_phase_active_label.place(relx=0.65, rely=0.6)
 
         if self.active_mode.get() == 1:
             active_mode_label = ctk.CTkLabel(manual_frame, text=f"Active Mode: Group Phase ({self.active_mode.get()})", font=("Helvetica", button_font_size * 1.5, "bold"), text_color="green")
-            active_mode_label.place(relx=0.7, rely=0.8)
+            active_mode_label.place(relx=0.65, rely=0.8)
         elif self.active_mode.get() == 3:
             active_mode_label = ctk.CTkLabel(manual_frame, text=f"Active Mode: KO Phase ({self.active_mode.get()})", font=("Helvetica", button_font_size * 1.5, "bold"), text_color="green")
-            active_mode_label.place(relx=0.7, rely=0.8)
+            active_mode_label.place(relx=0.65, rely=0.8)
         elif self.active_mode.get() == 2:
             active_mode_label = ctk.CTkLabel(manual_frame, text=f"Active Mode: Final Matches ({self.active_mode.get()})", font=("Helvetica", button_font_size * 1.5, "bold"), text_color="green")
-            active_mode_label.place(relx=0.7, rely=0.8)
+            active_mode_label.place(relx=0.65, rely=0.8)
 
         # Assuming self.spiel_buttons is initialized as an empty dictionary
         self.spiel_buttons = {}
