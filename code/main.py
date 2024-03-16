@@ -23,6 +23,7 @@ import pathlib
 import functools
 import platform
 import subprocess
+import json
 import traceback
 
 app = Flask(__name__)
@@ -122,7 +123,12 @@ class Window(ctk.CTk):
         logging.getLogger().addHandler(self.console_handler)
 
         logging.debug("Started logging")
-        
+
+        #check if there is an admins.json file
+        if not os.path.exists("data/admins.json"):
+            with open("data/admins.json", "w") as f:
+                pass
+                
         
         # Set window title
         self.title("Football Tournament Manager")
@@ -1164,28 +1170,30 @@ class Window(ctk.CTk):
             #pause_mode_active_label.place(relx=0.7, rely=0.4)
             #Replace the label with a button
             self.pause_mode_active_button = ctk.CTkButton(manual_frame, text="Pause Mode Active", command=self.on_pause_button_change, fg_color="red", hover_color="#801818", font=("Helvetica", button_font_size * 1.5, "bold"), height=button_height)
-            self.pause_mode_active_button.place(relx=0.7, rely=0.3)
+            self.pause_mode_active_button.place(relx=0.65, rely=0.0)
         
         if self.best_scorer_active.get() == 1:
             #best_scorer_active_label = ctk.CTkLabel(manual_frame, text="Best Scorer Active", font=("Helvetica", button_font_size * 1.5, "bold"), fg_color="red")
-            #best_scorer_active_label.place(relx=0.7, rely=0.1)
+            #best_scorer_active_label.place(relx=0.65, rely=0.1)
             #Replace the label with a button
-            self.best_scorer_active_button = ctk.CTkButton(manual_frame, text="Best Scorer Active", command=self.on_best_scorer_button_change, fg_color="red", hover_color="#801818", font=("Helvetica", button_font_size * 1.5, "bold"), height=button_height)
-            self.best_scorer_active_button.place(relx=0.7, rely=0.1)
+            #self.best_scorer_active_button = ctk.CTkButton(manual_frame, text="Best Scorer Active", command=self.on_best_scorer_button_change, fg_color="red", hover_color="#801818", font=("Helvetica", button_font_size * 1.5, "bold"), height=button_height)
+            #self.best_scorer_active_button.place(relx=0.65, rely=0.3)
+            self.best_scorer_active_button = ctk.CTkButton(manual_frame, text="Best Scorer Active", command=self.on_best_scorer_button_change, fg_color="#c1d231", hover_color="#c1d231", font=("Helvetica", button_font_size * 1.5, "bold"), height=button_height, text_color="#0740a4")
+            self.best_scorer_active_button.place(relx=0.65, rely=0.3)
         
         if self.there_is_an_ko_phase.get() == 1:
             ko_phase_active_label = ctk.CTkLabel(manual_frame, text="KO Phase Active", font=("Helvetica", button_font_size * 1.5, "bold"), text_color="green")
-            ko_phase_active_label.place(relx=0.7, rely=0.6)
+            ko_phase_active_label.place(relx=0.65, rely=0.6)
 
         if self.active_mode.get() == 1:
             active_mode_label = ctk.CTkLabel(manual_frame, text=f"Active Mode: Group Phase ({self.active_mode.get()})", font=("Helvetica", button_font_size * 1.5, "bold"), text_color="green")
-            active_mode_label.place(relx=0.7, rely=0.8)
+            active_mode_label.place(relx=0.65, rely=0.8)
         elif self.active_mode.get() == 3:
             active_mode_label = ctk.CTkLabel(manual_frame, text=f"Active Mode: KO Phase ({self.active_mode.get()})", font=("Helvetica", button_font_size * 1.5, "bold"), text_color="green")
-            active_mode_label.place(relx=0.7, rely=0.8)
+            active_mode_label.place(relx=0.65, rely=0.8)
         elif self.active_mode.get() == 2:
             active_mode_label = ctk.CTkLabel(manual_frame, text=f"Active Mode: Final Matches ({self.active_mode.get()})", font=("Helvetica", button_font_size * 1.5, "bold"), text_color="green")
-            active_mode_label.place(relx=0.7, rely=0.8)
+            active_mode_label.place(relx=0.65, rely=0.8)
 
         # Assuming self.spiel_buttons is initialized as an empty dictionary
         self.spiel_buttons = {}
@@ -1783,23 +1791,25 @@ class Window(ctk.CTk):
             time_interval_final_matches = int(self.time_intervalFM.get().replace("m", ""))
             
             # get time pause final matches
-            pause_between_final_matches = int(self.time_pause_before_FM.get().replace("m", ""))
+            pause_before_final_matches = int(self.time_pause_before_FM.get().replace("m", ""))
             
             # calculate the time for the current match
             time_interval_for_only_the_final_match = int(self.time_interval_for_only_the_final_match.get().replace("m", ""))
 
             timeIntervalKO = int(self.time_intervalKO.get().replace("m", ""))
+
             
             #logging.debug(f"active_match: {active_match}, time_interval_final_matches: {time_interval_final_matches}, timeinterval: {timeinterval}, match_count: {match_count}, pause_between_final_matches: {pause_between_final_matches}")
 
             # calculate the time for the current match
             if self.there_is_an_ko_phase.get() == 0:
-                current_match_time = starttime + datetime.timedelta(minutes=(final_match_active * time_interval_for_only_the_final_match) + (time_interval_final_matches * active_match) + (timeinterval * match_count) + pause_between_final_matches)
+                current_match_time = starttime + datetime.timedelta(minutes=(final_match_active * time_interval_for_only_the_final_match) + (time_interval_final_matches * active_match) + (timeinterval * match_count) + pause_before_final_matches)
             else:
                 self.cursor.execute("SELECT COUNT(*) FROM KOMatchesData")
                 ko_match_count = self.cursor.fetchone()[0]
+                pauseBeforeKOMatches = int(self.time_pause_before_KO.get().replace("m", ""))
                 
-                current_match_time = starttime + datetime.timedelta(minutes=(final_match_active * time_interval_for_only_the_final_match) + (time_interval_final_matches * active_match) + (timeinterval * match_count) + (timeIntervalKO * ko_match_count) + pause_between_final_matches)
+                current_match_time = starttime + datetime.timedelta(minutes=(final_match_active * time_interval_for_only_the_final_match) + (time_interval_final_matches * active_match) + (timeinterval * match_count) + (timeIntervalKO * ko_match_count) + pause_before_final_matches + pauseBeforeKOMatches)
     
 
             if next_match:
@@ -1826,8 +1836,10 @@ class Window(ctk.CTk):
             # get the time interval from settings
             timeIntervalKO = int(self.time_intervalKO.get().replace("m", ""))
 
+            pauseBeforeKOMatches = int(self.time_pause_before_KO.get().replace("m", ""))
+
             # calculate the time for the current match
-            current_match_time = starttime + datetime.timedelta(minutes=timeIntervalKO * active_match + timeinterval * match_count) 
+            current_match_time = starttime + datetime.timedelta(minutes=(timeIntervalKO * active_match) + (timeinterval * match_count) + pauseBeforeKOMatches)
 
             next_match_start_time = current_match_time + datetime.timedelta(minutes=timeIntervalKO)
 
@@ -2282,16 +2294,52 @@ class Window(ctk.CTk):
             result.append((0, 'No Team', 0, 0, 0))
 
         return result
+    
+    
+    def get_top_two_teams_KO_phase(self):
+        query = """
+        SELECT 
+            winningTeamId,
+            winningTeamName,
+            COUNT(*) as wins
+        FROM (
+            SELECT 
+                CASE 
+                    WHEN k.team1Goals > k.team2Goals THEN t1.id
+                    ELSE t2.id
+                END as winningTeamId,
+                CASE 
+                    WHEN k.team1Goals > k.team2Goals THEN t1.teamName
+                    ELSE t2.teamName
+                END as winningTeamName
+            FROM KOMatchesData k
+            LEFT JOIN teamData t1 ON t1.id = k.team1Id
+            LEFT JOIN teamData t2 ON t2.id = k.team2Id
+        ) as subquery
+        GROUP BY winningTeamId
+        ORDER BY wins DESC
+        LIMIT 4
+        """
+        self.cursor.execute(query)
+        result = self.cursor.fetchall()
+
+        return result
 
 
     def get_teams_for_final_matches(self):
-        teams1 = self.get_top_two_teams(1)
-        teams2 = self.get_top_two_teams(2)
+        if self.there_is_an_ko_phase.get() == 0:
+            teams1 = self.get_top_two_teams(1)
+            teams2 = self.get_top_two_teams(2)
+            if teams1 and teams2:
+                self.endteam1, self.endteam2 = teams1
+                self.endteam4, self.endteam3 = teams2
+                
+        elif self.there_is_an_ko_phase.get() == 1:
+            teams = self.get_top_two_teams_KO_phase()
+            if teams:
+                self.endteam1, self.endteam3 = teams[:2]
+                self.endteam2, self.endteam4 = teams[2:]
 
-        if teams1 and teams2:
-            self.endteam1, self.endteam2 = teams1
-            self.endteam4, self.endteam3 = teams2
-             
 
     def get_spiel_um_platz_3(self, team1, team2, team3, team4):
         #get the best two teams from the database(with most points)
@@ -2522,8 +2570,9 @@ class Window(ctk.CTk):
                     if self.there_is_an_ko_phase.get() == 0:
                         result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the end of the matches. Do you want activate the pause and the final matches?")
                         if result:
-                            self.pause_mode.set(1)
-                            self.on_pause_switch_change()
+                            if int(self.time_intervalFM.get().replace("m", "")) != 0:
+                                self.pause_mode.set(2)
+                                self.on_pause_switch_change()
                             self.active_mode.set(2)
                             self.save_active_mode_in_db()
                             values_list, active_match = self.get_values_list_mode2()
@@ -2539,8 +2588,11 @@ class Window(ctk.CTk):
                         else:
                             return
                     elif self.there_is_an_ko_phase.get() == 1:
-                        result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the end of the matches. Do you want to select the first KO match?")
+                        result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the end of the matches. Do you want to activate the pause and the KO matches?")
                         if result:
+                            if int(self.time_intervalKO.get().replace("m", "")) != 0:
+                                self.pause_mode.set(1)
+                                self.on_pause_switch_change()
                             self.active_mode.set(3)
                             self.save_active_mode_in_db()
                             values_list, pairedKoMatches = self.get_values_list_mode3()
@@ -2608,6 +2660,13 @@ class Window(ctk.CTk):
             if next_match:
                 if self.active_match < 3:
                     self.active_match += 1
+
+                if self.active_match == 3:
+                    result = tkinter.messagebox.askyesno("Selecting Helper", "Do want to activate the Half-Time break and switch to the last final match?")
+                    if result:
+                        if int(self.time_intervalFM.get().replace("m", "")) != 0:
+                            self.pause_mode.set(3)
+                            self.on_pause_switch_change()
             else:
                 if self.active_match > 0:
                     self.active_match -= 1
@@ -2675,8 +2734,9 @@ class Window(ctk.CTk):
                 if new_match_index > len(pairedKoMatches):
                     result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the end of the matches. Do you want activate the pause and the final matches?")
                     if result:
-                        self.pause_mode.set(1)
-                        self.on_pause_switch_change()
+                        if int(self.time_intervalFM.get().replace("m", "")) != 0:
+                            self.pause_mode.set(2)
+                            self.on_pause_switch_change()
                         self.active_mode.set(2)
                         self.save_active_mode_in_db()
                         values_list, _ = self.get_values_list_mode2()
@@ -3494,11 +3554,9 @@ class Window(ctk.CTk):
             if len(time_parts) != 2:
                 return False
             hour, minute = time_parts
-            if not hour.isdigit() or not minute.isdigit():
+            if not (hour.isdigit() and minute.isdigit() and len(hour) == 2 and len(minute) == 2):
                 return False
             if not (0 <= int(hour) <= 23 and 0 <= int(minute) <= 59):
-                return False
-            if len(minute) != 2:
                 return False
             return True
         else:
@@ -3508,17 +3566,22 @@ class Window(ctk.CTk):
     def on_start_time_change(self, event):
         if self.start_time.get() == "":
             return
-        if not self.is_valid_time(str(self.start_time.get())):
+        time_str = str(self.start_time.get())
+        if not self.is_valid_time(time_str):
             logging.warning(f"Invalid time format. Please enter time in HH:MM format.")
             return
+
+        # Format time correctly
+        hour, minute = time_str.split(":")
+        formatted_time = f"{int(hour):02d}:{int(minute):02d}"
 
         saveStartTimeInDB = """
         UPDATE settingsData
         SET startTime = ?
         WHERE id = 1
         """
-        logging.debug(f"on_start_time_change {self.start_time.get()}")
-        self.settingscursor.execute(saveStartTimeInDB, (self.start_time.get(),))
+        logging.debug(f"on_start_time_change {formatted_time}")
+        self.settingscursor.execute(saveStartTimeInDB, (formatted_time,))
         self.settingsconnection.commit()
 
         self.updated_data.update({"startTime": get_data_for_website(7)})
@@ -4240,7 +4303,7 @@ def get_data_for_website(which_data=-1):
                     grouped_data[row[0]]['team1Goals'].append(row[1])
                     grouped_data[row[0]]['team2Goals'].append(row[2])
 
-                # Calculate median and percentages
+                # Calculate percentages
                 tipping_statistics = {}
                 for matchId, data in grouped_data.items():
                     matchId += 1
@@ -4248,10 +4311,23 @@ def get_data_for_website(which_data=-1):
                     team2Goals = data['team2Goals']
                     average_team1Goals = sum(team1Goals) / len(team1Goals) if team1Goals else 0
                     average_team2Goals = sum(team2Goals) / len(team2Goals) if team2Goals else 0
-                    averageRounded_team1Goals = round(average_team1Goals, 2)
-                    averageRounded_team2Goals = round(average_team2Goals, 2)
-                    percent_team1Wins = sum(1 for goal in team1Goals if goal > average_team2Goals) / len(team1Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
-                    percent_team2Wins = sum(1 for goal in team2Goals if goal > average_team1Goals) / len(team2Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
+                    #averageRounded_team1Goals = round(average_team1Goals, 2)
+                    #averageRounded_team2Goals = round(average_team2Goals, 2)
+
+                    team1Wins = 0
+                    team2Wins = 0
+                    for team1Goal, team2Goal in zip(team1Goals, team2Goals):
+                        if team1Goal > team2Goal:
+                            team1Wins += 1
+                        elif team1Goal == team2Goal:
+                            team1Wins += 0.5
+                            team2Wins += 0.5
+                        if team2Goal > team1Goal:
+                            team2Wins += 1
+
+                    percent_team1Wins = team1Wins / len(team1Goals) * 100 if team1Goals else 0
+                    percent_team2Wins = team2Wins / len(team2Goals) * 100 if team2Goals else 0
+
                     tipping_statistics[matchId] = (average_team1Goals, average_team2Goals, percent_team1Wins, percent_team2Wins)
 
                 # Combine both datasets
@@ -4281,6 +4357,18 @@ def get_data_for_website(which_data=-1):
             elif tkapp.active_mode.get() == 3:
                 a_m += 100
                 a_m *= -1
+
+            #if tkapp.pause_mode.get() == 0:
+            #    #count all group phase matches
+            #    connection = sqlite3.connect(db_path)
+            #    cursor = connection.cursor()
+            #
+            #    get_all_matches = """
+            #    SELECT COUNT(*) FROM matchData
+            #    """
+            #    a_m = cursor.execute(get_all_matches).fetchone()[0]
+            #    return a_m
+            
             tkapp.updated_data.update({"activeMatchNumber": a_m})
             return a_m
         except:
@@ -4351,12 +4439,23 @@ def get_data_for_website(which_data=-1):
                         continue
                     team1Goals = data['team1Goals']
                     team2Goals = data['team2Goals']
-                    average_team1Goals = sum(team1Goals) / len(team1Goals) if team1Goals else 0
-                    average_team2Goals = sum(team2Goals) / len(team2Goals) if team2Goals else 0
-                    averageRounded_team1Goals = round(average_team1Goals, 2)
-                    averageRounded_team2Goals = round(average_team2Goals, 2)
-                    percent_team1Wins = sum(1 for goal in team1Goals if goal > average_team2Goals) / len(team1Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
-                    percent_team2Wins = sum(1 for goal in team2Goals if goal > average_team1Goals) / len(team2Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
+                    #averageRounded_team1Goals = round(average_team1Goals, 2)
+                    #averageRounded_team2Goals = round(average_team2Goals, 2)
+
+                    team1Wins = 0
+                    team2Wins = 0
+                    for team1Goal, team2Goal in zip(team1Goals, team2Goals):
+                        if team1Goal > team2Goal:
+                            team1Wins += 1
+                        elif team1Goal == team2Goal:
+                            team1Wins += 0.5
+                            team2Wins += 0.5
+                        if team2Goal > team1Goal:
+                            team2Wins += 1
+
+                    percent_team1Wins = team1Wins / len(team1Goals) * 100 if team1Goals else 0
+                    percent_team2Wins = team2Wins / len(team2Goals) * 100 if team2Goals else 0
+
                     tipping_statistics[matchId] = (average_team1Goals, average_team2Goals, percent_team1Wins, percent_team2Wins)
 
                 #
@@ -4460,10 +4559,23 @@ def get_data_for_website(which_data=-1):
                     team2Goals = data['team2Goals']
                     average_team1Goals = sum(team1Goals) / len(team1Goals) if team1Goals else 0
                     average_team2Goals = sum(team2Goals) / len(team2Goals) if team2Goals else 0
-                    averageRounded_team1Goals = round(average_team1Goals, 2)
-                    averageRounded_team2Goals = round(average_team2Goals, 2)
-                    percent_team1Wins = sum(1 for goal in team1Goals if goal > average_team2Goals) / len(team1Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
-                    percent_team2Wins = sum(1 for goal in team2Goals if goal > average_team1Goals) / len(team2Goals) * 100 if averageRounded_team1Goals != averageRounded_team2Goals else 50
+                    #averageRounded_team1Goals = round(average_team1Goals, 2)
+                    #averageRounded_team2Goals = round(average_team2Goals, 2)
+
+                    team1Wins = 0
+                    team2Wins = 0
+                    for team1Goal, team2Goal in zip(team1Goals, team2Goals):
+                        if team1Goal > team2Goal:
+                            team1Wins += 1
+                        elif team1Goal == team2Goal:
+                            team1Wins += 0.5
+                            team2Wins += 0.5
+                        if team2Goal > team1Goal:
+                            team2Wins += 1
+
+                    percent_team1Wins = team1Wins / len(team1Goals) * 100 if team1Goals else 0
+                    percent_team2Wins = team2Wins / len(team2Goals) * 100 if team2Goals else 0
+
                     tipping_statistics[matchId] = (average_team1Goals, average_team2Goals, percent_team1Wins, percent_team2Wins)
 
                 combined_data = []
@@ -4481,6 +4593,7 @@ def get_data_for_website(which_data=-1):
             else:
                 return tkapp.cache.get("KOMatches")
         except:
+            logging.info("Error in get_data_for_website(8)")
             return []
     
     elif which_data == 9:
@@ -4572,13 +4685,13 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 GOOGLE_CLIENT_ID = "450306821477-t53clamc7s8u20adedj2fqhv0904aa8t.apps.googleusercontent.com"
 client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret.json")
+admins_file = os.path.join(pathlib.Path(__file__).parent, "admins.json")
 
 flow = Flow.from_client_secrets_file(
     client_secrets_file=client_secrets_file,
     scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
     redirect_uri="https://technikag.serveo.net/callback"
 )
-
 
 def login_is_required(function):
     @functools.wraps(function)
@@ -4712,12 +4825,12 @@ def send_tipping_data():
         if match_id <= tkapp.active_match:
             return "Match already started or finished", 400
     elif tkapp.active_match != -1 and tkapp.active_mode.get() == 2:
-        match_id = (match_id * -1) - 2
-        if match_id <= tkapp.active_match:
+        match_id_temp = (match_id * -1) - 2
+        if match_id_temp <= tkapp.active_match:
             return "Match already started or finished", 400
     elif tkapp.active_match != -1 and tkapp.active_mode.get() == 3:
-        match_id = (match_id * -1) - 100
-        if match_id <= tkapp.active_match:
+        match_id_temp = (match_id * -1) - 100
+        if match_id_temp <= tkapp.active_match:
             return "Match already started or finished", 400
             
     connection = sqlite3.connect(db_path)
@@ -4774,6 +4887,7 @@ def send_user_name():
 
 @app.route("/")
 def home():
+    print("entered home")
     return get_initial_data("websitemain.html")
 
 @app.route("/group")
@@ -4790,7 +4904,7 @@ def plan_index():
 
 @app.route("/best_scorer")
 def best_scorer_index():
-    if tkapp.best_scorer_active.get() == 1:
+    if tkapp.best_scorer_active.get() == 1 or session.get("email") in json.load(open(admins_file, "r")):
         return get_initial_data("websitebestscorer.html")
     else:
         abort(404) 
@@ -4817,9 +4931,17 @@ def admin_index():
         print("email", session.get("email"))
     return get_initial_data("admin.html")
 
+##############################################################################################
+######################################### Handler ############################################
+##############################################################################################
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    return make_response(jsonify(error="ratelimit exceeded %s" % e.description), 429)
 
 
 ##############################################################################################

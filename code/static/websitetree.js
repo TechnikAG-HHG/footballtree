@@ -298,8 +298,8 @@ function writeTeamData(matchCount = 2) {
             var match = finalMatchesSliced[i];
             var team1 = match[0];
             var team2 = match[1];
-            var score1 = match[2][0];
-            var score2 = match[2][1];
+            var score1 = match[2];
+            var score2 = match[3];
 
             var matchElement = document.querySelector(`.text${i - 1}`);
 

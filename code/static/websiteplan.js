@@ -5,8 +5,9 @@ var startTime = new Date(); // Set the start time
 var finalMatchesTime = new Date(); // Set the final matches time
 var KOMatchesTime = new Date(); // Set the K.O. matches time
 
-var pauseCount = 3; // Global variable to keep track of the total number of pauses
+var pauseCount = 4; // Global variable to keep track of the total number of pauses
 var pauseTimes = []; // Global array to keep track of the pause times
+var positions = []; // Global array to keep track of the positions of the pause times
 
 startTime.setHours(0, 0, 0, 0);
 
@@ -85,7 +86,7 @@ function generateTableGroup(matches) {
         var row = tbody.insertRow();
 
         if (i == data["activeMatchNumber"] && data["pauseMode"] == -1) {
-            generateFullSize(match, i, row);
+            generateFullSize(match, data["activeMatchNumber"], i, row);
         } else {
             row.id = "section" + (i + 1); // Set the id of the row
 
@@ -144,8 +145,11 @@ function generatePauseTime(time, pos, startTime, pauseID) {
         if (pauseTimeDiv) {
             pauseTimeDiv.remove();
             pauseTimes[pauseID] = null;
+            positions[pauseID] = null;
         }
     }
+
+    positions[pauseID] = pos;
 
     stopTime = new Date(startTime.getTime() + time * 60000);
     if (pos > -1) {
@@ -227,16 +231,35 @@ function checkForPauseUpdate() {
     console.log("Checking for pause update");
     for (var i = 0; i < pauseCount; i++) {
         var pauseTimeElement = document.getElementById(`pauseTimeProgress${i}`);
-        if (pauseTimeElement) {
-            break;
-        }
-    }
 
-    if (i == data["pauseMode"]) {
-        intervalActivated = true;
-    } else {
-        pauseTimeElement.value = 0;
-        intervalActivated = false;
+        if (pauseTimeElement) {
+            console.log(pauseTimeElement);
+            if (i == data["pauseMode"]) {
+                console.log("Pause mode activated");
+                intervalActivated = true;
+            } else {
+                console.log("Pause mode not activated");
+                if (i < data["pauseMode"]) {
+                    pauseTimeElement.value = 999999999;
+                } else if (data["activeMatchNumber"] < -1 && data["activeMatchNumber"] > -100) {
+                    if (positions[i] > data["activeMatchNumber"] || positions[i] < -99) {
+                        pauseTimeElement.value = 999999999;
+                    } else {
+                        pauseTimeElement.value = 0;
+                    }
+                } else if (data["activeMatchNumber"] < -99) {
+                    if (positions[i] > data["activeMatchNumber"] ) {
+                        pauseTimeElement.value = 999999999;
+                    } else {
+                        pauseTimeElement.value = 0;
+                    }
+                } else if (positions[i] < data["activeMatchNumber"] || data["activeMatchNumber"] < -1) {
+                    pauseTimeElement.value = 999999999;
+                } else {
+                    pauseTimeElement.value = 0;
+                }
+            }
+        }
     }
 }
 
@@ -324,6 +347,7 @@ function KOMatchTable() {
                     ) {
                         generateFullSize(
                             match,
+                            data["activeMatchNumber"],
                             i,
                             row,
                             (gameName = "K.O.-Spiel " + (y + 1))
@@ -391,7 +415,7 @@ function finalMatchTable() {
         data["Matches"] === 0
     ) {
         console.log("No matches found");
-        return; // Add return statement here
+        return;
     }
 
     if ("finalMatches" in data && data["finalMatches"] != null) {
@@ -470,17 +494,22 @@ function finalMatchTable() {
             var row = tbody.insertRow();
             console.log("Match:", match);
 
+            finalMatchesTime = new Date(
+                finalMatchesTime.getTime() + data["timeIntervalFM"] * 60000);
+
             var matchNumber = i;
             var gameName;
             if (i == totalMatchNumber) {
                 gameName = "Finale";
                 if (data["halfTimePause"] != null && data["halfTimePause"] != "0") {
-                    finalMatchesTime = new Date(generatePauseTime(parseInt(data["halfTimePause"]), -4, finalMatchesTime, 2));
+                    finalMatchesTime = new Date(generatePauseTime(parseInt(data["halfTimePause"]), -4, finalMatchesTime, 3
+                    ));
                 }
             } else if (i == totalMatchNumber - 1) {
+                console.log("Spiel um Platz 3");
                 gameName = "Spiel um Platz 3";
                 if (data["pauseBeforeTheFinalMatch"] != null && data["pauseBeforeTheFinalMatch"] != "0") {
-                    finalMatchesTime = new Date(generatePauseTime(parseInt(data["pauseBeforeTheFinalMatch"]), -3, new Date(finalMatchesTime.getTime() + data["timeIntervalFM"] * 60000), 3));
+                    finalMatchesTime = new Date(generatePauseTime(parseInt(data["pauseBeforeTheFinalMatch"]), -3, finalMatchesTime, 2));
                 }
             } else {
                 gameName = "Halbfinalspiel " + matchNumber;
@@ -491,23 +520,10 @@ function finalMatchTable() {
                     i + 1 == Math.abs(data["activeMatchNumber"]) &&
                     data["pauseMode"] == -1
                 ) {
-                    generateFullSize(match, i, row, gameName);
+                    generateFullSize(match, data["activeMatchNumber"], i, row, gameName);
                 } else {
                     row.id = "section" + (i + 1) * -1; // Set the id of the row
                     var cellTime = row.insertCell(0);
-
-                    if (
-                        data["timeIntervalFM"] == null ||
-                        data["timeIntervalFM"] == "0"
-                    ) {
-                        finalMatchesTime = new Date(
-                            finalMatchesTime.getTime() + timeInterval * 60000
-                        );
-                    } else {
-                        finalMatchesTime = new Date(
-                            finalMatchesTime.getTime() + data["timeIntervalFM"] * 60000
-                        );
-                    }
 
                     cellTime.textContent = formatTime(finalMatchesTime);
 
@@ -524,10 +540,10 @@ function finalMatchTable() {
                         Math.abs(data["activeMatchNumber"]) - 1 > i &&
                         data["finalMatches"] != null
                     ) {
-                        if (match[2][0] > match[2][1]) {
+                        if (match[2] > match[3]) {
                             cellFirstTeam.className = "style-winner";
                             cellSecondTeam.className = "style-loser";
-                        } else if (match[2][0] < match[2][1]) {
+                        } else if (match[2] < match[3]) {
                             cellSecondTeam.className = "style-winner";
                             cellFirstTeam.className = "style-loser";
                         } else {
@@ -546,9 +562,9 @@ function finalMatchTable() {
     }
 }
 
-function generateFullSize(match, i, row, gameName = null) {
+function generateFullSize(match, matchID, i, row, gameName = null) {
     // Create a bigger statistic entry in the table for the current match
-    row.id = "section" + (i + 1); // Set the id of the row
+    row.id = "section" + matchID; // Set the id of the row
     row.style.backgroundColor = "black";
 
     var dataNumber = 5;
@@ -718,5 +734,5 @@ updateData();
 
 // call updateData() every 5 seconds
 setInterval(updateData, 10000);
-setInterval(updatePauseTime, 100);
+setInterval(updatePauseTime, 10);
 window.location.hash = ``;
