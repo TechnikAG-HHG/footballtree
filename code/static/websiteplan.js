@@ -233,7 +233,6 @@ function checkForPauseUpdate() {
         var pauseTimeElement = document.getElementById(`pauseTimeProgress${i}`);
 
         if (pauseTimeElement) {
-            console.log(pauseTimeElement);
             if (i == data["pauseMode"]) {
                 console.log("Pause mode activated");
                 intervalActivated = true;
