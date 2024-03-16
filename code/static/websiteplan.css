@@ -100,7 +100,11 @@ table {
 
 table td {
     padding: 0.8vw;
+    margin: 0 auto;
     text-align: center;
+    overflow-x: hidden;
+    max-width: 100%;
+    hyphens: auto;
 }
 
 table tbody tr:nth-child(odd) {
@@ -310,18 +314,32 @@ h2 {
 @media (max-width: 800px) {
     .pauseTime,
     #pauseTimeProgress {
-        height: 4vh;
-        border: 0.1vh solid #49ba67;
+        border: 0.3vh solid #49ba67;
     }
 
-    #pauseTimeStart,
-    #pauseTimeEnd,
-    #pauseTimeText {
+    .pauseTimeStart,
+    .pauseTimeEnd,
+    .pauseTimeText {
         font-size: 1.5vh;
     }
 
     table td {
         font-size: 1.5vh;
         border: 0.1vh solid #49ba67;
+    }
+
+    h2.title {
+        font-size: 1.7vh;
+    }
+
+    p.goals, p.description {
+        font-size: 1.5vh;
+    }
+
+    p.team1, p.team2 {
+        font-size: 1.5vh;
+        overflow-x: hidden;
+        max-width: 100%;
+        hyphens: auto;
     }
 }
