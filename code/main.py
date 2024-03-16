@@ -320,9 +320,9 @@ class Window(ctk.CTk):
             bestScorerActive BOOLEAN DEFAULT 0,
             thereAreKOMatches BOOLEAN DEFAULT 0,
             timeIntervalKO TEXT DEFAULT "",
-            timeBeforeTheFinalMatch TEXT DEFAULT "",
             pauseBeforeKO TEXT DEFAULT "",
-            halfTimePause TEXT DEFAULT ""
+            timeBeforeSUP3AndTheFinalMatch TEXT DEFAULT "",
+            timeBeforeTHEFinalMatch TEXT DEFAULT ""
         )
         """
         self.settingscursor.execute(settingsDataTableCreationQuery)
@@ -377,9 +377,9 @@ class Window(ctk.CTk):
         self.time_interval_for_only_the_final_match = tk.StringVar(value="10m")
         self.best_scorer_active = tk.BooleanVar(value=False)
         self.there_is_an_ko_phase = tk.BooleanVar(value=False)
-        self.time_before_the_final_match = tk.StringVar(value="0m")
         self.time_pause_before_KO = tk.StringVar(value="0m")
-        self.half_time_pause = tk.StringVar(value="0m")
+        self.time_before_SUP3_and_the_final_match = tk.StringVar(value="0m")
+        self.pause_before_THE_final_match = tk.StringVar(value="0m")
         
         # load the settings from the database into the variables
         if settings[5] is not None and settings[5] != "" and settings[5] != 0:
@@ -434,13 +434,13 @@ class Window(ctk.CTk):
             self.time_intervalKO.set(value=settings[19])
 
         if settings[20] is not None and settings[20] != "" and settings[20] != 0:
-            self.time_before_the_final_match.set(value=settings[20])
+            self.time_pause_before_KO.set(value=settings[20])
 
         if settings[21] is not None and settings[21] != "" and settings[21] != 0:
-            self.time_pause_before_KO.set(value=settings[21])
+            self.time_before_SUP3_and_the_final_match.set(value=settings[21])
 
         if settings[22] is not None and settings[22] != "" and settings[22] != 0:
-            self.half_time_pause.set(value=settings[22])
+            self.pause_before_THE_final_match.set(value=settings[22])
             
         if self.debug_mode.get() == 1:
             self.console_handler.setLevel(logging.DEBUG)
@@ -1796,21 +1796,30 @@ class Window(ctk.CTk):
             # calculate the time for the current match
             time_interval_for_only_the_final_match = int(self.time_interval_for_only_the_final_match.get().replace("m", ""))
 
+            timePauseBeforeTheFinalMatch = int(self.pause_before_THE_final_match.get().replace("m", ""))
+
             timeIntervalKO = int(self.time_intervalKO.get().replace("m", ""))
 
-            
+            pause_before_SUP3_and_the_final_matches = 0
+
+            active_match -= 1
+
+            if active_match >= 2:
+                pause_before_SUP3_and_the_final_matches = int(self.time_before_SUP3_and_the_final_match.get().replace("m", ""))
+
+
             #logging.debug(f"active_match: {active_match}, time_interval_final_matches: {time_interval_final_matches}, timeinterval: {timeinterval}, match_count: {match_count}, pause_between_final_matches: {pause_between_final_matches}")
 
             # calculate the time for the current match
+            common_time = (final_match_active * time_interval_for_only_the_final_match) + (final_match_active * timePauseBeforeTheFinalMatch) + (time_interval_final_matches * active_match) + (timeinterval * match_count) + pause_before_final_matches + pause_before_SUP3_and_the_final_matches
+
             if self.there_is_an_ko_phase.get() == 0:
-                current_match_time = starttime + datetime.timedelta(minutes=(final_match_active * time_interval_for_only_the_final_match) + (time_interval_final_matches * active_match) + (timeinterval * match_count) + pause_before_final_matches)
+                current_match_time = starttime + datetime.timedelta(minutes=common_time)
             else:
                 self.cursor.execute("SELECT COUNT(*) FROM KOMatchesData")
                 ko_match_count = self.cursor.fetchone()[0]
                 pauseBeforeKOMatches = int(self.time_pause_before_KO.get().replace("m", ""))
-                
-                current_match_time = starttime + datetime.timedelta(minutes=(final_match_active * time_interval_for_only_the_final_match) + (time_interval_final_matches * active_match) + (timeinterval * match_count) + (timeIntervalKO * ko_match_count) + pause_before_final_matches + pauseBeforeKOMatches)
-    
+                current_match_time = starttime + datetime.timedelta(minutes=common_time + (timeIntervalKO * ko_match_count) + pauseBeforeKOMatches)
 
             if next_match:
                 next_match_start_time = current_match_time + datetime.timedelta(minutes=time_interval_final_matches)                
@@ -2570,7 +2579,7 @@ class Window(ctk.CTk):
                     if self.there_is_an_ko_phase.get() == 0:
                         result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the end of the matches. Do you want activate the pause and the final matches?")
                         if result:
-                            if int(self.time_intervalFM.get().replace("m", "")) != 0:
+                            if int(self.time_pause_before_FM.get().replace("m", "")) != 0:
                                 self.pause_mode.set(2)
                                 self.on_pause_switch_change()
                             self.active_mode.set(2)
@@ -2590,7 +2599,7 @@ class Window(ctk.CTk):
                     elif self.there_is_an_ko_phase.get() == 1:
                         result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the end of the matches. Do you want to activate the pause and the KO matches?")
                         if result:
-                            if int(self.time_intervalKO.get().replace("m", "")) != 0:
+                            if int(self.time_pause_before_KO.get().replace("m", "")) != 0:
                                 self.pause_mode.set(1)
                                 self.on_pause_switch_change()
                             self.active_mode.set(3)
@@ -2661,8 +2670,8 @@ class Window(ctk.CTk):
                 if self.active_match < 3:
                     self.active_match += 1
 
-                if self.active_match == 3:
-                    result = tkinter.messagebox.askyesno("Selecting Helper", "Do want to activate the Half-Time break and switch to the last final match?")
+                if self.active_match == 2 and next_match:
+                    result = tkinter.messagebox.askyesno("Selecting Helper", "Do want to activate the Half-Time break?, in any case Spiel um Platz 3 will be selected.")
                     if result:
                         if int(self.time_intervalFM.get().replace("m", "")) != 0:
                             self.pause_mode.set(3)
@@ -2734,7 +2743,7 @@ class Window(ctk.CTk):
                 if new_match_index > len(pairedKoMatches):
                     result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the end of the matches. Do you want activate the pause and the final matches?")
                     if result:
-                        if int(self.time_intervalFM.get().replace("m", "")) != 0:
+                        if int(self.time_pause_before_FM.get().replace("m", "")) != 0:
                             self.pause_mode.set(2)
                             self.on_pause_switch_change()
                         self.active_mode.set(2)
@@ -3455,27 +3464,27 @@ class Window(ctk.CTk):
         time_pause_before_FM_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
         time_pause_before_FM_entry.bind("<KeyRelease>", lambda event: self.on_time_pause_before_FM_change(event))
 
-        # pause time before the final match
-        time_before_the_final_match_frame = ctk.CTkFrame(entry_frame3, bg_color='#0e1718', fg_color='#0e1718')
-        time_before_the_final_match_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
+        # pause time SUP3 and the final match
+        time_before_SUP3_and_the_final_match_frame = ctk.CTkFrame(entry_frame3, bg_color='#0e1718', fg_color='#0e1718')
+        time_before_SUP3_and_the_final_match_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
 
-        time_before_the_final_match_label = ctk.CTkLabel(time_before_the_final_match_frame, text="Pause FMs > THE Final Match", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
-        time_before_the_final_match_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
+        time_before_SUP3_and_the_final_match_label = ctk.CTkLabel(time_before_SUP3_and_the_final_match_frame, text="Pause HFMs > SUP3 & THE FM", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        time_before_SUP3_and_the_final_match_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
 
-        time_before_the_final_match_entry = ctk.CTkEntry(time_before_the_final_match_frame, textvariable=self.time_before_the_final_match, font=("Helvetica", self.team_button_font_size*1.3))
-        time_before_the_final_match_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
-        time_before_the_final_match_entry.bind("<KeyRelease>", lambda event: self.on_time_before_the_final_match_change(event))
+        time_before_SUP3_and_the_final_match_entry = ctk.CTkEntry(time_before_SUP3_and_the_final_match_frame, textvariable=self.time_before_SUP3_and_the_final_match, font=("Helvetica", self.team_button_font_size*1.3))
+        time_before_SUP3_and_the_final_match_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
+        time_before_SUP3_and_the_final_match_entry.bind("<KeyRelease>", lambda event: self.on_time_before_SUP3_and_the_final_match_change(event))
 
-        # Half time pause
-        half_time_pause_frame = ctk.CTkFrame(entry_frame3, bg_color='#0e1718', fg_color='#0e1718')
-        half_time_pause_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
+        # pause time before THE final match
+        pause_before_THE_final_match_frame = ctk.CTkFrame(entry_frame3, bg_color='#0e1718', fg_color='#0e1718')
+        pause_before_THE_final_match_frame.pack(pady=7, anchor=tk.N, side=tk.TOP, padx=0, expand=True, fill=tk.X)
 
-        half_time_pause_label = ctk.CTkLabel(half_time_pause_frame, text="Half Time Pause", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
-        half_time_pause_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
+        pause_before_THE_final_match_label = ctk.CTkLabel(pause_before_THE_final_match_frame, text="Pause SUP3 > THE Final Match", font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        pause_before_THE_final_match_label.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.N)
 
-        half_time_pause_entry = ctk.CTkEntry(half_time_pause_frame, textvariable=self.half_time_pause, font=("Helvetica", self.team_button_font_size*1.3))
-        half_time_pause_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
-        half_time_pause_entry.bind("<KeyRelease>", lambda event: self.on_half_time_pause_change(event))
+        pause_before_THE_final_match_entry = ctk.CTkEntry(pause_before_THE_final_match_frame, textvariable=self.pause_before_THE_final_match, font=("Helvetica", self.team_button_font_size*1.3))
+        pause_before_THE_final_match_entry.pack(side=tk.TOP, pady=5, padx=0, anchor=tk.NW, expand=True, fill=tk.X)
+        pause_before_THE_final_match_entry.bind("<KeyRelease>", lambda event: self.on_pause_before_THE_final_match_change(event))
 
         ############################################################################################################
         
@@ -3772,38 +3781,38 @@ class Window(ctk.CTk):
         self.updated_data.update({"pauseBeforeKOMatches": self.time_pause_before_KO.get().replace("m", "")})
 
 
-    def on_time_before_the_final_match_change(self, event):
-        if self.time_before_the_final_match.get() == "":
+    def on_time_before_SUP3_and_the_final_match_change(self, event):
+        if self.time_before_SUP3_and_the_final_match.get() == "":
             return
-        if self.time_before_the_final_match.get()[-1] not in "0123456789m" or not "m" in self.time_before_the_final_match.get() or len(self.time_before_the_final_match.get()) < 1:
+        if self.time_before_SUP3_and_the_final_match.get()[-1] not in "0123456789m" or not "m" in self.time_before_SUP3_and_the_final_match.get() or len(self.time_before_SUP3_and_the_final_match.get()) < 1:
             return
         saveTimeBeforeTheFinalMatchInDB = """
         UPDATE settingsData
         SET timeBeforeTheFinalMatch = ?
         WHERE id = 1
         """
-        logging.debug(f"on_time_before_the_final_match_change {self.time_before_the_final_match.get()}")
-        self.settingscursor.execute(saveTimeBeforeTheFinalMatchInDB, (self.time_before_the_final_match.get(),))
+        logging.debug(f"on_time_before_the_final_match_change {self.time_before_SUP3_and_the_final_match.get()}")
+        self.settingscursor.execute(saveTimeBeforeTheFinalMatchInDB, (self.time_before_SUP3_and_the_final_match.get(),))
         self.settingsconnection.commit()
         
-        self.updated_data.update({"pauseBeforeTheFinalMatch": self.time_before_the_final_match.get().replace("m", "")})
+        self.updated_data.update({"pauseBeforeTheFinalMatch": self.time_before_SUP3_and_the_final_match.get().replace("m", "")})
 
 
-    def on_half_time_pause_change(self, event):
-        if self.half_time_pause.get() == "":
+    def on_pause_before_THE_final_match_change(self, event):
+        if self.pause_before_THE_final_match.get() == "":
             return
-        if self.half_time_pause.get()[-1] not in "0123456789m" or not "m" in self.half_time_pause.get() or len(self.half_time_pause.get()) < 1:
+        if self.pause_before_THE_final_match.get()[-1] not in "0123456789m" or not "m" in self.pause_before_THE_final_match.get() or len(self.pause_before_THE_final_match.get()) < 1:
             return
         saveHalfTimePauseInDB = """
         UPDATE settingsData
         SET halfTimePause = ?
         WHERE id = 1
         """
-        logging.debug(f"on_half_time_pause_change {self.half_time_pause.get()}")
-        self.settingscursor.execute(saveHalfTimePauseInDB, (self.half_time_pause.get(),))
+        logging.debug(f"on_half_time_pause_change {self.pause_before_THE_final_match.get()}")
+        self.settingscursor.execute(saveHalfTimePauseInDB, (self.pause_before_THE_final_match.get(),))
         self.settingsconnection.commit()
         
-        self.updated_data.update({"halfTimePause": self.half_time_pause.get().replace("m", "")})
+        self.updated_data.update({"halfTimePause": self.pause_before_THE_final_match.get().replace("m", "")})
 
 
     ##############################################################################################
@@ -4669,9 +4678,9 @@ def get_initial_data(template_name, base_url=None):
         "bestScorerActive": tkapp.best_scorer_active.get(),
         "KOMatches": get_data_for_website(8),
         "timeIntervalKOMatches": tkapp.time_intervalKO.get().replace("m", ""),
-        "pauseBeforeTheFinalMatch": tkapp.time_before_the_final_match.get().replace("m", ""),
+        "pauseBeforeTheFinalMatch": tkapp.time_before_SUP3_and_the_final_match.get().replace("m", ""),
         "pauseBeforeKOMatches": tkapp.time_pause_before_KO.get().replace("m", ""),
-        "halfTimePause": tkapp.half_time_pause.get().replace("m", ""),
+        "halfTimePause": tkapp.pause_before_THE_final_match.get().replace("m", ""),
     }
     #print("initial_data", initial_data)
     return make_response(render_template(template_name, initial_data=initial_data, base_url=base_url))
