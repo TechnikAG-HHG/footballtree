@@ -131,9 +131,9 @@ function generateDropdownData() {
             option.textContent = `${group}: ${matchData[0]} vs ${matchData[1]}`;
 
             if (
-                (data["activeMatchNumber"] < -1 &&
+                ((data["activeMatchNumber"] < -1 &&
                     data["activeMatchNumber"] > -99) ||
-                data["activeMatchNumber"] < (i + 99) * -1
+                data["activeMatchNumber"] < (i + 99) * -1) && data["pauseMode"] != 0
             ) {
                 option.style.color = "gray";
                 disabledOptions.push(option);
@@ -187,9 +187,13 @@ function generateDropdownData() {
 
             option.textContent = `${group}: ${matchData[0]} vs ${matchData[1]}`;
 
-            if (Math.abs(data["activeMatchNumber"]) > i + 1) {
-                option.style.color = "gray";
-                disabledOptions.push(option);
+            if (!(i == 2 && data["pauseMode"] == 2) && !(i == 3 && data["pauseMode"] == 3)) {
+                if (Math.abs(data["activeMatchNumber"]) > i + 1 && data["pauseMode"] != 1) {
+                    option.style.color = "gray";
+                    disabledOptions.push(option);
+                } else {
+                    enabledOptions.push(option);
+                }
             } else {
                 enabledOptions.push(option);
             }
@@ -266,7 +270,12 @@ function voteForMatch(match) {
     }
 
     if (data["activeMatchNumber"] < -1 && data["activeMatchNumber"] > -99) {
-        if (matchNumber > data["activeMatchNumber"] - 1) {
+        if ((matchNumber == -4 && data["pauseMode"] == 2) || (matchNumber == -5 && data["pauseMode"] == 3)) {
+            matchPlayed = false;
+        } else if (matchNumber > -1 || matchNumber < -98) {
+            matchPlayed = true;
+            console.log("Match played 0");
+        } else if (matchNumber > data["activeMatchNumber"] - 1 && data["pauseMode"] != 1) {
             matchPlayed = true;
             console.log("Match played 1");
         } else if (matchNumber < -99) {
@@ -274,7 +283,10 @@ function voteForMatch(match) {
             console.log("Match played 2");
         }
     } else if (data["activeMatchNumber"] < -99) {
-        if (matchNumber > data["activeMatchNumber"]) {
+        if (matchNumber > -1) {
+            matchPlayed = true;
+            console.log("Match played 3");
+        } else if (matchNumber > data["activeMatchNumber"] && data["pauseMode"] != 0) {
             matchPlayed = true;
             console.log("Match played 3");
         }
