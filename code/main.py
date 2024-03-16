@@ -2671,18 +2671,22 @@ class Window(ctk.CTk):
                     self.active_match += 1
 
                 if self.active_match == 2 and next_match:
-                    result = tkinter.messagebox.askyesno("Selecting Helper", "Do want to activate the Pause before Spiel um Platz 3 and the final match?, in any case Spiel um Platz 3 will be selected.")
+                    result = tkinter.messagebox.askyesno("Selecting Helper", "Do want to activate the Pause before Spiel um Platz 3 and the final match?, if no, nothing will happen.")
                     if result:
                         if int(self.time_before_SUP3_and_the_final_match.get().replace("m", "")) != 0:
                             self.pause_mode.set(3)
                             self.on_pause_switch_change()
+                    else:
+                        return
                 
                 if self.active_match == 3 and next_match:
-                    result = tkinter.messagebox.askyesno("Selecting Helper", "Do want to activate the Pause before the final match?, in any case the final match will be selected.")
+                    result = tkinter.messagebox.askyesno("Selecting Helper", "Do want to activate the Pause before the final match?, if no, nothing will happen.")
                     if result:
                         if int(self.pause_before_THE_final_match.get().replace("m", "")) != 0:
                             self.pause_mode.set(4)
                             self.on_pause_switch_change()
+                    else:
+                        return
             else:
                 if self.active_match > 0:
                     self.active_match -= 1
