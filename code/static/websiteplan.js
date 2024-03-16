@@ -734,5 +734,5 @@ updateData();
 
 // call updateData() every 5 seconds
 setInterval(updateData, 10000);
-setInterval(updatePauseTime, 100);
+setInterval(updatePauseTime, 10);
 window.location.hash = ``;
