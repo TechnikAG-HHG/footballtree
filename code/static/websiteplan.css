@@ -311,7 +311,7 @@ h2 {
     .pauseTime,
     #pauseTimeProgress {
         height: 4vh;
-        border: 0.1vh solid #49ba67;
+        border: 0.2vh solid #49ba67;
     }
 
     #pauseTimeStart,
