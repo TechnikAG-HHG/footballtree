@@ -1165,7 +1165,7 @@ class Window(ctk.CTk):
         SPIEL_button = ctk.CTkButton(manual_manual_frame, text="Reload", command=lambda : self.reload_spiel_button_command(True), width=button_width, height=button_height, font=("Helvetica", button_font_size, "bold"), fg_color="#34757a", hover_color="#1f4346")            
         SPIEL_button.pack(pady=10, side=tk.BOTTOM, anchor=tk.S, padx=10) 
 
-        if self.pause_mode.get() == 1:
+        if self.pause_mode.get() > 0:
             #pause_mode_active_label = ctk.CTkLabel(manual_frame, text="Pause Mode Active", font=("Helvetica", button_font_size * 1.5, "bold"), fg_color="red")
             #pause_mode_active_label.place(relx=0.7, rely=0.4)
             #Replace the label with a button
@@ -2671,10 +2671,17 @@ class Window(ctk.CTk):
                     self.active_match += 1
 
                 if self.active_match == 2 and next_match:
-                    result = tkinter.messagebox.askyesno("Selecting Helper", "Do want to activate the Half-Time break?, in any case Spiel um Platz 3 will be selected.")
+                    result = tkinter.messagebox.askyesno("Selecting Helper", "Do want to activate the Pause before Spiel um Platz 3 and the final match?, in any case Spiel um Platz 3 will be selected.")
                     if result:
-                        if int(self.time_intervalFM.get().replace("m", "")) != 0:
+                        if int(self.time_before_SUP3_and_the_final_match.get().replace("m", "")) != 0:
                             self.pause_mode.set(3)
+                            self.on_pause_switch_change()
+                
+                if self.active_match == 3 and next_match:
+                    result = tkinter.messagebox.askyesno("Selecting Helper", "Do want to activate the Pause before the final match?, in any case the final match will be selected.")
+                    if result:
+                        if int(self.pause_before_THE_final_match.get().replace("m", "")) != 0:
+                            self.pause_mode.set(4)
                             self.on_pause_switch_change()
             else:
                 if self.active_match > 0:
@@ -3318,14 +3325,17 @@ class Window(ctk.CTk):
         pause_radio_button_1 = ctk.CTkRadioButton(pause_radio_frame, text="Off", variable=self.pause_mode, value=0, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
         pause_radio_button_1.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
 
-        pause_radio_button_4 = ctk.CTkRadioButton(pause_radio_frame, text="Before KO Matches", variable=self.pause_mode, value=1, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
-        pause_radio_button_4.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
+        pause_radio_button_2 = ctk.CTkRadioButton(pause_radio_frame, text="Before KO Matches", variable=self.pause_mode, value=1, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
+        pause_radio_button_2.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
 
         pause_radio_button_3 = ctk.CTkRadioButton(pause_radio_frame, text="Before Final Matches", variable=self.pause_mode, value=2, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
         pause_radio_button_3.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
 
-        pause_radio_button_2 = ctk.CTkRadioButton(pause_radio_frame, text="Before The Final Match", variable=self.pause_mode, value=3, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
-        pause_radio_button_2.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
+        pause_radio_button_4 = ctk.CTkRadioButton(pause_radio_frame, text="Before SUP3 and the Final Match", variable=self.pause_mode, value=3, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
+        pause_radio_button_4.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
+
+        pause_radio_button_5 = ctk.CTkRadioButton(pause_radio_frame, text="Before THE Final Match", variable=self.pause_mode, value=4, font=("Helvetica", self.team_button_font_size*1.3), command=self.on_pause_switch_change)
+        pause_radio_button_5.pack(side=tk.TOP, pady=2, padx = 0, anchor=tk.NW)
 
         ############################################################################################################
         
@@ -3737,7 +3747,7 @@ class Window(ctk.CTk):
 
     def on_pause_button_change(self):
         #######################################
-        #This is not the Pause Switch Function!
+        #This is not the Pause Radio Button Function!
         #######################################
         result = tkinter.messagebox.askyesno("Pause Manager", "Do you want to disable the pause mode?")
         if result:
@@ -4385,7 +4395,7 @@ def get_data_for_website(which_data=-1):
             return 0
     
     elif which_data == 6:
-        if tkapp.active_mode.get() == 2:
+        if (tkapp.active_mode.get() == 2 and tkapp.pause_mode.get() == 1) or (tkapp.active_mode.get() == 2 and tkapp.active_mode.get() >= 2):
             if tkapp.cache_vars.get("getfinalmatches_changed_using_var") == True:
                 
                 final_goles = []
