@@ -266,7 +266,10 @@ function voteForMatch(match) {
     }
 
     if (data["activeMatchNumber"] < -1 && data["activeMatchNumber"] > -99) {
-        if (matchNumber > data["activeMatchNumber"] - 1) {
+        if (matchNumber > -1 || matchNumber < -98) {
+            matchPlayed = true;
+            console.log("Match played 0");
+        } else if (matchNumber > data["activeMatchNumber"] - 1 && data["pauseMode"] != 1) {
             matchPlayed = true;
             console.log("Match played 1");
         } else if (matchNumber < -99) {
@@ -274,7 +277,11 @@ function voteForMatch(match) {
             console.log("Match played 2");
         }
     } else if (data["activeMatchNumber"] < -99) {
-        if (matchNumber > data["activeMatchNumber"]) {
+        if (matchNumber > -1) {
+            matchPlayed = true;
+            console.log("Match played 3");
+        }
+        else if (matchNumber > data["activeMatchNumber"] && data["pauseMode"] != 0) {
             matchPlayed = true;
             console.log("Match played 3");
         }
