@@ -370,10 +370,9 @@ function KOMatchTable() {
 
                         var cellSecondTeam = row.insertCell(3);
                         cellSecondTeam.textContent = match[1];
-
+                        
                         if (
-                            Math.abs(data["activeMatchNumber"]) > i &&
-                            data["KOMatches"] != null
+                            Math.abs(data["activeMatchNumber"]) > i || (data["activeMatchNumber"] < -1 && data["activeMatchNumber"] > -99)
                         ) {
                             if (match[2] > match[3]) {
                                 cellFirstTeam.className = "style-winner";
