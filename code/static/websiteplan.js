@@ -5,8 +5,9 @@ var startTime = new Date(); // Set the start time
 var finalMatchesTime = new Date(); // Set the final matches time
 var KOMatchesTime = new Date(); // Set the K.O. matches time
 
-var pauseCount = 3; // Global variable to keep track of the total number of pauses
+var pauseCount = 4; // Global variable to keep track of the total number of pauses
 var pauseTimes = []; // Global array to keep track of the pause times
+var positions = []; // Global array to keep track of the positions of the pause times
 
 startTime.setHours(0, 0, 0, 0);
 
@@ -144,8 +145,11 @@ function generatePauseTime(time, pos, startTime, pauseID) {
         if (pauseTimeDiv) {
             pauseTimeDiv.remove();
             pauseTimes[pauseID] = null;
+            positions[pauseID] = null;
         }
     }
+
+    positions[pauseID] = pos;
 
     stopTime = new Date(startTime.getTime() + time * 60000);
     if (pos > -1) {
@@ -227,16 +231,35 @@ function checkForPauseUpdate() {
     console.log("Checking for pause update");
     for (var i = 0; i < pauseCount; i++) {
         var pauseTimeElement = document.getElementById(`pauseTimeProgress${i}`);
-        if (pauseTimeElement) {
-            break;
-        }
-    }
 
-    if (i == data["pauseMode"]) {
-        intervalActivated = true;
-    } else {
-        pauseTimeElement.value = 0;
-        intervalActivated = false;
+        if (pauseTimeElement) {
+            console.log(pauseTimeElement);
+            if (i == data["pauseMode"]) {
+                console.log("Pause mode activated");
+                intervalActivated = true;
+            } else {
+                console.log("Pause mode not activated");
+                if (i < data["pauseMode"]) {
+                    pauseTimeElement.value = 999999999;
+                } else if (data["activeMatchNumber"] < -1 && data["activeMatchNumber"] > -100) {
+                    if (positions[i] > data["activeMatchNumber"] || positions[i] < -99) {
+                        pauseTimeElement.value = 999999999;
+                    } else {
+                        pauseTimeElement.value = 0;
+                    }
+                } else if (data["activeMatchNumber"] < -99) {
+                    if (positions[i] > data["activeMatchNumber"] ) {
+                        pauseTimeElement.value = 999999999;
+                    } else {
+                        pauseTimeElement.value = 0;
+                    }
+                } else if (positions[i] < data["activeMatchNumber"] || data["activeMatchNumber"] < -1) {
+                    pauseTimeElement.value = 999999999;
+                } else {
+                    pauseTimeElement.value = 0;
+                }
+            }
+        }
     }
 }
 
@@ -479,13 +502,14 @@ function finalMatchTable() {
             if (i == totalMatchNumber) {
                 gameName = "Finale";
                 if (data["halfTimePause"] != null && data["halfTimePause"] != "0") {
-                    finalMatchesTime = new Date(generatePauseTime(parseInt(data["halfTimePause"]), -4, finalMatchesTime, 2));
+                    finalMatchesTime = new Date(generatePauseTime(parseInt(data["halfTimePause"]), -4, finalMatchesTime, 3
+                    ));
                 }
             } else if (i == totalMatchNumber - 1) {
                 console.log("Spiel um Platz 3");
                 gameName = "Spiel um Platz 3";
                 if (data["pauseBeforeTheFinalMatch"] != null && data["pauseBeforeTheFinalMatch"] != "0") {
-                    finalMatchesTime = new Date(generatePauseTime(parseInt(data["pauseBeforeTheFinalMatch"]), -3, finalMatchesTime, 3));
+                    finalMatchesTime = new Date(generatePauseTime(parseInt(data["pauseBeforeTheFinalMatch"]), -3, finalMatchesTime, 2));
                 }
             } else {
                 gameName = "Halbfinalspiel " + matchNumber;
