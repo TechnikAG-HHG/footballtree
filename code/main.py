@@ -185,7 +185,7 @@ class Window(ctk.CTk):
         
         
     def start_server(self):
-        app.run(debug=False, threaded=True, port=8080, host="127.0.0.1", use_reloader=False)
+        app.run(debug=False, threaded=True, port=5000, host="127.0.0.1", use_reloader=False)
     
     
     def init_sqlite_db(self):
@@ -4716,7 +4716,7 @@ admins_file = os.path.join(pathlib.Path(__file__).parent, "admins.json")
 flow = Flow.from_client_secrets_file(
     client_secrets_file=client_secrets_file,
     scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
-    redirect_uri="https://50ec9dcfa3507d.lhr.life/callback"
+    redirect_uri="https://technikag.serveo.net/callback"
 )
 
 def login_is_required(function):
@@ -5111,8 +5111,7 @@ stored_data = {}
 tkapp = Window(start_server_and_ssh)
 
 if start_server_and_ssh:
-    #subprocess.Popen(["python", "code/serveo_shh_connect.py"])
-    pass
+    subprocess.Popen(["python", "code/serveo_shh_connect.py"])
 
 if __name__ == "__main__":
     tkapp.mainloop()
