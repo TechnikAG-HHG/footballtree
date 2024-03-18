@@ -4841,7 +4841,7 @@ def send_tipping_data():
     except:
         return "Please enter a valid number", 400
     
-    if team1_goals >= 25 or team2_goals >= 25:
+    if team1_goals > 25 or team2_goals > 25:
         return "Please enter a valid number, too high", 400
     
     if match_id >= 0:
