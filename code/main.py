@@ -185,7 +185,7 @@ class Window(ctk.CTk):
         
         
     def start_server(self):
-        app.run(debug=False, threaded=True, port=5000, host="0.0.0.0", use_reloader=False)
+        app.run(debug=False, threaded=True, port=8080, host="127.0.0.1", use_reloader=False)
     
     
     def init_sqlite_db(self):
@@ -4399,119 +4399,122 @@ def get_data_for_website(which_data=-1):
             return 0
     
     elif which_data == 6:
-        if (tkapp.active_mode.get() == 2 and tkapp.pause_mode.get() == 1) or (tkapp.active_mode.get() == 2 and tkapp.active_mode.get() >= 2):
-            if tkapp.cache_vars.get("getfinalmatches_changed_using_var") == True:
-                
-                final_goles = []
-                
-                if tkapp.endteam1 and tkapp.endteam3:
-                    if tkapp.endteam1[1] != "No Team" and tkapp.endteam3[1] != "No Team":
-                        final_goles.append([ich_kann_nicht_mehr(tkapp.endteam1[0], tkapp.endteam3[0]), ich_kann_nicht_mehr(tkapp.endteam3[0], tkapp.endteam1[0])])
+        try:
+            if (tkapp.active_mode.get() == 2 and tkapp.pause_mode.get() == 1) or (tkapp.active_mode.get() == 2 and tkapp.active_mode.get() >= 2):
+                if tkapp.cache_vars.get("getfinalmatches_changed_using_var") == True:
+                    
+                    final_goles = []
+                    
+                    if tkapp.endteam1 and tkapp.endteam3:
+                        if tkapp.endteam1[1] != "No Team" and tkapp.endteam3[1] != "No Team":
+                            final_goles.append([ich_kann_nicht_mehr(tkapp.endteam1[0], tkapp.endteam3[0]), ich_kann_nicht_mehr(tkapp.endteam3[0], tkapp.endteam1[0])])
+                        else:
+                            final_goles.append([0, 0])
                     else:
                         final_goles.append([0, 0])
-                else:
-                    final_goles.append([0, 0])
-                    
-                if tkapp.endteam2 and tkapp.endteam4:
-                    if tkapp.endteam2[1] != "No Team" and tkapp.endteam4[1] != "No Team":
-                        final_goles.append([ich_kann_nicht_mehr(tkapp.endteam2[0], tkapp.endteam4[0]), ich_kann_nicht_mehr(tkapp.endteam4[0], tkapp.endteam2[0])])
+                        
+                    if tkapp.endteam2 and tkapp.endteam4:
+                        if tkapp.endteam2[1] != "No Team" and tkapp.endteam4[1] != "No Team":
+                            final_goles.append([ich_kann_nicht_mehr(tkapp.endteam2[0], tkapp.endteam4[0]), ich_kann_nicht_mehr(tkapp.endteam4[0], tkapp.endteam2[0])])
+                        else:
+                            final_goles.append([0, 0])
                     else:
                         final_goles.append([0, 0])
-                else:
-                    final_goles.append([0, 0])
+                        
+                    if tkapp.spiel_um_platz_3:
+                        final_goles.append([ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[0][0], tkapp.spiel_um_platz_3[1][0]), ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[1][0], tkapp.spiel_um_platz_3[0][0])])
+                    else:
+                        final_goles.append([0, 0])
+                        
+                    if tkapp.final_match_teams:
+                        final_goles.append([ich_kann_nicht_mehr(tkapp.final_match_teams[0][0], tkapp.final_match_teams[1][0]), ich_kann_nicht_mehr(tkapp.final_match_teams[1][0], tkapp.final_match_teams[0][0])])
+                    else:
+                        final_goles.append([0, 0])
+
+                    connection = sqlite3.connect(db_path)
+                    cursor = connection.cursor()
+
+                    get_tipping_statistics_query = """
+                    SELECT matchId, team1Goals, team2Goals
+                    FROM tippingData
+                    ORDER BY matchId
+                    """
+                    cursor.execute(get_tipping_statistics_query)
+
+                    tipping_data = cursor.fetchall()
+
+                    cursor.close()
+                    connection.close()
+
+                    # Group data by matchId
+                    grouped_data = {}
+                    for row in tipping_data:
+                        if row[0] not in grouped_data:
+                            grouped_data[row[0]] = {'team1Goals': [], 'team2Goals': []}
+                        grouped_data[row[0]]['team1Goals'].append(row[1])
+                        grouped_data[row[0]]['team2Goals'].append(row[2])
+
+                    # Calculate median and percentages
+                    tipping_statistics = {}
+                    for matchId, data in grouped_data.items():
+                        matchId *= -1
+                        matchId = matchId - 1
+                        if matchId < 0:
+                            continue
+                        team1Goals = data['team1Goals']
+                        team2Goals = data['team2Goals']
+                        #averageRounded_team1Goals = round(average_team1Goals, 2)
+                        #averageRounded_team2Goals = round(average_team2Goals, 2)
+
+                        team1Wins = 0
+                        team2Wins = 0
+                        for team1Goal, team2Goal in zip(team1Goals, team2Goals):
+                            if team1Goal > team2Goal:
+                                team1Wins += 1
+                            elif team1Goal == team2Goal:
+                                team1Wins += 0.5
+                                team2Wins += 0.5
+                            if team2Goal > team1Goal:
+                                team2Wins += 1
+
+                        percent_team1Wins = team1Wins / len(team1Goals) * 100 if team1Goals else 0
+                        percent_team2Wins = team2Wins / len(team2Goals) * 100 if team2Goals else 0
+
+                        tipping_statistics[matchId] = (average_team1Goals, average_team2Goals, percent_team1Wins, percent_team2Wins)
+
+                    #
+                    #    # Combine both datasets
+                    #    combined_data = []
+                    #    for matchId in all_matches:
+                    #        statistics = tipping_statistics.get(matchId, (None, None, None, None))
+                    #        combined_data.append(list(all_matches[matchId]) + list([statistics]))
+                    #    return combined_data
+                        
+                    combined_data = []
+                    for matchId in range(1, 5):
+                        statistics = tipping_statistics.get(matchId, (None, None, None, None))
+                        combined_data.append(statistics)
+                        print(f"matchId {matchId}, statistics {statistics}")
+
+                    v = [
+                        [tkapp.endteam1[1] if tkapp.endteam1 and tkapp.endteam1[1] != "No Team" else None, tkapp.endteam3[1] if tkapp.endteam3 and tkapp.endteam3[1] != "No Team" else None, final_goles[0][0], final_goles[0][1], combined_data[0]],
+                        [tkapp.endteam2[1] if tkapp.endteam2 and tkapp.endteam2[1] != "No Team" else None, tkapp.endteam4[1] if tkapp.endteam4 and tkapp.endteam4[1] != "No Team" else None, final_goles[1][0], final_goles[1][1], combined_data[1]],
+                        [tkapp.spiel_um_platz_3[0][1] if tkapp.spiel_um_platz_3 else None, tkapp.spiel_um_platz_3[1][1] if tkapp.spiel_um_platz_3 else None, final_goles[2][0], final_goles[2][1], combined_data[2]],
+                        [tkapp.final_match_teams[0][1] if tkapp.final_match_teams else None, tkapp.final_match_teams[1][1] if tkapp.final_match_teams else None, final_goles[3][0], final_goles[3][1], combined_data[3]]
+                    ]
+                    logging.debug(f"v {v}")
                     
-                if tkapp.spiel_um_platz_3:
-                    final_goles.append([ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[0][0], tkapp.spiel_um_platz_3[1][0]), ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[1][0], tkapp.spiel_um_platz_3[0][0])])
-                else:
-                    final_goles.append([0, 0])
+                    tkapp.cache_vars["getfinalmatches_changed_using_var"] = False
                     
-                if tkapp.final_match_teams:
-                    final_goles.append([ich_kann_nicht_mehr(tkapp.final_match_teams[0][0], tkapp.final_match_teams[1][0]), ich_kann_nicht_mehr(tkapp.final_match_teams[1][0], tkapp.final_match_teams[0][0])])
-                else:
-                    final_goles.append([0, 0])
-
-                connection = sqlite3.connect(db_path)
-                cursor = connection.cursor()
-
-                get_tipping_statistics_query = """
-                SELECT matchId, team1Goals, team2Goals
-                FROM tippingData
-                ORDER BY matchId
-                """
-                cursor.execute(get_tipping_statistics_query)
-
-                tipping_data = cursor.fetchall()
-
-                cursor.close()
-                connection.close()
-
-                # Group data by matchId
-                grouped_data = {}
-                for row in tipping_data:
-                    if row[0] not in grouped_data:
-                        grouped_data[row[0]] = {'team1Goals': [], 'team2Goals': []}
-                    grouped_data[row[0]]['team1Goals'].append(row[1])
-                    grouped_data[row[0]]['team2Goals'].append(row[2])
-
-                # Calculate median and percentages
-                tipping_statistics = {}
-                for matchId, data in grouped_data.items():
-                    matchId *= -1
-                    matchId = matchId - 1
-                    if matchId < 0:
-                        continue
-                    team1Goals = data['team1Goals']
-                    team2Goals = data['team2Goals']
-                    #averageRounded_team1Goals = round(average_team1Goals, 2)
-                    #averageRounded_team2Goals = round(average_team2Goals, 2)
-
-                    team1Wins = 0
-                    team2Wins = 0
-                    for team1Goal, team2Goal in zip(team1Goals, team2Goals):
-                        if team1Goal > team2Goal:
-                            team1Wins += 1
-                        elif team1Goal == team2Goal:
-                            team1Wins += 0.5
-                            team2Wins += 0.5
-                        if team2Goal > team1Goal:
-                            team2Wins += 1
-
-                    percent_team1Wins = team1Wins / len(team1Goals) * 100 if team1Goals else 0
-                    percent_team2Wins = team2Wins / len(team2Goals) * 100 if team2Goals else 0
-
-                    tipping_statistics[matchId] = (average_team1Goals, average_team2Goals, percent_team1Wins, percent_team2Wins)
-
-                #
-                #    # Combine both datasets
-                #    combined_data = []
-                #    for matchId in all_matches:
-                #        statistics = tipping_statistics.get(matchId, (None, None, None, None))
-                #        combined_data.append(list(all_matches[matchId]) + list([statistics]))
-                #    return combined_data
+                    tkapp.cache["finalMatches"] = v
                     
-                combined_data = []
-                for matchId in range(1, 5):
-                    statistics = tipping_statistics.get(matchId, (None, None, None, None))
-                    combined_data.append(statistics)
-                    print(f"matchId {matchId}, statistics {statistics}")
-
-                v = [
-                    [tkapp.endteam1[1] if tkapp.endteam1 and tkapp.endteam1[1] != "No Team" else None, tkapp.endteam3[1] if tkapp.endteam3 and tkapp.endteam3[1] != "No Team" else None, final_goles[0][0], final_goles[0][1], combined_data[0]],
-                    [tkapp.endteam2[1] if tkapp.endteam2 and tkapp.endteam2[1] != "No Team" else None, tkapp.endteam4[1] if tkapp.endteam4 and tkapp.endteam4[1] != "No Team" else None, final_goles[1][0], final_goles[1][1], combined_data[1]],
-                    [tkapp.spiel_um_platz_3[0][1] if tkapp.spiel_um_platz_3 else None, tkapp.spiel_um_platz_3[1][1] if tkapp.spiel_um_platz_3 else None, final_goles[2][0], final_goles[2][1], combined_data[2]],
-                    [tkapp.final_match_teams[0][1] if tkapp.final_match_teams else None, tkapp.final_match_teams[1][1] if tkapp.final_match_teams else None, final_goles[3][0], final_goles[3][1], combined_data[3]]
-                ]
-                logging.debug(f"v {v}")
-                
-                tkapp.cache_vars["getfinalmatches_changed_using_var"] = False
-                
-                tkapp.cache["finalMatches"] = v
-                
-                return v
-        
+                    return v
+            
+                else:
+                    return tkapp.cache.get("finalMatches")
             else:
-                return tkapp.cache.get("finalMatches")
-        else:
+                return None
+        except:
             return None
     
     elif which_data == 7:
@@ -4615,7 +4618,7 @@ def get_data_for_website(which_data=-1):
                 return combined_data
             else:
                 return tkapp.cache.get("KOMatches")
-        except:
+        except OSError:
             logging.info("Error in get_data_for_website(8)")
             return []
     
@@ -4713,7 +4716,7 @@ admins_file = os.path.join(pathlib.Path(__file__).parent, "admins.json")
 flow = Flow.from_client_secrets_file(
     client_secrets_file=client_secrets_file,
     scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
-    redirect_uri="https://technikag.serveo.net/callback"
+    redirect_uri="https://50ec9dcfa3507d.lhr.life/callback"
 )
 
 def login_is_required(function):
@@ -5108,7 +5111,8 @@ stored_data = {}
 tkapp = Window(start_server_and_ssh)
 
 if start_server_and_ssh:
-    subprocess.Popen(["python", "code/serveo_shh_connect.py"])
+    #subprocess.Popen(["python", "code/serveo_shh_connect.py"])
+    pass
 
 if __name__ == "__main__":
     tkapp.mainloop()
