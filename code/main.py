@@ -2500,6 +2500,10 @@ class Window(ctk.CTk):
         elif self.active_mode.get() == 2:
             #logging.debug("self.spiel_um_platz_3", self.spiel_um_platz_3)
             #logging.debug("self.final_match_teams", self.final_match_teams)
+            
+            if getattr(self, 'endteam1', None) == None:
+                logging.error("endteam1 is None fatal error, handeld but not good")
+                return
             if selected_match == "Spiel 1 Halb: " + self.endteam1[1] + " vs " + self.endteam3[1]:
                 self.teams_playing = [self.endteam1[0], self.endteam3[0]]
                 self.active_match = 0
@@ -2667,10 +2671,7 @@ class Window(ctk.CTk):
                 
         elif self.active_mode.get() == 2:
             if next_match:
-                if self.active_match < 3:
-                    self.active_match += 1
-
-                if self.active_match == 2 and next_match:
+                if self.active_match == 1 and next_match:
                     result = tkinter.messagebox.askyesno("Selecting Helper", "Do want to activate the Pause before Spiel um Platz 3 and the final match?, if no, nothing will happen.")
                     if result:
                         if int(self.time_before_SUP3_and_the_final_match.get().replace("m", "")) != 0:
@@ -2679,7 +2680,7 @@ class Window(ctk.CTk):
                     else:
                         return
                 
-                if self.active_match == 3 and next_match:
+                elif self.active_match == 2 and next_match:
                     result = tkinter.messagebox.askyesno("Selecting Helper", "Do want to activate the Pause before the final match?, if no, nothing will happen.")
                     if result:
                         if int(self.pause_before_THE_final_match.get().replace("m", "")) != 0:
@@ -2687,12 +2688,16 @@ class Window(ctk.CTk):
                             self.on_pause_switch_change()
                     else:
                         return
+
+                if self.active_match < 3:
+                    self.active_match += 1
+
             else:
                 if self.active_match > 0:
                     self.active_match -= 1
                 else:
                     if self.there_is_an_ko_phase.get() == 0:
-                        result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the beginning of the final matches. Do you want to select the last match of the group phase?")
+                        result = tkinter.messagebox.askyesno("Selecting Helper", "You have reached the end of the final matches. Do you want to select the last match of the group phase?")
                         if result:
                             self.active_mode.set(1)
                             self.save_active_mode_in_db()
@@ -2823,8 +2828,6 @@ class Window(ctk.CTk):
     def global_scored_a_point(self, teamID, team2ID, direction="UP"):
         # Get the current score
         self.cache_vars["getgoals_changed_using_var"] = True
-        self.cache_vars["getmatches_changed_using_var"] = True
-        self.cache_vars["getfinalmatches_changed_using_var"] = True
         logging.debug(f"global_scored_a_point teamID: {teamID}, team2ID: {team2ID}, direction: {direction}")
         current_score = self.read_goals_for_match_from_db(teamID, team2ID)
         old_goals = current_score
@@ -2842,14 +2845,19 @@ class Window(ctk.CTk):
             return
             
         # Write the score into the database
-        
         if self.write_score_for_team_into_db(teamID, team2ID, old_goals, direction):
             # Update the score label
             self.spiel_buttons[teamID]["global"][3].set(str(current_score))
             self.updated_data.update({"Goals": get_data_for_website(1)})
-            self.updated_data.update({"Matches": get_data_for_website(4)})
-            if self.active_mode.get() == 2:
+            if self.active_mode.get() == 1:
+                self.cache_vars["getmatches_changed_using_var"] = True
+                self.updated_data.update({"Matches": get_data_for_website(4)})
+            elif self.active_mode.get() == 2:
+                self.cache_vars["getfinalmatches_changed_using_var"] = True
                 self.updated_data.update({"finalMatches": get_data_for_website(6)})
+            elif self.active_mode.get() == 3:
+                self.cache_vars["getkomatches_changed_using_var"] = True
+                self.updated_data.update({"KOMatches": get_data_for_website(8)})
     
     
     def read_mp3_path_from_db_for_team(self, teamID):
@@ -4400,8 +4408,10 @@ def get_data_for_website(which_data=-1):
     
     elif which_data == 6:
         try:
-            if (tkapp.active_mode.get() == 2 and tkapp.pause_mode.get() == 1) or (tkapp.active_mode.get() == 2 and tkapp.active_mode.get() >= 2):
+            if tkapp.active_mode.get() == 2:
                 if tkapp.cache_vars.get("getfinalmatches_changed_using_var") == True:
+
+                    print("##################################Final Match Number##################################", tkapp.active_match)
                     
                     final_goles = []
                     
@@ -4421,14 +4431,11 @@ def get_data_for_website(which_data=-1):
                     else:
                         final_goles.append([0, 0])
                         
-                    if tkapp.spiel_um_platz_3:
+                    if tkapp.spiel_um_platz_3 and (tkapp.active_match >= 2 or tkapp.pause_mode.get() == 3):
                         final_goles.append([ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[0][0], tkapp.spiel_um_platz_3[1][0]), ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[1][0], tkapp.spiel_um_platz_3[0][0])])
-                    else:
-                        final_goles.append([0, 0])
-                        
-                    if tkapp.final_match_teams:
                         final_goles.append([ich_kann_nicht_mehr(tkapp.final_match_teams[0][0], tkapp.final_match_teams[1][0]), ich_kann_nicht_mehr(tkapp.final_match_teams[1][0], tkapp.final_match_teams[0][0])])
                     else:
+                        final_goles.append([0, 0])
                         final_goles.append([0, 0])
 
                     connection = sqlite3.connect(db_path)
@@ -4497,10 +4504,34 @@ def get_data_for_website(which_data=-1):
                         print(f"matchId {matchId}, statistics {statistics}")
 
                     v = [
-                        [tkapp.endteam1[1] if tkapp.endteam1 and tkapp.endteam1[1] != "No Team" else None, tkapp.endteam3[1] if tkapp.endteam3 and tkapp.endteam3[1] != "No Team" else None, final_goles[0][0], final_goles[0][1], combined_data[0]],
-                        [tkapp.endteam2[1] if tkapp.endteam2 and tkapp.endteam2[1] != "No Team" else None, tkapp.endteam4[1] if tkapp.endteam4 and tkapp.endteam4[1] != "No Team" else None, final_goles[1][0], final_goles[1][1], combined_data[1]],
-                        [tkapp.spiel_um_platz_3[0][1] if tkapp.spiel_um_platz_3 else None, tkapp.spiel_um_platz_3[1][1] if tkapp.spiel_um_platz_3 else None, final_goles[2][0], final_goles[2][1], combined_data[2]],
-                        [tkapp.final_match_teams[0][1] if tkapp.final_match_teams else None, tkapp.final_match_teams[1][1] if tkapp.final_match_teams else None, final_goles[3][0], final_goles[3][1], combined_data[3]]
+                        [
+                            tkapp.endteam1[1] if tkapp.endteam1 and tkapp.endteam1[1] != "No Team" else None,
+                            tkapp.endteam3[1] if tkapp.endteam3 and tkapp.endteam3[1] != "No Team" else None,
+                            final_goles[0][0],
+                            final_goles[0][1],
+                            combined_data[0]
+                        ],
+                        [
+                            tkapp.endteam2[1] if tkapp.endteam2 and tkapp.endteam2[1] != "No Team" else None,
+                            tkapp.endteam4[1] if tkapp.endteam4 and tkapp.endteam4[1] != "No Team" else None,
+                            final_goles[1][0],
+                            final_goles[1][1],
+                            combined_data[1]
+                        ],
+                        [
+                            tkapp.spiel_um_platz_3[0][1] if tkapp.spiel_um_platz_3 and (tkapp.active_match >= 2 or tkapp.pause_mode.get() == 3) else None,
+                            tkapp.spiel_um_platz_3[1][1] if tkapp.spiel_um_platz_3 and (tkapp.active_match >= 2 or tkapp.pause_mode.get() == 3) else None,
+                            final_goles[2][0],
+                            final_goles[2][1],
+                            combined_data[2]
+                        ],
+                        [
+                            tkapp.final_match_teams[0][1] if tkapp.final_match_teams and (tkapp.active_match >= 2 or tkapp.pause_mode.get() == 3) else None,
+                            tkapp.final_match_teams[1][1] if tkapp.final_match_teams  and (tkapp.active_match >= 2 or tkapp.pause_mode.get() == 3)else None,
+                            final_goles[3][0],
+                            final_goles[3][1],
+                            combined_data[3]
+                        ]
                     ]
                     logging.debug(f"v {v}")
                     
@@ -4526,7 +4557,7 @@ def get_data_for_website(which_data=-1):
         try:
 
             if tkapp.there_is_an_ko_phase.get() == 0:
-                tkapp.cache_vars["getkomatches_changed_using_var"] = True
+                #tkapp.cache_vars["getkomatches_changed_using_var"] = True
                 return None
             
             if tkapp.active_mode.get() == 1: #and tkapp.pause_time_before_ko.get() == 0:
@@ -4847,7 +4878,7 @@ def send_tipping_data():
     if team1_goals > 25 or team2_goals > 25:
         return "Please enter a valid number, too high", 400
     
-    if match_id >= 0:
+    if match_id >= 0 and tkapp.active_match != -1 and tkapp.active_mode.get() == 1:
         if match_id <= tkapp.active_match:
             return "Match already started or finished", 400
     elif tkapp.active_match != -1 and tkapp.active_mode.get() == 2:
