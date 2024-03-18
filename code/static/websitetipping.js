@@ -258,7 +258,7 @@ function voteForMatch(match) {
             matchData = data["finalMatches"][Math.abs(matchNumber) - 2];
         } else if (match.split(".")[1].startsWith(" K")) {
             matchData = data["KOMatches"][matchNumber];
-            matchNumber = (parseInt(match.split(".")[0]) + 98) * -1;
+            matchNumber = (parseInt(match.split(".")[0]) + 99) * -1;
             console.log("Voting for match", matchNumber);
         }
     } else if (match.split(":")[0] == "Spiel um Platz 3") {
@@ -431,6 +431,8 @@ function handleSubmit() {
         );
         return;
     }
+
+    console.log("Submitting tipping data for match", matchNumber);
 
     fetch("/send_tipping_data", {
         method: "POST",
