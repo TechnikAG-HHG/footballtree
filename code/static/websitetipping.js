@@ -451,7 +451,7 @@ function handleSubmit() {
         })
         .then((data) => {
             console.log("Success:", data);
-            updateData();
+            //updateData();
             generateSuccessMessage(
                 "Deine Wette wurde erfolgreich abgeschickt!"
             );
