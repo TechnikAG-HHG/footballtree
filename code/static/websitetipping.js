@@ -1,5 +1,4 @@
 var tippingData = {};
-var oldMatchesData;
 var oldActiveMatchNumber;
 
 async function updateData() {
@@ -55,7 +54,6 @@ function generateDropdownData() {
     console.log("Old active match number:", oldActiveMatchNumber);
 
     if (
-        JSON.stringify(data["Matches"]) === JSON.stringify(oldMatchesData) &&
         data["activeMatchNumber"] == oldActiveMatchNumber
         ) {
             return;
@@ -231,7 +229,6 @@ function generateDropdownData() {
 
     
     if (!(
-        JSON.stringify(data["Matches"]) === JSON.stringify(oldMatchesData) &&
         data["activeMatchNumber"] == oldActiveMatchNumber
     )) {
         voteForMatch(document.getElementById("game-select").value);
@@ -242,7 +239,6 @@ function generateDropdownData() {
         voteForMatch(document.getElementById("game-select").value);
     }
 
-    oldMatchesData = data["Matches"];
     oldActiveMatchNumber = data["activeMatchNumber"];
 }
 
@@ -258,7 +254,7 @@ function voteForMatch(match) {
             matchData = data["finalMatches"][Math.abs(matchNumber) - 2];
         } else if (match.split(".")[1].startsWith(" K")) {
             matchData = data["KOMatches"][matchNumber];
-            matchNumber = (parseInt(match.split(".")[0]) + 98) * -1;
+            matchNumber = (parseInt(match.split(".")[0]) + 99) * -1;
             console.log("Voting for match", matchNumber);
         }
     } else if (match.split(":")[0] == "Spiel um Platz 3") {
@@ -432,6 +428,8 @@ function handleSubmit() {
         return;
     }
 
+    console.log("Submitting tipping data for match", matchNumber);
+
     fetch("/send_tipping_data", {
         method: "POST",
         headers: {
@@ -451,7 +449,7 @@ function handleSubmit() {
         })
         .then((data) => {
             console.log("Success:", data);
-            updateData();
+            //updateData();
             generateSuccessMessage(
                 "Deine Wette wurde erfolgreich abgeschickt!"
             );
