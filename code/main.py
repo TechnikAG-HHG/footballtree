@@ -4411,7 +4411,7 @@ def get_data_for_website(which_data=-1):
             if tkapp.active_mode.get() == 2:
                 if tkapp.cache_vars.get("getfinalmatches_changed_using_var") == True:
 
-                    print("##################################Final Match Number##################################", tkapp.active_match)
+                    #print("##################################Final Match Number##################################", tkapp.active_match)
                     
                     final_goles = []
                     
@@ -4944,7 +4944,6 @@ def send_user_name():
 
 @app.route("/")
 def home():
-    print("entered home")
     return get_initial_data("websitemain.html")
 
 @app.route("/group")
