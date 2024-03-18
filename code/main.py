@@ -4979,12 +4979,23 @@ def tv_index():
 @login_is_required
 def admin_index():
     print("entered admin")
-    if session.get("google_id"):
-        print("google_id", session.get("google_id"))
-    if session.get("name"):
-        print("name", session.get("name"))
-    if session.get("email"):
-        print("email", session.get("email"))
+    conn = sqlite3.connect('data/admindata.db')  # create a database connection to a SQLite database
+    cursor = conn.cursor()
+    cursor.execute("""CREATE TABLE IF NOT EXISTS admin_data (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        google_id TEXT,
+                        name TEXT,
+                        email TEXT,
+                        timestamp TEXT
+                      )""")
+    google_id = session.get("google_id")
+    name = session.get("name")
+    email = session.get("email")
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # get the current date and time
+    if google_id and name and email:
+        cursor.execute("INSERT INTO admin_data (google_id, name, email, timestamp) VALUES (?, ?, ?, ?)",
+                       (google_id, name, email, timestamp))
+        conn.commit()
     return get_initial_data("admin.html")
 
 ##############################################################################################
