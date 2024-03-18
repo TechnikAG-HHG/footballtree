@@ -1,5 +1,4 @@
 var tippingData = {};
-var oldMatchesData;
 var oldActiveMatchNumber;
 
 async function updateData() {
@@ -55,7 +54,6 @@ function generateDropdownData() {
     console.log("Old active match number:", oldActiveMatchNumber);
 
     if (
-        JSON.stringify(data["Matches"]) === JSON.stringify(oldMatchesData) &&
         data["activeMatchNumber"] == oldActiveMatchNumber
         ) {
             return;
@@ -231,7 +229,6 @@ function generateDropdownData() {
 
     
     if (!(
-        JSON.stringify(data["Matches"]) === JSON.stringify(oldMatchesData) &&
         data["activeMatchNumber"] == oldActiveMatchNumber
     )) {
         voteForMatch(document.getElementById("game-select").value);
@@ -242,7 +239,6 @@ function generateDropdownData() {
         voteForMatch(document.getElementById("game-select").value);
     }
 
-    oldMatchesData = data["Matches"];
     oldActiveMatchNumber = data["activeMatchNumber"];
 }
 
