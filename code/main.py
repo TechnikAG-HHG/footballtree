@@ -4351,7 +4351,7 @@ def get_data_for_website(which_data=-1):
                     percent_team1Wins = team1Wins / len(team1Goals) * 100 if team1Goals else 0
                     percent_team2Wins = team2Wins / len(team2Goals) * 100 if team2Goals else 0
 
-                    tipping_statistics[matchId] = (average_team1Goals, average_team2Goals, percent_team1Wins, percent_team2Wins)
+                    tipping_statistics[matchId] = (round(average_team1Goals, 1), round(average_team2Goals, 1), round(percent_team1Wins, 1), round(percent_team2Wins, 1))
 
                 # Combine both datasets
                 combined_data = []
@@ -4480,7 +4480,7 @@ def get_data_for_website(which_data=-1):
                         percent_team1Wins = team1Wins / len(team1Goals) * 100 if team1Goals else 0
                         percent_team2Wins = team2Wins / len(team2Goals) * 100 if team2Goals else 0
 
-                        tipping_statistics[matchId] = (average_team1Goals, average_team2Goals, percent_team1Wins, percent_team2Wins)
+                        tipping_statistics[matchId] = (round(average_team1Goals, 1), round(average_team2Goals, 1), round(percent_team1Wins, 1), round(percent_team2Wins, 1))
 
                     #
                     #    # Combine both datasets
@@ -4602,7 +4602,7 @@ def get_data_for_website(which_data=-1):
                     percent_team1Wins = team1Wins / len(team1Goals) * 100 if team1Goals else 0
                     percent_team2Wins = team2Wins / len(team2Goals) * 100 if team2Goals else 0
 
-                    tipping_statistics[matchId] = (average_team1Goals, average_team2Goals, percent_team1Wins, percent_team2Wins)
+                    tipping_statistics[matchId] = (round(average_team1Goals, 1), round(average_team2Goals, 1), round(percent_team1Wins, 1), round(percent_team2Wins, 1))
 
                 combined_data = []
                 for foo in all_matches:
