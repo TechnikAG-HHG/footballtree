@@ -2000,12 +2000,12 @@ class Window(ctk.CTk):
         
         matches = self.calculate_matches()
 
-        self.cache_vars["getmatches_changed_using_var"] = True
+        #self.cache_vars["getmatches_changed_using_var"] = True
         self.cache_vars["getkomatches_changed_using_var"] = True
         self.cache_vars["getfinalmatches_changed_using_var"] = True
         self.updated_data.update({"finalMatches": get_data_for_website(6)})
         self.updated_data.update({"KOMatches": get_data_for_website(8)})
-        self.updated_data.update({"Matches": get_data_for_website(4)})
+        #self.updated_data.update({"Matches": get_data_for_website(4)})
         
         self.spiel_select_frame = ctk.CTkFrame(frame, fg_color='#142324', corner_radius=5)
         self.spiel_select_frame.pack(pady=10, padx=10, anchor=tk.SW, side=tk.LEFT)
@@ -3220,7 +3220,6 @@ class Window(ctk.CTk):
             
     def on_tipping_tab_change(self):
         current_tab = self.tipping_tab_view.get()
-        print("current_tab", current_tab)
         
         if current_tab == "Tippers List":
             if self.tippers_list_frame:
@@ -3544,7 +3543,7 @@ class Window(ctk.CTk):
         self.cache_vars["getfinalmatches_changed_using_var"] = True
         selected_value = self.active_mode.get()
 
-        print("selected_value", selected_value, "self.read_teamNames()", self.read_teamNames())
+        #print("selected_value", selected_value, "self.read_teamNames()", self.read_teamNames())
         if self.read_teamNames() == [''] and selected_value != 1:
             self.active_mode.set(1)
             self.on_radio_button_change()
@@ -4390,12 +4389,15 @@ def get_data_for_website(which_data=-1):
 
                 tkapp.cache["Matches"] = combined_data
 
+               # print("combined_data", combined_data)
+
                 return combined_data
             
             else:
+                #print("return tkapp.cache.get('Matches')", tkapp.cache.get("Matches"))
                 return tkapp.cache.get("Matches")
         except NameError as e:
-            print("Error in get_data_for_website(4)", e)
+            #print("Error in get_data_for_website(4)", e)
             return []
     
     elif which_data == 5:
@@ -4523,7 +4525,7 @@ def get_data_for_website(which_data=-1):
                     for matchId in range(1, 5):
                         statistics = tipping_statistics.get(matchId, (None, None, None, None))
                         combined_data.append(statistics)
-                        print(f"matchId {matchId}, statistics {statistics}")
+                        #print(f"matchId {matchId}, statistics {statistics}")
 
                     v = [
                         [
@@ -4638,7 +4640,7 @@ def get_data_for_website(which_data=-1):
                     matchId *= -1
                     matchId = matchId - 100
                     matchId += 1
-                    print(f"matchId {matchId}, data {data}")
+                    #print(f"matchId {matchId}, data {data}")
                     team1Goals = data['team1Goals']
                     team2Goals = data['team2Goals']
                     average_team1Goals = sum(team1Goals) / len(team1Goals) if team1Goals else 0
