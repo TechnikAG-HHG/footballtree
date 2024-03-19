@@ -1990,6 +1990,13 @@ class Window(ctk.CTk):
         self.manual_select_active_sure = False
         
         matches = self.calculate_matches()
+
+        self.cache_vars["getmatches_changed_using_var"] = True
+        self.cache_vars["getkomatches_changed_using_var"] = True
+        self.cache_vars["getfinalmatches_changed_using_var"] = True
+        self.updated_data.update({"finalMatches": get_data_for_website(6)})
+        self.updated_data.update({"KOMatches": get_data_for_website(8)})
+        self.updated_data.update({"Matches": get_data_for_website(4)})
         
         self.spiel_select_frame = ctk.CTkFrame(frame, fg_color='#142324', corner_radius=5)
         self.spiel_select_frame.pack(pady=10, padx=10, anchor=tk.SW, side=tk.LEFT)
@@ -4642,19 +4649,18 @@ def get_data_for_website(which_data=-1):
                 combined_data = []
                 for foo in all_matches:
                     statistics = tipping_statistics.get(foo[0], (None, None, None, None))
+                    #print(f"foo {foo}, statistics {statistics}, tipping_statistics {tipping_statistics}")
                     combined_data.append(list(foo[1:]) + list([statistics]))
 
                 tkapp.cache_vars["getkomatches_changed_using_var"] = False
 
                 tkapp.cache["KOMatches"] = combined_data
 
-
-
                 return combined_data
             else:
                 return tkapp.cache.get("KOMatches")
-        except OSError:
-            logging.info("Error in get_data_for_website(8)")
+        except :
+            #logging.debug("Error in get_data_for_website(8)")
             return []
     
     elif which_data == 9:
