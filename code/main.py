@@ -5179,8 +5179,7 @@ stored_data = {}
 tkapp = Window(start_server_and_ssh)
 
 if start_server_and_ssh:
-    pass
-    #subprocess.Popen(["python", "code/serveo_shh_connect.py"])
+    subprocess.Popen(["python", "code/serveo_shh_connect.py"])
 
 if __name__ == "__main__":
     tkapp.mainloop()
