@@ -662,6 +662,8 @@ class Window(ctk.CTk):
             self.updated_data.update({"Teams": get_data_for_website(0)})
             self.updated_data.update({"Matches": get_data_for_website(4)})
             self.updated_data.update({"finalMatches": get_data_for_website(6)})
+            self.updated_data.update({"KOMatches": get_data_for_website(8)})
+
     
 
     def create_backup_of_db(self):
@@ -696,6 +698,7 @@ class Window(ctk.CTk):
 
     def reset_match_datas(self):
             self.cursor.execute("UPDATE matchData SET team1Goals = 0, team2Goals = 0, matchTime = ''")
+            self.settingscursor.execute("UPDATE settingsData SET activeMatch = 0, teams_playing = 0, activeMode = 1")
             self.cursor.execute("DROP TABLE finalMatchesData")
 
             finalMatchesDataTableCreationQuery = """
@@ -740,6 +743,8 @@ class Window(ctk.CTk):
             """
             self.cursor.execute(tippingTableCreationQuery)
             self.connection.commit()
+
+
             
 
     ##############################################################################################
@@ -1990,6 +1995,13 @@ class Window(ctk.CTk):
         self.manual_select_active_sure = False
         
         matches = self.calculate_matches()
+
+        self.cache_vars["getmatches_changed_using_var"] = True
+        self.cache_vars["getkomatches_changed_using_var"] = True
+        self.cache_vars["getfinalmatches_changed_using_var"] = True
+        self.updated_data.update({"finalMatches": get_data_for_website(6)})
+        self.updated_data.update({"KOMatches": get_data_for_website(8)})
+        self.updated_data.update({"Matches": get_data_for_website(4)})
         
         self.spiel_select_frame = ctk.CTkFrame(frame, fg_color='#142324', corner_radius=5)
         self.spiel_select_frame.pack(pady=10, padx=10, anchor=tk.SW, side=tk.LEFT)
@@ -2142,10 +2154,13 @@ class Window(ctk.CTk):
 
     def start_match_in_first_game_in_group_phase(self):
         if self.active_mode.get() == 1:
-            values_list = self.get_values_list_mode1(self.calculate_matches())
-            self.on_match_select(values_list[0], self.calculate_matches())
-            self.manual_select_active = False
-            self.show_frame(self.SPIEL_frame) # Fix for player doubleing
+            try:
+                values_list = self.get_values_list_mode1(self.calculate_matches())
+                self.on_match_select(values_list[0], self.calculate_matches())
+                self.manual_select_active = False
+                self.show_frame(self.SPIEL_frame) # Fix for player doubleing
+            except IndexError:
+                pass
         else:
             logging.error("The active mode is not 1")
 
@@ -4570,6 +4585,7 @@ def get_data_for_website(which_data=-1):
 
                 getAllMatchesFromKOMatchesDB = """
                 SELECT 
+                    m.matchId,
                     t1.teamName as team1Name, 
                     t2.teamName as team2Name, 
                     m.team1Goals, 
@@ -4609,9 +4625,12 @@ def get_data_for_website(which_data=-1):
                 tipping_statistics = {}
 
                 for matchId, data in grouped_data.items():
+                    if not matchId <= -100:
+                        continue
                     matchId *= -1
                     matchId = matchId - 100
                     matchId += 1
+                    print(f"matchId {matchId}, data {data}")
                     team1Goals = data['team1Goals']
                     team2Goals = data['team2Goals']
                     average_team1Goals = sum(team1Goals) / len(team1Goals) if team1Goals else 0
@@ -4638,19 +4657,18 @@ def get_data_for_website(which_data=-1):
                 combined_data = []
                 for foo in all_matches:
                     statistics = tipping_statistics.get(foo[0], (None, None, None, None))
-                    combined_data.append(list(foo) + list([statistics]))
+                    #print(f"foo {foo}, statistics {statistics}, tipping_statistics {tipping_statistics}")
+                    combined_data.append(list(foo[1:]) + list([statistics]))
 
                 tkapp.cache_vars["getkomatches_changed_using_var"] = False
 
                 tkapp.cache["KOMatches"] = combined_data
 
-
-
                 return combined_data
             else:
                 return tkapp.cache.get("KOMatches")
-        except OSError:
-            logging.info("Error in get_data_for_website(8)")
+        except :
+            #logging.debug("Error in get_data_for_website(8)")
             return []
     
     elif which_data == 9:
