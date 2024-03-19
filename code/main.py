@@ -4887,7 +4887,7 @@ def send_tipping_data():
             return "Match already started or finished (2)", 400
     elif tkapp.active_match != -1 and tkapp.active_mode.get() == 3:
         match_id_temp = (match_id * -1) - 100
-        if (match_id_temp <= tkapp.active_match) or (match_id_temp == 0 and tkapp.pause_mode.get() == 1):
+        if (match_id_temp <= tkapp.active_match) and not (match_id_temp == 0 and tkapp.pause_mode.get() == 1):
             #print("match_id_temp", match_id_temp, tkapp.active_match)
             return "Match already started or finished (3)", 400
             
