@@ -3825,7 +3825,7 @@ class Window(ctk.CTk):
             return
         saveTimeBeforeTheFinalMatchInDB = """
         UPDATE settingsData
-        SET timeBeforeTheFinalMatch = ?
+        SET timeBeforeSUP3AndTheFinalMatch = ?
         WHERE id = 1
         """
         logging.debug(f"on_time_before_the_final_match_change {self.time_before_SUP3_and_the_final_match.get()}")
@@ -3842,7 +3842,7 @@ class Window(ctk.CTk):
             return
         saveHalfTimePauseInDB = """
         UPDATE settingsData
-        SET halfTimePause = ?
+        SET timeBeforeTHEFinalMatch = ?
         WHERE id = 1
         """
         logging.debug(f"on_half_time_pause_change {self.pause_before_THE_final_match.get()}")
@@ -4446,7 +4446,7 @@ def get_data_for_website(which_data=-1):
                     else:
                         final_goles.append([0, 0])
                         
-                    if tkapp.spiel_um_platz_3 and (tkapp.active_match >= 2 or tkapp.pause_mode.get() == 3):
+                    if tkapp.spiel_um_platz_3 and (tkapp.active_match >= 2 or tkapp.pause_mode.get() == 3 or tkapp.pause_mode.get() == 4):
                         final_goles.append([ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[0][0], tkapp.spiel_um_platz_3[1][0]), ich_kann_nicht_mehr(tkapp.spiel_um_platz_3[1][0], tkapp.spiel_um_platz_3[0][0])])
                         final_goles.append([ich_kann_nicht_mehr(tkapp.final_match_teams[0][0], tkapp.final_match_teams[1][0]), ich_kann_nicht_mehr(tkapp.final_match_teams[1][0], tkapp.final_match_teams[0][0])])
                     else:
@@ -4485,6 +4485,8 @@ def get_data_for_website(which_data=-1):
                             continue
                         team1Goals = data['team1Goals']
                         team2Goals = data['team2Goals']
+                        average_team1Goals = sum(team1Goals) / len(team1Goals) if team1Goals else 0
+                        average_team2Goals = sum(team2Goals) / len(team2Goals) if team2Goals else 0
                         #averageRounded_team1Goals = round(average_team1Goals, 2)
                         #averageRounded_team2Goals = round(average_team2Goals, 2)
 
@@ -4534,15 +4536,15 @@ def get_data_for_website(which_data=-1):
                             combined_data[1]
                         ],
                         [
-                            tkapp.spiel_um_platz_3[0][1] if tkapp.spiel_um_platz_3 and (tkapp.active_match >= 2 or tkapp.pause_mode.get() == 3) else None,
-                            tkapp.spiel_um_platz_3[1][1] if tkapp.spiel_um_platz_3 and (tkapp.active_match >= 2 or tkapp.pause_mode.get() == 3) else None,
+                            tkapp.spiel_um_platz_3[0][1] if tkapp.spiel_um_platz_3 and (tkapp.active_match >= 2 or tkapp.pause_mode.get() == 3 or tkapp.pause_mode.get() == 4) else None,
+                            tkapp.spiel_um_platz_3[1][1] if tkapp.spiel_um_platz_3 and (tkapp.active_match >= 2 or tkapp.pause_mode.get() == 3 or tkapp.pause_mode.get() == 4) else None,
                             final_goles[2][0],
                             final_goles[2][1],
                             combined_data[2]
                         ],
                         [
-                            tkapp.final_match_teams[0][1] if tkapp.final_match_teams and (tkapp.active_match >= 2 or tkapp.pause_mode.get() == 3) else None,
-                            tkapp.final_match_teams[1][1] if tkapp.final_match_teams  and (tkapp.active_match >= 2 or tkapp.pause_mode.get() == 3)else None,
+                            tkapp.final_match_teams[0][1] if tkapp.final_match_teams and (tkapp.active_match >= 2 or tkapp.pause_mode.get() == 3 or tkapp.pause_mode.get() == 4) else None,
+                            tkapp.final_match_teams[1][1] if tkapp.final_match_teams and (tkapp.active_match >= 2 or tkapp.pause_mode.get() == 3 or tkapp.pause_mode.get() == 4) else None,
                             final_goles[3][0],
                             final_goles[3][1],
                             combined_data[3]
@@ -4560,7 +4562,8 @@ def get_data_for_website(which_data=-1):
                     return tkapp.cache.get("finalMatches")
             else:
                 return None
-        except:
+        except NameError as e:
+            logging.error(f"Error in get_data_for_website(6) {e}")
             return None
     
     elif which_data == 7:
@@ -5171,7 +5174,8 @@ stored_data = {}
 tkapp = Window(start_server_and_ssh)
 
 if start_server_and_ssh:
-    subprocess.Popen(["python", "code/serveo_shh_connect.py"])
+    pass
+    #subprocess.Popen(["python", "code/serveo_shh_connect.py"])
 
 if __name__ == "__main__":
     tkapp.mainloop()
