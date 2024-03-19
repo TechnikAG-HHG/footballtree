@@ -662,6 +662,8 @@ class Window(ctk.CTk):
             self.updated_data.update({"Teams": get_data_for_website(0)})
             self.updated_data.update({"Matches": get_data_for_website(4)})
             self.updated_data.update({"finalMatches": get_data_for_website(6)})
+            self.updated_data.update({"KOMatches": get_data_for_website(8)})
+
     
 
     def create_backup_of_db(self):
@@ -696,6 +698,7 @@ class Window(ctk.CTk):
 
     def reset_match_datas(self):
             self.cursor.execute("UPDATE matchData SET team1Goals = 0, team2Goals = 0, matchTime = ''")
+            self.settingscursor.execute("UPDATE settingsData SET activeMatch = 0, teams_playing = 0, activeMode = 1")
             self.cursor.execute("DROP TABLE finalMatchesData")
 
             finalMatchesDataTableCreationQuery = """
@@ -740,6 +743,8 @@ class Window(ctk.CTk):
             """
             self.cursor.execute(tippingTableCreationQuery)
             self.connection.commit()
+
+
             
 
     ##############################################################################################
@@ -2149,10 +2154,13 @@ class Window(ctk.CTk):
 
     def start_match_in_first_game_in_group_phase(self):
         if self.active_mode.get() == 1:
-            values_list = self.get_values_list_mode1(self.calculate_matches())
-            self.on_match_select(values_list[0], self.calculate_matches())
-            self.manual_select_active = False
-            self.show_frame(self.SPIEL_frame) # Fix for player doubleing
+            try:
+                values_list = self.get_values_list_mode1(self.calculate_matches())
+                self.on_match_select(values_list[0], self.calculate_matches())
+                self.manual_select_active = False
+                self.show_frame(self.SPIEL_frame) # Fix for player doubleing
+            except IndexError:
+                pass
         else:
             logging.error("The active mode is not 1")
 
