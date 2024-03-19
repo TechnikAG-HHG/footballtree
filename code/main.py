@@ -1421,51 +1421,55 @@ class Window(ctk.CTk):
 
     
     def create_player_widgets(self, player_info, i, team_i):
-        player_name, player_number, goals, player_id, player_goals_per_match = player_info
-        player_index = i 
-        
-        #player_id = self.get_player_id_from_player_name(player_name)
-        #logging.debug("player_id", self.get_player_id_from_player_name(player_name))
-        if team_i == 0:
-            if i < 7:
-                self.group_frame = ctk.CTkFrame(self.up_frame1, fg_color='#142324', corner_radius=10)
-                self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
+        try:
+            player_name, player_number, goals, player_id, player_goals_per_match = player_info
+            player_index = i 
+            
+            #player_id = self.get_player_id_from_player_name(player_name)
+            #logging.debug("player_id", self.get_player_id_from_player_name(player_name))
+            if team_i == 0:
+                if i < 7:
+                    self.group_frame = ctk.CTkFrame(self.up_frame1, fg_color='#142324', corner_radius=10)
+                    self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
+                else:
+                    self.group_frame = ctk.CTkFrame(self.down_frame1, fg_color='#142324', corner_radius=10)
+                    self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
             else:
-                self.group_frame = ctk.CTkFrame(self.down_frame1, fg_color='#142324', corner_radius=10)
-                self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
-        else:
-            if i < 7:
-                self.group_frame = ctk.CTkFrame(self.up_frame2, fg_color='#142324', corner_radius=10)
-                self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
-            else:
-                self.group_frame = ctk.CTkFrame(self.down_frame2, fg_color='#142324', corner_radius=10)
-                self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
-        
-        #self.group_frame = tk.Frame(self.for_team_frame, background="lightcoral")
-        #self.group_frame.pack(side=tk.LEFT, padx=10, pady=10)
+                if i < 7:
+                    self.group_frame = ctk.CTkFrame(self.up_frame2, fg_color='#142324', corner_radius=10)
+                    self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.N)
+                else:
+                    self.group_frame = ctk.CTkFrame(self.down_frame2, fg_color='#142324', corner_radius=10)
+                    self.group_frame.pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.S)
+            
+            #self.group_frame = tk.Frame(self.for_team_frame, background="lightcoral")
+            #self.group_frame.pack(side=tk.LEFT, padx=10, pady=10)
 
-        playertext1 = ctk.CTkLabel(self.group_frame, text=f"Player {i}", font=("Helvetica", self.team_button_font_size))
-        playertext1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
-        
-        playertext2_text = f"{player_name} - {player_number}"
-        
-        playertext2 = ctk.CTkLabel(master=self.group_frame, text=playertext2_text , font=("Helvetica", self.team_button_font_size, "bold"))
-        playertext2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
-        
-        playertext3 = ctk.CTkLabel(self.group_frame, text=f"Tore {str(player_goals_per_match)}", font=("Helvetica", self.team_button_font_size))
-        playertext3.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
+            playertext1 = ctk.CTkLabel(self.group_frame, text=f"Player {i}", font=("Helvetica", self.team_button_font_size))
+            playertext1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
+            
+            playertext2_text = f"{player_name} - {player_number}"
+            
+            playertext2 = ctk.CTkLabel(master=self.group_frame, text=playertext2_text , font=("Helvetica", self.team_button_font_size, "bold"))
+            playertext2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
+            
+            playertext3 = ctk.CTkLabel(self.group_frame, text=f"Tore {str(player_goals_per_match)}", font=("Helvetica", self.team_button_font_size))
+            playertext3.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
 
-        playerbutton1 = ctk.CTkButton(self.group_frame, text="UP", command=lambda team=self.teams_playing[team_i], player_id1=player_id, player_index = player_index, player_name = player_name: self.player_scored_a_point(team, player_id1, player_index,  "UP", player_name), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)  
-        playerbutton1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
+            playerbutton1 = ctk.CTkButton(self.group_frame, text="UP", command=lambda team=self.teams_playing[team_i], player_id1=player_id, player_index = player_index, player_name = player_name: self.player_scored_a_point(team, player_id1, player_index,  "UP", player_name), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)  
+            playerbutton1.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
+            
+            playerbutton2 = ctk.CTkButton(self.group_frame, text="DOWN", command=lambda team=self.teams_playing[team_i], player_id1=player_id, player_index = player_index, player_name = player_name: self.player_scored_a_point(team, player_id1, player_index, "DOWN", player_name), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)
+            playerbutton2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
         
-        playerbutton2 = ctk.CTkButton(self.group_frame, text="DOWN", command=lambda team=self.teams_playing[team_i], player_id1=player_id, player_index = player_index, player_name = player_name: self.player_scored_a_point(team, player_id1, player_index, "DOWN", player_name), fg_color="#34757a", hover_color="#1f4346", font=("Helvetica", self.team_button_font_size), height=self.team_button_height, width=self.team_button_width)
-        playerbutton2.pack(side=tk.TOP, pady=2, expand=True, fill=tk.X, padx=5)
-    
-    
-        #logging.debug("team", team, "i", i)
+        
+            #logging.debug("team", team, "i", i)
 
-        # Save the group_frame, playertext1, and playerbutton in each for loop with the team name as key
-        self.spiel_buttons[self.teams_playing[team_i]][i] = (self.group_frame, playertext1, playertext2, playertext3, playerbutton1, playerbutton2)  # Use append for a list
+            # Save the group_frame, playertext1, and playerbutton in each for loop with the team name as key
+            self.spiel_buttons[self.teams_playing[team_i]][i] = (self.group_frame, playertext1, playertext2, playertext3, playerbutton1, playerbutton2)  # Use append for a list
+        except Exception as e:
+            logging.error(f"Exception in create_player_widgets: {e}")
+            return
         
         
     def setup_player_goals_per_match(self, team_id):
@@ -4390,7 +4394,8 @@ def get_data_for_website(which_data=-1):
             
             else:
                 return tkapp.cache.get("Matches")
-        except:
+        except NameError as e:
+            print("Error in get_data_for_website(4)", e)
             return []
     
     elif which_data == 5:
