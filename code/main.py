@@ -185,7 +185,7 @@ class Window(ctk.CTk):
         
         
     def start_server(self):
-        app.run(debug=False, threaded=True, port=5000, host="127.0.0.1", use_reloader=False)
+        app.run(debug=False, threaded=True, port=5000, host="0.0.0.0", use_reloader=False)
     
     
     def init_sqlite_db(self):

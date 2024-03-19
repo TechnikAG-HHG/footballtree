@@ -314,7 +314,7 @@ h2 {
 @media (max-width: 800px) {
     .pauseTime,
     #pauseTimeProgress {
-        height: 4vh;
+        /*height: 4vh;*/
         border: 0.2vh solid #49ba67;
     }
 
