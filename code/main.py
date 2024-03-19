@@ -4880,15 +4880,16 @@ def send_tipping_data():
     
     if match_id >= 0 and tkapp.active_match != -1 and tkapp.active_mode.get() == 1:
         if match_id <= tkapp.active_match:
-            return "Match already started or finished", 400
+            return "Match already started or finished (1)", 400
     elif tkapp.active_match != -1 and tkapp.active_mode.get() == 2:
         match_id_temp = (match_id * -1) - 2
         if match_id_temp <= tkapp.active_match:
-            return "Match already started or finished", 400
+            return "Match already started or finished (2)", 400
     elif tkapp.active_match != -1 and tkapp.active_mode.get() == 3:
         match_id_temp = (match_id * -1) - 100
-        if match_id_temp <= tkapp.active_match:
-            return "Match already started or finished", 400
+        if (match_id_temp <= tkapp.active_match) or (match_id_temp == 0 and tkapp.pause_mode.get() == 1):
+            print("match_id_temp", match_id_temp, tkapp.active_match)
+            return "Match already started or finished (3)", 400
             
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
