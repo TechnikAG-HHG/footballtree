@@ -442,8 +442,8 @@ function handleSubmit() {
         }),
     })
         .then((response) => {
-            if (response.status === 400) {
-                throw new Error("Bad Request");
+            if (response.status != 200) {
+                throw response;
             }
             return response.text();
         })
@@ -455,7 +455,7 @@ function handleSubmit() {
             );
         })
         .catch((error) => {
-            console.error("Error:", error);
+            console.log(error.text());
             generateErrorMessage("Fehler, bitte versuche es erneut!");
         });
 }
