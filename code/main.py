@@ -4796,31 +4796,33 @@ def login():
 
 @app.route("/callback")
 def callback():
-    global session
-    state = session.pop("state", None)  # Use pop to get and remove state from session
-    if state is None or state != request.args.get("state"):
+    try:
+        global session
+        state = session.pop("state", None)  # Use pop to get and remove state from session
+        if state is None or state != request.args.get("state"):
+            return redirect("/login")
+
+        flow.fetch_token(authorization_response=request.url)
+
+        credentials = flow.credentials
+        request_session = requests.session()
+        cached_session = cachecontrol.CacheControl(request_session)
+        token_request = google.auth.transport.requests.Request(session=cached_session)
+
+
+        id_info = id_token.verify_oauth2_token(
+            id_token=credentials._id_token,
+            request=token_request,
+            audience=GOOGLE_CLIENT_ID, 
+            clock_skew_in_seconds=10
+        )
+
+        session["google_id"] = id_info.get("sub")
+        session["name"] = id_info.get("name")
+        session["email"] = id_info.get("email")
+        return redirect(session.pop("next", "/"))
+    except:
         return redirect("/login")
-
-    flow.fetch_token(authorization_response=request.url)
-
-    credentials = flow.credentials
-    request_session = requests.session()
-    cached_session = cachecontrol.CacheControl(request_session)
-    token_request = google.auth.transport.requests.Request(session=cached_session)
-
-
-    id_info = id_token.verify_oauth2_token(
-        id_token=credentials._id_token,
-        request=token_request,
-        audience=GOOGLE_CLIENT_ID, 
-        clock_skew_in_seconds=10
-    )
-  
-
-    session["google_id"] = id_info.get("sub")
-    session["name"] = id_info.get("name")
-    session["email"] = id_info.get("email")
-    return redirect(session.pop("next", "/"))
  
 @app.route("/logout")
 def logout():
