@@ -1,10 +1,10 @@
 function drawTree() {
     var teamCount = 4;
     var boxes = teamCount;
-    var boxheight = 30;
+    var boxheight = 15;
     var boxestodraw = 0;
     var textsdrawn = 0;
-    var marginsubbox = 200;
+    var marginsubbox = 100;
 
     console.log("drawTree() called");
 
@@ -192,6 +192,11 @@ function drawLines() {
             drawLinesBetweenBoxes(boxes[i], boxes[i + 1], svg);
         }
     }
+
+    // delete the first and sixth line
+    var lines = document.getElementsByTagName("line");
+    lines[0].remove();
+    lines[5].remove();
 }
 
 function drawLinesBetweenBoxes(box, nextBox, svg) {
@@ -309,14 +314,18 @@ function writeTeamData(matchCount = 2) {
                 }
 
                 let div1 = document.createElement("div");
+                div1.classList.add("teamDiv");
                 div1.textContent = team1;
                 matchElement.appendChild(div1);
 
                 let div2 = document.createElement("div");
+                div2.classList.add("score");
+                div2.classList.add("teamDiv");
                 div2.textContent = `${score1} : ${score2}`;
                 matchElement.appendChild(div2);
 
                 let div3 = document.createElement("div");
+                div3.classList.add("teamDiv");
                 div3.textContent = team2;
                 matchElement.appendChild(div3);
             }
@@ -324,42 +333,45 @@ function writeTeamData(matchCount = 2) {
         finalMatchesSliced.reverse();
     }
 
+    var KOMatchesSliced = [];
     if ("KOMatches" in data) {
         var KOMatches = data["KOMatches"];
         if (
             KOMatches == null ||
             (KOMatches[0][0] == null && KOMatches[0][1] == null)
         ) {
-            var KOMatchesSliced = [];
+            KOMatchesSliced = [];
             while (KOMatchesSliced.length < 4) {
-                KOMatchesSliced.push(["???", "???", "0", "0", [null, null, null, null]]);
+            KOMatchesSliced.push(["???", "???", "0", "0", [null, null, null, null]]);
             }
 
             var totalMatchNumber = 4;
         } else {
             if (KOMatches.length > Math.abs(data["activeMatchNumber"])) {
-                if (
-                    KOMatches.length / 2 <
-                    Math.abs(data["activeMatchNumber"])
-                ) {
-                    var KOMatchesSliced = KOMatches;
-                } else {
-                    var KOMatchesSliced = KOMatches.slice(0, 2);
-                }
-                while (KOMatchesSliced.length < KOMatches.length) {
-                    KOMatchesSliced.push(["???", "???", "0", "0", [null, null, null, null]]);
-                }
+                KOMatchesSliced = [...KOMatches];
+            
+            while (KOMatchesSliced.length < KOMatches.length) {
+                KOMatchesSliced.push(["???", "???", "0", "0", [null, null, null, null]]);
+            }
             } else {
-                var KOMatchesSliced = KOMatches;
+                KOMatchesSliced = [...KOMatches];
             }
 
             var totalMatchNumber = KOMatchesSliced.length;
         }
 
+        
+        // Switch positions 2 and 3 of KOMatchesSliced
+        let temp = null;
+        temp = KOMatchesSliced[1];
+        KOMatchesSliced[1] = KOMatchesSliced[2];
+        KOMatchesSliced[2] = temp;
+
+
         KOMatchesSliced.reverse();
 
         for (var i = 4; i < (matchCount * 2) + 4; i++) {
-            console.log("KOMatchesSliced[i]:", KOMatchesSliced[i]);
+            console.log("KOMatchesSliced[i]:", KOMatchesSliced[i - 4]);
             var match = KOMatchesSliced[i - 4];
             var team1 = match[0];
             var team2 = match[1];
@@ -374,14 +386,18 @@ function writeTeamData(matchCount = 2) {
                 }
 
                 let div1 = document.createElement("div");
+                div1.classList.add("teamDiv");
                 div1.textContent = team1;
                 matchElement.appendChild(div1);
 
                 let div2 = document.createElement("div");
+                div2.classList.add("teamDiv");
+                div2.classList.add("score");
                 div2.textContent = `${score1} : ${score2}`;
                 matchElement.appendChild(div2);
 
                 let div3 = document.createElement("div");
+                div3.classList.add("teamDiv");
                 div3.textContent = team2;
                 matchElement.appendChild(div3);
             }
@@ -390,7 +406,7 @@ function writeTeamData(matchCount = 2) {
     }
 }
 
-function updateData() {
+async function updateData() {
     // Include the last data version in the request headers
     var headers = new Headers();
     headers.append("Last-Data-Update", data["LastUpdate"]);
@@ -415,9 +431,7 @@ function updateData() {
     document.title = data["websiteTitle"];
     document.getElementById("websiteTitle").textContent = data["websiteTitle"];
 
-    setTimeout(function () {
-        writeTeamData();
-    }, 500);
+    await writeTeamData();
 }
 
 // Function to handle button clicks and redirect

@@ -131,13 +131,9 @@ body {
 }
 
 .team-name {
-    width: 100%;
-    height: 100%;
-    margin-right: 0.5vw;
-    margin-left: 0.5vw;
-    font-size: 1.5vw;
+    width: 100%;	
+    font-size: 1vw;
     color: white;
-    font-family: "Roboto", sans-serif;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
@@ -147,7 +143,7 @@ body {
     width: 100%;
     margin-right: 0.5vw;
     margin-left: 0.5vw;
-    font-size: 1.5vw;
+    font-size: 1vw;
     color: white;
     font-family: "Roboto", sans-serif;
     display: flex;
@@ -170,4 +166,34 @@ body {
     list-style: none;
     padding: 0%;
     font-weight: bold;
+}
+
+.score {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
+    padding: 0%;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.teamDiv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 0.5vw;
+    padding: 0;
+    text-align: center;
+}
+
+@media (max-width: 800px) {
+    .drawn-sub-box {
+        height: 5vh;
+    }
+
+    line {
+        stroke-width: 0.4vw;
+    }
 }

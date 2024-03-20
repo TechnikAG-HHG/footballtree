@@ -206,7 +206,7 @@ function drawWinnerPodest() {
     );
     firstText.setAttribute("x", "49.5%");
     firstText.setAttribute("y", "35"); // adjust this value to position the text correctly
-    firstText.textContent = "First";
+    firstText.textContent = "Erster";
     firstText.classList.add("svgText");
     firstText.classList.add("firstText");
     svg.appendChild(firstText);
@@ -217,7 +217,7 @@ function drawWinnerPodest() {
     );
     secondText.setAttribute("x", "16.5%");
     secondText.setAttribute("y", "85"); // adjust this value to position the text correctly
-    secondText.textContent = "Second";
+    secondText.textContent = "Zweiter";
     secondText.classList.add("svgText");
     secondText.classList.add("secondText");
     svg.appendChild(secondText);
@@ -228,7 +228,7 @@ function drawWinnerPodest() {
     );
     thirdText.setAttribute("x", "82.5%");
     thirdText.setAttribute("y", "135"); // adjust this value to position the text correctly
-    thirdText.textContent = "Third";
+    thirdText.textContent = "Dritter";
     thirdText.classList.add("svgText");
     thirdText.classList.add("thirdText");
     svg.appendChild(thirdText);
