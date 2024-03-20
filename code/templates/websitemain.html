@@ -44,12 +44,24 @@
             <h1 id="websiteTitle">Loading...</h1>
         </div>
 
+        <script>
+            var data = {{ initial_data|tojson|safe }};
+            console.log('Initial data:', data);
+        </script>
+
         <button id="planButton">Zum Spielplan</button>
         <button id="groupButton">Zur Gruppenansicht</button>
         <button id="tippingButton">Zum Tippspiel</button>
-        <button id="bestScorerButton" style="display: none">
-            Auswertung Torsch&uuml;tzenk&ouml;nig
-        </button>
+        {% if bestScorerActive %}
+            <button id="bestScorerButton">
+                Auswertung Torsch&uuml;tzenk&ouml;nig
+            </button>
+        {% else %}
+            <button id="bestScorerButton" style="display: none">
+                Auswertung Torsch&uuml;tzenk&ouml;nig
+            </button>
+        {% endif %}
+
         <button id="treeButton">Zum Gewinnbaum</button>
 
         <a class="MadeBy">Made by:</a>
@@ -59,11 +71,6 @@
         <a class="link" , href="https://www.github.com/Limonadeundco">
             github.com/Limonadeundco
         </a>
-
-        <script>
-            var data = {{ initial_data|tojson|safe }};
-            console.log('Initial data:', data);
-        </script>
 
         <script src="{{url_for('static', filename='websitemain.js')}}"></script>
     </body>
