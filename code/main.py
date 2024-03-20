@@ -4759,7 +4759,7 @@ def get_initial_data(template_name, base_url=None):
         "halfTimePause": tkapp.pause_before_THE_final_match.get().replace("m", ""),
     }
     #print("initial_data", initial_data)
-    return make_response(render_template(template_name, initial_data=initial_data, base_url=base_url))
+    return make_response(render_template(template_name, initial_data=initial_data, base_url=base_url, bestScorerActive=tkapp.best_scorer_active.get() == 1))
 
 
 ##############################################################################################
