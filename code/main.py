@@ -2327,30 +2327,23 @@ class Window(ctk.CTk):
     def get_top_two_teams_KO_phase(self):
         query = """
         SELECT 
-            winningTeamId,
-            winningTeamName,
-            COUNT(*) as wins
-        FROM (
-            SELECT 
-                CASE 
-                    WHEN k.team1Goals > k.team2Goals THEN t1.id
-                    ELSE t2.id
-                END as winningTeamId,
-                CASE 
-                    WHEN k.team1Goals > k.team2Goals THEN t1.teamName
-                    ELSE t2.teamName
-                END as winningTeamName
-            FROM KOMatchesData k
-            LEFT JOIN teamData t1 ON t1.id = k.team1Id
-            LEFT JOIN teamData t2 ON t2.id = k.team2Id
-        ) as subquery
-        GROUP BY winningTeamId
-        ORDER BY wins DESC
-        LIMIT 4
+            CASE 
+            WHEN k.team1Goals > k.team2Goals THEN t1.id
+            ELSE t2.id
+            END as winningTeamId,
+            CASE 
+            WHEN k.team1Goals > k.team2Goals THEN t1.teamName
+            ELSE t2.teamName
+            END as winningTeamName
+        FROM KOMatchesData k
+        INNER JOIN teamData t1 ON t1.id = k.team1Id
+        INNER JOIN teamData t2 ON t2.id = k.team2Id
+        WHERE k.team1Goals > k.team2Goals OR k.team2Goals > k.team1Goals
+        ORDER BY k.matchId
         """
         self.cursor.execute(query)
         result = self.cursor.fetchall()
-
+        print("result", result)
         return result
 
 
