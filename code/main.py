@@ -3157,6 +3157,7 @@ class Window(ctk.CTk):
 
 
     def create_tippers_list_elements(self):
+        print("updated points")
         self.calculate_points_for_tippers_using_db()
 
         getTippers = """
@@ -3225,7 +3226,7 @@ class Window(ctk.CTk):
         getTippersAndMatches = """
         SELECT t.googleId, t.team1Goals, t.team2Goals, m.matchId, m.team1Id, m.team2Id, m.team1Goals, m.team2Goals 
         FROM tippingData t
-        INNER JOIN matchData m ON t.matchId = m.matchId
+        INNER JOIN matchData m ON t.matchId + 1 = m.matchId
         ORDER BY m.matchId ASC
         """
         self.cursor.execute(getTippersAndMatches)
@@ -3236,7 +3237,11 @@ class Window(ctk.CTk):
         update_points = {}
 
         for row in tippers_and_matches:
+            print("row", row)
             googleId, tipper_team1Goals, tipper_team2Goals, matchId, team1Id, team2Id, team1Goals, team2Goals = row
+            
+            #print all
+            print("googleId", googleId, "tipper_team1Goals", tipper_team1Goals, "tipper_team2Goals", tipper_team2Goals, "matchId", matchId, "team1Id", team1Id, "team2Id", team2Id, "team1Goals", team1Goals, "team2Goals", team2Goals)
 
             goal_difference = team1Goals - team2Goals
             team1won = team1Goals > team2Goals
@@ -3244,6 +3249,7 @@ class Window(ctk.CTk):
             
             if tipper_team1Goals == team1Goals and tipper_team2Goals == team2Goals:
                 points = 4
+                print("googleId", googleId, "points", points)
             elif (tipper_team1Goals - tipper_team2Goals) == goal_difference:
                 points = 3
             elif (tipper_team1Goals > tipper_team2Goals and team1won) or (tipper_team1Goals < tipper_team2Goals and team2won):
