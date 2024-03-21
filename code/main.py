@@ -2327,17 +2327,17 @@ class Window(ctk.CTk):
         query = """
         SELECT 
             CASE 
-            WHEN k.team1Goals > k.team2Goals THEN t1.id
+            WHEN k.team1Goals >= k.team2Goals THEN t1.id
             ELSE t2.id
             END as winningTeamId,
             CASE 
-            WHEN k.team1Goals > k.team2Goals THEN t1.teamName
+            WHEN k.team1Goals >= k.team2Goals THEN t1.teamName
             ELSE t2.teamName
             END as winningTeamName
         FROM KOMatchesData k
         INNER JOIN teamData t1 ON t1.id = k.team1Id
         INNER JOIN teamData t2 ON t2.id = k.team2Id
-        WHERE k.team1Goals > k.team2Goals OR k.team2Goals > k.team1Goals
+        WHERE k.team1Goals >= k.team2Goals OR k.team2Goals >= k.team1Goals
         ORDER BY k.matchId
         """
         self.cursor.execute(query)
@@ -3222,14 +3222,38 @@ class Window(ctk.CTk):
             
         
     def calculate_points_for_tippers_using_db(self):
-        getTippersAndMatches = """
+        getTippersAndMatchesGroup = """
         SELECT t.googleId, t.team1Goals, t.team2Goals, m.matchId, m.team1Id, m.team2Id, m.team1Goals, m.team2Goals 
         FROM tippingData t
         INNER JOIN matchData m ON t.matchId + 1 = m.matchId
         ORDER BY m.matchId ASC
         """
-        self.cursor.execute(getTippersAndMatches)
+        
+        getTippersAndMatchesKO = """
+        SELECT t.googleId, t.team1Goals, t.team2Goals, m.matchId, m.team1Id, m.team2Id, m.team1Goals, m.team2Goals
+        FROM tippingData t
+        INNER JOIN KOMatchesData m ON t.matchId * -1 - 99 = m.matchId
+        ORDER BY m.matchId ASC
+        """
+        
+        getTippersAndMatchesFinal = """
+        SELECT t.googleId, t.team1Goals, t.team2Goals, m.matchId, m.team1Id, m.team2Id, m.team1Goals, m.team2Goals
+        FROM tippingData t
+        INNER JOIN finalMatchesData m ON t.matchId * -1 - 1 = m.matchId
+        ORDER BY m.matchId ASC
+        """
+        
+        #tippingdatamatchid * -1
+        #komatchmatchid - 100 * -1
+        
+        self.cursor.execute(getTippersAndMatchesGroup)
         tippers_and_matches = self.cursor.fetchall()
+
+        self.cursor.execute(getTippersAndMatchesKO)
+        tippers_and_matches += self.cursor.fetchall()
+
+        self.cursor.execute(getTippersAndMatchesFinal)
+        tippers_and_matches += self.cursor.fetchall()
 
         #print("tippers_and_matches", tippers_and_matches)
         
@@ -3259,6 +3283,8 @@ class Window(ctk.CTk):
             #print("googleId", googleId, "points", points)
 
             update_points[googleId] = update_points.get(googleId, 0) + points
+        
+        
             
             
         for googleId, points in update_points.items():
