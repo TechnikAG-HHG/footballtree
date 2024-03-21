@@ -663,7 +663,6 @@ class Window(ctk.CTk):
             self.updated_data.update({"Matches": get_data_for_website(4)})
             self.updated_data.update({"finalMatches": get_data_for_website(6)})
             self.updated_data.update({"KOMatches": get_data_for_website(8)})
-
     
 
     def create_backup_of_db(self):
