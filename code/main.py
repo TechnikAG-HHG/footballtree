@@ -4593,8 +4593,8 @@ def get_data_for_website(which_data=-1):
                     return tkapp.cache.get("finalMatches")
             else:
                 return None
-        except NameError as e:
-            logging.error(f"Error in get_data_for_website(6) {e}")
+        except:
+            logging.error(f"Error in get_data_for_website(6)")
             return None
     
     elif which_data == 7:
