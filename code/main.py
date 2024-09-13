@@ -322,7 +322,8 @@ class Window(ctk.CTk):
             timeIntervalKO TEXT DEFAULT "",
             pauseBeforeKO TEXT DEFAULT "",
             timeBeforeSUP3AndTheFinalMatch TEXT DEFAULT "",
-            timeBeforeTHEFinalMatch TEXT DEFAULT ""
+            timeBeforeTHEFinalMatch TEXT DEFAULT "",
+            tippingActive BOOLEAN DEFAULT 0
         )
         """
         self.settingscursor.execute(settingsDataTableCreationQuery)
@@ -376,6 +377,7 @@ class Window(ctk.CTk):
         self.pause_mode = tk.IntVar(value=0)
         self.time_interval_for_only_the_final_match = tk.StringVar(value="10m")
         self.best_scorer_active = tk.BooleanVar(value=False)
+        self.tipping_active = tk.BooleanVar(value=False)
         self.there_is_an_ko_phase = tk.BooleanVar(value=False)
         self.time_pause_before_KO = tk.StringVar(value="0m")
         self.time_before_SUP3_and_the_final_match = tk.StringVar(value="0m")
@@ -441,6 +443,9 @@ class Window(ctk.CTk):
 
         if settings[22] is not None and settings[22] != "" and settings[22] != 0:
             self.pause_before_THE_final_match.set(value=settings[22])
+        
+        if settings[23] is not None and settings[23] != "" and settings[23] != 0:
+            self.tipping_active.set(value=settings[23])
             
         if self.debug_mode.get() == 1:
             self.console_handler.setLevel(logging.DEBUG)
@@ -3404,6 +3409,12 @@ class Window(ctk.CTk):
         
         best_scorer_active_switch = ctk.CTkSwitch(best_scorer_active_switch_frame, text="Best Scorer Active", variable=self.best_scorer_active, command=self.on_best_scorer_active_switch_change, font=("Helvetica", self.team_button_font_size*1.4, "bold"))
         best_scorer_active_switch.pack(side=tk.TOP, pady=2, padx=0, anchor=tk.N)
+        
+        self.tipping_active_switch_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
+        self.tipping_active_switch_frame.pack(pady=5, anchor=tk.NW, side=tk.TOP, padx=5)
+        
+        self.tipping_active_switch = ctk.CTkSwitch(self.tipping_active_switch_frame, text="Tipping Active", variable=self.tipping_active, command=self.on_tipping_active_switch_change, font=("Helvetica", self.team_button_font_size*1.4, "bold"))
+        self.tipping_active_switch.pack(side=tk.TOP, pady=2, padx=0, anchor=tk.N)
 
         # debug mode switcher
         debug_frame = ctk.CTkFrame(all_switcher_frame, bg_color='#0e1718', fg_color='#0e1718')
@@ -3797,7 +3808,20 @@ class Window(ctk.CTk):
         self.settingsconnection.commit()
         
         self.updated_data.update({"thereIsAnKoPhase": selected_value})
-
+        
+        
+    def on_tipping_active_switch_change(self):
+        selected_value = self.tipping_active.get()
+        saveModeInDB = """
+        UPDATE settingsData
+        SET tippingActive = ?
+        WHERE id = 1
+        """
+        self.settingscursor.execute(saveModeInDB, (selected_value,))
+        self.settingsconnection.commit()
+        
+        self.updated_data.update({"tippingActive": selected_value})
+        
 
     def on_pause_button_change(self):
         #######################################
@@ -4755,7 +4779,7 @@ def ich_kann_nicht_mehr(teamID, team2ID):
     
     return goals
         
-  
+
 def get_initial_data(template_name, base_url=None):
     global initial_data
     
@@ -4781,6 +4805,7 @@ def get_initial_data(template_name, base_url=None):
         "pauseBeforeTheFinalMatch": tkapp.time_before_SUP3_and_the_final_match.get().replace("m", ""),
         "pauseBeforeKOMatches": tkapp.time_pause_before_KO.get().replace("m", ""),
         "halfTimePause": tkapp.pause_before_THE_final_match.get().replace("m", ""),
+        "tippingActive": tkapp.tipping_active.get(),
     }
     #print("initial_data", initial_data)
     return make_response(render_template(template_name, initial_data=initial_data, base_url=base_url, bestScorerActive=tkapp.best_scorer_active.get() == 1))
@@ -4847,7 +4872,7 @@ def callback():
         return redirect(session.pop("next", "/"))
     except:
         return redirect("/login")
- 
+
 @app.route("/logout")
 def logout():
     session.clear()
@@ -4937,8 +4962,8 @@ def send_tipping_data():
             return "Match already started or finished (1)", 400
     elif tkapp.active_match != -1 and tkapp.active_mode.get() == 2:
         match_id_temp = (match_id * -1) - 2
-        if (match_id_temp <= tkapp.active_match) and not (match_id_temp == 0 and tkapp.pause_mode.get() == 2) and not (match_id_temp == 2 and tkapp.pause_mode.get() == 3):
-            return "Match already started or finished (2)", 400
+        if (match_id_temp <= tkapp.active_match) and not (match_id_temp == 0 and tkapp.pause_mode.get() == 2) and not (match_id_temp == 2 and tkapp.pause_mode.get() == 3) and not (match_id_temp == 3 and tkapp.pause_mode.get() == 4):
+            return f"Match already started or finished (2)", 400
     elif tkapp.active_match != -1 and tkapp.active_mode.get() == 3:
         match_id_temp = (match_id * -1) - 100
         if (match_id_temp <= tkapp.active_match) and not (match_id_temp == 0 and tkapp.pause_mode.get() == 1):
