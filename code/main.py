@@ -2846,6 +2846,8 @@ class Window(ctk.CTk):
         self.cache_vars["getgoals_changed_using_var"] = True
         logging.debug(f"global_scored_a_point teamID: {teamID}, team2ID: {team2ID}, direction: {direction}")
         current_score = self.read_goals_for_match_from_db(teamID, team2ID)
+        if current_score == None:
+            current_score = 0
         old_goals = current_score
         
         # Update the score
