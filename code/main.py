@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from tkinter import filedialog
 import tkinter.messagebox
 import customtkinter as ctk
@@ -25,6 +25,12 @@ import platform
 import subprocess
 import json
 import traceback
+
+# clear console
+if platform.system() == 'Windows':
+    os.system('cls')
+else:
+    os.system('clear')
 
 app = Flask(__name__)
 app.secret_key = "Felix.com"
@@ -360,97 +366,117 @@ class Window(ctk.CTk):
         
     
     def load_settings(self):
-        # get the settings from the database
-        self.settingscursor.execute("SELECT * FROM settingsData")
-        settings = self.settingscursor.fetchone()
-        
-        # create the variables for the settings
-        self.volume = tk.IntVar(value=50)
-        self.active_mode = tk.IntVar(value=-1)
-        self.debug_mode = tk.IntVar(value=0)
-        self.start_time = tk.StringVar(value="08:00")
-        self.time_interval = tk.StringVar(value="10m")
-        self.time_intervalFM = tk.StringVar(value="10m")
-        self.time_intervalKO = tk.StringVar(value="10m")
-        self.time_pause_before_FM = tk.StringVar(value="0m") 
-        self.website_title = tk.StringVar(value="HHG-Fußballturnier")
-        self.pause_mode = tk.IntVar(value=0)
-        self.time_interval_for_only_the_final_match = tk.StringVar(value="10m")
-        self.best_scorer_active = tk.BooleanVar(value=False)
-        self.tipping_active = tk.BooleanVar(value=False)
-        self.there_is_an_ko_phase = tk.BooleanVar(value=False)
-        self.time_pause_before_KO = tk.StringVar(value="0m")
-        self.time_before_SUP3_and_the_final_match = tk.StringVar(value="0m")
-        self.pause_before_THE_final_match = tk.StringVar(value="0m")
-        
-        # load the settings from the database into the variables
-        if settings[5] is not None and settings[5] != "" and settings[5] != 0:
-            self.volume.set(value=settings[5])
+        try:
+            # get the settings from the database
+            self.settingscursor.execute("SELECT * FROM settingsData")
+            settings = self.settingscursor.fetchone()
             
-        if settings[6] is not None and settings[6] != "" and settings[6] != 0:
-            logging.debug(f"settings[6]: {settings[6]}")
-            self.active_mode.set(value=settings[6])
-        
-        if settings[7] is not None and settings[7] != "" and settings[7] != 0:
-            logging.debug(f"settings[7]: {settings[7]}")
-            self.debug_mode.set(value=settings[7])
-        
-        if settings[8] is not None and settings[8] != "" and settings[8] != 0:
-            self.start_time.set(value=settings[8])
+            # create the variables for the settings
+            self.volume = tk.IntVar(value=50)
+            self.active_mode = tk.IntVar(value=-1)
+            self.debug_mode = tk.IntVar(value=0)
+            self.start_time = tk.StringVar(value="08:00")
+            self.time_interval = tk.StringVar(value="10m")
+            self.time_intervalFM = tk.StringVar(value="10m")
+            self.time_intervalKO = tk.StringVar(value="10m")
+            self.time_pause_before_FM = tk.StringVar(value="0m") 
+            self.website_title = tk.StringVar(value="HHG-Fußballturnier")
+            self.pause_mode = tk.IntVar(value=0)
+            self.time_interval_for_only_the_final_match = tk.StringVar(value="10m")
+            self.best_scorer_active = tk.BooleanVar(value=False)
+            self.tipping_active = tk.BooleanVar(value=False)
+            self.there_is_an_ko_phase = tk.BooleanVar(value=False)
+            self.time_pause_before_KO = tk.StringVar(value="0m")
+            self.time_before_SUP3_and_the_final_match = tk.StringVar(value="0m")
+            self.pause_before_THE_final_match = tk.StringVar(value="0m")
             
-        if settings[9] is not None and settings[9] != "" and settings[9] != 0:
-            self.time_interval.set(value=settings[9])
+            # load the settings from the database into the variables
+            if settings[5] is not None and settings[5] != "" and settings[5] != 0:
+                self.volume.set(value=settings[5])
+                
+            if settings[6] is not None and settings[6] != "" and settings[6] != 0:
+                logging.debug(f"settings[6]: {settings[6]}")
+                self.active_mode.set(value=settings[6])
             
-        if settings[10] is not None and settings[10] != "" and settings[10] != 0:
-            self.time_intervalFM.set(value=settings[10])
+            if settings[7] is not None and settings[7] != "" and settings[7] != 0:
+                logging.debug(f"settings[7]: {settings[7]}")
+                self.debug_mode.set(value=settings[7])
             
-        if settings[11] is not None and settings[11] != "" and settings[11] != 0:
-            self.time_pause_before_FM.set(value=settings[11])
+            if settings[8] is not None and settings[8] != "" and settings[8] != 0:
+                self.start_time.set(value=settings[8])
+                
+            if settings[9] is not None and settings[9] != "" and settings[9] != 0:
+                self.time_interval.set(value=settings[9])
+                
+            if settings[10] is not None and settings[10] != "" and settings[10] != 0:
+                self.time_intervalFM.set(value=settings[10])
+                
+            if settings[11] is not None and settings[11] != "" and settings[11] != 0:
+                self.time_pause_before_FM.set(value=settings[11])
+                
+            if settings[12] is not None and settings[12] != "" and settings[12] != 0:
+                self.website_title.set(value=settings[12])
             
-        if settings[12] is not None and settings[12] != "" and settings[12] != 0:
-            self.website_title.set(value=settings[12])
-        
-        if settings[13] is not None and settings[13] != "" and settings[13] != 0:
+            if settings[13] is not None and settings[13] != "" and settings[13] != 0:
 
-            self.teams_playing = ast.literal_eval(settings[13])
-            logging.debug(f"self.teams_playing: {self.teams_playing[0]}")
-            logging.debug(f"settings[13]: {settings[13]}")
-            logging.debug(f"Type of self.teams_playing: {type(self.teams_playing)}")
-        
-        if settings[14] is not None:
-            self.active_match = settings[14]
+                self.teams_playing = ast.literal_eval(settings[13])
+                logging.debug(f"self.teams_playing: {self.teams_playing[0]}")
+                logging.debug(f"settings[13]: {settings[13]}")
+                logging.debug(f"Type of self.teams_playing: {type(self.teams_playing)}")
             
-        if settings[15] is not None and settings[15] != "" and settings[15] != 0:
-            self.pause_mode.set(value=settings[15])
-        
-        if settings[16] is not None and settings[16] != "" and settings[16] != 0:
-            self.time_interval_for_only_the_final_match.set(value=settings[16])
+            if settings[14] is not None:
+                self.active_match = settings[14]
+                
+            if settings[15] is not None and settings[15] != "" and settings[15] != 0:
+                self.pause_mode.set(value=settings[15])
             
-        if settings[17] is not None and settings[17] != "" and settings[17] != 0:
-            self.best_scorer_active.set(value=settings[17])
+            if settings[16] is not None and settings[16] != "" and settings[16] != 0:
+                self.time_interval_for_only_the_final_match.set(value=settings[16])
+                
+            if settings[17] is not None and settings[17] != "" and settings[17] != 0:
+                self.best_scorer_active.set(value=settings[17])
 
-        if settings[18] is not None and settings[18] != "" and settings[18] != 0:
-            self.there_is_an_ko_phase.set(value=settings[18])
+            if settings[18] is not None and settings[18] != "" and settings[18] != 0:
+                self.there_is_an_ko_phase.set(value=settings[18])
 
-        if settings[19] is not None and settings[19] != "" and settings[19] != 0:
-            self.time_intervalKO.set(value=settings[19])
+            if settings[19] is not None and settings[19] != "" and settings[19] != 0:
+                self.time_intervalKO.set(value=settings[19])
 
-        if settings[20] is not None and settings[20] != "" and settings[20] != 0:
-            self.time_pause_before_KO.set(value=settings[20])
+            if settings[20] is not None and settings[20] != "" and settings[20] != 0:
+                self.time_pause_before_KO.set(value=settings[20])
 
-        if settings[21] is not None and settings[21] != "" and settings[21] != 0:
-            self.time_before_SUP3_and_the_final_match.set(value=settings[21])
+            if settings[21] is not None and settings[21] != "" and settings[21] != 0:
+                self.time_before_SUP3_and_the_final_match.set(value=settings[21])
 
-        if settings[22] is not None and settings[22] != "" and settings[22] != 0:
-            self.pause_before_THE_final_match.set(value=settings[22])
-        
-        if settings[23] is not None and settings[23] != "" and settings[23] != 0:
-            self.tipping_active.set(value=settings[23])
+            if settings[22] is not None and settings[22] != "" and settings[22] != 0:
+                self.pause_before_THE_final_match.set(value=settings[22])
             
-        if self.debug_mode.get() == 1:
-            self.console_handler.setLevel(logging.DEBUG)
-        elif self.debug_mode.get() == 0:
-            self.console_handler.setLevel(logging.ERROR)
+            if settings[23] is not None and settings[23] != "" and settings[23] != 0:
+                self.tipping_active.set(value=settings[23])
+                
+            if self.debug_mode.get() == 1:
+                self.console_handler.setLevel(logging.DEBUG)
+            elif self.debug_mode.get() == 0:
+                self.console_handler.setLevel(logging.ERROR)
+        
+        except IndexError:
+            selection = messagebox.askyesno("Error", "There was an error while loading the settings. Do you want to reset the settings? In every case the program will be stopped.")
+            if selection:
+                self.reset_settings()
+            else:
+                self.destroy()
+                return
+            
+    
+    def reset_settings(self):
+        # delete the settings file and restart the program
+        
+        self.settingscursor.close()
+        self.settingsconnection.close()
+        
+        self.destroy()
+        os.remove("data/settings.db")
+        
     
     
     ##############################################################################################
@@ -1347,7 +1373,7 @@ class Window(ctk.CTk):
         
         none_count = self.teams_playing.count(None)
         
-        if none_count == 0 and self.teams_playing:
+        if none_count == 0 and self.teams_playing and not self.manual_select_active:
         
             ######################################################
             #Time Display
@@ -1403,7 +1429,7 @@ class Window(ctk.CTk):
         
         self.create_matches_labels(manual_frame)
 
-        if none_count == 0 and self.teams_playing:
+        if none_count == 0 and self.teams_playing[0] is not None and self.teams_playing[1] is not None:
             self.configure_team_select(self.manual_team_select_2, tk.NORMAL, team_names[self.teams_playing[0]])
             self.configure_team_select(self.manual_team_select_1, tk.NORMAL, team_names[self.teams_playing[1]])
         elif none_count == 2:
@@ -2846,6 +2872,9 @@ class Window(ctk.CTk):
         self.cache_vars["getgoals_changed_using_var"] = True
         logging.debug(f"global_scored_a_point teamID: {teamID}, team2ID: {team2ID}, direction: {direction}")
         current_score = self.read_goals_for_match_from_db(teamID, team2ID)
+        is_current_score_not_defined = True if current_score == None else False
+        if current_score == None:
+            current_score = 0
         old_goals = current_score
         
         # Update the score
@@ -2861,7 +2890,7 @@ class Window(ctk.CTk):
             return
             
         # Write the score into the database
-        if self.write_score_for_team_into_db(teamID, team2ID, old_goals, direction):
+        if not is_current_score_not_defined and self.write_score_for_team_into_db(teamID, team2ID, old_goals, direction):
             # Update the score label
             self.spiel_buttons[teamID]["global"][3].set(str(current_score))
             self.updated_data.update({"Goals": get_data_for_website(1)})
