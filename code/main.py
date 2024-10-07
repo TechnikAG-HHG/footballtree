@@ -1403,7 +1403,7 @@ class Window(ctk.CTk):
         
         self.create_matches_labels(manual_frame)
 
-        if none_count == 0 and self.teams_playing:
+        if none_count == 0 and self.teams_playing[0] is not None and self.teams_playing[1] is not None:
             self.configure_team_select(self.manual_team_select_2, tk.NORMAL, team_names[self.teams_playing[0]])
             self.configure_team_select(self.manual_team_select_1, tk.NORMAL, team_names[self.teams_playing[1]])
         elif none_count == 2:
