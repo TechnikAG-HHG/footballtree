@@ -101,7 +101,13 @@ function generateTableGroup(matches) {
             cellMatchNumber.textContent = 'Spiel ' + matchNumber;
 
             var cellGroup = row.insertCell(2);
-            cellGroup.textContent = `Gruppe ${match[4]}`;
+            if (match[4] == 1) {
+                cellGroup.textContent = 'Gruppe A';
+            } else if (match[4] == 2) {
+                cellGroup.textContent = 'Gruppe B';
+            } else {
+                cellGroup.textContent = '???';
+            }
 
             var cellFirstTeam = row.insertCell(3);
             cellFirstTeam.textContent = match[0];
