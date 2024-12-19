@@ -160,6 +160,9 @@ class Window(ctk.CTk):
         if platform.system() == 'Windows':
             self.media_player_instance = vlc.Instance()
             self.media_player_instance.log_unset()
+        else:
+            self.media_player_instance = vlc.Instance("--no-xlib")
+            self.media_player_instance.log_unset()
         
 
         # Create and pack the navigation bar
@@ -3986,23 +3989,31 @@ class Window(ctk.CTk):
         #logging.debug(self.updated_data)
         self.updated_data = {}
         
-        
+    
     def play_mp3(self, file_path, volume=""):
         if file_path == "":
             return
         if volume == "":
             volume = self.volume
-
-        if self.media_player_instance_save != None:
+    
+        if self.media_player_instance_save is not None:
             self.media_player_instance_save.release()
-        
-        player = self.media_player_instance.media_player_new()
-        media = self.media_player_instance.media_new(file_path)
-        player.set_media(media)
-        player.audio_set_volume(int(volume.get()))
-        player.play()
-        self.media_player_instance_save = player
-        #logging.debug("play_mp3", file_path, "volume", volume.get(), "self.volume", self.volume.get(), "player", player,"media", media)
+    
+        # Add logging to check the state of media_player_instance
+        logging.debug(f"media_player_instance: {self.media_player_instance}")
+        logging.debug(f"type(media_player_instance): {type(self.media_player_instance)}")
+    
+        try:
+            player = self.media_player_instance.media_player_new()
+            media = self.media_player_instance.media_new(file_path)
+            player.set_media(media)
+            player.audio_set_volume(int(volume.get()))
+            player.play()
+            self.media_player_instance_save = player
+        except AttributeError as e:
+            logging.error(f"AttributeError: {e}")
+            logging.error("media_player_instance might not be properly initialized.")
+        # logging.debug("play_mp3", file_path, "volume", volume.get(), "self.volume", self.volume.get(), "player", player, "media", media)
    
         
     ##############################################################################################
